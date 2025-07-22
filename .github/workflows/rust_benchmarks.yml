@@ -34,14 +34,11 @@ jobs:
           toolchain: nightly
           override: true
 
-      - name: Install SP1 toolchain
-        run: |
-          curl -L https://sp1up.succinct.xyz | bash
-          ~/.sp1/bin/sp1up 
-          ~/.sp1/bin/cargo-prove prove --version
+      - name: Install SP1
+        uses: ./.github/actions/install-sp1
 
-      - name: Install powdr
-        run: cargo install cargo-powdr
+      - name: Install Powdr
+        uses: ./.github/actions/install-powdr
 
       - name: Build full workspace (release)
         run: cargo build --release --workspace
@@ -69,6 +66,12 @@ jobs:
         with:
           toolchain: nightly
           override: true
+
+      - name: Install SP1
+        uses: ./.github/actions/install-sp1
+
+      - name: Install Powdr
+        uses: ./.github/actions/install-powdr
 
       - name: Run workspace benchmarks
         run: cargo bench
