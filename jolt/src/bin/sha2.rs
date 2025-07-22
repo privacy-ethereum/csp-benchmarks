@@ -1,6 +1,6 @@
 use jolt::Serializable;
 use std::time::Instant;
-use utils::{bench::Metrics, bench::benchmark, metadata::SHA2_INPUTS, sha2_input};
+use utils::{bench::benchmark, bench::Metrics, metadata::SHA2_INPUTS, sha2_input};
 
 const TARGET_DIR: &str = "./sha2-guest";
 

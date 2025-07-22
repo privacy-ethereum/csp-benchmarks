@@ -10,7 +10,6 @@ use serde::Serialize;
 
 pub mod bench;
 pub mod metadata;
-pub mod profile;
 
 pub fn sha2_input(num_bytes: usize) -> Vec<u8> {
     let mut rng = StdRng::seed_from_u64(1337);
