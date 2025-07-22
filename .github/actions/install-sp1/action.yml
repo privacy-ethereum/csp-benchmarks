@@ -2,10 +2,12 @@ name: "Install SP1 toolchain"
 description: "Installs the SP1 toolchain"
 runs:
   using: "composite"
+  env:
+    SP1_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   steps:
     - shell: bash
       run: |
         curl -L https://sp1up.succinct.xyz | bash
         source ~/.bashrc
-        ~/.sp1/bin/sp1up 
+        ~/.sp1/bin/sp1up --token $SP1_TOKEN
         ~/.sp1/bin/cargo-prove prove --version
