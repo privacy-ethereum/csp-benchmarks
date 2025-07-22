@@ -21,6 +21,9 @@ fn benchmark_sha2(num_bytes: usize) -> Metrics {
     let verifier = sha2_guest::build_verifier_sha2(verifier_preprocessing);
 
     let input = sha2_input(num_bytes);
+    let program_summary = sha2_guest::analyze_sha2(&input);
+    metrics.cycles = program_summary.processed_trace.len() as u64;
+    
     let start = Instant::now();
     let (output, proof) = prover(&input);
     metrics.proof_duration = start.elapsed();

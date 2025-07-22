@@ -65,6 +65,8 @@ pub struct Metrics {
     #[serde_as(as = "DurationNanoSeconds")]
     #[tabled(display_with = "display_duration")]
     pub verify_duration: Duration,
+    #[tabled(display_with = "display_cycles")]
+    pub cycles: u64,
     #[tabled(display_with = "display_bytes")]
     pub proof_size: usize,
     #[tabled(display_with = "display_bytes")]
@@ -73,6 +75,10 @@ pub struct Metrics {
 
 fn display_bytes(bytes: &usize) -> String {
     bytes.human_count_bytes().to_string()
+}
+
+fn display_cycles(cycles: &u64) -> String {
+    cycles.human_count_bare().to_string()
 }
 
 fn display_duration(duration: &Duration) -> String {
@@ -85,6 +91,7 @@ impl Metrics {
             input_size: size,
             proof_duration: Duration::default(),
             verify_duration: Duration::default(),
+            cycles: 0,
             proof_size: 0,
             peak_memory: 0,
         }
