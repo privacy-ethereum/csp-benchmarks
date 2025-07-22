@@ -11,5 +11,5 @@ runs:
       run: |
         curl -L https://sp1up.succinct.xyz | bash
         source ~/.bashrc
-        ~/.sp1/bin/sp1up -C v5.0.8 --token ${{ inputs.token }}
+        ~/.sp1/bin/sp1up -v v4.2.0 --token ${{ inputs.token }}
         ~/.sp1/bin/cargo-prove prove --version
