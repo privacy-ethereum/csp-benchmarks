@@ -31,7 +31,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: nightly-2025-02-20-aarch64-apple-darwin
           override: true
           profile: default
           default: true
@@ -69,7 +69,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: nightly-2025-02-20-aarch64-apple-darwin
           override: true
           profile: default
           default: true
