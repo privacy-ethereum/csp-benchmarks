@@ -36,6 +36,8 @@ jobs:
 
       - name: Install SP1
         uses: ./.github/actions/install-sp1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Powdr
         uses: ./.github/actions/install-powdr
@@ -69,6 +71,8 @@ jobs:
 
       - name: Install SP1
         uses: ./.github/actions/install-sp1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Powdr
         uses: ./.github/actions/install-powdr
