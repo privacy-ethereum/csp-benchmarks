@@ -3,4 +3,5 @@ description: "Installs the Powdr toolchain"
 runs:
   using: "composite"
   steps:
-    - run: cargo install cargo-powdr
+    - shell: bash
+      run: cargo install cargo-powdr
