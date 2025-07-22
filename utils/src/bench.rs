@@ -57,30 +57,22 @@ pub fn measure_peak_memory<R, F: FnOnce() -> R>(func: F) -> (R, usize) {
 #[serde_as]
 #[derive(Serialize, Tabled)]
 pub struct Metrics {
-    pub size: usize,
-    #[serde_as(as = "DurationNanoSeconds")]
-    #[tabled(display_with = "display_duration")]
-    pub exec_duration: Duration,
+    #[tabled(display_with = "display_bytes")]
+    pub input_size: usize,
     #[serde_as(as = "DurationNanoSeconds")]
     #[tabled(display_with = "display_duration")]
     pub proof_duration: Duration,
     #[serde_as(as = "DurationNanoSeconds")]
     #[tabled(display_with = "display_duration")]
     pub verify_duration: Duration,
-    #[tabled(display_with = "display_cycles")]
-    pub cycles: u64,
     #[tabled(display_with = "display_bytes")]
-    pub proof_bytes: usize,
+    pub proof_size: usize,
     #[tabled(display_with = "display_bytes")]
     pub peak_memory: usize,
 }
 
 fn display_bytes(bytes: &usize) -> String {
     bytes.human_count_bytes().to_string()
-}
-
-fn display_cycles(cycles: &u64) -> String {
-    cycles.human_count_bare().to_string()
 }
 
 fn display_duration(duration: &Duration) -> String {
@@ -90,12 +82,10 @@ fn display_duration(duration: &Duration) -> String {
 impl Metrics {
     pub fn new(size: usize) -> Self {
         Metrics {
-            size,
-            exec_duration: Duration::default(),
+            input_size: size,
             proof_duration: Duration::default(),
             verify_duration: Duration::default(),
-            cycles: 0,
-            proof_bytes: 0,
+            proof_size: 0,
             peak_memory: 0,
         }
     }
