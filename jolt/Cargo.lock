@@ -1853,6 +1853,7 @@ version = "0.1.0"
 dependencies = [
  "hex",
  "jolt-sdk",
+ "memory-stats",
  "sha2-guest",
  "utils",
 ]
