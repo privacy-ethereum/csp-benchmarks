@@ -91,6 +91,7 @@ impl Metrics {
             output_bytes: 0,
             proof_bytes: 0,
             speed: 0.0,
+            peak_memory: 0,
         }
     }
 }
