@@ -14,9 +14,8 @@ The benchmark code is from RISC Zero benchmark code:
 cd risc0
 ```
 
-3. Run the script according to hardware
+3. Run the bench & measure the RAM usage
 
 ```console
-chmod +x ./risc0_proving_mac.sh
-./risc0_proving_mac.sh
+cargo run --release -- big-sha2
 ```

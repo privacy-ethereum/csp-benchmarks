@@ -28,6 +28,7 @@ use risc0_zkvm::{
 use serde::Serialize;
 use serde_with::{serde_as, DurationNanoSeconds};
 use tabled::{settings::Style, Table, Tabled};
+use memory_stats::memory_stats;
 
 #[serde_as]
 #[derive(Serialize, Tabled)]
@@ -56,6 +57,8 @@ pub struct Metrics {
     pub output_bytes: usize,
     #[tabled(display_with = "display_bytes")]
     pub proof_bytes: usize,
+    #[tabled(display_with = "display_bytes")]
+    pub peak_memory: usize,
 }
 
 fn display_bytes(bytes: &usize) -> String {
@@ -136,7 +139,10 @@ impl Job {
         let ctx = VerifierContext::default();
 
         let start = Instant::now();
+        let usage_before = memory_stats().unwrap();
         let receipt = prover.prove_session(&ctx, &session).unwrap().receipt;
+        let usage_after = memory_stats().unwrap();
+        metrics.peak_memory = (usage_after.physical_mem - usage_before.physical_mem) as usize;
         metrics.proof_duration = start.elapsed();
 
         metrics.total_duration = metrics.exec_duration + metrics.proof_duration;
