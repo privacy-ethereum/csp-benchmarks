@@ -652,6 +652,7 @@ dependencies = [
  "clap",
  "criterion",
  "itertools 0.13.0",
+ "memory-stats",
  "rand 0.8.5",
  "tikv-jemalloc-ctl",
  "tikv-jemallocator",
