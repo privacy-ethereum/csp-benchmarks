@@ -6035,6 +6035,7 @@ dependencies = [
  "bincode",
  "clap",
  "criterion",
+ "memory-stats",
  "serde",
  "serde_json",
  "sha-lib",
