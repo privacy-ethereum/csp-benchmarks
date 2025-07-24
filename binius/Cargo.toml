@@ -40,6 +40,9 @@ name = "sha256_bench"
 harness = false
 
 [[bin]]
-name = "measure"
-path = "src/bin/measure.rs"
+name = "measure_lookup"
+path = "src/bin/measure_lookup.rs"
 
+[[bin]]
+name = "measure_no_lookup"
+path = "src/bin/measure_no_lookup.rs"
