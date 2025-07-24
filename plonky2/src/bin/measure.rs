@@ -1,10 +1,3 @@
-#[cfg(not(target_env = "msvc"))]
-use tikv_jemallocator::Jemalloc;
-
-#[cfg(not(target_env = "msvc"))]
-#[global_allocator]
-static GLOBAL: Jemalloc = Jemalloc;
-
 use plonky2::{plonk::config::PoseidonGoldilocksConfig, util::serialization::Write};
 use plonky2_sha256::bench::{prove, sha256_no_lookup_prepare};
 use plonky2_u32::gates::arithmetic_u32::{U32GateSerializer, U32GeneratorSerializer};

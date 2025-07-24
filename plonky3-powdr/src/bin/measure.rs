@@ -1,10 +1,4 @@
 use sha::bench::{prepare_pipeline, prove, verify};
-#[cfg(not(target_env = "msvc"))]
-use tikv_jemallocator::Jemalloc;
-
-#[cfg(not(target_env = "msvc"))]
-#[global_allocator]
-static GLOBAL: Jemalloc = Jemalloc;
 use utils::bench::measure_peak_memory;
 
 fn main() {

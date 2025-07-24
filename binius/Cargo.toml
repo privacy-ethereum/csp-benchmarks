@@ -31,8 +31,6 @@ rand = { workspace = true }
 tracing-profile = "0.10.3"
 tracing = { workspace = true }
 criterion = { workspace = true }
-tikv-jemalloc-ctl = { workspace = true }
-tikv-jemallocator = { workspace = true }
 utils = { path="../utils" }
 
 [[bench]]
