@@ -14,7 +14,6 @@ lto = "fat"
 [dependencies]
 jolt = { package = "jolt-sdk", git = "https://github.com/a16z/jolt", rev = "edce59e951725973f425ff4d04f1ac19de0ece8e", features = ["host"] }
 hex = "0.4.3"
-memory-stats = "1.2.0"
 
 sha2-guest = { path = "./sha2-guest" }
 utils = { path = "../utils" }

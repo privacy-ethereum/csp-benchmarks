@@ -1,8 +1,8 @@
 # RISC Zero(zkVM) SHA256 Benchmarks
 
-The benchmark code is from RISC Zero benchmark code:
+The benchmark code is from the following one:
 
-* https://github.com/risc0/risc0/tree/main/benchmarks
+* https://github.com/kkrt-labs/zkvm-benchmarks/tree/master/risczero
 
 ## How to run
 
@@ -17,5 +17,5 @@ cd risc0
 3. Run the bench & measure the RAM usage
 
 ```console
-cargo run --release -- big-sha2
+RUSTFLAGS="-C target-cpu=native" cargo run --release --bin sha2
 ```

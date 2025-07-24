@@ -1,6 +1,5 @@
 use jolt::Serializable;
 use std::time::Instant;
-use memory_stats::memory_stats;
 use utils::{bench::benchmark, bench::Metrics, metadata::SHA2_INPUTS, sha2_input};
 
 const TARGET_DIR: &str = "./sha2-guest";
@@ -25,13 +24,10 @@ fn benchmark_sha2(num_bytes: usize) -> Metrics {
     let program_summary = sha2_guest::analyze_sha2(&input);
     metrics.cycles = program_summary.processed_trace.len() as u64;
     
-    let usage_before = memory_stats().unwrap();
     let start = Instant::now();
     let (output, proof) = prover(&input);
     metrics.proof_duration = start.elapsed();
     metrics.proof_size = proof.size().unwrap();
-    let usage_after = memory_stats().unwrap();
-    metrics.prover_ram = (usage_after.physical_mem - usage_before.physical_mem) as usize;
 
     let start = Instant::now();
     let _verify_result = verifier(&input, output, proof);

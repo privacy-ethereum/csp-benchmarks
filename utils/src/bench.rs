@@ -70,8 +70,6 @@ pub struct Metrics {
     #[tabled(display_with = "display_bytes")]
     pub proof_size: usize,
     #[tabled(display_with = "display_bytes")]
-    pub prover_ram: usize,
-    #[tabled(display_with = "display_bytes")]
     pub peak_memory: usize,
 }
 
@@ -95,7 +93,6 @@ impl Metrics {
             verify_duration: Duration::default(),
             cycles: 0,
             proof_size: 0,
-            prover_ram: 0,
             peak_memory: 0,
         }
     }
