@@ -1,8 +1,58 @@
 use human_repr::{HumanCount, HumanDuration};
 use serde::Serialize;
 use serde_with::{serde_as, DurationNanoSeconds};
-use std::time::Duration;
+use std::{
+    fmt::Display,
+    sync::{
+        atomic::{AtomicBool, AtomicUsize, Ordering},
+        Arc,
+    },
+    thread,
+    time::Duration,
+};
 use tabled::{settings::Style, Table, Tabled};
+
+fn get_current_memory_usage() -> Result<usize, std::io::Error> {
+    unsafe {
+        let mut out: libc::rusage = std::mem::zeroed();
+        libc::getrusage(libc::RUSAGE_SELF, &mut out);
+        #[cfg(target_os = "linux")]
+        {
+            Ok(out.ru_maxrss as usize * 1024)
+        }
+        #[cfg(target_os = "macos")]
+        {
+            Ok(out.ru_maxrss as usize)
+        }
+        #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+        {
+            compile_error!("This crate only supports Linux and macOS for memory measurement");
+        }
+    }
+}
+
+pub fn measure_peak_memory<R, F: FnOnce() -> R>(func: F) -> (R, usize) {
+    let peak = Arc::new(AtomicUsize::new(0));
+    let stop = Arc::new(AtomicBool::new(false));
+
+    let peak_clone = Arc::clone(&peak);
+    let stop_clone = Arc::clone(&stop);
+    let monitor = thread::spawn(move || {
+        while !stop_clone.load(Ordering::Relaxed) {
+            if let Ok(mem) = get_current_memory_usage() {
+                peak_clone.fetch_max(mem, Ordering::Relaxed);
+            }
+            thread::sleep(Duration::from_millis(10));
+        }
+    });
+
+    let result = func();
+
+    stop.store(true, Ordering::Relaxed);
+    monitor.join().unwrap();
+
+    (result, peak.load(Ordering::Relaxed))
+}
 
 #[serde_as]
 #[derive(Serialize, Tabled)]
@@ -19,6 +69,8 @@ pub struct Metrics {
     pub cycles: u64,
     #[tabled(display_with = "display_bytes")]
     pub proof_size: usize,
+    #[tabled(display_with = "display_bytes")]
+    pub prover_ram: usize,
     #[tabled(display_with = "display_bytes")]
     pub peak_memory: usize,
 }
@@ -43,9 +95,24 @@ impl Metrics {
             verify_duration: Duration::default(),
             cycles: 0,
             proof_size: 0,
+            prover_ram: 0,
             peak_memory: 0,
         }
     }
+}
+
+pub fn benchmark<T: Display + Clone, F>(func: F, inputs: &[T], file: &str)
+where
+    F: Fn(T) -> Metrics,
+{
+    let mut results = Vec::new();
+    for input in inputs {
+        let (mut metrics, peak_memory) = measure_peak_memory(|| func(input.clone()));
+        metrics.peak_memory = peak_memory;
+        results.push(metrics);
+    }
+
+    write_csv(file, &results);
 }
 
 pub fn write_csv(out_path: &str, results: &[Metrics]) {

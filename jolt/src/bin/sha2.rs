@@ -1,20 +1,14 @@
 use jolt::Serializable;
 use std::time::Instant;
 use memory_stats::memory_stats;
-use utils::{bench::write_csv, bench::Metrics, metadata::SHA2_INPUTS, sha2_input};
+use utils::{bench::benchmark, bench::Metrics, metadata::SHA2_INPUTS, sha2_input};
 
 const TARGET_DIR: &str = "./sha2-guest";
 
 fn main() {
     let csv_file = format!("sha2_jolt{}{}.csv", "", "");
 
-    let mut results = Vec::new();
-    for input in &SHA2_INPUTS {
-        let metrics = benchmark_sha2(*input);
-        results.push(metrics);
-    }
-
-    write_csv(&csv_file, &results);
+    benchmark(benchmark_sha2, &SHA2_INPUTS, &csv_file);
 }
 
 fn benchmark_sha2(num_bytes: usize) -> Metrics {
@@ -37,7 +31,7 @@ fn benchmark_sha2(num_bytes: usize) -> Metrics {
     metrics.proof_duration = start.elapsed();
     metrics.proof_size = proof.size().unwrap();
     let usage_after = memory_stats().unwrap();
-    metrics.peak_memory = (usage_after.physical_mem - usage_before.physical_mem) as usize;
+    metrics.prover_ram = (usage_after.physical_mem - usage_before.physical_mem) as usize;
 
     let start = Instant::now();
     let _verify_result = verifier(&input, output, proof);

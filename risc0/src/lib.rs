@@ -58,7 +58,7 @@ pub struct Metrics {
     #[tabled(display_with = "display_bytes")]
     pub proof_bytes: usize,
     #[tabled(display_with = "display_bytes")]
-    pub peak_memory: usize,
+    pub prover_ram: usize,
 }
 
 fn display_bytes(bytes: &usize) -> String {
@@ -91,7 +91,7 @@ impl Metrics {
             output_bytes: 0,
             proof_bytes: 0,
             speed: 0.0,
-            peak_memory: 0,
+            prover_ram: 0,
         }
     }
 }
@@ -143,7 +143,7 @@ impl Job {
         let usage_before = memory_stats().unwrap();
         let receipt = prover.prove_session(&ctx, &session).unwrap().receipt;
         let usage_after = memory_stats().unwrap();
-        metrics.peak_memory = (usage_after.physical_mem - usage_before.physical_mem) as usize;
+        metrics.prover_ram = (usage_after.physical_mem - usage_before.physical_mem) as usize;
         metrics.proof_duration = start.elapsed();
 
         metrics.total_duration = metrics.exec_duration + metrics.proof_duration;

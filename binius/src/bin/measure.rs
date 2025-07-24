@@ -18,7 +18,7 @@ fn main() -> Result<(), Error> {
     let usage_before = memory_stats().unwrap();
     let (cs, args, proof) = prove(constraint_system, args, witness, backend);
     let usage_after = memory_stats().unwrap();
-    
+
     println!(
         "Proving memory usage: {} GB resident | {} GB virt",
         (usage_after.physical_mem - usage_before.physical_mem) as f32 / (1024.0 * 1024.0 * 1024.0),
