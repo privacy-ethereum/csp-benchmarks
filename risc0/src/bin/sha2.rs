@@ -19,7 +19,6 @@ fn benchmark_sha2(num_bytes: usize) -> Metrics {
 
     let env = ExecutorEnv::builder().write_slice(&input).build().unwrap();
     let mut exec = ExecutorImpl::from_elf(env, &ELF).unwrap();
-    let start = Instant::now();
     let session = exec.run().unwrap();
     metrics.cycles = session.user_cycles;
 
