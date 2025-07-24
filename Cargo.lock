@@ -661,12 +661,12 @@ dependencies = [
  "clap",
  "criterion",
  "itertools 0.13.0",
- "memory-stats",
  "rand 0.8.5",
  "tikv-jemalloc-ctl",
  "tikv-jemallocator",
  "tracing",
  "tracing-profile",
+ "utils",
 ]
 
 [[package]]
@@ -3309,16 +3309,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "483758ad303d734cec05e5c12b41d7e93e6a6390c5e9dae6bdeb7c1259012d28"
 dependencies = [
  "libc",
-]
-
-[[package]]
-name = "memory-stats"
-version = "1.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c73f5c649995a115e1a0220b35e4df0a1294500477f97a91d0660fb5abeb574a"
-dependencies = [
- "libc",
- "windows-sys 0.52.0",
 ]
 
 [[package]]
