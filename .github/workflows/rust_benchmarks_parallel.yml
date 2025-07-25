@@ -70,25 +70,26 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Configure base‑branch remote
+      - name: Determine base‑remote and fetch it
+        id: base
         run: |
-          # If we're running in a fork (origin ≠ real repo), add upstream:
+          REMOTE=origin
           if [[ "${GITHUB_REPOSITORY}" != "privacy-scaling-explorations/csp-benchmarks" ]]; then
             git remote add upstream https://github.com/privacy-scaling-explorations/csp-benchmarks.git
+            REMOTE=upstream
           fi
 
-      - name: Fetch CSP‑Q3‑2025 branch
-        run: |
-          # Try upstream first; if that fails, pull from origin
-          if git ls-remote --exit-code upstream CSP-Q3-2025; then
-            git fetch upstream CSP-Q3-2025:CSP-Q3-2025
-          else
-            git fetch origin CSP-Q3-2025:CSP-Q3-2025
-          fi
+          BASE_BRANCH="CSP-Q3-2025"
+          git fetch --prune --no-tags --depth=1 "$REMOTE" "$BASE_BRANCH"
+
+          # expose for later steps
+          echo "BASE_REF=${REMOTE}/${BASE_BRANCH}" >> "$GITHUB_OUTPUT"
 
       - name: Detect changed benchmark crates
         id: set
         run: |
+          BASE_REF="${{ steps.base.outputs.BASE_REF }}"
+
           RUN_ALL="${{ github.event.inputs.run_all }}"
 
           EXCLUDE_REGEX='^(utils|mobile)(/|$)'
