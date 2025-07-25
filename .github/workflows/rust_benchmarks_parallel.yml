@@ -1,0 +1,150 @@
+name: Benchmarks
+
+on:
+  schedule:
+    # Every Monday at 06:00 UTC
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      run_all:
+        description: "Run benches for all benchmark crates"
+        required: false
+        default: false
+        type: boolean
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  prepare-cache:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache everything
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            ~/.rustup
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2025-02-20-aarch64-apple-darwin
+          override: true
+          profile: default
+          default: true
+          components: llvm-tools, rustc-dev
+
+      - name: Install SP1
+        uses: ./.github/actions/install-sp1
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Install Powdr
+        uses: ./.github/actions/install-powdr
+
+      - name: Build full workspace (release)
+        run: cargo build --release --workspace
+
+  detect-crates:
+    needs: prepare-cache
+    runs-on: macos-latest
+    outputs:
+      crates: ${{ steps.set.outputs.crates }}
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure base‑branch remote
+        run: |
+          # If we're running in a fork (origin ≠ real repo), add upstream:
+          if [[ "${GITHUB_REPOSITORY}" != "privacy-scaling-explorations/csp-benchmarks" ]]; then
+            git remote add upstream https://github.com/privacy-scaling-explorations/csp-benchmarks.git
+          fi
+
+      - name: Fetch CSP‑Q3‑2025 branch
+        run: |
+          # Try upstream first; if that fails, pull from origin
+          if git ls-remote --exit-code upstream CSP-Q3-2025; then
+            git fetch upstream CSP-Q3-2025:CSP-Q3-2025
+          else
+            git fetch origin CSP-Q3-2025:CSP-Q3-2025
+          fi
+
+      - name: Detect changed benchmark crates
+        id: set
+        run: |
+          RUN_ALL="${{ github.event.inputs.run_all }}"
+
+          EXCLUDE_REGEX='^(utils|mobile)(/|$)'
+
+          # ─── 1. discover Cargo.toml files ────────────────────────────────
+          dirs=$(find . -mindepth 2 -maxdepth 4 -type f -name Cargo.toml \
+                  ! -path "./Cargo.toml" \
+                | sed -e 's|^\./||' -e 's|/Cargo.toml$||' \
+                | grep -vE "$EXCLUDE_REGEX" \
+                | sort -u)
+
+          # ─── 2. select top‑level dirs ───────────────────────────────────
+          selected=()      # declare early to please `set -u`
+          while IFS= read -r d; do
+            skip=false
+            for p in "${selected[@]-}"; do
+              [[ "$d/" == "$p/"* ]] && skip=true && break
+            done
+            $skip || selected+=("$d")
+          done < <(printf '%s\n' "$dirs" | awk '{print length,$0}' | sort -n | cut -d' ' -f2-)
+
+          # ─── 3. filter by diff & [[bench]] ──────────────────────────────
+          changed=()       # declare early
+          if [[ "$RUN_ALL" == "true" ]]; then
+            changed=("${selected[@]}")
+          else
+            for d in "${selected[@]}"; do
+              if git diff --name-only "$BASE_REF"...HEAD | grep -q "^${d}/" \
+                && grep -q '^\[\[bench\]\]' "$d/Cargo.toml"; then
+                changed+=("$d")
+              fi
+            done
+          fi
+
+          # ─── 4. output JSON array ───────────────────────────────────────
+          printf '%s\n' "${changed[@]}" | jq -R -s -c 'split("\n")[:-1]'
+
+  bench:
+    needs: [prepare-cache, detect-crates]
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: ${{ fromJSON(needs.detect-crates.outputs.crates) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git fetch origin CSP-Q3-2025:CSP-Q3-2025
+
+      - name: Run benches in ${{ matrix.crate }}
+        run: |
+          cd ${{ matrix.crate }}
+          cargo bench
+
+      - name: Upload reports for ${{ matrix.crate }}
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "criterion-${{ matrix.crate }}"
+          path: ${{ matrix.crate }}/target/criterion
+          retention-days: 30
