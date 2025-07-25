@@ -1,9 +1,12 @@
 name: Benchmarks
 
 on:
-  schedule:
-    # Every Monday at 06:00 UTC
-    - cron: "0 6 * * 1"
+  push:
+    branches:
+      - "CSP-Q3-2025"
+  pull_request:
+    branches:
+      - "CSP-Q3-2025"
   workflow_dispatch:
     inputs:
       run_all:
