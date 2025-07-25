@@ -125,15 +125,22 @@ jobs:
           fi
 
           # ─── 4. output JSON array ───────────────────────────────────────
-          printf '%s\n' "${changed[@]}" | jq -R -s -c 'split("\n")[:-1]'
+          json=$(printf '%s\n' "${changed[@]}" \
+            | jq -R -s -c 'split("\n")[:-1]')
+          # When nothing matched, jq outputs "" – replace with []
+          if [[ -z "$json" ]]; then
+            json='[]'
+          fi
+          echo "crates=$json" >> "$GITHUB_OUTPUT"   # ← new style set‑output
 
   bench:
+    if: ${{ needs.detect-crates.outputs.crates != '[]' }}
     needs: [prepare-cache, detect-crates]
     runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
-        crate: ${{ fromJSON(needs.detect-crates.outputs.crates) }}
+        crate: ${{ fromJson(needs.detect-crates.outputs.crates) }}
     steps:
       - uses: actions/checkout@v4
         with:
