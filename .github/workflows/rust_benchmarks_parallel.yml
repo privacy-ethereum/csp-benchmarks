@@ -117,7 +117,7 @@ jobs:
             changed=("${selected[@]}")
           else
             for d in "${selected[@]}"; do
-              if git diff --name-only "$BASE_REF"...HEAD | grep -q "^${d}/" \
+              if git diff --name-only "$BASE_REF"..HEAD 2>/dev/null | grep -q "^${d}/" \
                 && grep -q '^\[\[bench\]\]' "$d/Cargo.toml"; then
                 changed+=("$d")
               fi
@@ -134,18 +134,46 @@ jobs:
           echo "crates=$json" >> "$GITHUB_OUTPUT"   # ← new style set‑output
 
   bench:
-    if: ${{ needs.detect-crates.outputs.crates != '[]' }}
+    if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
     needs: [prepare-cache, detect-crates]
     runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
         crate: ${{ fromJson(needs.detect-crates.outputs.crates) }}
+
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-      - run: git fetch origin CSP-Q3-2025:CSP-Q3-2025
+          fetch-depth:
+
+      - name: Restore Cargo cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2025-02-20-aarch64-apple-darwin
+          override: true
+          profile: default
+          default: true
+          components: llvm-tools, rustc-dev
+
+      - name: Install SP1
+        uses: ./.github/actions/install-sp1
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Install Powdr
+        uses: ./.github/actions/install-powdr
 
       - name: Run benches in ${{ matrix.crate }}
         run: |
