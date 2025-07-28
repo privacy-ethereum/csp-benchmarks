@@ -56,6 +56,9 @@ jobs:
       - name: Install Powdr
         uses: ./.github/actions/install-powdr
 
+      - name: Install nightly-2024-08-01 with rust-src for Powdr
+        run: rustup toolchain install nightly-2024-08-01 --component rust-src
+
       - name: Build full workspace (release)
         run: cargo build --release --workspace
 
@@ -125,13 +128,11 @@ jobs:
           fi
 
           # ─── 4. output JSON array ───────────────────────────────────────
-          json=$(printf '%s\n' "${changed[@]}" \
-            | jq -R -s -c 'split("\n")[:-1]')
-          # When nothing matched, jq outputs "" – replace with []
-          if [[ -z "$json" ]]; then
-            json='[]'
-          fi
-          echo "crates=$json" >> "$GITHUB_OUTPUT"   # ← new style set‑output
+          json=$(printf '%s\n' "${changed[@]}" |
+            jq -R -s -c 'split("\n") | map(select(length>0))')
+
+          echo "Detected changed crates: '$json'"
+          echo "crates=$json" >> "$GITHUB_OUTPUT"
 
   bench:
     if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
@@ -174,6 +175,9 @@ jobs:
 
       - name: Install Powdr
         uses: ./.github/actions/install-powdr
+
+      - name: Install nightly-2024-08-01 with rust-src for Powdr
+        run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
       - name: Run benches in ${{ matrix.crate }}
         run: |
