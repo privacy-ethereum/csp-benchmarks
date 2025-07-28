@@ -1,16 +1,17 @@
 [workspace]
-resolver = "3"
 members = [
     "binius",
     "plonky2",
     "plonky3-powdr",
     "plonky3-sp1/lib",
     "plonky3-sp1/script",
+    "utils",
+    "provekit",
 ]
 exclude = [
     "plonky3-sp1/program", # Should be excluded, compiled for the Succinct toolchain via sp1_helper in script/build.rs
-    "provekit",            # Compatibility issue in noir-r1cs
 ]
+resolver = "3"
 
 [workspace.dependencies]
 anyhow = "1.0.81"

@@ -1,17 +1,13 @@
 [package]
-name = "csp-tooling"
+name = "provekit"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 rand = { workspace = true }
-
-#ProveKit
+utils = { path = "../utils" }
 noir-r1cs = { git = "https://github.com/worldfnd/ProveKit", branch = "main" }
 
-[dev-dependencies]
-criterion = "0.6.0"
-
 [[bench]]
-name = "sha256"
+name = "provekit"
 harness = false
