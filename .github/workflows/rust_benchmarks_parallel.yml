@@ -116,16 +116,17 @@ jobs:
 
           # ─── 3. filter by diff & [[bench]] ──────────────────────────────
           changed=()       # declare early
-          if [[ "$RUN_ALL" == "true" ]]; then
-            changed=("${selected[@]}")
-          else
-            for d in "${selected[@]}"; do
-              if git diff --name-only "$BASE_REF"..HEAD 2>/dev/null | grep -q "^${d}/" \
-                && grep -q '^\[\[bench\]\]' "$d/Cargo.toml"; then
-                changed+=("$d")
-              fi
-            done
-          fi
+          for d in "${selected[@]}"; do
+            # When RUN_ALL=true we ignore the diff check, otherwise we require a diff.
+            if [[ "$RUN_ALL" != "true" ]]; then
+              git diff --name-only "$BASE_REF"..HEAD 2>/dev/null | grep -q "^${d}/" || continue
+            fi
+
+            # Always require the crate to have a [[bench]] section.
+            if grep -q '^\[\[bench\]\]' "$d/Cargo.toml"; then
+              changed+=("$d")
+            fi
+          done
 
           # ─── 4. output JSON array ───────────────────────────────────────
           json=$(printf '%s\n' "${changed[@]}" |
@@ -169,14 +170,17 @@ jobs:
           components: llvm-tools, rustc-dev
 
       - name: Install SP1
+        if: ${{ contains(matrix.crate, 'sp1') }}
         uses: ./.github/actions/install-sp1
         with:
           token: ${{ secrets.GH_PAT }}
 
       - name: Install Powdr
+        if: ${{ contains(matrix.crate, 'powdr') }}
         uses: ./.github/actions/install-powdr
 
       - name: Install nightly-2024-08-01 with rust-src for Powdr
+        if: ${{ contains(matrix.crate, 'powdr') }}
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
       - name: Run benches in ${{ matrix.crate }}
