@@ -16,6 +16,5 @@
 bazel-*
 dist/
 Dockerfile
-provekit/circuits/hash/sha256-provekit/*/Prover.toml
 rust-project.json
 tmp/

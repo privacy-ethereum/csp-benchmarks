@@ -19,5 +19,5 @@ cargo bench
 Measure RAM footprint:
 
 ```bash
-cargo run -r --bin measure
+cargo run -r --bin plonky3-powdr-measure
 ```

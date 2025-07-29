@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 rand = { workspace = true }
-utils = { path = "../utils" }
+utils = { workspace = true }
 noir-r1cs = { git = "https://github.com/worldfnd/ProveKit", branch = "main" }
 
 [[bench]]
