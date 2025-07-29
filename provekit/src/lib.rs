@@ -6,7 +6,7 @@ use std::process::Command;
 use std::time::Instant;
 use utils::bench::{Metrics, benchmark};
 
-pub const INPUT_EXP: [u32; 5] = [8, 10, 11, 12, 14];
+pub const INPUT_EXP: [u32; 5] = [8, 9, 10, 11, 12];
 pub const TMP_DIR: &str = "tmp";
 pub const CIRCUIT_ROOT: &str = "circuits/hash/sha256-provekit";
 pub const CSV_OUTPUT: &str = "tmp/provekit_sha256.csv";
