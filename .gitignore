@@ -18,3 +18,4 @@ dist/
 Dockerfile
 rust-project.json
 tmp/
+*.csv
