@@ -1,5 +1,5 @@
 use human_repr::{HumanCount, HumanDuration};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DurationNanoSeconds};
 use std::{
     fmt::Display,
@@ -113,6 +113,59 @@ where
 }
 
 pub fn write_csv(out_path: &str, results: &[Metrics]) {
+    let mut out = csv::WriterBuilder::new().from_path(out_path).unwrap();
+
+    let mut all_metrics = Vec::new();
+
+    for metric in results {
+        out.serialize(&metric).expect("Could not serialize");
+        out.flush().expect("Could not flush");
+        all_metrics.push(metric);
+    }
+
+    out.flush().expect("Could not flush");
+
+    let mut table = Table::new(&all_metrics);
+    table.with(Style::modern());
+    println!("{table}");
+}
+
+#[serde_as]
+#[derive(Serialize, Deserialize, Tabled)]
+pub struct CustomMetrics {
+    #[tabled(display_with = "display_bytes")]
+    pub input_size: usize,
+    #[serde_as(as = "DurationNanoSeconds")]
+    #[tabled(display_with = "display_duration")]
+    pub proof_duration: Duration,
+    #[serde_as(as = "DurationNanoSeconds")]
+    #[tabled(display_with = "display_duration")]
+    pub verify_duration: Duration,
+    #[tabled(display_with = "display_bytes")]
+    pub proof_size: usize,
+    #[tabled(display_with = "display_bytes")]
+    pub proving_peak_memory: usize,
+    #[tabled(display_with = "display_bytes")]
+    pub preprocessing_size: usize,
+    #[tabled(display_with = "display_bytes")]
+    pub preprocessing_peak_memory: usize,
+}
+
+impl CustomMetrics {
+    pub fn new(size: usize) -> Self {
+        CustomMetrics {
+            input_size: size,
+            proof_duration: Duration::default(),
+            verify_duration: Duration::default(),
+            proof_size: 0,
+            proving_peak_memory: 0,
+            preprocessing_size: 0,
+            preprocessing_peak_memory: 0,
+        }
+    }
+}
+
+pub fn write_csv_custom(out_path: &str, results: &[CustomMetrics]) {
     let mut out = csv::WriterBuilder::new().from_path(out_path).unwrap();
 
     let mut all_metrics = Vec::new();
