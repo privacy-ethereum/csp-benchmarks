@@ -64,6 +64,8 @@ jobs:
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
       - name: Build full workspace (release)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }} # for ACIR (required by protoc-prebuilt)
         run: cargo build --release --workspace
 
   detect-crates:
