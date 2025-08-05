@@ -1,21 +1,20 @@
 use anyhow::Error;
-use binius::bench::{prove, sha256_no_lookup_prepare, verify};
-use std::time::Instant;
-use utils::bench::{CustomMetrics, measure_peak_memory, write_csv_custom};
+use binius::bench::{prove, sha256_no_lookup_prepare};
+use utils::bench::{SubMetrics, measure_peak_memory, write_json_submetrics};
 
 fn main() -> Result<(), Error> {
-    let csv_file = "sha2_binius_no_lookup.csv";
+    let json_file = "sha2_binius_no_lookup_submetrics.json";
 
     let input_num_bytes = 2048;
     let metrics = benchmark_sha2(input_num_bytes)?;
 
-    write_csv_custom(csv_file, &[metrics]);
+    write_json_submetrics(json_file, &metrics);
 
     Ok(())
 }
 
-fn benchmark_sha2(num_bytes: usize) -> Result<CustomMetrics, Error> {
-    let mut metrics = CustomMetrics::new(num_bytes);
+fn benchmark_sha2(num_bytes: usize) -> Result<SubMetrics, Error> {
+    let mut metrics = SubMetrics::new(num_bytes);
 
     let allocator = bumpalo::Bump::new();
 
@@ -24,16 +23,10 @@ fn benchmark_sha2(num_bytes: usize) -> Result<CustomMetrics, Error> {
     metrics.preprocessing_peak_memory = peak_memory;
     metrics.preprocessing_size = 0; // TODO
 
-    let start = Instant::now();
-    let ((cs, args, proof), peak_memory) =
+    let ((_, _, proof), peak_memory) =
         measure_peak_memory(|| prove(constraint_system, args, witness, backend));
-    metrics.proof_duration = start.elapsed();
     metrics.proving_peak_memory = peak_memory;
     metrics.proof_size = proof.get_proof_size();
-
-    let start = Instant::now();
-    verify(cs, args, proof);
-    metrics.verify_duration = start.elapsed();
 
     Ok(metrics)
 }
