@@ -23,7 +23,8 @@ fn benchmark_sha2(num_bytes: usize) -> SubMetrics {
     // Load the proving key and constants from the files.
     let pk_bytes = std::fs::read("powdr-target/pkey.bin").expect("Unable to read file");
     let constants_bytes = std::fs::read("powdr-target/constants.bin").expect("Unable to read file");
-    metrics.preprocessing_size = pk_bytes.len() + constants_bytes.len();
+    let pil_bytes = std::fs::read("powdr-target/guest.pil").expect("Unable to read file");
+    metrics.preprocessing_size = pk_bytes.len() + constants_bytes.len() + pil_bytes.len();
 
     let (_, peak_memory) = measure_peak_memory(|| prove(&mut pipeline));
     metrics.proving_peak_memory = peak_memory;
