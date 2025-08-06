@@ -27,7 +27,7 @@ fn benchmark_sha2(num_bytes: usize) -> Result<SubMetrics, Error> {
     let _ = constraint_system
         .serialize(&mut buffer, binius_utils::SerializationMode::CanonicalTower)
         .expect("Failed to serialize constraint system");
-    metrics.preprocessing_size = buffer.len(); // correct?
+    metrics.preprocessing_size = buffer.len();
 
     let ((_, _, proof), peak_memory) =
         measure_peak_memory(|| prove(constraint_system, args, witness, backend));

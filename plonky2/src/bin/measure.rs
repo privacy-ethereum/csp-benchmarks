@@ -35,7 +35,7 @@ fn benchmark_sha2(num_bytes: usize) -> SubMetrics {
         "Common data size: {}B, Prover data size: {}B",
         common_data_size, prover_data_size
     );
-    metrics.preprocessing_size = prover_data_size + common_data_size; // correct?
+    metrics.preprocessing_size = prover_data_size;
 
     let (proof, peak_memory) = measure_peak_memory(|| prove(&data.prover_data(), pw));
     metrics.proving_peak_memory = peak_memory;
