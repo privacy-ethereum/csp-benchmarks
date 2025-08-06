@@ -1,5 +1,6 @@
 use anyhow::Error;
 use binius::bench::{prove, sha256_with_lookup_prepare};
+use binius_utils::SerializeBytes;
 use utils::bench::{SubMetrics, measure_peak_memory, write_json_submetrics};
 
 fn main() -> Result<(), Error> {
@@ -21,7 +22,12 @@ fn benchmark_sha2(num_bytes: usize) -> Result<SubMetrics, Error> {
     let ((constraint_system, args, witness, backend), peak_memory) =
         measure_peak_memory(|| sha256_with_lookup_prepare(&allocator));
     metrics.preprocessing_peak_memory = peak_memory;
-    metrics.preprocessing_size = 0; // TODO
+
+    let mut buffer: Vec<u8> = Vec::new();
+    let _ = constraint_system
+        .serialize(&mut buffer, binius_utils::SerializationMode::CanonicalTower)
+        .expect("Failed to serialize constraint system");
+    metrics.preprocessing_size = buffer.len(); // TODO
 
     let ((_, _, proof), peak_memory) =
         measure_peak_memory(|| prove(constraint_system, args, witness, backend));
