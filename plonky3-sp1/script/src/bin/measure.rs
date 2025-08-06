@@ -35,7 +35,7 @@ fn benchmark_sha2(input_num_bytes: usize) -> SubMetrics {
         peak_memory as f32 / (1024.0 * 1024.0 * 1024.0)
     );
 
-    metrics.preprocessing_size = pk_bytes.len() + SHA_ELF.len(); // TODO
+    metrics.preprocessing_size = pk_bytes.len() + SHA_ELF.len(); // correct?
 
     // Generate the proof
     let (_, peak_memory) = measure_peak_memory(|| {
