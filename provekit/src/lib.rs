@@ -1,4 +1,4 @@
-use noir_r1cs::NoirProofScheme;
+use noir_r1cs::{NoirProof, NoirProofScheme};
 use rand::RngCore;
 use std::fs::{self, File};
 use std::io::{Read, Write};
@@ -6,10 +6,9 @@ use std::process::Command;
 use std::time::Instant;
 use utils::bench::{Metrics, benchmark};
 
-pub const INPUT_EXP: [u32; 5] = [8, 9, 10, 11, 12];
+pub const INPUT_EXP: [u32; 1] = [11];
 pub const TMP_DIR: &str = "tmp";
 pub const CIRCUIT_ROOT: &str = "circuits/hash/sha256-provekit";
-pub const CSV_OUTPUT: &str = "tmp/provekit_sha256.csv";
 
 /// Generates random input files for hashing benchmarks.
 pub fn generate_hash_inputs() -> Result<(), &'static str> {
@@ -104,35 +103,23 @@ pub fn setup() -> Result<(), &'static str> {
     Ok(())
 }
 
-/// Benchmarks provekit with sha256 for all input exponents.
-pub fn bench_sha256() {
-    let inputs: Vec<u32> = INPUT_EXP.to_vec();
+pub fn prove(input_exp: u32) -> NoirProof {
+    let circuit_dir = format!("{}/sha256-bench-2e{}", CIRCUIT_ROOT, input_exp);
+    let circuit_path = format!("circuits/target/sha256_bench_2e{}.json", input_exp);
+    let prover_toml_path = format!("{}/Prover.toml", circuit_dir);
 
-    benchmark(
-        |input_exp| {
-            let size = 1usize << input_exp;
-            let mut metrics = Metrics::new(size);
+    let proof_scheme = NoirProofScheme::from_file(&circuit_path).unwrap();
+    let input_map = proof_scheme.read_witness(&prover_toml_path).unwrap();
 
-            let circuit_dir = format!("{}/sha256-bench-2e{}", CIRCUIT_ROOT, input_exp);
-            let circuit_path = format!("circuits/target/sha256_bench_2e{}.json", input_exp);
-            let prover_toml_path = format!("{}/Prover.toml", circuit_dir);
+    let proof = proof_scheme.prove(&input_map).unwrap();
 
-            let proof_scheme = NoirProofScheme::from_file(&circuit_path).unwrap();
-            let input_map = proof_scheme.read_witness(&prover_toml_path).unwrap();
+    proof
+}
 
-            let prove_start = Instant::now();
-            let proof = proof_scheme.prove(&input_map).unwrap();
-            metrics.proof_duration = prove_start.elapsed();
+pub fn verify(input_exp: u32, proof: NoirProof) {
+    let circuit_path = format!("circuits/target/sha256_bench_2e{}.json", input_exp);
 
-            let verify_start = Instant::now();
-            proof_scheme.verify(&proof).unwrap();
-            metrics.verify_duration = verify_start.elapsed();
+    let proof_scheme = NoirProofScheme::from_file(&circuit_path).unwrap();
 
-            metrics.proof_size = proof.whir_r1cs_proof.transcript.len();
-
-            metrics
-        },
-        &inputs,
-        CSV_OUTPUT,
-    );
+    proof_scheme.verify(&proof).unwrap();
 }

@@ -6499,6 +6499,7 @@ dependencies = [
 name = "provekit"
 version = "0.1.0"
 dependencies = [
+ "criterion",
  "noir-r1cs",
  "rand 0.8.5",
  "utils",
