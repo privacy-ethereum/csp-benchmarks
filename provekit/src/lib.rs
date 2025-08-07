@@ -4,9 +4,11 @@ use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::process::Command;
 use std::time::Instant;
-use utils::bench::{Metrics, benchmark};
+use utils::{
+    bench::{Metrics, benchmark},
+    metadata::SHA2_INPUTS,
+};
 
-pub const INPUT_EXP: [u32; 1] = [11];
 pub const TMP_DIR: &str = "tmp";
 pub const CIRCUIT_ROOT: &str = "circuits/hash/sha256-provekit";
 
@@ -17,9 +19,8 @@ pub fn generate_hash_inputs() -> Result<(), &'static str> {
 
     let mut rng = rand::thread_rng();
 
-    for exp in INPUT_EXP {
-        let size = 1usize << exp;
-        let bin_path = format!("{}/input_2e{}.bin", input_dir, exp);
+    for size in SHA2_INPUTS {
+        let bin_path = format!("{}/input_{}.bin", input_dir, size);
 
         let mut data = vec![0u8; size];
         rng.fill_bytes(&mut data);
@@ -80,10 +81,9 @@ pub fn generate_prover_toml(
 
 /// Sets up Prover.toml files for all circuits.
 pub fn setup_circuits() -> Result<(), &'static str> {
-    for exp in INPUT_EXP {
-        let size = 1usize << exp;
-        let input_file = format!("{}/hash-input/input_2e{}.bin", TMP_DIR, exp);
-        let circuit_dir = format!("{}/sha256-bench-2e{}", CIRCUIT_ROOT, exp);
+    for size in SHA2_INPUTS {
+        let input_file = format!("{}/hash-input/input_{}.bin", TMP_DIR, size);
+        let circuit_dir = format!("{}/sha256-bench-{}", CIRCUIT_ROOT, size);
         let toml_path = format!("{}/Prover.toml", circuit_dir);
 
         generate_prover_toml(&toml_path, &input_file, size)?;
@@ -103,9 +103,9 @@ pub fn setup() -> Result<(), &'static str> {
     Ok(())
 }
 
-pub fn prove(input_exp: u32) -> NoirProof {
-    let circuit_dir = format!("{}/sha256-bench-2e{}", CIRCUIT_ROOT, input_exp);
-    let circuit_path = format!("circuits/target/sha256_bench_2e{}.json", input_exp);
+pub fn prove(input_num_bytes: usize) -> NoirProof {
+    let circuit_dir = format!("{}/sha256-bench-{}", CIRCUIT_ROOT, input_num_bytes);
+    let circuit_path = format!("circuits/target/sha256_bench_{}.json", input_num_bytes);
     let prover_toml_path = format!("{}/Prover.toml", circuit_dir);
 
     let proof_scheme = NoirProofScheme::from_file(&circuit_path).unwrap();
@@ -116,8 +116,8 @@ pub fn prove(input_exp: u32) -> NoirProof {
     proof
 }
 
-pub fn verify(input_exp: u32, proof: NoirProof) {
-    let circuit_path = format!("circuits/target/sha256_bench_2e{}.json", input_exp);
+pub fn verify(input_num_bytes: usize, proof: NoirProof) {
+    let circuit_path = format!("circuits/target/sha256_bench_{}.json", input_num_bytes);
 
     let proof_scheme = NoirProofScheme::from_file(&circuit_path).unwrap();
 

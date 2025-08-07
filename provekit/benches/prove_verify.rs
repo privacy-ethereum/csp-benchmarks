@@ -11,7 +11,7 @@ fn sha256_bench(c: &mut Criterion) {
                 let _ = setup().unwrap();
             },
             || {
-                prove(11);
+                prove(2048);
             },
             BatchSize::SmallInput,
         );
@@ -21,11 +21,11 @@ fn sha256_bench(c: &mut Criterion) {
         bench.iter_batched(
             || {
                 let _ = setup().unwrap();
-                let proof = prove(11);
+                let proof = prove(2048);
                 proof
             },
             |proof| {
-                verify(11, proof);
+                verify(2048, proof);
             },
             BatchSize::SmallInput,
         );
