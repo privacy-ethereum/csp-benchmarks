@@ -135,3 +135,35 @@ pub fn write_csv(out_path: &str, results: &[Metrics]) {
     table.with(Style::modern());
     println!("{table}");
 }
+
+#[serde_as]
+#[derive(Serialize, Tabled)]
+pub struct SubMetrics {
+    #[tabled(display_with = "display_bytes")]
+    pub input_size: usize,
+    #[tabled(display_with = "display_bytes")]
+    pub proof_size: usize,
+    #[tabled(display_with = "display_bytes")]
+    pub proving_peak_memory: usize,
+    #[tabled(display_with = "display_bytes")]
+    pub preprocessing_size: usize,
+    #[tabled(display_with = "display_bytes")]
+    pub preprocessing_peak_memory: usize,
+}
+
+impl SubMetrics {
+    pub fn new(size: usize) -> Self {
+        SubMetrics {
+            input_size: size,
+            proof_size: 0,
+            proving_peak_memory: 0,
+            preprocessing_size: 0,
+            preprocessing_peak_memory: 0,
+        }
+    }
+}
+
+pub fn write_json_submetrics(output_path: &str, metrics: &SubMetrics) {
+    let json = serde_json::to_string_pretty(metrics).unwrap();
+    std::fs::write(output_path, json).unwrap();
+}

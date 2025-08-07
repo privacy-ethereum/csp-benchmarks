@@ -19,3 +19,4 @@ dist/
 Dockerfile
 rust-project.json
 tmp/
+*.json
