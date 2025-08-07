@@ -157,6 +157,18 @@ impl SubMetrics {
     }
 }
 
+pub struct SubMetricsTable(pub Vec<SubMetrics>);
+
+impl Display for SubMetricsTable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.0.is_empty() {
+            return Ok(());
+        }
+        let mut table = Table::new(&self.0);
+        table.with(Style::modern());
+        write!(f, "{table}")
+    }
+}
 pub fn write_json_submetrics(output_path: &str, metrics: &SubMetrics) {
     let json = serde_json::to_string_pretty(metrics).unwrap();
     std::fs::write(output_path, json).unwrap();

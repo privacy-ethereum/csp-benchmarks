@@ -12,7 +12,3 @@ noir-r1cs = { git = "https://github.com/worldfnd/ProveKit", branch = "main" }
 [[bench]]
 name = "prove_verify"
 harness = false
-
-[[bin]]
-name = "provekit-measure"
-path = "src/bin/measure.rs"
