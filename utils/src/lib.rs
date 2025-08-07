@@ -1,6 +1,6 @@
 use guests::ecdsa::EcdsaVerifyInput;
-use k256::{ecdsa::Signature, elliptic_curve::sec1::EncodedPoint, Secp256k1};
-use rand::{rngs::StdRng, RngCore, SeedableRng};
+use k256::{Secp256k1, ecdsa::Signature, elliptic_curve::sec1::EncodedPoint};
+use rand::{RngCore, SeedableRng, rngs::StdRng};
 use std::fs;
 use std::fs::File;
 use std::io::Write;

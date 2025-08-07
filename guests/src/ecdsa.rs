@@ -1,7 +1,7 @@
 use k256::{
-    ecdsa::{signature::Verifier, Signature, VerifyingKey},
-    elliptic_curve::sec1::EncodedPoint,
     Secp256k1,
+    ecdsa::{Signature, VerifyingKey, signature::Verifier},
+    elliptic_curve::sec1::EncodedPoint,
 };
 use serde::{Deserialize, Serialize};
 
