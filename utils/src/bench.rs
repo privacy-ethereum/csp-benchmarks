@@ -1,28 +1,34 @@
 use human_repr::{HumanCount, HumanDuration};
 use serde::Serialize;
-use serde_with::{serde_as, DurationNanoSeconds};
+use serde_with::{DurationNanoSeconds, serde_as};
 use std::{
     fmt::Display,
     sync::{
-        atomic::{AtomicBool, AtomicUsize, Ordering},
         Arc,
+        atomic::{AtomicBool, AtomicUsize, Ordering},
     },
     thread,
     time::Duration,
 };
-use tabled::{settings::Style, Table, Tabled};
+use tabled::{Table, Tabled, settings::Style};
 
 fn get_current_memory_usage() -> Result<usize, std::io::Error> {
     unsafe {
-        let mut out: libc::rusage = std::mem::zeroed();
-        libc::getrusage(libc::RUSAGE_SELF, &mut out);
+        let mut self_usage: libc::rusage = std::mem::zeroed();
+        libc::getrusage(libc::RUSAGE_SELF, &mut self_usage);
+
+        let mut child_usage: libc::rusage = std::mem::zeroed();
+        libc::getrusage(libc::RUSAGE_CHILDREN, &mut child_usage);
+
+        let total_maxrss = self_usage.ru_maxrss + child_usage.ru_maxrss;
+
         #[cfg(target_os = "linux")]
         {
-            Ok(out.ru_maxrss as usize * 1024)
+            Ok(total_maxrss as usize * 1024)
         }
         #[cfg(target_os = "macos")]
         {
-            Ok(out.ru_maxrss as usize)
+            Ok(total_maxrss as usize)
         }
         #[cfg(not(any(target_os = "linux", target_os = "macos")))]
         {
