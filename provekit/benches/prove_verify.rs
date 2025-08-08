@@ -1,11 +1,12 @@
 use criterion::{BatchSize, Criterion, black_box, criterion_group, criterion_main};
 use provekit::{ProvekitSha256Benchmark, WORKSPACE_ROOT};
 use std::path::PathBuf;
-use utils::bench::{SubMetrics, display_submetrics, measure_peak_memory};
+use utils::bench::{SubMetrics, display_submetrics, measure_peak_memory, write_json_submetrics};
 
 const INPUT_EXPONENTS: [u32; 1] = [11];
 
 fn sha256_benchmarks(c: &mut Criterion) {
+    // measure the SubMetrics
     let (bench_harness, preprocessing_peak_memory) =
         measure_peak_memory(|| ProvekitSha256Benchmark::new(&INPUT_EXPONENTS));
 
@@ -37,6 +38,9 @@ fn sha256_benchmarks(c: &mut Criterion) {
     }
 
     println!("{}", display_submetrics(&all_metrics));
+
+    let json_path = "sha2_provekit_submetrics.json";
+    write_json_submetrics(json_path, &all_metrics[0]);
 
     let mut group = c.benchmark_group("SHA256 Prove & Verify");
     group.sample_size(10);

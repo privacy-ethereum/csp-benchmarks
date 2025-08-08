@@ -8,9 +8,3 @@ This benchmark code is using the ProveKit of World Foundation(https://github.com
 ```bash
 cargo bench
 ```
-
-Measure RAM footprint:
-
-```bash
-cargo run -r --bin provekit-measure
-```
