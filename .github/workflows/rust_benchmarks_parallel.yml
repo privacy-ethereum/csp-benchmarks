@@ -189,11 +189,10 @@ jobs:
         if: ${{ contains(matrix.crate, 'powdr') }}
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
-      - name: Install Noir
-        run: |
-          curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash -s -- -y
-          echo "$HOME/.noir/bin" >> $GITHUB_PATH
-          ~/.noir/bin/noirup
+      - name: Install Nargo
+        uses: noir-lang/noirup@v0.1.2
+        with:
+          toolchain: stable
 
       - name: Run benches in ${{ matrix.crate }}
         run: |
