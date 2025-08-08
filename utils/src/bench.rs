@@ -131,7 +131,7 @@ pub fn write_csv(out_path: &str, results: &[Metrics]) {
 }
 
 #[serde_as]
-#[derive(Serialize, Tabled)]
+#[derive(Serialize, Tabled, Clone, Copy)]
 pub struct SubMetrics {
     #[tabled(display_with = "display_bytes")]
     pub input_size: usize,
@@ -157,18 +157,15 @@ impl SubMetrics {
     }
 }
 
-pub struct SubMetricsTable(pub Vec<SubMetrics>);
-
-impl Display for SubMetricsTable {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.0.is_empty() {
-            return Ok(());
-        }
-        let mut table = Table::new(&self.0);
-        table.with(Style::modern());
-        write!(f, "{table}")
+pub fn display_submetrics(metrics: &[SubMetrics]) -> String {
+    if metrics.is_empty() {
+        return String::new();
     }
+    let mut table = Table::new(metrics);
+    table.with(Style::modern());
+    table.to_string()
 }
+
 pub fn write_json_submetrics(output_path: &str, metrics: &SubMetrics) {
     let json = serde_json::to_string_pretty(metrics).unwrap();
     std::fs::write(output_path, json).unwrap();
