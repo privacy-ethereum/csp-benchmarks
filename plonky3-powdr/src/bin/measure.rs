@@ -13,7 +13,7 @@ fn main() {
 fn benchmark_sha2(num_bytes: usize) -> SubMetrics {
     let mut metrics = SubMetrics::new(num_bytes);
 
-    let (mut pipeline, peak_memory) = measure_peak_memory(|| prepare_pipeline());
+    let (mut pipeline, peak_memory) = measure_peak_memory(prepare_pipeline);
     metrics.preprocessing_peak_memory = peak_memory;
     println!(
         "Preprocessing peak memory: {} GB",

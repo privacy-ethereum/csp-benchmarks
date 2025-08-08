@@ -24,7 +24,7 @@ fn benchmark_sha2(num_bytes: usize) -> Result<SubMetrics, Error> {
     metrics.preprocessing_peak_memory = peak_memory;
 
     let mut buffer: Vec<u8> = Vec::new();
-    let _ = constraint_system
+    constraint_system
         .serialize(&mut buffer, binius_utils::SerializationMode::CanonicalTower)
         .expect("Failed to serialize constraint system");
     metrics.preprocessing_size = buffer.len();
