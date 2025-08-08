@@ -6,7 +6,6 @@ use utils::bench::{SubMetrics, display_submetrics, measure_peak_memory, write_js
 const INPUT_EXPONENTS: [u32; 1] = [11];
 
 fn sha256_benchmarks(c: &mut Criterion) {
-    // measure the SubMetrics
     let (bench_harness, preprocessing_peak_memory) =
         measure_peak_memory(|| ProvekitSha256Benchmark::new(&INPUT_EXPONENTS));
 
