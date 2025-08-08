@@ -63,6 +63,12 @@ jobs:
       - name: Install nightly-2024-08-01 with rust-src for Powdr
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
       - name: Build full workspace (release)
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }} # for ACIR (required by protoc-prebuilt)
