@@ -6,8 +6,9 @@ edition = "2024"
 [dependencies]
 rand = { workspace = true }
 utils = { workspace = true }
+criterion = { workspace = true }
 noir-r1cs = { git = "https://github.com/worldfnd/ProveKit", branch = "main" }
 
 [[bench]]
-name = "provekit"
+name = "prove_verify"
 harness = false

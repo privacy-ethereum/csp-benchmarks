@@ -421,8 +421,8 @@ mod tests {
     #[test]
     fn test_sha256() -> Result<()> {
         let mut msg = vec![0; 128_usize];
-        for i in 0..127 {
-            msg[i] = i as u8;
+        for (i, byte) in msg.iter_mut().enumerate().take(127) {
+            *byte = i as u8;
         }
 
         let msg_bits = array_to_bits(&msg);
@@ -434,15 +434,15 @@ mod tests {
         let targets = make_circuits(&mut builder, len as u64);
         let mut pw = PartialWitness::new();
 
-        for i in 0..len {
-            pw.set_bool_target(targets.message[i], msg_bits[i])?;
+        for (target, &bit) in targets.message.iter().zip(msg_bits.iter()).take(len) {
+            pw.set_bool_target(*target, bit)?;
         }
 
-        for i in 0..EXPECTED_RES.len() {
-            if EXPECTED_RES[i] == 1 {
-                builder.assert_one(targets.digest[i].target);
+        for (&expected, digest) in EXPECTED_RES.iter().zip(targets.digest.iter()) {
+            if expected == 1 {
+                builder.assert_one(digest.target);
             } else {
-                builder.assert_zero(targets.digest[i].target);
+                builder.assert_zero(digest.target);
             }
         }
 
@@ -464,8 +464,8 @@ mod tests {
     #[should_panic]
     fn test_sha256_failure() {
         let mut msg = vec![0; 128_usize];
-        for i in 0..127 {
-            msg[i] = i as u8;
+        for (i, byte) in msg.iter_mut().enumerate().take(127) {
+            *byte = i as u8;
         }
 
         let msg_bits = array_to_bits(&msg);
@@ -477,18 +477,18 @@ mod tests {
         let targets = make_circuits(&mut builder, len as u64);
         let mut pw = PartialWitness::new();
 
-        for i in 0..len {
-            pw.set_bool_target(targets.message[i], msg_bits[i]).unwrap();
+        for (target, &bit) in targets.message.iter().zip(msg_bits.iter()).take(len) {
+            pw.set_bool_target(*target, bit).unwrap();
         }
 
         let mut rng = rand::thread_rng();
         let rnd = rng.gen_range(0..256);
-        for i in 0..EXPECTED_RES.len() {
-            let b = (i == rnd && EXPECTED_RES[i] != 1) || (i != rnd && EXPECTED_RES[i] == 1);
+        for (i, (&expected, digest)) in EXPECTED_RES.iter().zip(targets.digest.iter()).enumerate() {
+            let b = (i == rnd && expected != 1) || (i != rnd && expected == 1);
             if b {
-                builder.assert_one(targets.digest[i].target);
+                builder.assert_one(digest.target);
             } else {
-                builder.assert_zero(targets.digest[i].target);
+                builder.assert_zero(digest.target);
             }
         }
 

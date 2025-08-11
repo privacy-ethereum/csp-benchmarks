@@ -137,7 +137,7 @@ pub fn write_csv(out_path: &str, results: &[Metrics]) {
 }
 
 #[serde_as]
-#[derive(Serialize, Tabled)]
+#[derive(Serialize, Tabled, Clone, Copy)]
 pub struct SubMetrics {
     #[tabled(display_with = "display_bytes")]
     pub input_size: usize,
@@ -161,6 +161,15 @@ impl SubMetrics {
             preprocessing_peak_memory: 0,
         }
     }
+}
+
+pub fn display_submetrics(metrics: &[SubMetrics]) -> String {
+    if metrics.is_empty() {
+        return String::new();
+    }
+    let mut table = Table::new(metrics);
+    table.with(Style::modern());
+    table.to_string()
 }
 
 pub fn write_json_submetrics(output_path: &str, metrics: &SubMetrics) {

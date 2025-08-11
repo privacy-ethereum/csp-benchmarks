@@ -19,7 +19,7 @@ fn main() {
 fn benchmark_sha2(num_bytes: usize) -> SubMetrics {
     let mut metrics = SubMetrics::new(num_bytes);
 
-    let ((data, pw), peak_memory) = measure_peak_memory(|| sha256_no_lookup_prepare());
+    let ((data, pw), peak_memory) = measure_peak_memory(sha256_no_lookup_prepare);
     metrics.preprocessing_peak_memory = peak_memory;
 
     let gate_serializer = U32GateSerializer;

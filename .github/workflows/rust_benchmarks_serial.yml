@@ -48,10 +48,16 @@ jobs:
       - name: Install nightly-2024-08-01 with rust-src for Powdr
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
+      - name: Format
+        run: cargo fmt --all -- --check
+
       - name: Build full workspace (release)
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }} # for ACIR (required by protoc-prebuilt)
         run: cargo build --release --workspace
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features
 
   # ────────────────── 2. Rust workspace benchmarks ──────────────────
   bench-workspace:
@@ -90,6 +96,11 @@ jobs:
 
       - name: Install nightly-2024-08-01 with rust-src for Powdr
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
+
+      - name: Install Nargo
+        uses: noir-lang/noirup@v0.1.4
+        with:
+          toolchain: stable
 
       - name: Run workspace benchmarks
         run: cargo bench
