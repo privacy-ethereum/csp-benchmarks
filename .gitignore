@@ -7,6 +7,7 @@
 *~
 *.swp
 *.swo
+*.csv
 .bazelrc.local
 .cache
 .devcontainer/
