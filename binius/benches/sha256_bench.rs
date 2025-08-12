@@ -54,8 +54,8 @@ fn sha256_no_lookup(c: &mut Criterion) {
 fn sha256_with_lookup(c: &mut Criterion) {
     let mut all_metrics = Vec::new();
 
-    for &num_byte in SHA2_INPUTS.iter() {
-        let metrics = sha2_binius_with_lookup_submetrics(num_byte);
+    for &input_size in SHA2_INPUTS.iter() {
+        let metrics = sha2_binius_with_lookup_submetrics(input_size);
         all_metrics.push(metrics);
     }
 
@@ -97,8 +97,8 @@ fn sha256_with_lookup(c: &mut Criterion) {
 criterion_main!(sha256);
 criterion_group!(sha256, sha256_no_lookup, sha256_with_lookup);
 
-fn sha2_binius_no_lookup_submetrics(num_bytes: usize) -> SubMetrics {
-    let mut metrics = SubMetrics::new(num_bytes);
+fn sha2_binius_no_lookup_submetrics(input_size: usize) -> SubMetrics {
+    let mut metrics = SubMetrics::new(input_size);
 
     let allocator = bumpalo::Bump::new();
 
@@ -120,8 +120,8 @@ fn sha2_binius_no_lookup_submetrics(num_bytes: usize) -> SubMetrics {
     metrics
 }
 
-fn sha2_binius_with_lookup_submetrics(num_bytes: usize) -> SubMetrics {
-    let mut metrics = SubMetrics::new(num_bytes);
+fn sha2_binius_with_lookup_submetrics(input_size: usize) -> SubMetrics {
+    let mut metrics = SubMetrics::new(input_size);
 
     let allocator = bumpalo::Bump::new();
 

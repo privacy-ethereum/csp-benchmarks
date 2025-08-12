@@ -8,8 +8,8 @@ use utils::{
 fn sha256_bench(c: &mut Criterion) {
     let mut all_metrics = Vec::new();
 
-    for &num_byte in SHA2_INPUTS.iter() {
-        let metrics = sha2_plonky3_powdr_submetrics(num_byte);
+    for &input_size in SHA2_INPUTS.iter() {
+        let metrics = sha2_plonky3_powdr_submetrics(input_size);
         all_metrics.push(metrics);
     }
 
@@ -50,8 +50,8 @@ fn sha256_bench(c: &mut Criterion) {
 criterion_main!(sha256);
 criterion_group!(sha256, sha256_bench);
 
-fn sha2_plonky3_powdr_submetrics(num_bytes: usize) -> SubMetrics {
-    let mut metrics = SubMetrics::new(num_bytes);
+fn sha2_plonky3_powdr_submetrics(input_size: usize) -> SubMetrics {
+    let mut metrics = SubMetrics::new(input_size);
 
     let (mut pipeline, peak_memory) = measure_peak_memory(prepare_pipeline);
     metrics.preprocessing_peak_memory = peak_memory;

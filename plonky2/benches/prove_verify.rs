@@ -9,8 +9,8 @@ use utils::{
 fn sha256_no_lookup(c: &mut Criterion) {
     let mut all_metrics = Vec::new();
 
-    for &num_byte in SHA2_INPUTS.iter() {
-        let metrics = sha2_plonky2_submetrics(num_byte);
+    for &input_size in SHA2_INPUTS.iter() {
+        let metrics = sha2_plonky2_submetrics(input_size);
         all_metrics.push(metrics);
     }
 
@@ -51,7 +51,7 @@ fn sha256_no_lookup(c: &mut Criterion) {
 criterion_main!(sha256);
 criterion_group!(sha256, sha256_no_lookup);
 
-fn sha2_plonky2_submetrics(num_bytes: usize) -> SubMetrics {
+fn sha2_plonky2_submetrics(input_size: usize) -> SubMetrics {
     use plonky2::{plonk::config::PoseidonGoldilocksConfig, util::serialization::Write};
     use plonky2_sha256::bench::{prove, sha256_no_lookup_prepare};
     use plonky2_u32::gates::arithmetic_u32::{U32GateSerializer, U32GeneratorSerializer};
@@ -59,7 +59,7 @@ fn sha2_plonky2_submetrics(num_bytes: usize) -> SubMetrics {
     const D: usize = 2;
     type C = PoseidonGoldilocksConfig;
 
-    let mut metrics = SubMetrics::new(num_bytes);
+    let mut metrics = SubMetrics::new(input_size);
 
     let ((data, pw), peak_memory) = measure_peak_memory(sha256_no_lookup_prepare);
     metrics.preprocessing_peak_memory = peak_memory;
