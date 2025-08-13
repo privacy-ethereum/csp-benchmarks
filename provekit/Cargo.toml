@@ -9,6 +9,10 @@ utils = { workspace = true }
 criterion = { workspace = true }
 noir-r1cs = { git = "https://github.com/worldfnd/ProveKit", branch = "main" }
 
+[[bin]]
+name = "provekit-measure"
+path = "src/bin/measure.rs"
+
 [[bench]]
 name = "prove_verify"
 harness = false
