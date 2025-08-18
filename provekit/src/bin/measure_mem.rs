@@ -6,8 +6,6 @@ const INPUT_EXPONENTS: [u32; 1] = [11];
 fn main() {
     let bench_harness = ProvekitSha256Benchmark::new(&INPUT_EXPONENTS);
 
-    let mut all_metrics = Vec::new();
-
     for &exp in INPUT_EXPONENTS.iter() {
         let package_name = format!("sha256_bench_2e{exp}");
         let circuit_path = PathBuf::from(WORKSPACE_ROOT)
