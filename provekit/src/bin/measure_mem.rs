@@ -18,6 +18,6 @@ fn main() {
             .join(format!("sha256-bench-2e{exp}"))
             .join("Prover.toml");
 
-        let _proof= bench_harness.run_prove(exp);
+        let _proof = bench_harness.run_prove(exp);
     }
 }

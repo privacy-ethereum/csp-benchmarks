@@ -144,7 +144,7 @@ pub struct SubMetrics {
     #[tabled(display_with = "display_bytes")]
     pub proof_size: usize,
     #[tabled(display_with = "display_bytes")]
-    pub proving_peak_memory: usize,  // NOTE: This should be removed when `SP1` benchmarks are refactored to use `ere`.
+    pub proving_peak_memory: usize, // NOTE: This should be removed when `SP1` benchmarks are refactored to use `ere`.
     #[tabled(display_with = "display_bytes")]
     pub preprocessing_size: usize,
     #[tabled(display_with = "display_bytes")]
