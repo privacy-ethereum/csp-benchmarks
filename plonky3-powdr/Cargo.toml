@@ -38,5 +38,9 @@ name = "plonky3-powdr-measure"
 path = "src/bin/measure.rs"
 
 [[bin]]
+name = "plonky3-powdr-measure-mem"
+path = "src/bin/measure_mem.rs"
+
+[[bin]]
 name = "plonky3-powdr-sha"
 path = "src/main.rs"

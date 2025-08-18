@@ -16,8 +16,14 @@ cargo run -r --bin plonky3-powdr-sha
 cargo bench
 ```
 
-Measure RAM footprint:
+Measure some metrics(e.g. proof size):
 
 ```bash
 cargo run -r --bin plonky3-powdr-measure
+```
+
+Measure RAM footprint:
+```bash
+chmod +x ../measure_mem_avg.sh
+../measure_mem_avg.sh --json sha2_plonky3_powder_mem_report.json -- cargo r -r --bin plonky3-powdr-measure-mem
 ```
