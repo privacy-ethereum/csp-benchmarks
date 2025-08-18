@@ -16,3 +16,8 @@ cargo bench
 ```
 cargo run --bin plonky2-measure --release
 ```
+
+```bash
+chmod +x ../measure_mem_avg.sh
+../measure_mem_avg.sh --json sha2_plonky2_mem_report.json -- cargo r -r --bin plonky2-measure-mem
+```
