@@ -1,10 +1,10 @@
 use criterion::{BatchSize, Criterion, black_box, criterion_group, criterion_main};
-use provekit::{ProvekitSha256Benchmark, WORKSPACE_ROOT};
-use utils::bench::{SubMetrics, display_submetrics, measure_peak_memory, write_json_submetrics};
+use provekit::ProvekitSha256Benchmark;
 
 const INPUT_EXPONENTS: [u32; 1] = [11];
 
 fn sha256_benchmarks(c: &mut Criterion) {
+    let bench_harness = ProvekitSha256Benchmark::new(&INPUT_EXPONENTS);
     let mut group = c.benchmark_group("SHA256 Prove & Verify");
     group.sample_size(10);
 
