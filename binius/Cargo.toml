@@ -42,5 +42,13 @@ name = "measure_lookup"
 path = "src/bin/measure_lookup.rs"
 
 [[bin]]
+name = "measure_lookup_mem"
+path = "src/bin/measure_lookup_mem.rs"
+
+[[bin]]
 name = "measure_no_lookup"
 path = "src/bin/measure_no_lookup.rs"
+
+[[bin]]
+name = "measure_no_lookup_mem"
+path = "src/bin/measure_no_lookup_mem.rs"
