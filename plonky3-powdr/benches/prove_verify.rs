@@ -6,7 +6,7 @@ fn sha256_bench(c: &mut Criterion) {
     // Measure the SubMetrics
     let input_size = 2048;
     let metrics = sha256_submetrics(input_size);
-    
+
     let json_file = "sha2_plonky3_powdr_submetrics.json";
     write_json_submetrics(json_file, &metrics);
 

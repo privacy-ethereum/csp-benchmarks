@@ -12,7 +12,7 @@ fn sha256_no_lookup(c: &mut Criterion) {
     // Measure the SubMetrics
     let input_size = 2048;
     let metrics = sha256_no_lookup_submetrics(input_size);
-    
+
     let json_file = "sha2_plonky2_submetrics.json";
     write_json_submetrics(json_file, &metrics);
 

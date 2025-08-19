@@ -1,15 +1,15 @@
 // Copyright 2024-2025 Irreducible Inc.
 
 use binius::bench::{prove, sha256_no_lookup_prepare, sha256_with_lookup_prepare, verify};
-use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use binius_utils::SerializeBytes;
+use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use utils::bench::{SubMetrics, write_json_submetrics};
 
 fn sha256_no_lookup(c: &mut Criterion) {
     // Measure the SubMetrics
     let input_size = 2048;
     let metrics = sha2_no_lookup_submetrics(input_size);
-    
+
     let json_file = "sha2_binius_no_lookup_submetrics.json";
     write_json_submetrics(json_file, &metrics);
 
@@ -48,7 +48,7 @@ fn sha256_with_lookup(c: &mut Criterion) {
     // Measure the SubMetrics
     let input_size = 2048;
     let metrics = sha2_with_lookup_submetrics(input_size);
-    
+
     let json_file = "sha2_binius_lookup_submetrics.json";
     write_json_submetrics(json_file, &metrics);
 
@@ -91,8 +91,7 @@ fn sha2_with_lookup_submetrics(input_size: usize) -> SubMetrics {
 
     let allocator = bumpalo::Bump::new();
 
-    let (constraint_system, args, witness, backend) =
-        sha256_with_lookup_prepare(&allocator);
+    let (constraint_system, args, witness, backend) = sha256_with_lookup_prepare(&allocator);
 
     let mut buffer: Vec<u8> = Vec::new();
     constraint_system
@@ -111,8 +110,7 @@ fn sha2_no_lookup_submetrics(input_size: usize) -> SubMetrics {
 
     let allocator = bumpalo::Bump::new();
 
-    let (constraint_system, args, witness, backend) =
-        sha256_no_lookup_prepare(&allocator);
+    let (constraint_system, args, witness, backend) = sha256_no_lookup_prepare(&allocator);
 
     let mut buffer: Vec<u8> = Vec::new();
     constraint_system
