@@ -1,12 +1,12 @@
 use provekit::{ProvekitSha256Benchmark, WORKSPACE_ROOT};
 use std::path::PathBuf;
 
-const INPUT_SIZES: [usize; 1] = [2048];
+const INPUT_EXPONENTS: [u32; 1] = [11];
 
 fn main() {
-    let bench_harness = ProvekitSha256Benchmark::new(&INPUT_SIZES);
+    let bench_harness = ProvekitSha256Benchmark::new(&INPUT_EXPONENTS);
 
-    for &size in INPUT_SIZES.iter() {
-        let _proof = bench_harness.run_prove(size);
+    for &exp in INPUT_EXPONENTS.iter() {
+        let _proof = bench_harness.run_prove(exp);
     }
 }
