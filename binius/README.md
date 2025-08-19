@@ -8,12 +8,7 @@ These benchmarks use official circuits from the Binius project: https://github.c
 cargo bench
 ```
 
-# Measure SHA256 RAM footprint and preprocessing size
-
-```bash
-cargo run --release --bin measure_lookup
-cargo run --release --bin measure_no_lookup
-```
+# Measure SHA256 RAM footprint
 
 ```bash
 chmod +x ../measure_mem_avg.sh
