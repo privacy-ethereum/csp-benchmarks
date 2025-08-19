@@ -22,9 +22,5 @@ name = "prove_verify"
 harness = false
 
 [[bin]]
-name = "plonky2-measure"
-path = "src/bin/measure.rs"
-
-[[bin]]
 name = "plonky2-measure-mem"
 path = "src/bin/measure_mem.rs"
