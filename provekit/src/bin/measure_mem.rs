@@ -1,5 +1,4 @@
-use provekit::{ProvekitSha256Benchmark, WORKSPACE_ROOT};
-use std::path::PathBuf;
+use provekit::ProvekitSha256Benchmark;
 
 const INPUT_EXPONENTS: [u32; 1] = [11];
 
