@@ -10,13 +10,13 @@ pub const CIRCUIT_SUB_PATH: &str = "hash/sha256-provekit";
 
 /// Provekit benchmark harness for SHA256.
 pub struct ProvekitSha256Benchmark {
-    proof_schemes: HashMap<u32, NoirProofScheme>,
-    toml_paths: HashMap<u32, PathBuf>,
+    proof_schemes: HashMap<usize, NoirProofScheme>,
+    toml_paths: HashMap<usize, PathBuf>,
 }
 
 impl ProvekitSha256Benchmark {
     /// Compiles the circuits and creates a new benchmark harness.
-    pub fn new(exponents: &[u32]) -> Self {
+    pub fn new(input_sizes: &[usize]) -> Self {
         let output = Command::new("nargo")
             .args([
                 "compile",
@@ -40,18 +40,17 @@ impl ProvekitSha256Benchmark {
         let mut proof_schemes = HashMap::new();
         let mut toml_paths = HashMap::new();
 
-        for &exp in exponents {
-            let size = 1usize << exp;
-            let package_name = format!("sha256_bench_2e{exp}");
+        for &size in input_sizes {
+            let package_name = format!("sha256_bench_{size}");
             let circuit_path = workspace_path
                 .join("target")
                 .join(format!("{package_name}.json"));
 
             let proof_scheme = NoirProofScheme::from_file(circuit_path.to_str().unwrap())
-                .unwrap_or_else(|e| panic!("Failed to load proof scheme for exp {exp}: {e}"));
-            proof_schemes.insert(exp, proof_scheme);
+                .unwrap_or_else(|e| panic!("Failed to load proof scheme for size {size}: {e}"));
+            proof_schemes.insert(size, proof_scheme);
 
-            let dir_name = format!("sha256-bench-2e{exp}");
+            let dir_name = format!("sha256-bench-{size}");
             let circuit_member_dir = workspace_path.join(CIRCUIT_SUB_PATH).join(dir_name);
             fs::create_dir_all(&circuit_member_dir).expect("Failed to create circuit dir");
 
@@ -67,7 +66,7 @@ impl ProvekitSha256Benchmark {
 
             let toml_path = circuit_member_dir.join("Prover.toml");
             fs::write(&toml_path, toml_content).expect("Failed to write Prover.toml");
-            toml_paths.insert(exp, toml_path);
+            toml_paths.insert(size, toml_path);
         }
 
         Self {
@@ -77,9 +76,9 @@ impl ProvekitSha256Benchmark {
     }
 
     /// Runs the proving algorithm.
-    pub fn run_prove(&self, input_exp: u32) -> NoirProof {
-        let proof_scheme = self.proof_schemes.get(&input_exp).unwrap();
-        let toml_path = self.toml_paths.get(&input_exp).unwrap();
+    pub fn run_prove(&self, input_size: usize) -> NoirProof {
+        let proof_scheme = self.proof_schemes.get(&input_size).unwrap();
+        let toml_path = self.toml_paths.get(&input_size).unwrap();
         let witness_map = proof_scheme
             .read_witness(toml_path.to_str().unwrap())
             .expect("Failed to read witness");
@@ -90,9 +89,9 @@ impl ProvekitSha256Benchmark {
     }
 
     /// Prepares inputs for verification.
-    pub fn prepare_verify(&self, input_exp: u32) -> (NoirProof, &NoirProofScheme) {
-        let proof_scheme = self.proof_schemes.get(&input_exp).unwrap();
-        let proof = self.run_prove(input_exp);
+    pub fn prepare_verify(&self, input_size: usize) -> (NoirProof, &NoirProofScheme) {
+        let proof_scheme = self.proof_schemes.get(&input_size).unwrap();
+        let proof = self.run_prove(input_size);
         (proof, proof_scheme)
     }
 

@@ -1,11 +1,10 @@
 use provekit::ProvekitSha256Benchmark;
-
-const INPUT_EXPONENTS: [u32; 1] = [11];
+use utils::metadata::SHA2_INPUTS;
 
 fn main() {
-    let bench_harness = ProvekitSha256Benchmark::new(&INPUT_EXPONENTS);
+    let bench_harness = ProvekitSha256Benchmark::new(&SHA2_INPUTS);
 
-    for &exp in INPUT_EXPONENTS.iter() {
-        let _proof = bench_harness.run_prove(exp);
+    for &size in SHA2_INPUTS.iter() {
+        let _proof = bench_harness.run_prove(size);
     }
 }

@@ -1,5 +1,5 @@
 [package]
-name = "sha256_bench_2e12"
+name = "sha256_bench_2048"
 type = "bin"
 
 [dependencies]
