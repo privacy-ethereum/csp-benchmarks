@@ -4,6 +4,8 @@ description: "Installs the noir-lang toolchain"
 runs:
   using: "composite"
   steps:
-    uses: noir-lang/noirup@v0.1.4
-    with:
-      toolchain: stable
+    - shell: bash
+      run: |
+        curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash
+        source ~/.bashrc
+        ~/.nargo/bin/noirup --version
