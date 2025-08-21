@@ -1,0 +1,9 @@
+name: "Install Nargo"
+description: "Installs the noir-lang toolchain"
+
+runs:
+  using: "composite"
+  steps:
+    uses: noir-lang/noirup@v0.1.4
+    with:
+      toolchain: stable
