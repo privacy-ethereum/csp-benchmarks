@@ -11,8 +11,9 @@ This code is a fork of https://github.com/polymerdao/plonky2-sha256/tree/main
 cargo bench
 ```
 
-## Measuring disk space and RAM requirements
+## Measuring RAM requirements
 
-```
-cargo run --bin plonky2-measure --release
+```bash
+chmod +x ../measure_mem_avg.sh
+../measure_mem_avg.sh --json sha2_plonky2_mem_report.json -- cargo r -r --bin plonky2-measure-mem
 ```

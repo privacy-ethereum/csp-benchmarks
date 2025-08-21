@@ -12,5 +12,6 @@ cargo bench
 Measure RAM footprint:
 
 ```bash
-cargo run -r --bin provekit-measure
+chmod +x ../measure_mem_avg.sh
+../measure_mem_avg.sh --json sha2_provekit_mem_report.json -- cargo r -r --bin provekit-measure-mem
 ```

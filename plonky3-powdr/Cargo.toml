@@ -34,8 +34,8 @@ name = "prove_verify"
 harness = false
 
 [[bin]]
-name = "plonky3-powdr-measure"
-path = "src/bin/measure.rs"
+name = "plonky3-powdr-measure-mem"
+path = "src/bin/measure_mem.rs"
 
 [[bin]]
 name = "plonky3-powdr-sha"
