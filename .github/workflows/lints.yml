@@ -39,6 +39,22 @@ jobs:
           default: true
           components: rustfmt, clippy
 
+      - name: Install SP1
+        uses: ./.github/actions/install-sp1
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Install Powdr
+        uses: ./.github/actions/install-powdr
+
+      - name: Install nightly-2024-08-01 with rust-src for Powdr
+        run: rustup toolchain install nightly-2024-08-01 --component rust-src
+      
+      - name: Build full workspace (release)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }} # for ACIR (required by protoc-prebuilt)
+        run: cargo build --release --workspace
+      
       - name: Format
         run: cargo fmt --all -- --check
 
