@@ -50,10 +50,13 @@ jobs:
       - name: Install nightly-2024-08-01 with rust-src for Powdr
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
       
-      - name: Build full workspace (release)
+      - name: Install Nargo
+        uses: ./.github/actions/install-nargo
+      
+      - name: Build full workspace
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }} # for ACIR (required by protoc-prebuilt)
-        run: cargo build --release --workspace
+        run: cargo build --workspace
       
       - name: Format
         run: cargo fmt --all -- --check
