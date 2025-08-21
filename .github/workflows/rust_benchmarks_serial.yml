@@ -35,7 +35,7 @@ jobs:
           override: true
           profile: default
           default: true
-          components: llvm-tools, rustc-dev, rustfmt
+          components: llvm-tools, rustc-dev, rustfmt, clippy
 
       - name: Install SP1
         uses: ./.github/actions/install-sp1
