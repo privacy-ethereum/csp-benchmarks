@@ -1,49 +1,49 @@
-use ere_risc0::{EreRisc0, RV32_IM_RISC0_ZKVM_ELF};
-use rand::{RngCore, SeedableRng, rngs::StdRng};
+use ere_miden::{EreMiden, MidenTarget};
+use rand::RngCore;
 use std::collections::HashMap;
 use std::path::Path;
 use std::time::Instant;
 use utils::bench::{Metrics, benchmark};
 use utils::metadata::SHA2_INPUTS;
-use zkvm_interface::{Compiler, Input, ProverResourceType, zkVM};
+use zkvm_interface::{Compiler, InputItem, ProverResourceType, zkVM};
+const CSV_OUTPUT: &str = "miden_sha256.csv";
 
-const CSV_OUTPUT: &str = "risc0_sha256.csv";
-
-/// Risc0 SHA-256 benchmark.
+/// Miden SHA-256 benchmark harness.
 struct Sha256Benchmark {
+    program: <MidenTarget as Compiler>::Program,
     inputs: HashMap<usize, (usize, &'static [u8])>,
 }
 
 impl Sha256Benchmark {
     /// Compiles the guest program and generates inputs.
     fn new(sizes: &[usize]) -> Self {
+        let guest_path = Path::new("../guests/masm/sha256");
+        let program = MidenTarget
+            .compile(guest_path)
+            .expect("Failed to compile guest program");
+
         let inputs = sizes
             .iter()
             .map(|&size| {
-                let mut rng = StdRng::seed_from_u64(1337);
                 let mut data = vec![0u8; size];
-                rng.fill_bytes(&mut data);
+                rand::thread_rng().fill_bytes(&mut data);
                 let static_data: &'static [u8] = Box::leak(data.into_boxed_slice());
                 (size, (size, static_data))
             })
             .collect();
 
-        Self { inputs }
+        Self { program, inputs }
     }
 
     /// Runs a single benchmark iteration.
     fn run(&self, input_size: usize) -> Metrics {
-        let guest_relative = Path::new("../guests/rust/sha256");
-        let program = RV32_IM_RISC0_ZKVM_ELF
-            .compile(guest_relative)
-            .expect("Failed to compile guest program");
-
         let &(size, test_data) = self.inputs.get(&input_size).unwrap();
+        let zkvm = EreMiden::new(self.program.clone(), ProverResourceType::Cpu);
 
-        let zkvm = EreRisc0::new(program.clone(), ProverResourceType::Cpu).unwrap();
-        let mut input = Input::new();
-        input.write(test_data);
+        // Input size is placed in the stack on the ere side
+        let input = vec![InputItem::Bytes(test_data.to_vec())].into();
 
+        // Execute, prove, and verify, measuring performance at each step.
         let execution_report = zkvm.execute(&input).unwrap();
 
         let prove_start = Instant::now();
@@ -59,12 +59,11 @@ impl Sha256Benchmark {
         metrics.verify_duration = verify_duration;
         metrics.cycles = execution_report.total_num_cycles;
         metrics.proof_size = proof.len();
-
         metrics
     }
 }
 
-/// Runs the Risc0 SHA-256 benchmark.
+/// Runs the Miden SHA-256 benchmark.
 pub fn bench_sha256() {
     let bench_harness = Sha256Benchmark::new(&SHA2_INPUTS);
     benchmark(

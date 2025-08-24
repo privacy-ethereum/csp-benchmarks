@@ -9,7 +9,8 @@ members = [
     "provekit",
     "utils",
     "ere/risc0",
-    "ere/guests/sha256",
+    "ere/miden",
+    "ere/guests/rust/sha256",
 ]
 exclude = [
     "plonky3-sp1/program", # Should be excluded, compiled for the Succinct toolchain via sp1_helper in script/build.rs

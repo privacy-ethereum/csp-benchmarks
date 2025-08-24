@@ -1,0 +1,30 @@
+use.std::crypto::hashes::sha256
+
+begin
+    # Stack: [byte_length, ...]
+    # Advice: input data as u32 words (LE in current host)
+
+    # Store byte length, calculate ceil(len/4) word count
+    dup mem_store.1
+    u32assert u32overflowing_add.3 assertz u32assert u32div.4
+
+    # Set memory address
+    push.10000 mem_store.0
+
+    # Load data from advice to memory, one word per address
+    mem_load.2 u32assert neq.0
+    while.true
+        adv_push.1
+        mem_load.0 mem_store
+        mem_load.0 u32assert u32overflowing_add.1 assertz mem_store.0
+        mem_load.2 u32assert u32overflowing_sub.1 assertz dup mem_store.2 u32assert neq.0
+    end
+
+    # Hash the data in memory
+    mem_load.1
+    push.10000
+    exec.sha256::hash_memory
+
+    # Drop to prevent stack overflow
+    drop drop drop drop drop drop drop drop
+end

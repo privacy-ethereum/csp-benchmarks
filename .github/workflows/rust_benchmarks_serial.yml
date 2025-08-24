@@ -6,6 +6,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
+  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
 # ────────────────── 1. Warm‑up build ──────────────────
 jobs:
@@ -31,7 +32,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2025-04-05-aarch64-apple-darwin
+          toolchain: nightly-2025-08-18-aarch64-apple-darwin
           override: true
           profile: default
           default: true
@@ -49,8 +50,6 @@ jobs:
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
       - name: Build full workspace (release)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }} # for ACIR (required by protoc-prebuilt)
         run: cargo build --release --workspace
 
   # ────────────────── 2. Rust workspace benchmarks ──────────────────
@@ -74,7 +73,7 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2025-04-05-aarch64-apple-darwin
+          toolchain: nightly-2025-08-18-aarch64-apple-darwin
           override: true
           profile: default
           default: true
@@ -90,6 +89,9 @@ jobs:
 
       - name: Install nightly-2024-08-01 with rust-src for Powdr
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
+
+      - name: Install RISC0
+        uses: ./.github/actions/install-risc0
 
       - name: Install Nargo
         uses: ./.github/actions/install-nargo
