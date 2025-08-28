@@ -39,10 +39,7 @@ fn main() -> io::Result<()> {
                                     continue;
                                 }
                             };
-                        benchmarks.insert(
-                            path.file_name().unwrap().to_str().unwrap().to_owned(),
-                            metrics,
-                        );
+                        benchmarks.insert(path_str.to_owned(), metrics);
                     } else {
                         for feat in feats {
                             let metrics = match extract_metrics(
@@ -58,10 +55,7 @@ fn main() -> io::Result<()> {
                                     continue;
                                 }
                             };
-                            benchmarks.insert(
-                                path.file_name().unwrap().to_str().unwrap().to_owned(),
-                                metrics,
-                            );
+                            benchmarks.insert(path_str.to_owned(), metrics);
                         }
                     }
                 }
