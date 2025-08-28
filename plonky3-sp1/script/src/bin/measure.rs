@@ -5,7 +5,7 @@ use utils::bench::{SubMetrics, measure_peak_memory, write_json_submetrics};
 pub const SHA_ELF: &[u8] = include_elf!("sha-program");
 
 fn main() {
-    let json_file = "sha2_plonky3_sp1_submetrics.json";
+    let json_file = "sha256_plonky3_sp1_submetrics.json";
 
     let input_num_bytes = 2048;
     let metrics = benchmark_sha2(input_num_bytes);
