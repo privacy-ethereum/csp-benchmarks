@@ -11,16 +11,16 @@ type C = PoseidonGoldilocksConfig;
 fn sha256_no_lookup(c: &mut Criterion) {
     // Measure the SubMetrics
     let input_size = 2048;
-    let metrics = sha256_no_lookup_submetrics(input_size);
+    let metrics = sha256_plonky2_no_lookup_submetrics(input_size);
 
     let json_file = "sha2_plonky2_submetrics.json";
     write_json_submetrics(json_file, &metrics);
 
     // Run the benchmarks
-    let mut group = c.benchmark_group("sha256_no_lookup");
+    let mut group = c.benchmark_group("sha256_plonky2_no_lookup");
     group.sample_size(10);
 
-    group.bench_function("sha256_no_lookup_prove", |bench| {
+    group.bench_function("sha256_plonky2_no_lookup_prove", |bench| {
         bench.iter_batched(
             sha256_no_lookup_prepare,
             |(data, pw)| {
@@ -30,7 +30,7 @@ fn sha256_no_lookup(c: &mut Criterion) {
         );
     });
 
-    group.bench_function("sha256_no_lookup_verify", |bench| {
+    group.bench_function("sha256_plonky2_no_lookup_verify", |bench| {
         bench.iter_batched(
             || {
                 let (data, pw) = sha256_no_lookup_prepare();
@@ -49,7 +49,7 @@ fn sha256_no_lookup(c: &mut Criterion) {
 criterion_main!(sha256);
 criterion_group!(sha256, sha256_no_lookup);
 
-fn sha256_no_lookup_submetrics(input_size: usize) -> SubMetrics {
+fn sha256_plonky2_no_lookup_submetrics(input_size: usize) -> SubMetrics {
     let mut metrics = SubMetrics::new(input_size);
 
     let (data, pw) = sha256_no_lookup_prepare();

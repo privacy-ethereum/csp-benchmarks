@@ -27,10 +27,10 @@ fn sha256_bench(c: &mut Criterion) {
     // client.verify(&proof, &vk).expect("failed to verify proof");
     // println!("Successfully verified proof!");
 
-    let mut group = c.benchmark_group("sha256_bench");
+    let mut group = c.benchmark_group("sha256_sp1");
     group.sample_size(10);
 
-    group.bench_function("sha256_bench_prove", |bench| {
+    group.bench_function("sha256_sp1_prove", |bench| {
         bench.iter_batched(
             || sha256_prepare(&client),
             |(pk, _pw)| {
@@ -43,7 +43,7 @@ fn sha256_bench(c: &mut Criterion) {
         );
     });
 
-    group.bench_function("sha256_bench_verify", |bench| {
+    group.bench_function("sha256_sp1_verify", |bench| {
         bench.iter_batched(
             || {
                 let (pk, vk) = sha256_prepare(&client);

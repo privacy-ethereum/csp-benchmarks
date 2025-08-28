@@ -6,26 +6,24 @@ use utils::metadata::SHA2_INPUTS;
 
 fn sha256_benchmarks(c: &mut Criterion) {
     // Measure the SubMetrics
-    let metrics = sha256_submetrics();
+    let metrics = sha256_provekit_submetrics();
     let json_file: &'static str = "sha2_provekit_submetrics.json";
     write_json_submetrics(json_file, &metrics[0]);
 
     // Run the benchmarks
     let bench_harness = ProvekitSha256Benchmark::new(&SHA2_INPUTS);
-    let mut group = c.benchmark_group("SHA256 Prove & Verify");
+    let mut group = c.benchmark_group("sha256_provekit");
     group.sample_size(10);
 
     for &input_size in SHA2_INPUTS.iter() {
-        let prove_id = format!("Prove ({} bytes)", input_size);
-        group.bench_function(prove_id, |bench| {
+        group.bench_function("sha256_provekit_prove", |bench| {
             bench.iter(|| {
                 let proof = bench_harness.run_prove(input_size);
                 black_box(proof);
             });
         });
 
-        let verify_id = format!("Verify ({} bytes)", input_size);
-        group.bench_function(verify_id, |bench| {
+        group.bench_function("sha256_provekit_verify", |bench| {
             bench.iter_batched(
                 || bench_harness.prepare_verify(input_size),
                 |(proof, proof_scheme)| bench_harness.run_verify(&proof, proof_scheme).unwrap(),
@@ -40,7 +38,7 @@ fn sha256_benchmarks(c: &mut Criterion) {
 criterion_group!(benches, sha256_benchmarks);
 criterion_main!(benches);
 
-fn sha256_submetrics() -> Vec<SubMetrics> {
+fn sha256_provekit_submetrics() -> Vec<SubMetrics> {
     let bench_harness = ProvekitSha256Benchmark::new(&SHA2_INPUTS);
 
     let mut all_metrics = Vec::new();

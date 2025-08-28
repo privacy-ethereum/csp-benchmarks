@@ -5,16 +5,16 @@ use utils::bench::{SubMetrics, write_json_submetrics};
 fn sha256_bench(c: &mut Criterion) {
     // Measure the SubMetrics
     let input_size = 2048;
-    let metrics = sha256_submetrics(input_size);
+    let metrics = sha256_powdr_submetrics(input_size);
 
     let json_file = "sha2_plonky3_powdr_submetrics.json";
     write_json_submetrics(json_file, &metrics);
 
     // Run the benchmarks
-    let mut group = c.benchmark_group("sha256_bench");
+    let mut group = c.benchmark_group("sha256_powdr");
     group.sample_size(10);
 
-    group.bench_function("sha256_bench_prove", |bench| {
+    group.bench_function("sha256_powdr_prove", |bench| {
         bench.iter_batched(
             prepare_pipeline,
             |mut pipeline| {
@@ -24,7 +24,7 @@ fn sha256_bench(c: &mut Criterion) {
         );
     });
 
-    group.bench_function("sha256_bench_verify", |bench| {
+    group.bench_function("sha256_powdr_verify", |bench| {
         bench.iter_batched(
             || {
                 let mut pipeline = prepare_pipeline();
@@ -43,7 +43,7 @@ fn sha256_bench(c: &mut Criterion) {
 criterion_main!(sha256);
 criterion_group!(sha256, sha256_bench);
 
-fn sha256_submetrics(input_size: usize) -> SubMetrics {
+fn sha256_powdr_submetrics(input_size: usize) -> SubMetrics {
     let mut metrics = SubMetrics::new(input_size);
 
     let mut pipeline = prepare_pipeline();
