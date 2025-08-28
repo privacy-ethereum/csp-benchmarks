@@ -19,5 +19,5 @@ cargo bench
 Measure RAM footprint:
 ```bash
 chmod +x ../measure_mem_avg.sh
-../measure_mem_avg.sh --json sha2_plonky3_powder_mem_report.json -- cargo r -r --bin plonky3-powdr-measure-mem
+../measure_mem_avg.sh --json sha256_plonky3_powder_mem_report.json -- cargo r -r --bin plonky3-powdr-measure-mem
 ```
