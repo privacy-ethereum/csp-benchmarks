@@ -26,7 +26,6 @@ fn main() -> io::Result<()> {
     for entry in fs::read_dir(root_dir)? {
         let path = entry?.path();
         if path.is_dir() {
-            // println!("Processing {:?}", path);
             let path_str = path.file_name().unwrap().to_str().unwrap();
             for prov_sys in &prov_sys_names {
                 if path_str.contains(*prov_sys) {
@@ -71,7 +70,7 @@ fn main() -> io::Result<()> {
     }
 
     let output = serde_json::to_string_pretty(&benchmarks).unwrap();
-    std::fs::write("collected_benchmarks.json", output).unwrap();
+    std::fs::write("../collected_benchmarks.json", output).unwrap();
 
     Ok(())
 }
@@ -84,12 +83,12 @@ fn extract_metrics(
     feat: Option<&String>,
 ) -> io::Result<CollectedMetrics> {
     let crit_path_p = match feat {
-        Some(feat) => dir.join(format!("../target/criterion/{target}_{input_size}_{prov_sys}_{feat}/{target}_{input_size}_{prov_sys}_{feat}_prove/new/estimates.json")),
-        None => dir.join(format!("../target/criterion/{target}_{input_size}_{prov_sys}/{target}_{input_size}_{prov_sys}_prove/new/estimates.json")),
+        Some(feat) => dir.parent().unwrap().join(format!("target/criterion/{target}_{input_size}_{prov_sys}_{feat}/{target}_{input_size}_{prov_sys}_{feat}_prove/new/estimates.json")),
+        None => dir.parent().unwrap().join(format!("target/criterion/{target}_{input_size}_{prov_sys}/{target}_{input_size}_{prov_sys}_prove/new/estimates.json")),
     };
     let crit_path_v = match feat {
-        Some(feat) => dir.join(format!("../target/criterion/{target}_{input_size}_{prov_sys}_{feat}/{target}_{input_size}_{prov_sys}_{feat}_verify/new/estimates.json")),
-        None => dir.join(format!("../target/criterion/{target}_{input_size}_{prov_sys}/{target}_{input_size}_{prov_sys}_verify/new/estimates.json")),
+        Some(feat) => dir.parent().unwrap().join(format!("target/criterion/{target}_{input_size}_{prov_sys}_{feat}/{target}_{input_size}_{prov_sys}_{feat}_verify/new/estimates.json")),
+        None => dir.parent().unwrap().join(format!("target/criterion/{target}_{input_size}_{prov_sys}/{target}_{input_size}_{prov_sys}_verify/new/estimates.json")),
     };
     let mem_path = match feat {
         Some(feat) => dir.join(format!(
@@ -99,9 +98,9 @@ fn extract_metrics(
     };
     let sub_path = match feat {
         Some(feat) => dir.join(format!(
-            "{target}_{input_size}_{prov_sys}_{feat}_sub_report.json"
+            "{target}_{input_size}_{prov_sys}_{feat}_submetrics.json"
         )),
-        None => dir.join(format!("{target}_{input_size}_{prov_sys}_sub_report.json")),
+        None => dir.join(format!("{target}_{input_size}_{prov_sys}_submetrics.json")),
     };
 
     let proof_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_p)?)?;
@@ -133,9 +132,6 @@ fn extract_metrics(
         }
     }
 
-    // let obj = Value::Object(merged);
-    // fs::write(out_path, serde_json::to_string_pretty(&obj)?)?;
-
     let mut metrics = CollectedMetrics::new(
         dir.file_name().unwrap().to_str().unwrap().to_owned(),
         feat.map(|f| f.to_owned()).unwrap_or_default(),
@@ -144,6 +140,7 @@ fn extract_metrics(
     );
     metrics.preprocessing_size =
         merged.get("preprocessing_size").unwrap().as_u64().unwrap() as usize;
+    metrics.proof_size = merged.get("proof_size").unwrap().as_u64().unwrap() as usize;
     metrics.proof_duration = Duration::from_nanos(
         merged
             .get("proof_time_estimate")
