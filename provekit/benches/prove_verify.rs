@@ -7,23 +7,23 @@ use utils::metadata::SHA2_INPUTS;
 fn sha256_benchmarks(c: &mut Criterion) {
     // Measure the SubMetrics
     let metrics = sha256_provekit_submetrics();
-    let json_file: &'static str = "sha256_provekit_submetrics.json";
+    let json_file: &'static str = "sha256_2048_provekit_submetrics.json";
     write_json_submetrics(json_file, &metrics[0]);
 
     // Run the benchmarks
     let bench_harness = ProvekitSha256Benchmark::new(&SHA2_INPUTS);
-    let mut group = c.benchmark_group("sha256_provekit");
+    let mut group = c.benchmark_group("sha256_2048_provekit");
     group.sample_size(10);
 
     for &input_size in SHA2_INPUTS.iter() {
-        group.bench_function("sha256_provekit_prove", |bench| {
+        group.bench_function("sha256_2048_provekit_prove", |bench| {
             bench.iter(|| {
                 let proof = bench_harness.run_prove(input_size);
                 black_box(proof);
             });
         });
 
-        group.bench_function("sha256_provekit_verify", |bench| {
+        group.bench_function("sha256_2048_provekit_verify", |bench| {
             bench.iter_batched(
                 || bench_harness.prepare_verify(input_size),
                 |(proof, proof_scheme)| bench_harness.run_verify(&proof, proof_scheme).unwrap(),

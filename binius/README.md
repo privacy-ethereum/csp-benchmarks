@@ -12,6 +12,6 @@ cargo bench
 
 ```bash
 chmod +x ../measure_mem_avg.sh
-../measure_mem_avg.sh --json sha256_binius_lookup_mem_report.json -- cargo r -r --bin measure_lookup_mem
-../measure_mem_avg.sh --json sha256_binius_no_lookup_mem_report.json -- cargo r -r --bin measure_no_lookup_mem 
+../measure_mem_avg.sh --json sha256_2048_binius_with_lookup_mem_report.json -- cargo r -r --bin measure_lookup_mem
+../measure_mem_avg.sh --json sha256_2048_binius_no_lookup_mem_report.json -- cargo r -r --bin measure_no_lookup_mem 
 ```

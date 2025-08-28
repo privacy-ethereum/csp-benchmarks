@@ -10,15 +10,15 @@ fn sha256_no_lookup(c: &mut Criterion) {
     let input_size = 2048;
     let metrics = sha256_binius_no_lookup_submetrics(input_size);
 
-    let json_file = "sha256_binius_no_lookup_submetrics.json";
+    let json_file = "sha256_2048_binius_no_lookup_submetrics.json";
     write_json_submetrics(json_file, &metrics);
 
     // Run the benchmarks
-    let mut group = c.benchmark_group("sha256_binius_no_lookup");
+    let mut group = c.benchmark_group("sha256_2048_binius_no_lookup");
     group.sample_size(10);
     let allocator = bumpalo::Bump::new();
 
-    group.bench_function("sha256_binius_no_lookup_prove", |bench| {
+    group.bench_function("sha256_2048_binius_no_lookup_prove", |bench| {
         bench.iter_batched(
             || sha256_no_lookup_prepare(&allocator),
             |(constraint_system, args, witness, backend)| {
@@ -28,7 +28,7 @@ fn sha256_no_lookup(c: &mut Criterion) {
         );
     });
 
-    group.bench_function("sha256_binius_no_lookup_verify", |bench| {
+    group.bench_function("sha256_2048_binius_no_lookup_verify", |bench| {
         bench.iter_batched(
             || {
                 let (constraint_system, args, witness, backend) =
@@ -49,15 +49,15 @@ fn sha256_with_lookup(c: &mut Criterion) {
     let input_size = 2048;
     let metrics = sha256_binius_with_lookup_submetrics(input_size);
 
-    let json_file = "sha256_binius_lookup_submetrics.json";
+    let json_file = "sha256_2048_binius_with_lookup_submetrics.json";
     write_json_submetrics(json_file, &metrics);
 
     // Run the benchmarks
-    let mut group = c.benchmark_group("sha256_binius_with_lookup");
+    let mut group = c.benchmark_group("sha256_2048_binius_with_lookup");
     group.sample_size(10);
     let allocator = bumpalo::Bump::new();
 
-    group.bench_function("sha256_binius_with_lookup_prove", |bench| {
+    group.bench_function("sha256_2048_binius_with_lookup_prove", |bench| {
         bench.iter_batched(
             || sha256_with_lookup_prepare(&allocator),
             |(constraint_system, args, witness, backend)| {
@@ -67,7 +67,7 @@ fn sha256_with_lookup(c: &mut Criterion) {
         );
     });
 
-    group.bench_function("sha256_binius_with_lookup_verify", |bench| {
+    group.bench_function("sha256_2048_binius_with_lookup_verify", |bench| {
         bench.iter_batched(
             || {
                 let (constraint_system, args, witness, backend) =
