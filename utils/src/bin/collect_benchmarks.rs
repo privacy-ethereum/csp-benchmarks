@@ -120,7 +120,7 @@ fn extract_metrics(
     let sub: Value = serde_json::from_str(&fs::read_to_string(&sub_path)?)?;
 
     let mut metrics = CollectedMetrics::new(
-        dir.file_name().unwrap().to_str().unwrap().to_owned(),
+        proving_system.to_string(),
         feature.map(|f| f.to_owned()).unwrap_or_default(),
         target.to_string(),
         input_size,
