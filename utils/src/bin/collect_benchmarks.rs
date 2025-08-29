@@ -16,7 +16,10 @@ fn main() -> io::Result<()> {
             let metrics_file_paths = find_metrics_files(&path);
             for metrics_file_path in metrics_file_paths {
                 let metrics = extract_metrics(&path, &metrics_file_path)?;
-                benchmarks.insert(path.to_string_lossy().into_owned(), metrics);
+                benchmarks.insert(
+                    path.file_name().unwrap().to_string_lossy().into_owned(),
+                    metrics,
+                );
             }
         }
     }
