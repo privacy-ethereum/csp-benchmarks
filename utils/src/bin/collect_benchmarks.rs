@@ -1,4 +1,4 @@
-use serde_json::{Map, Value};
+use serde_json::Value;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -6,19 +6,19 @@ use std::{fs, io};
 use utils::bench::CollectedMetrics;
 
 fn main() -> io::Result<()> {
-    let target = "sha256".to_string();
-    let input_size = 2048;
+    let benchmark_target = "sha256".to_string();
+    let benchmark_input_size = 2048;
 
-    let mut prov_systems: HashMap<String, Vec<String>> = HashMap::new();
-    prov_systems.insert(
+    let mut proving_systems: HashMap<String, Vec<String>> = HashMap::new();
+    proving_systems.insert(
         "binius".to_string(),
         vec!["with_lookup".to_string(), "no_lookup".to_string()],
     );
-    prov_systems.insert("plonky2".to_string(), vec!["no_lookup".to_string()]);
-    prov_systems.insert("powdr".to_string(), vec![]);
-    prov_systems.insert("provekit".to_string(), vec![]);
+    proving_systems.insert("plonky2".to_string(), vec!["no_lookup".to_string()]);
+    proving_systems.insert("powdr".to_string(), vec![]);
+    proving_systems.insert("provekit".to_string(), vec![]);
 
-    let prov_sys_names = prov_systems.keys().collect::<Vec<_>>();
+    let proving_system_names = proving_systems.keys().collect::<Vec<_>>();
 
     let mut benchmarks: HashMap<String, CollectedMetrics> = HashMap::new();
 
@@ -27,34 +27,27 @@ fn main() -> io::Result<()> {
         let path = entry?.path();
         if path.is_dir() {
             let path_str = path.file_name().unwrap().to_str().unwrap();
-            for prov_sys in &prov_sys_names {
-                if path_str.contains(*prov_sys) {
-                    let feats = prov_systems.get(*prov_sys).unwrap();
-                    if feats.is_empty() {
-                        let metrics =
-                            match extract_metrics(&path, &target, input_size, prov_sys, None) {
-                                Ok(m) => m,
-                                Err(err) => {
-                                    eprintln!("Error in {:?}: {}", path, err);
-                                    continue;
-                                }
-                            };
+            for proving_system in &proving_system_names {
+                if path_str.contains(*proving_system) {
+                    let features = proving_systems.get(*proving_system).unwrap();
+                    if features.is_empty() {
+                        let metrics = extract_metrics(
+                            &path,
+                            &benchmark_target,
+                            benchmark_input_size,
+                            proving_system,
+                            None,
+                        )?;
                         benchmarks.insert(path_str.to_owned(), metrics);
                     } else {
-                        for feat in feats {
-                            let metrics = match extract_metrics(
+                        for feature in features {
+                            let metrics = extract_metrics(
                                 &path,
-                                &target,
-                                input_size,
-                                prov_sys,
-                                Some(feat),
-                            ) {
-                                Ok(m) => m,
-                                Err(err) => {
-                                    eprintln!("Error in {:?}: {}", path, err);
-                                    continue;
-                                }
-                            };
+                                &benchmark_target,
+                                benchmark_input_size,
+                                proving_system,
+                                Some(feature),
+                            )?;
                             benchmarks.insert(path_str.to_owned(), metrics);
                         }
                     }
@@ -63,8 +56,8 @@ fn main() -> io::Result<()> {
         }
     }
 
-    let output = serde_json::to_string_pretty(&benchmarks).unwrap();
-    std::fs::write("../collected_benchmarks.json", output).unwrap();
+    let output = serde_json::to_string_pretty(&benchmarks)?;
+    std::fs::write("../collected_benchmarks.json", output)?;
 
     Ok(())
 }
@@ -73,28 +66,52 @@ fn extract_metrics(
     dir: &Path,
     target: &String,
     input_size: usize,
-    prov_sys: &String,
-    feat: Option<&String>,
+    proving_system: &String,
+    feature: Option<&String>,
 ) -> io::Result<CollectedMetrics> {
-    let crit_path_p = match feat {
-        Some(feat) => dir.parent().unwrap().join(format!("target/criterion/{target}_{input_size}_{prov_sys}_{feat}/{target}_{input_size}_{prov_sys}_{feat}_prove/new/estimates.json")),
-        None => dir.parent().unwrap().join(format!("target/criterion/{target}_{input_size}_{prov_sys}/{target}_{input_size}_{prov_sys}_prove/new/estimates.json")),
+    let crit_path_p = match feature {
+        Some(feat) => dir
+            .parent()
+            .unwrap()
+            .join(format!(
+                "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_prove/new/estimates.json"
+            )),
+        None => dir
+            .parent()
+            .unwrap()
+            .join(format!(
+                "target/criterion/{target}_{input_size}_{proving_system}/{target}_{input_size}_{proving_system}_prove/new/estimates.json"
+            )),
     };
-    let crit_path_v = match feat {
-        Some(feat) => dir.parent().unwrap().join(format!("target/criterion/{target}_{input_size}_{prov_sys}_{feat}/{target}_{input_size}_{prov_sys}_{feat}_verify/new/estimates.json")),
-        None => dir.parent().unwrap().join(format!("target/criterion/{target}_{input_size}_{prov_sys}/{target}_{input_size}_{prov_sys}_verify/new/estimates.json")),
+    let crit_path_v = match feature {
+        Some(feat) => dir
+            .parent()
+            .unwrap()
+            .join(format!(
+                "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_verify/new/estimates.json"
+            )),
+        None => dir
+            .parent()
+            .unwrap()
+            .join(format!(
+                "target/criterion/{target}_{input_size}_{proving_system}/{target}_{input_size}_{proving_system}_verify/new/estimates.json"
+            )),
     };
-    let mem_path = match feat {
+    let mem_path = match feature {
         Some(feat) => dir.join(format!(
-            "{target}_{input_size}_{prov_sys}_{feat}_mem_report.json"
+            "{target}_{input_size}_{proving_system}_{feat}_mem_report.json"
         )),
-        None => dir.join(format!("{target}_{input_size}_{prov_sys}_mem_report.json")),
+        None => dir.join(format!(
+            "{target}_{input_size}_{proving_system}_mem_report.json"
+        )),
     };
-    let sub_path = match feat {
+    let sub_path = match feature {
         Some(feat) => dir.join(format!(
-            "{target}_{input_size}_{prov_sys}_{feat}_submetrics.json"
+            "{target}_{input_size}_{proving_system}_{feat}_submetrics.json"
         )),
-        None => dir.join(format!("{target}_{input_size}_{prov_sys}_submetrics.json")),
+        None => dir.join(format!(
+            "{target}_{input_size}_{proving_system}_submetrics.json"
+        )),
     };
 
     let proof_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_p)?)?;
@@ -102,19 +119,24 @@ fn extract_metrics(
     let mem: Value = serde_json::from_str(&fs::read_to_string(&mem_path)?)?;
     let sub: Value = serde_json::from_str(&fs::read_to_string(&sub_path)?)?;
 
-    let mut merged = Map::new();
+    let mut metrics = CollectedMetrics::new(
+        dir.file_name().unwrap().to_str().unwrap().to_owned(),
+        feature.map(|f| f.to_owned()).unwrap_or_default(),
+        target.to_string(),
+        input_size,
+    );
 
     if let Some(est) = proof_crit.get("mean").and_then(|m| m.get("point_estimate")) {
-        merged.insert("proof_time_estimate".to_owned(), est.clone());
+        metrics.proof_duration = Duration::from_nanos(est.as_f64().unwrap().round() as u64);
     }
     if let Some(est) = verify_crit
         .get("mean")
         .and_then(|m| m.get("point_estimate"))
     {
-        merged.insert("verify_time_estimate".to_owned(), est.clone());
+        metrics.verify_duration = Duration::from_nanos(est.as_f64().unwrap().round() as u64);
     }
     if let Some(avg) = mem.get("average_bytes") {
-        merged.insert("average_memory_bytes".to_owned(), avg.clone());
+        metrics.peak_memory = avg.as_u64().unwrap() as usize;
     }
 
     if let Value::Object(map) = sub {
@@ -122,40 +144,13 @@ fn extract_metrics(
             if k.ends_with("_memory") {
                 continue;
             }
-            merged.insert(k.clone(), v.clone());
+            match k.as_str() {
+                "preprocessing_size" => metrics.preprocessing_size = v.as_u64().unwrap() as usize,
+                "proof_size" => metrics.proof_size = v.as_u64().unwrap() as usize,
+                _ => continue,
+            }
         }
     }
-
-    let mut metrics = CollectedMetrics::new(
-        dir.file_name().unwrap().to_str().unwrap().to_owned(),
-        feat.map(|f| f.to_owned()).unwrap_or_default(),
-        target.to_string(),
-        input_size,
-    );
-    metrics.preprocessing_size =
-        merged.get("preprocessing_size").unwrap().as_u64().unwrap() as usize;
-    metrics.proof_size = merged.get("proof_size").unwrap().as_u64().unwrap() as usize;
-    metrics.proof_duration = Duration::from_nanos(
-        merged
-            .get("proof_time_estimate")
-            .unwrap()
-            .as_f64()
-            .unwrap()
-            .round() as u64,
-    );
-    metrics.verify_duration = Duration::from_nanos(
-        merged
-            .get("verify_time_estimate")
-            .unwrap()
-            .as_f64()
-            .unwrap()
-            .round() as u64,
-    );
-    metrics.peak_memory = merged
-        .get("average_memory_bytes")
-        .unwrap()
-        .as_u64()
-        .unwrap() as usize;
 
     Ok(metrics)
 }
