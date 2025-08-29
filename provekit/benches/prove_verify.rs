@@ -6,7 +6,7 @@ use utils::metadata::SHA2_INPUTS;
 
 fn sha256_benchmarks(c: &mut Criterion) {
     // Measure the SubMetrics
-    let metrics = sha256_provekit_submetrics();
+    let metrics = sha256_provekit_metrics();
     let json_file: &'static str = "sha256_2048_provekit_metrics.json";
     write_json_metrics1(json_file, &metrics[0]);
 
