@@ -193,8 +193,6 @@ pub struct CollectedMetrics {
     pub proof_duration: Duration,
     #[tabled(display_with = "display_duration")]
     pub verify_duration: Duration,
-    #[tabled(display_with = "display_cycles")]
-    pub cycles: u64,
     #[tabled(display_with = "display_bytes")]
     pub peak_memory: usize,
 }
@@ -210,7 +208,6 @@ impl CollectedMetrics {
             preprocessing_size: 0,
             proof_duration: Duration::default(),
             verify_duration: Duration::default(),
-            cycles: 0,
             peak_memory: 0,
         }
     }
