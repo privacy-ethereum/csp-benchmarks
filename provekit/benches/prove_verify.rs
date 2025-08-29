@@ -1,14 +1,14 @@
 use criterion::{BatchSize, Criterion, black_box, criterion_group, criterion_main};
 use provekit::{ProvekitSha256Benchmark, WORKSPACE_ROOT};
 use std::path::PathBuf;
-use utils::bench::{SubMetrics, display_submetrics, write_json_submetrics};
+use utils::bench::{Metrics1, write_json_metrics1, display_metrics1};
 use utils::metadata::SHA2_INPUTS;
 
 fn sha256_benchmarks(c: &mut Criterion) {
     // Measure the SubMetrics
     let metrics = sha256_provekit_submetrics();
-    let json_file: &'static str = "sha256_2048_provekit_submetrics.json";
-    write_json_submetrics(json_file, &metrics[0]);
+    let json_file: &'static str = "sha256_2048_provekit_metrics.json";
+    write_json_metrics1(json_file, &metrics[0]);
 
     // Run the benchmarks
     let bench_harness = ProvekitSha256Benchmark::new(&SHA2_INPUTS);
@@ -38,13 +38,13 @@ fn sha256_benchmarks(c: &mut Criterion) {
 criterion_group!(benches, sha256_benchmarks);
 criterion_main!(benches);
 
-fn sha256_provekit_submetrics() -> Vec<SubMetrics> {
+fn sha256_provekit_metrics() -> Vec<Metrics1> {
     let bench_harness = ProvekitSha256Benchmark::new(&SHA2_INPUTS);
 
     let mut all_metrics = Vec::new();
 
     for &size in SHA2_INPUTS.iter() {
-        let mut metrics = SubMetrics::new(size);
+        let mut metrics = Metrics1::new("provekit".to_string(), "".to_string(), "sha256".to_string(), size);
 
         let package_name = format!("sha256_bench_{size}");
         let circuit_path = PathBuf::from(WORKSPACE_ROOT)
@@ -66,7 +66,7 @@ fn sha256_provekit_submetrics() -> Vec<SubMetrics> {
         all_metrics.push(metrics);
     }
 
-    println!("{}", display_submetrics(&all_metrics));
+    println!("{}", display_metrics1(&all_metrics));
 
     all_metrics
 }

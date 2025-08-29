@@ -1,14 +1,14 @@
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use sha::bench::{prepare_pipeline, prove, verify};
-use utils::bench::{SubMetrics, write_json_submetrics};
+use utils::bench::{Metrics1, write_json_metrics1};
 
 fn sha256_bench(c: &mut Criterion) {
     // Measure the SubMetrics
     let input_size = 2048;
-    let metrics = sha256_powdr_submetrics(input_size);
+    let metrics = sha256_powdr_metrics(input_size);
 
-    let json_file = "sha256_2048_powdr_submetrics.json";
-    write_json_submetrics(json_file, &metrics);
+    let json_file = "sha256_2048_powdr_metrics.json";
+    write_json_metrics1(json_file, &metrics);
 
     // Run the benchmarks
     let mut group = c.benchmark_group("sha256_2048_powdr");
@@ -43,8 +43,8 @@ fn sha256_bench(c: &mut Criterion) {
 criterion_main!(sha256);
 criterion_group!(sha256, sha256_bench);
 
-fn sha256_powdr_submetrics(input_size: usize) -> SubMetrics {
-    let mut metrics = SubMetrics::new(input_size);
+fn sha256_powdr_metrics(input_size: usize) -> Metrics1 {
+    let mut metrics = Metrics1::new("powdr".to_string(), "".to_string(), "sha256".to_string(), input_size);
 
     let mut pipeline = prepare_pipeline();
 

@@ -28,10 +28,7 @@ cargo run --release --bin plonky3-sp1-sha -- --prove
 
 3. Measure the RAM usage:
 
-```
-cd script
-cargo run --bin plonky3-sp1-measure --release
-```
+TODO
 
 ## Benchmarking
 

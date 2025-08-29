@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use std::{fs, io};
-use utils::bench::CollectedMetrics;
+use utils::bench::Metrics1;
 
 fn main() -> io::Result<()> {
     let benchmark_target = "sha256".to_string();
@@ -20,7 +20,7 @@ fn main() -> io::Result<()> {
 
     let proving_system_names = proving_systems.keys().collect::<Vec<_>>();
 
-    let mut benchmarks: HashMap<String, CollectedMetrics> = HashMap::new();
+    let mut benchmarks: HashMap<String, Metrics1> = HashMap::new();
 
     let root_dir = workspace_dir();
     for entry in fs::read_dir(root_dir)? {
@@ -68,7 +68,7 @@ fn extract_metrics(
     input_size: usize,
     proving_system: &String,
     feature: Option<&String>,
-) -> io::Result<CollectedMetrics> {
+) -> io::Result<Metrics1> {
     let crit_path_p = match feature {
         Some(feat) => dir
             .parent()
@@ -105,27 +105,21 @@ fn extract_metrics(
             "{target}_{input_size}_{proving_system}_mem_report.json"
         )),
     };
-    let sub_path = match feature {
+    let metrics_path = match feature {
         Some(feat) => dir.join(format!(
-            "{target}_{input_size}_{proving_system}_{feat}_submetrics.json"
+            "{target}_{input_size}_{proving_system}_{feat}_metrics.json"
         )),
         None => dir.join(format!(
-            "{target}_{input_size}_{proving_system}_submetrics.json"
+            "{target}_{input_size}_{proving_system}_metrics.json"
         )),
     };
 
     let proof_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_p)?)?;
     let verify_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_v)?)?;
     let mem: Value = serde_json::from_str(&fs::read_to_string(&mem_path)?)?;
-    let sub: Value = serde_json::from_str(&fs::read_to_string(&sub_path)?)?;
+    let metrics: Value = serde_json::from_str(&fs::read_to_string(&metrics_path)?)?;
 
-    let mut metrics = CollectedMetrics::new(
-        proving_system.to_string(),
-        feature.map(|f| f.to_owned()).unwrap_or_default(),
-        target.to_string(),
-        input_size,
-    );
-
+    let mut metrics : Metrics1 = serde_json::from_value(metrics.clone())?;
     if let Some(est) = proof_crit.get("mean").and_then(|m| m.get("point_estimate")) {
         metrics.proof_duration = Duration::from_nanos(est.as_f64().unwrap().round() as u64);
     }
@@ -137,19 +131,6 @@ fn extract_metrics(
     }
     if let Some(avg) = mem.get("average_bytes") {
         metrics.peak_memory = avg.as_u64().unwrap() as usize;
-    }
-
-    if let Value::Object(map) = sub {
-        for (k, v) in map {
-            if k.ends_with("_memory") {
-                continue;
-            }
-            match k.as_str() {
-                "preprocessing_size" => metrics.preprocessing_size = v.as_u64().unwrap() as usize,
-                "proof_size" => metrics.proof_size = v.as_u64().unwrap() as usize,
-                _ => continue,
-            }
-        }
     }
 
     Ok(metrics)

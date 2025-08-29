@@ -8,10 +8,6 @@ default-run = "plonky3-sp1-sha"
 name = "plonky3-sp1-sha"
 path = "src/bin/main.rs"
 
-[[bin]]
-name = "plonky3-sp1-measure"
-path = "src/bin/measure.rs"
-
 [dependencies]
 sp1-sdk = { version = "4.1.7", default-features = false }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }

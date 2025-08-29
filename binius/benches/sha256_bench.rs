@@ -3,15 +3,15 @@
 use binius::bench::{prove, sha256_no_lookup_prepare, sha256_with_lookup_prepare, verify};
 use binius_utils::SerializeBytes;
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
-use utils::bench::{SubMetrics, write_json_submetrics};
+use utils::bench::{Metrics1, write_json_metrics1};
 
 fn sha256_no_lookup(c: &mut Criterion) {
-    // Measure the SubMetrics
+    // Measure the metrics
     let input_size = 2048;
-    let metrics = sha256_binius_no_lookup_submetrics(input_size);
+    let metrics = sha256_binius_no_lookup_metrics(input_size);
 
-    let json_file = "sha256_2048_binius_no_lookup_submetrics.json";
-    write_json_submetrics(json_file, &metrics);
+    let json_file = "sha256_2048_binius_no_lookup_metrics.json";
+    write_json_metrics1(json_file, &metrics);
 
     // Run the benchmarks
     let mut group = c.benchmark_group("sha256_2048_binius_no_lookup");
@@ -45,12 +45,12 @@ fn sha256_no_lookup(c: &mut Criterion) {
 }
 
 fn sha256_with_lookup(c: &mut Criterion) {
-    // Measure the SubMetrics
+    // Measure the metrics
     let input_size = 2048;
-    let metrics = sha256_binius_with_lookup_submetrics(input_size);
+    let metrics = sha256_binius_with_lookup_metrics(input_size);
 
-    let json_file = "sha256_2048_binius_with_lookup_submetrics.json";
-    write_json_submetrics(json_file, &metrics);
+    let json_file = "sha256_2048_binius_with_lookup_metrics.json";
+    write_json_metrics1(json_file, &metrics);
 
     // Run the benchmarks
     let mut group = c.benchmark_group("sha256_2048_binius_with_lookup");
@@ -86,8 +86,8 @@ fn sha256_with_lookup(c: &mut Criterion) {
 criterion_main!(sha256);
 criterion_group!(sha256, sha256_no_lookup, sha256_with_lookup);
 
-fn sha256_binius_with_lookup_submetrics(input_size: usize) -> SubMetrics {
-    let mut metrics = SubMetrics::new(input_size);
+fn sha256_binius_with_lookup_metrics(input_size: usize) -> Metrics1 {
+    let mut metrics = Metrics1::new("binius".to_string(), "with_lookup".to_string(), "sha256".to_string(), input_size);
 
     let allocator = bumpalo::Bump::new();
 
@@ -105,8 +105,8 @@ fn sha256_binius_with_lookup_submetrics(input_size: usize) -> SubMetrics {
     metrics
 }
 
-fn sha256_binius_no_lookup_submetrics(input_size: usize) -> SubMetrics {
-    let mut metrics = SubMetrics::new(input_size);
+fn sha256_binius_no_lookup_metrics(input_size: usize) -> Metrics1 {
+    let mut metrics = Metrics1::new("binius".to_string(), "no_lookup".to_string(), "sha256".to_string(), input_size);
 
     let allocator = bumpalo::Bump::new();
 

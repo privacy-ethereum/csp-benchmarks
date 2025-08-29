@@ -1,5 +1,5 @@
 use human_repr::{HumanCount, HumanDuration};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_with::{DurationNanoSeconds, serde_as};
 use std::{
     fmt::Display,
@@ -137,49 +137,8 @@ pub fn write_csv(out_path: &str, results: &[Metrics]) {
 }
 
 #[serde_as]
-#[derive(Serialize, Tabled, Clone, Copy)]
-pub struct SubMetrics {
-    #[tabled(display_with = "display_bytes")]
-    pub input_size: usize,
-    #[tabled(display_with = "display_bytes")]
-    pub proof_size: usize,
-    #[tabled(display_with = "display_bytes")]
-    pub proving_peak_memory: usize, // NOTE: This should be removed when `SP1` benchmarks are refactored to use `ere`.
-    #[tabled(display_with = "display_bytes")]
-    pub preprocessing_size: usize,
-    #[tabled(display_with = "display_bytes")]
-    pub preprocessing_peak_memory: usize, // NOTE: This should be removed when `SP1` benchmarks are refactored to use `ere`.
-}
-
-impl SubMetrics {
-    pub fn new(size: usize) -> Self {
-        SubMetrics {
-            input_size: size,
-            proof_size: 0,
-            proving_peak_memory: 0,
-            preprocessing_size: 0,
-            preprocessing_peak_memory: 0,
-        }
-    }
-}
-
-pub fn display_submetrics(metrics: &[SubMetrics]) -> String {
-    if metrics.is_empty() {
-        return String::new();
-    }
-    let mut table = Table::new(metrics);
-    table.with(Style::modern());
-    table.to_string()
-}
-
-pub fn write_json_submetrics(output_path: &str, metrics: &SubMetrics) {
-    let json = serde_json::to_string_pretty(metrics).unwrap();
-    std::fs::write(output_path, json).unwrap();
-}
-
-#[serde_as]
-#[derive(Serialize, Tabled, Clone)]
-pub struct CollectedMetrics {
+#[derive(Serialize, Deserialize, Tabled, Clone)]
+pub struct Metrics1 {
     pub name: String,
     pub feat: String,
     pub target: String,
@@ -197,9 +156,9 @@ pub struct CollectedMetrics {
     pub peak_memory: usize,
 }
 
-impl CollectedMetrics {
+impl Metrics1 {
     pub fn new(name: String, feat: String, target: String, input_size: usize) -> Self {
-        CollectedMetrics {
+        Metrics1 {
             name,
             feat,
             target,
@@ -211,4 +170,18 @@ impl CollectedMetrics {
             peak_memory: 0,
         }
     }
+}
+
+pub fn write_json_metrics1(output_path: &str, metrics: &Metrics1) {
+    let json = serde_json::to_string_pretty(metrics).unwrap();
+    std::fs::write(output_path, json).unwrap();
+}
+
+pub fn display_metrics1(metrics: &[Metrics1]) -> String {
+    if metrics.is_empty() {
+        return String::new();
+    }
+    let mut table = Table::new(metrics);
+    table.with(Style::modern());
+    table.to_string()
 }
