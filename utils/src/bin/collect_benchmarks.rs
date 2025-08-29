@@ -1,3 +1,4 @@
+use glob::glob;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -6,52 +7,16 @@ use std::{fs, io};
 use utils::bench::Metrics1;
 
 fn main() -> io::Result<()> {
-    let benchmark_target = "sha256".to_string();
-    let benchmark_input_size = 2048;
-
-    let mut proving_systems: HashMap<String, Vec<String>> = HashMap::new();
-    proving_systems.insert(
-        "binius".to_string(),
-        vec!["with_lookup".to_string(), "no_lookup".to_string()],
-    );
-    proving_systems.insert("plonky2".to_string(), vec!["no_lookup".to_string()]);
-    proving_systems.insert("powdr".to_string(), vec![]);
-    proving_systems.insert("provekit".to_string(), vec![]);
-
-    let proving_system_names = proving_systems.keys().collect::<Vec<_>>();
-
     let mut benchmarks: HashMap<String, Metrics1> = HashMap::new();
 
     let root_dir = workspace_dir();
     for entry in fs::read_dir(root_dir)? {
         let path = entry?.path();
         if path.is_dir() {
-            let path_str = path.file_name().unwrap().to_str().unwrap();
-            for proving_system in &proving_system_names {
-                if path_str.contains(*proving_system) {
-                    let features = proving_systems.get(*proving_system).unwrap();
-                    if features.is_empty() {
-                        let metrics = extract_metrics(
-                            &path,
-                            &benchmark_target,
-                            benchmark_input_size,
-                            proving_system,
-                            None,
-                        )?;
-                        benchmarks.insert(path_str.to_owned(), metrics);
-                    } else {
-                        for feature in features {
-                            let metrics = extract_metrics(
-                                &path,
-                                &benchmark_target,
-                                benchmark_input_size,
-                                proving_system,
-                                Some(feature),
-                            )?;
-                            benchmarks.insert(format!("{path_str}_{feature}"), metrics);
-                        }
-                    }
-                }
+            let metrics_file_paths = find_metrics_files(&path);
+            for metrics_file_path in metrics_file_paths {
+                let metrics = extract_metrics(&path, &metrics_file_path)?;
+                benchmarks.insert(path.to_string_lossy().into_owned(), metrics);
             }
         }
     }
@@ -62,75 +27,65 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn extract_metrics(
-    dir: &Path,
-    target: &String,
-    input_size: usize,
-    proving_system: &String,
-    feature: Option<&String>,
-) -> io::Result<Metrics1> {
-    let crit_path_p = match feature {
-        Some(feat) => dir
-            .parent()
-            .unwrap()
-            .join(format!(
-                "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_prove/new/estimates.json"
-            )),
-        None => dir
-            .parent()
-            .unwrap()
-            .join(format!(
+fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics1> {
+    let metrics_json: Value = serde_json::from_str(&fs::read_to_string(&metrics_file_path)?)?;
+    let mut metrics: Metrics1 = serde_json::from_value(metrics_json)?;
+
+    let target = &metrics.target;
+    let input_size = metrics.input_size;
+    let proving_system = &metrics.name;
+    let feat = &metrics.feat;
+
+    if metrics.proof_duration.is_zero() {
+        let crit_path_p = if feat.is_empty() {
+            dir.parent().unwrap().join(format!(
                 "target/criterion/{target}_{input_size}_{proving_system}/{target}_{input_size}_{proving_system}_prove/new/estimates.json"
-            )),
-    };
-    let crit_path_v = match feature {
-        Some(feat) => dir
-            .parent()
-            .unwrap()
-            .join(format!(
-                "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_verify/new/estimates.json"
-            )),
-        None => dir
-            .parent()
-            .unwrap()
-            .join(format!(
+            ))
+        } else {
+            dir.parent().unwrap().join(format!(
+                "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_prove/new/estimates.json"
+            ))
+        };
+
+        let proof_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_p)?)?;
+        if let Some(est) = proof_crit.get("mean").and_then(|m| m.get("point_estimate")) {
+            metrics.proof_duration = Duration::from_nanos(est.as_f64().unwrap().round() as u64);
+        }
+    }
+
+    if metrics.verify_duration.is_zero() {
+        let crit_path_v = if feat.is_empty() {
+            dir.parent().unwrap().join(format!(
                 "target/criterion/{target}_{input_size}_{proving_system}/{target}_{input_size}_{proving_system}_verify/new/estimates.json"
-            )),
-    };
-    let mem_path = match feature {
-        Some(feat) => dir.join(format!(
-            "{target}_{input_size}_{proving_system}_{feat}_mem_report.json"
-        )),
-        None => dir.join(format!(
-            "{target}_{input_size}_{proving_system}_mem_report.json"
-        )),
-    };
-    let metrics_path = match feature {
-        Some(feat) => dir.join(format!(
-            "{target}_{input_size}_{proving_system}_{feat}_metrics.json"
-        )),
-        None => dir.join(format!(
-            "{target}_{input_size}_{proving_system}_metrics.json"
-        )),
-    };
-
-    let proof_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_p)?)?;
-    let verify_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_v)?)?;
-    let mem: Value = serde_json::from_str(&fs::read_to_string(&mem_path)?)?;
-    let metrics: Value = serde_json::from_str(&fs::read_to_string(&metrics_path)?)?;
-
-    let mut metrics : Metrics1 = serde_json::from_value(metrics.clone())?;
-    if let Some(est) = proof_crit.get("mean").and_then(|m| m.get("point_estimate")) {
-        metrics.proof_duration = Duration::from_nanos(est.as_f64().unwrap().round() as u64);
+            ))
+        } else {
+            dir.parent().unwrap().join(format!(
+                "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_verify/new/estimates.json"
+            ))
+        };
+        let verify_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_v)?)?;
+        if let Some(est) = verify_crit
+            .get("mean")
+            .and_then(|m| m.get("point_estimate"))
+        {
+            metrics.verify_duration = Duration::from_nanos(est.as_f64().unwrap().round() as u64);
+        }
     }
-    if let Some(est) = verify_crit
-        .get("mean")
-        .and_then(|m| m.get("point_estimate"))
-    {
-        metrics.verify_duration = Duration::from_nanos(est.as_f64().unwrap().round() as u64);
-    }
-    if let Some(avg) = mem.get("average_bytes") {
-        metrics.peak_memory = avg.as_u64().unwrap() as usize;
+
+    if metrics.peak_memory == 0 {
+        let mem_path = if feat.is_empty() {
+            dir.join(format!(
+                "{target}_{input_size}_{proving_system}_mem_report.json"
+            ))
+        } else {
+            dir.join(format!(
+                "{target}_{input_size}_{proving_system}_{feat}_mem_report.json"
+            ))
+        };
+        let mem: Value = serde_json::from_str(&fs::read_to_string(&mem_path)?)?;
+        if let Some(m) = mem.get("average_bytes") {
+            metrics.peak_memory = m.as_u64().unwrap() as usize;
+        }
     }
 
     Ok(metrics)
@@ -146,4 +101,25 @@ fn workspace_dir() -> PathBuf {
         .stdout;
     let cargo_path = Path::new(std::str::from_utf8(&output).unwrap().trim());
     cargo_path.parent().unwrap().to_path_buf()
+}
+
+/// Try to find a file(s) matching "*_metrics.json" in `dir`.
+/// Returns `Vec<PathBuf>`.
+fn find_metrics_files(dir: &Path) -> Vec<PathBuf> {
+    // Construct the pattern like "dir/*_metrics.json"
+    let pattern = dir.join("*_metrics.json").to_string_lossy().into_owned();
+
+    let mut metrics_files: Vec<PathBuf> = Vec::new();
+
+    // Iterate over matching entries
+    for entry in glob(&pattern).unwrap() {
+        match entry {
+            Ok(path) => {
+                metrics_files.push(path);
+            }
+            Err(e) => eprintln!("Glob error: {}", e),
+        }
+    }
+
+    metrics_files
 }
