@@ -48,7 +48,7 @@ fn main() -> io::Result<()> {
                                 proving_system,
                                 Some(feature),
                             )?;
-                            benchmarks.insert(path_str.to_owned(), metrics);
+                            benchmarks.insert(format!("{path_str}_{feature}"), metrics);
                         }
                     }
                 }
