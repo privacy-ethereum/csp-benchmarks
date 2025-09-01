@@ -44,7 +44,12 @@ criterion_main!(sha256);
 criterion_group!(sha256, sha256_bench);
 
 fn sha256_powdr_metrics(input_size: usize) -> Metrics1 {
-    let mut metrics = Metrics1::new("powdr".to_string(), "".to_string(), "sha256".to_string(), input_size);
+    let mut metrics = Metrics1::new(
+        "powdr".to_string(),
+        "".to_string(),
+        "sha256".to_string(),
+        input_size,
+    );
 
     let mut pipeline = prepare_pipeline();
 

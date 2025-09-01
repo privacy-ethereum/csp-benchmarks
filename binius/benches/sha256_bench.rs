@@ -87,7 +87,12 @@ criterion_main!(sha256);
 criterion_group!(sha256, sha256_no_lookup, sha256_with_lookup);
 
 fn sha256_binius_with_lookup_metrics(input_size: usize) -> Metrics1 {
-    let mut metrics = Metrics1::new("binius".to_string(), "with_lookup".to_string(), "sha256".to_string(), input_size);
+    let mut metrics = Metrics1::new(
+        "binius".to_string(),
+        "with_lookup".to_string(),
+        "sha256".to_string(),
+        input_size,
+    );
 
     let allocator = bumpalo::Bump::new();
 
@@ -106,7 +111,12 @@ fn sha256_binius_with_lookup_metrics(input_size: usize) -> Metrics1 {
 }
 
 fn sha256_binius_no_lookup_metrics(input_size: usize) -> Metrics1 {
-    let mut metrics = Metrics1::new("binius".to_string(), "no_lookup".to_string(), "sha256".to_string(), input_size);
+    let mut metrics = Metrics1::new(
+        "binius".to_string(),
+        "no_lookup".to_string(),
+        "sha256".to_string(),
+        input_size,
+    );
 
     let allocator = bumpalo::Bump::new();
 

@@ -1,7 +1,7 @@
 use criterion::{BatchSize, Criterion, black_box, criterion_group, criterion_main};
 use provekit::{ProvekitSha256Benchmark, WORKSPACE_ROOT};
 use std::path::PathBuf;
-use utils::bench::{Metrics1, write_json_metrics1, display_metrics1};
+use utils::bench::{Metrics1, display_metrics1, write_json_metrics1};
 use utils::metadata::SHA2_INPUTS;
 
 fn sha256_benchmarks(c: &mut Criterion) {
@@ -44,7 +44,12 @@ fn sha256_provekit_metrics() -> Vec<Metrics1> {
     let mut all_metrics = Vec::new();
 
     for &size in SHA2_INPUTS.iter() {
-        let mut metrics = Metrics1::new("provekit".to_string(), "".to_string(), "sha256".to_string(), size);
+        let mut metrics = Metrics1::new(
+            "provekit".to_string(),
+            "".to_string(),
+            "sha256".to_string(),
+            size,
+        );
 
         let package_name = format!("sha256_bench_{size}");
         let circuit_path = PathBuf::from(WORKSPACE_ROOT)

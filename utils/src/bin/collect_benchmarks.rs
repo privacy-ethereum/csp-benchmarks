@@ -5,6 +5,9 @@ use std::time::Duration;
 use std::{fs, io};
 use utils::bench::Metrics1;
 
+/// Collect all JSON files in subdirectories of the workspace directory
+/// containing SHA256 benchmark metrics, and write them to a single JSON file
+/// at `../collected_benchmarks.json`.
 fn main() -> io::Result<()> {
     let mut benchmarks: Vec<Metrics1> = Vec::new();
 
@@ -26,8 +29,20 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
+/// Extract `Metrics1` from JSON file `metrics_file_path` and fill in any missing
+/// fields by reading from Criterion's JSON files.
+///
+/// Specifically, this function looks for fields `proof_duration` and
+/// `verify_duration` in the JSON file and fills them in with the mean
+/// execution times reported by Criterion's JSON files, if they are not
+/// already set. It also fills in the `peak_memory` field if it is not
+/// already set, using the memory usage reported by the `mem_report` JSON
+/// file.
+///
+/// Returns `Metrics1` if successful.
 fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics1> {
     let metrics_json: Value = serde_json::from_str(&fs::read_to_string(&metrics_file_path)?)?;
+
     let mut metrics: Metrics1 = serde_json::from_value(metrics_json)?;
 
     let target = &metrics.target;
@@ -90,6 +105,8 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics1>
     Ok(metrics)
 }
 
+/// Returns the root directory of the current workspace, as determined by the
+/// `cargo locate-project` command.
 fn workspace_dir() -> PathBuf {
     let output = std::process::Command::new(env!("CARGO"))
         .arg("locate-project")
