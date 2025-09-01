@@ -76,10 +76,8 @@ Example:
 * Memory report: should be like the following:
 ```json
 {
-  "runs": 10,
-  "average_bytes": 44869222
+  "peak_memory": 44869222
 }
 ```
-Here, the `runs` means how many times we repeat the process to get the average RAM usage.
 
 For more details, please check the existing benchmarks like `binius` and `plonky2`.

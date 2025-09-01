@@ -97,7 +97,7 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> 
             ))
         };
         let mem: Value = serde_json::from_str(&fs::read_to_string(&mem_path)?)?;
-        if let Some(m) = mem.get("average_bytes") {
+        if let Some(m) = mem.get("peak_memory") {
             metrics.peak_memory = m.as_u64().unwrap() as usize;
         }
     }

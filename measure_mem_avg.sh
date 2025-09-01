@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Configurable number of runs
-NUM_RUNS=${NUM_RUNS:-10}
-total_bytes=0
-
 # Detect OS and set measurement parameters
 OS_TYPE="$(uname)"
 if [[ "$OS_TYPE" == "Darwin" ]]; then
@@ -60,6 +56,10 @@ fi
 echo "Running command: $* (averaging over $NUM_RUNS runs)"
 echo "JSON output file: $json_file"
 
+# Fixed number of runs: 10
+NUM_RUNS=10
+total_bytes=0
+
 for i in $(seq 1 $NUM_RUNS); do
   echo " Run #$i..."
   
@@ -101,9 +101,8 @@ echo "  • ${avg_mib} MiB"
 
 # Prepare JSON output
 json_output=$(jq -n \
-  --argjson runs "$NUM_RUNS" \
   --argjson avg_bytes "$avg_bytes" \
-  '{runs: $runs, average_bytes: $avg_bytes}'
+  '{peak_memory: $avg_bytes}'
 )
 
 echo "$json_output" > "$json_file"
