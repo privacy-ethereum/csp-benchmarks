@@ -1,31 +1,40 @@
-# How to contribute
+# How to Contribute
+=====================================
+
 Howdy! Usual good software engineering practices apply. Write comments. Follow standard Rust coding practices where possible. Use `cargo fmt` and `cargo clippy` to tidy up formatting.
 
-## What's expected in the contribution/PR
-We depend on 3 JSON files for collecting benchmark of the proving systems - metrics, criterion report and memory report.
-When you add new benchmark for certain proving system, you should add directory which includes JSON files, into the repo.
-The JSON files should follow the certain rules, in order to be collected by our collecting program.
+## What's Expected in the Contribution/PR
+------------------------------------------
 
-### Rules for JSON files
-1. Naming
-The name of metrics file should be like following: 
-`[target]_[size]_[proving_system]_[(optional)feat]_metrics.json`
+We depend on 3 JSON files for collecting benchmarks of the proving systems:
 
-The memory report should be named as similar:
-`[target]_[size]_[proving_system]_[(optional)feat]_mem_report.json`
+* Metrics
+* Criterion report
+* Memory report
 
-The naming of criterion report is similar, too. It's generated in the `target/criterion` dir of workspace, not in your dir.
-Since the report JSON files are inside the dir with name of its bench ID, you should name the bench ID with above rule - `[target]_[size]_[proving_system]_[(optional)feat]_prove` and `[target]_[size]_[proving_system]_[(optional)feat]_verify`.
+When you add a new benchmark for a certain proving system, you should add a directory that includes these JSON files to the repo.
 
-Example: When you want to add benchmark for binius with lookup for target function `sha256` with input size `2048`, 
-```
-metrics: sha256_2048_binius_with_lookup_metrics.json
-mem report: sha256_2048_binius_with_lookup_mem_report.json
-criterion IDs: sha256_2048_binius_with_lookup_prove, sha256_2048_binius_with_lookup_verify
-```
+### Rules for JSON Files
+-------------------------
 
-2. Contents
-The contents of metrics file should be deserialized into the following struct.
+#### Naming
+
+* Metrics file: `[target]_[size]_[proving_system]_[(optional)feat]_metrics.json`
+* Memory report: `[target]_[size]_[proving_system]_[(optional)feat]_mem_report.json`
+* Criterion report: `[target]_[size]_[proving_system]_[(optional)feat]_prove` and `[target]_[size]_[proving_system]_[(optional)feat]_verify`  
+
+NOTE: Criterion report files are generated under the `target/criterion` directory of workspace. Hence, you should apply above naming to criterion benchmark function IDs.
+
+Example:
+
+* When you want to add a benchmark for Binius with lookup for target function `sha256` with input size `2048`:
+	+ Metrics: `sha256_2048_binius_with_lookup_metrics.json`
+	+ Memory report: `sha256_2048_binius_with_lookup_mem_report.json`
+	+ Criterion IDs: `sha256_2048_binius_with_lookup_prove` and `sha256_2048_binius_with_lookup_verify`
+
+#### Contents
+
+* Metrics file: should be deserialized into the following struct:
 ```rust
 #[serde_as]
 #[derive(Serialize, Deserialize, Tabled, Clone)]
@@ -47,7 +56,7 @@ pub struct Metrics {
     pub peak_memory: usize,
 }
 ```
-Example: 
+Example:
 ```json
 {
   "name": "binius",
@@ -67,16 +76,13 @@ Example:
   "peak_memory": 0
 }
 ```
-
-The contents of memory report should be like the following:
-
-Example:
+* Memory report: should be like the following:
 ```json
 {
   "runs": 10,
   "average_bytes": 44869222
 }
 ```
-Here, the `runs` means how many times we repeat the process, in order to get the average RAM usage.
+Here, the `runs` means how many times we repeat the process to get the average RAM usage.
 
-For more details, please check the existing benchmarks like `binius`, and `plonky2`.
+For more details, please check the existing benchmarks like `binius` and `plonky2`.
