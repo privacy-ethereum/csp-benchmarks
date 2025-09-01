@@ -1,13 +1,12 @@
 use glob::glob;
 use serde_json::Value;
-use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use std::{fs, io};
 use utils::bench::Metrics1;
 
 fn main() -> io::Result<()> {
-    let mut benchmarks: HashMap<String, Metrics1> = HashMap::new();
+    let mut benchmarks: Vec<Metrics1> = Vec::new();
 
     let root_dir = workspace_dir();
     for entry in fs::read_dir(root_dir)? {
@@ -16,14 +15,7 @@ fn main() -> io::Result<()> {
             let metrics_file_paths = find_metrics_files(&path);
             for metrics_file_path in metrics_file_paths {
                 let metrics = extract_metrics(&path, &metrics_file_path)?;
-                benchmarks.insert(
-                    metrics_file_path
-                        .file_name()
-                        .unwrap()
-                        .to_string_lossy()
-                        .into_owned(),
-                    metrics,
-                );
+                benchmarks.push(metrics);
             }
         }
     }
