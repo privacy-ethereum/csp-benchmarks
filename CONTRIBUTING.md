@@ -1,10 +1,8 @@
 # How to Contribute
-=====================================
 
 Howdy! Usual good software engineering practices apply. Write comments. Follow standard Rust coding practices where possible. Use `cargo fmt` and `cargo clippy` to tidy up formatting.
 
 ## What's Expected in the Contribution/PR
-------------------------------------------
 
 We depend on 3 JSON files for collecting benchmarks of the proving systems:
 
@@ -15,7 +13,6 @@ We depend on 3 JSON files for collecting benchmarks of the proving systems:
 When you add a new benchmark for a certain proving system, you should add a directory that includes these JSON files to the repo.
 
 ### Rules for JSON Files
--------------------------
 
 #### Naming
 
