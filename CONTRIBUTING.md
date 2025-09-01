@@ -29,7 +29,7 @@ Example:
 	+ Memory report: `sha256_2048_binius_with_lookup_mem_report.json`
 	+ Criterion IDs: `sha256_2048_binius_with_lookup_prove` and `sha256_2048_binius_with_lookup_verify`
 
-You can reference the existing benchmarks for naming. (e.g. `./binius/benches/sha256_bench.rs`)
+You can reference the existing benchmarks for naming. (e.g. [./binius/benches/sha256_bench.rs](https://github.com/privacy-scaling-explorations/csp-benchmarks/blob/collect-benchmarks-0/binius/benches/sha256_bench.rs))
 
 #### Contents
 
@@ -82,7 +82,7 @@ Example:
   "peak_memory": 0
 }
 ```
-You can reference how to create JSON files of metrics in the existing benchmarks.(e.g. `./binius/benches/sha256_bench.rs`)
+You can reference how to create JSON files of metrics in the existing benchmarks.(e.g. [./binius/benches/sha256_bench.rs](https://github.com/privacy-scaling-explorations/csp-benchmarks/blob/collect-benchmarks-0/binius/benches/sha256_bench.rs))
 
 * Memory report: should be like the following:
 ```json
@@ -90,7 +90,7 @@ You can reference how to create JSON files of metrics in the existing benchmarks
   "peak_memory": 44869222
 }
 ```
-We provide the shell script to make this JSON file - `./measure_mem_avg.sh`.
-You can reference how to use the script in README file of existing benchmarks.(e.g. `./binius/README.md`)
+We provide the shell script to make this JSON file - `./measure_mem_avg.sh`.  
+You can reference how to use the script in README file of existing benchmarks.(e.g. [./binius/README.md](https://github.com/privacy-scaling-explorations/csp-benchmarks/blob/collect-benchmarks-0/binius/README.md#measure-sha256-ram-footprint))
 
 For more details, please check the existing benchmarks like `binius` and `plonky2`.
