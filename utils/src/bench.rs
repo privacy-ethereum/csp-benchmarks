@@ -61,8 +61,12 @@ pub fn measure_peak_memory<R, F: FnOnce() -> R>(func: F) -> (R, usize) {
 }
 
 #[serde_as]
-#[derive(Serialize, Tabled)]
+#[derive(Serialize, Deserialize, Tabled, Clone)]
 pub struct Metrics {
+    pub name: String,
+    pub feat: String,
+    pub is_zkvm: bool,
+    pub target: String,
     #[tabled(display_with = "display_bytes")]
     pub input_size: usize,
     #[serde_as(as = "DurationNanoSeconds")]
@@ -75,6 +79,8 @@ pub struct Metrics {
     pub cycles: u64,
     #[tabled(display_with = "display_bytes")]
     pub proof_size: usize,
+    #[tabled(display_with = "display_bytes")]
+    pub preprocessing_size: usize,
     #[tabled(display_with = "display_bytes")]
     pub peak_memory: usize,
 }
@@ -92,13 +98,18 @@ fn display_duration(duration: &Duration) -> String {
 }
 
 impl Metrics {
-    pub fn new(size: usize) -> Self {
+    pub fn new(name: String, feat: String, is_zkvm: bool, target: String, size: usize) -> Self {
         Metrics {
+            name,
+            feat,
+            is_zkvm,
+            target,
             input_size: size,
             proof_duration: Duration::default(),
             verify_duration: Duration::default(),
             cycles: 0,
             proof_size: 0,
+            preprocessing_size: 0,
             peak_memory: 0,
         }
     }
@@ -136,52 +147,7 @@ pub fn write_csv(out_path: &str, results: &[Metrics]) {
     println!("{table}");
 }
 
-#[serde_as]
-#[derive(Serialize, Deserialize, Tabled, Clone)]
-pub struct Metrics1 {
-    pub name: String,
-    pub feat: String,
-    pub target: String,
-    #[tabled(display_with = "display_bytes")]
-    pub input_size: usize,
-    #[tabled(display_with = "display_bytes")]
-    pub proof_size: usize,
-    #[tabled(display_with = "display_bytes")]
-    pub preprocessing_size: usize,
-    #[tabled(display_with = "display_duration")]
-    pub proof_duration: Duration,
-    #[tabled(display_with = "display_duration")]
-    pub verify_duration: Duration,
-    #[tabled(display_with = "display_bytes")]
-    pub peak_memory: usize,
-}
-
-impl Metrics1 {
-    pub fn new(name: String, feat: String, target: String, input_size: usize) -> Self {
-        Metrics1 {
-            name,
-            feat,
-            target,
-            input_size,
-            proof_size: 0,
-            preprocessing_size: 0,
-            proof_duration: Duration::default(),
-            verify_duration: Duration::default(),
-            peak_memory: 0,
-        }
-    }
-}
-
-pub fn write_json_metrics1(output_path: &str, metrics: &Metrics1) {
+pub fn write_json_metrics(output_path: &str, metrics: &Metrics) {
     let json = serde_json::to_string_pretty(metrics).unwrap();
     std::fs::write(output_path, json).unwrap();
-}
-
-pub fn display_metrics1(metrics: &[Metrics1]) -> String {
-    if metrics.is_empty() {
-        return String::new();
-    }
-    let mut table = Table::new(metrics);
-    table.with(Style::modern());
-    table.to_string()
 }

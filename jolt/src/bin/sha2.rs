@@ -11,7 +11,7 @@ fn main() {
 }
 
 fn benchmark_sha2(num_bytes: usize) -> Metrics {
-    let mut metrics = Metrics::new(num_bytes as usize);
+    let mut metrics = Metrics::new("jolt".to_string(), "".to_string(), true, "sha256".to_string(), num_bytes as usize);
 
     let program = sha2_guest::compile_sha2(TARGET_DIR);
     let prover_preprocessing = sha2_guest::preprocess_prover_sha2(&program);

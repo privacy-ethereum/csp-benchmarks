@@ -3,7 +3,7 @@ use plonky2_sha256::bench::{prove, sha256_no_lookup_prepare, verify};
 
 use plonky2::{plonk::config::PoseidonGoldilocksConfig, util::serialization::Write};
 use plonky2_u32::gates::arithmetic_u32::{U32GateSerializer, U32GeneratorSerializer};
-use utils::bench::{Metrics1, write_json_metrics1};
+use utils::bench::{Metrics, write_json_metrics};
 
 const D: usize = 2;
 type C = PoseidonGoldilocksConfig;
@@ -14,7 +14,7 @@ fn sha256_no_lookup(c: &mut Criterion) {
     let metrics = sha256_plonky2_no_lookup_metrics(input_size);
 
     let json_file = "sha256_2048_plonky2_no_lookup_metrics.json";
-    write_json_metrics1(json_file, &metrics);
+    write_json_metrics(json_file, &metrics);
 
     // Run the benchmarks
     let mut group = c.benchmark_group("sha256_2048_plonky2_no_lookup");
@@ -49,10 +49,11 @@ fn sha256_no_lookup(c: &mut Criterion) {
 criterion_main!(sha256);
 criterion_group!(sha256, sha256_no_lookup);
 
-fn sha256_plonky2_no_lookup_metrics(input_size: usize) -> Metrics1 {
-    let mut metrics = Metrics1::new(
+fn sha256_plonky2_no_lookup_metrics(input_size: usize) -> Metrics {
+    let mut metrics = Metrics::new(
         "plonky2".to_string(),
         "no_lookup".to_string(),
+        false,
         "sha256".to_string(),
         input_size,
     );

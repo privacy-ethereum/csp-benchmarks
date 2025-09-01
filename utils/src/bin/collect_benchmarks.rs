@@ -3,13 +3,13 @@ use serde_json::Value;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use std::{fs, io};
-use utils::bench::Metrics1;
+use utils::bench::Metrics;
 
 /// Collect all JSON files in subdirectories of the workspace directory
-/// containing SHA256 benchmark metrics, and write them to a single JSON file
+/// containing benchmark metrics, and write them to a single JSON file
 /// at `../collected_benchmarks.json`.
 fn main() -> io::Result<()> {
-    let mut benchmarks: Vec<Metrics1> = Vec::new();
+    let mut benchmarks: Vec<Metrics> = Vec::new();
 
     let root_dir = workspace_dir();
     for entry in fs::read_dir(root_dir)? {
@@ -29,7 +29,7 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-/// Extract `Metrics1` from JSON file `metrics_file_path` and fill in any missing
+/// Extract `Metrics` from JSON file `metrics_file_path` and fill in any missing
 /// fields by reading from Criterion's JSON files.
 ///
 /// Specifically, this function looks for fields `proof_duration` and
@@ -39,11 +39,11 @@ fn main() -> io::Result<()> {
 /// already set, using the memory usage reported by the `mem_report` JSON
 /// file.
 ///
-/// Returns `Metrics1` if successful.
-fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics1> {
+/// Returns `Metrics` if successful.
+fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> {
     let metrics_json: Value = serde_json::from_str(&fs::read_to_string(&metrics_file_path)?)?;
 
-    let mut metrics: Metrics1 = serde_json::from_value(metrics_json)?;
+    let mut metrics: Metrics = serde_json::from_value(metrics_json)?;
 
     let target = &metrics.target;
     let input_size = metrics.input_size;

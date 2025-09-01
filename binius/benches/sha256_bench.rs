@@ -3,7 +3,7 @@
 use binius::bench::{prove, sha256_no_lookup_prepare, sha256_with_lookup_prepare, verify};
 use binius_utils::SerializeBytes;
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
-use utils::bench::{Metrics1, write_json_metrics1};
+use utils::bench::{Metrics, write_json_metrics};
 
 fn sha256_no_lookup(c: &mut Criterion) {
     // Measure the metrics
@@ -11,7 +11,7 @@ fn sha256_no_lookup(c: &mut Criterion) {
     let metrics = sha256_binius_no_lookup_metrics(input_size);
 
     let json_file = "sha256_2048_binius_no_lookup_metrics.json";
-    write_json_metrics1(json_file, &metrics);
+    write_json_metrics(json_file, &metrics);
 
     // Run the benchmarks
     let mut group = c.benchmark_group("sha256_2048_binius_no_lookup");
@@ -50,7 +50,7 @@ fn sha256_with_lookup(c: &mut Criterion) {
     let metrics = sha256_binius_with_lookup_metrics(input_size);
 
     let json_file = "sha256_2048_binius_with_lookup_metrics.json";
-    write_json_metrics1(json_file, &metrics);
+    write_json_metrics(json_file, &metrics);
 
     // Run the benchmarks
     let mut group = c.benchmark_group("sha256_2048_binius_with_lookup");
@@ -86,10 +86,11 @@ fn sha256_with_lookup(c: &mut Criterion) {
 criterion_main!(sha256);
 criterion_group!(sha256, sha256_no_lookup, sha256_with_lookup);
 
-fn sha256_binius_with_lookup_metrics(input_size: usize) -> Metrics1 {
-    let mut metrics = Metrics1::new(
+fn sha256_binius_with_lookup_metrics(input_size: usize) -> Metrics {
+    let mut metrics = Metrics::new(
         "binius".to_string(),
         "with_lookup".to_string(),
+        false,
         "sha256".to_string(),
         input_size,
     );
@@ -110,10 +111,11 @@ fn sha256_binius_with_lookup_metrics(input_size: usize) -> Metrics1 {
     metrics
 }
 
-fn sha256_binius_no_lookup_metrics(input_size: usize) -> Metrics1 {
-    let mut metrics = Metrics1::new(
+fn sha256_binius_no_lookup_metrics(input_size: usize) -> Metrics {
+    let mut metrics = Metrics::new(
         "binius".to_string(),
         "no_lookup".to_string(),
+        false,
         "sha256".to_string(),
         input_size,
     );

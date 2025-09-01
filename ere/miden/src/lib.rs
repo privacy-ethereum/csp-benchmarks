@@ -54,7 +54,13 @@ impl Sha256Benchmark {
         zkvm.verify(&proof).unwrap();
         let verify_duration = verify_start.elapsed();
 
-        let mut metrics = Metrics::new(size);
+        let mut metrics = Metrics::new(
+            "miden".to_string(),
+            "".to_string(),
+            true,
+            "sha256".to_string(),
+            size,
+        );
         metrics.proof_duration = proof_duration;
         metrics.verify_duration = verify_duration;
         metrics.cycles = execution_report.total_num_cycles;
