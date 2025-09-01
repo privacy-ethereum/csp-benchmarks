@@ -53,12 +53,12 @@ if (( $# == 0 )); then
   exit 1
 fi
 
-echo "Running command: $* (averaging over $NUM_RUNS runs)"
-echo "JSON output file: $json_file"
-
 # Fixed number of runs: 10
 NUM_RUNS=10
 total_bytes=0
+
+echo "Running command: $* (averaging over $NUM_RUNS runs)"
+echo "JSON output file: $json_file"
 
 for i in $(seq 1 $NUM_RUNS); do
   echo " Run #$i..."
