@@ -10,7 +10,7 @@ We depend on 3 JSON files for collecting benchmarks of the proving systems:
 * Criterion report
 * Memory report
 
-When you add a new benchmark for a certain proving system, you should add a directory that includes these JSON files to the repo.
+When you add a new benchmark for a certain proving system, you should add a benchmarking code directory that are able to generate these JSON files. The directory should be included in the workspace(root-level `Cargo.toml`).
 
 ### Rules for JSON Files
 
@@ -29,6 +29,8 @@ Example:
 	+ Memory report: `sha256_2048_binius_with_lookup_mem_report.json`
 	+ Criterion IDs: `sha256_2048_binius_with_lookup_prove` and `sha256_2048_binius_with_lookup_verify`
 
+You can reference the existing benchmarks for naming. (e.g. `./binius/benches/sha256_bench.rs`)
+
 #### Contents
 
 * Metrics file: should be deserialized into the following struct:
@@ -38,17 +40,22 @@ Example:
 pub struct Metrics {
     pub name: String,
     pub feat: String,
+    pub is_zkvm: bool,
     pub target: String,
     #[tabled(display_with = "display_bytes")]
     pub input_size: usize,
+    #[serde_as(as = "DurationNanoSeconds")]
+    #[tabled(display_with = "display_duration")]
+    pub proof_duration: Duration,
+    #[serde_as(as = "DurationNanoSeconds")]
+    #[tabled(display_with = "display_duration")]
+    pub verify_duration: Duration,
+    #[tabled(display_with = "display_cycles")]
+    pub cycles: u64,
     #[tabled(display_with = "display_bytes")]
     pub proof_size: usize,
     #[tabled(display_with = "display_bytes")]
     pub preprocessing_size: usize,
-    #[tabled(display_with = "display_duration")]
-    pub proof_duration: Duration,
-    #[tabled(display_with = "display_duration")]
-    pub verify_duration: Duration,
     #[tabled(display_with = "display_bytes")]
     pub peak_memory: usize,
 }
@@ -58,26 +65,32 @@ Example:
 {
   "name": "binius",
   "feat": "no_lookup",
+  "is_zkvm": false,
   "target": "sha256",
   "input_size": 2048,
-  "proof_size": 475590,
-  "preprocessing_size": 329524,
   "proof_duration": {
-    "secs": 0,
-    "nanos": 0
+    "secs": 9,
+    "nanos": 912673217
   },
   "verify_duration": {
-    "secs": 0,
-    "nanos": 0
+    "secs": 3,
+    "nanos": 933078432
   },
+  "cycles": 0,
+  "proof_size": 475590,
+  "preprocessing_size": 329524,
   "peak_memory": 0
 }
 ```
+You can reference how to create JSON files of metrics in the existing benchmarks.(e.g. `./binius/benches/sha256_bench.rs`)
+
 * Memory report: should be like the following:
 ```json
 {
   "peak_memory": 44869222
 }
 ```
+We provide the shell script to make this JSON file - `./measure_mem_avg.sh`.
+You can reference how to use the script in README file of existing benchmarks.(e.g. `./binius/README.md`)
 
 For more details, please check the existing benchmarks like `binius` and `plonky2`.
