@@ -1,5 +1,3 @@
-use guests::ecdsa::EcdsaVerifyInput;
-use k256::{Secp256k1, ecdsa::Signature, elliptic_curve::sec1::EncodedPoint};
 use rand::{RngCore, SeedableRng, rngs::StdRng};
 use std::fs;
 use std::fs::File;
@@ -16,29 +14,6 @@ pub fn sha2_input(num_bytes: usize) -> Vec<u8> {
     let mut message = vec![0; num_bytes];
     rng.fill_bytes(&mut message);
     message
-}
-
-pub fn ecdsa_input() -> EcdsaVerifyInput {
-    const MESSAGE: &[u8] = include_bytes!("../../utils/ecdsa_signature/message.txt");
-    const KEY: &[u8] = include_bytes!("../../utils/ecdsa_signature/verifying_key.txt");
-    const SIGNATURE: &[u8] = include_bytes!("../../utils/ecdsa_signature/signature.txt");
-
-    // Use a static variable to store the decoded message so it has a 'static lifetime
-    let message = hex::decode(MESSAGE).expect("Failed to decode hex of 'message'");
-
-    let encoded_point = EncodedPoint::<Secp256k1>::from_bytes(
-        hex::decode(KEY).expect("Failed to decode hex of 'verifying_key'"),
-    )
-    .expect("Invalid encoded verifying_key bytes");
-
-    let bytes = hex::decode(SIGNATURE).expect("Failed to decode hex of 'signature'");
-    let signature = Signature::from_slice(&bytes).expect("Invalid signature bytes");
-
-    EcdsaVerifyInput {
-        encoded_point,
-        message: message.clone(),
-        signature,
-    }
 }
 
 pub fn load_elf(path: &str) -> Vec<u8> {

@@ -12,13 +12,6 @@ tabled = "0.15"
 csv = "1.1"
 human-repr = { version = "1.0", features = ["1024"] }
 hex = { workspace = true }
-k256 = { version = "=0.13.4", features = [
-  "arithmetic",
-  "serde",
-  "expose-field",
-  "std",
-  "ecdsa",
-], default-features = false }
 guests = { path = "../guests", features = ["with-ecdsa"] }
 pprof = { version = "0.14.0", features = ["prost-codec"] }
 tracing-chrome = "0.7.1"

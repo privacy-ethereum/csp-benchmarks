@@ -41,7 +41,7 @@ fn main() -> io::Result<()> {
 ///
 /// Returns `Metrics` if successful.
 fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> {
-    let metrics_json: Value = serde_json::from_str(&fs::read_to_string(&metrics_file_path)?)?;
+    let metrics_json: Value = serde_json::from_str(&fs::read_to_string(metrics_file_path)?)?;
 
     let mut metrics: Metrics = serde_json::from_value(metrics_json)?;
 
