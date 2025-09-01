@@ -8,4 +8,4 @@ runs:
       run: |
         curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash
         source ~/.bashrc
-        ~/.nargo/bin/noirup --version
+        ~/.nargo/bin/noirup --version 1.0.0-beta.9
