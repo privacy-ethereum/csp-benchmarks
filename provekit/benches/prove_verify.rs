@@ -1,6 +1,5 @@
 use criterion::{BatchSize, Criterion, black_box, criterion_group, criterion_main};
-use provekit::{ProvekitSha256Benchmark, WORKSPACE_ROOT};
-use std::path::PathBuf;
+use provekit::ProvekitSha256Benchmark;
 use utils::bench::{Metrics, write_json_metrics};
 use utils::metadata::SHA2_INPUTS;
 

@@ -27,7 +27,7 @@ impl ProvekitSha256Benchmark {
                 "--silence-warnings",
                 "--skip-brillig-constraints-check",
             ])
-            .current_dir(workspace_root)
+            .current_dir(&workspace_root)
             .output()
             .expect("Failed to run nargo compile");
 
@@ -68,7 +68,7 @@ impl ProvekitSha256Benchmark {
         let preprocessing_size = std::fs::metadata(circuit_path)
             .map(|m| m.len())
             .unwrap_or(0) as usize
-            + std::fs::metadata(toml_path).map(|m| m.len()).unwrap_or(0) as usize;
+            + std::fs::metadata(&toml_path).map(|m| m.len()).unwrap_or(0) as usize;
 
         Self {
             proof_scheme,
