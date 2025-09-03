@@ -5,72 +5,64 @@ use utils::bench::{Metrics, write_json_metrics};
 use utils::metadata::SHA2_INPUTS;
 
 fn sha256_benchmarks(c: &mut Criterion) {
-    // Measure the SubMetrics
-    let metrics = sha256_provekit_metrics();
-    let json_file: &'static str = "sha256_2048_provekit_metrics.json";
-    write_json_metrics(json_file, &metrics[0]);
-
-    // Run the benchmarks
-    let bench_harness = ProvekitSha256Benchmark::new(&SHA2_INPUTS);
-    let mut group = c.benchmark_group("sha256_2048_provekit");
-    group.sample_size(10);
-
     for &input_size in SHA2_INPUTS.iter() {
-        group.bench_function("sha256_2048_provekit_prove", |bench| {
+        let bench_harness = ProvekitSha256Benchmark::new(input_size);
+
+        // Measure the Metrics
+        let metrics = sha256_provekit_metrics(&bench_harness, input_size);
+        let json_file = format!("sha256_{input_size}_provekit_metrics.json");
+        write_json_metrics(&json_file, &metrics);
+
+        // Run the benchmarks
+        let mut group = c.benchmark_group(format!("sha256_{input_size}_provekit"));
+        group.sample_size(10);
+
+        group.bench_function(format!("sha256_{input_size}_provekit_prove"), |bench| {
             bench.iter(|| {
-                let proof = bench_harness.run_prove(input_size);
+                let proof = bench_harness.run_prove();
                 black_box(proof);
             });
         });
 
-        group.bench_function("sha256_2048_provekit_verify", |bench| {
+        group.bench_function(format!("sha256_{input_size}_provekit_verify"), |bench| {
             bench.iter_batched(
-                || bench_harness.prepare_verify(input_size),
+                || bench_harness.prepare_verify(),
                 |(proof, proof_scheme)| bench_harness.run_verify(&proof, proof_scheme).unwrap(),
                 BatchSize::SmallInput,
             );
         });
+        group.finish();
     }
-
-    group.finish();
 }
 
 criterion_group!(benches, sha256_benchmarks);
 criterion_main!(benches);
 
-fn sha256_provekit_metrics() -> Vec<Metrics> {
-    let bench_harness = ProvekitSha256Benchmark::new(&SHA2_INPUTS);
+fn sha256_provekit_metrics(bench_harness: &ProvekitSha256Benchmark, input_size: usize) -> Metrics {
+    let mut metrics = Metrics::new(
+        "provekit".to_string(),
+        "".to_string(),
+        false,
+        "sha256".to_string(),
+        input_size,
+    );
 
-    let mut all_metrics = Vec::new();
+    let package_name = format!("sha256_bench_{input_size}");
+    let circuit_path = PathBuf::from(WORKSPACE_ROOT)
+        .join("target")
+        .join(format!("{package_name}.json"));
+    let toml_path = PathBuf::from(WORKSPACE_ROOT)
+        .join("circuits/hash/sha256-provekit")
+        .join(format!("sha256-bench-{input_size}"))
+        .join("Prover.toml");
 
-    for &size in SHA2_INPUTS.iter() {
-        let mut metrics = Metrics::new(
-            "provekit".to_string(),
-            "".to_string(),
-            false,
-            "sha256".to_string(),
-            size,
-        );
+    metrics.preprocessing_size = std::fs::metadata(circuit_path)
+        .map(|m| m.len())
+        .unwrap_or(0) as usize
+        + std::fs::metadata(toml_path).map(|m| m.len()).unwrap_or(0) as usize;
 
-        let package_name = format!("sha256_bench_{size}");
-        let circuit_path = PathBuf::from(WORKSPACE_ROOT)
-            .join("target")
-            .join(format!("{package_name}.json"));
-        let toml_path = PathBuf::from(WORKSPACE_ROOT)
-            .join("circuits/hash/sha256-provekit")
-            .join(format!("sha256-bench-{size}"))
-            .join("Prover.toml");
+    let proof = bench_harness.run_prove();
+    metrics.proof_size = proof.whir_r1cs_proof.transcript.len();
 
-        metrics.preprocessing_size = std::fs::metadata(circuit_path)
-            .map(|m| m.len())
-            .unwrap_or(0) as usize
-            + std::fs::metadata(toml_path).map(|m| m.len()).unwrap_or(0) as usize;
-
-        let proof = bench_harness.run_prove(size);
-        metrics.proof_size = proof.whir_r1cs_proof.transcript.len();
-
-        all_metrics.push(metrics);
-    }
-
-    all_metrics
+    metricss
 }
