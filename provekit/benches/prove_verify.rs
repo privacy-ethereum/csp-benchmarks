@@ -47,19 +47,7 @@ fn sha256_provekit_metrics(bench_harness: &ProvekitSha256Benchmark, input_size: 
         input_size,
     );
 
-    let package_name = format!("sha256_bench_{input_size}");
-    let circuit_path = PathBuf::from(WORKSPACE_ROOT)
-        .join("target")
-        .join(format!("{package_name}.json"));
-    let toml_path = PathBuf::from(WORKSPACE_ROOT)
-        .join("circuits/hash/sha256-provekit")
-        .join(format!("sha256-bench-{input_size}"))
-        .join("Prover.toml");
-
-    metrics.preprocessing_size = std::fs::metadata(circuit_path)
-        .map(|m| m.len())
-        .unwrap_or(0) as usize
-        + std::fs::metadata(toml_path).map(|m| m.len()).unwrap_or(0) as usize;
+    metrics.preprocessing_size = bench_harness.preprocessing_size();
 
     let proof = bench_harness.run_prove();
     metrics.proof_size = proof.whir_r1cs_proof.transcript.len();
