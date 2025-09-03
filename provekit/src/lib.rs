@@ -1,6 +1,5 @@
 use noir_r1cs::{NoirProof, NoirProofScheme};
 use rand::RngCore;
-use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
@@ -73,7 +72,7 @@ impl ProvekitSha256Benchmark {
     pub fn run_prove(&self) -> NoirProof {
         let witness_map = self
             .proof_scheme
-            .read_witness(toml_path.to_str().unwrap())
+            .read_witness(self.toml_path.to_str().unwrap())
             .expect("Failed to read witness");
 
         self.proof_scheme
