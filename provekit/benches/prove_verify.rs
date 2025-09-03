@@ -64,5 +64,5 @@ fn sha256_provekit_metrics(bench_harness: &ProvekitSha256Benchmark, input_size: 
     let proof = bench_harness.run_prove();
     metrics.proof_size = proof.whir_r1cs_proof.transcript.len();
 
-    metricss
+    metrics
 }
