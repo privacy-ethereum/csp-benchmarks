@@ -68,14 +68,8 @@ Example:
   "is_zkvm": false,
   "target": "sha256",
   "input_size": 2048,
-  "proof_duration": {
-    "secs": 9,
-    "nanos": 912673217
-  },
-  "verify_duration": {
-    "secs": 3,
-    "nanos": 933078432
-  },
+  "proof_duration": 10644587248,
+  "verify_duration": 4647043282,
   "cycles": 0,
   "proof_size": 475590,
   "preprocessing_size": 329524,
