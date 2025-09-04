@@ -6,41 +6,42 @@ use utils::{
 };
 
 fn sha256_bench(c: &mut Criterion) {
-    // Measure the SubMetrics
-    let input_size = SHA2_INPUTS[0];
-    let metrics = sha256_powdr_metrics(input_size);
+    for input_size in SHA2_INPUTS {
+        // Measure the SubMetrics
+        let metrics = sha256_powdr_metrics(input_size);
 
-    let json_file = format!("sha256_{input_size}_powdr_metrics.json");
-    write_json_metrics(&json_file, &metrics);
+        let json_file = format!("sha256_{input_size}_powdr_metrics.json");
+        write_json_metrics(&json_file, &metrics);
 
-    // Run the benchmarks
-    let mut group = c.benchmark_group(format!("sha256_{input_size}_powdr"));
-    group.sample_size(10);
+        // Run the benchmarks
+        let mut group = c.benchmark_group(format!("sha256_{input_size}_powdr"));
+        group.sample_size(10);
 
-    group.bench_function(format!("sha256_{input_size}_powdr_prove"), |bench| {
-        bench.iter_batched(
-            prepare_pipeline,
-            |mut pipeline| {
-                prove(&mut pipeline);
-            },
-            BatchSize::SmallInput,
-        );
-    });
+        group.bench_function(format!("sha256_{input_size}_powdr_prove"), |bench| {
+            bench.iter_batched(
+                prepare_pipeline,
+                |mut pipeline| {
+                    prove(&mut pipeline);
+                },
+                BatchSize::SmallInput,
+            );
+        });
 
-    group.bench_function(format!("sha256_{input_size}_powdr_verify"), |bench| {
-        bench.iter_batched(
-            || {
-                let mut pipeline = prepare_pipeline();
-                prove(&mut pipeline);
-                pipeline
-            },
-            |pipeline| {
-                verify(pipeline);
-            },
-            BatchSize::SmallInput,
-        );
-    });
-    group.finish();
+        group.bench_function(format!("sha256_{input_size}_powdr_verify"), |bench| {
+            bench.iter_batched(
+                || {
+                    let mut pipeline = prepare_pipeline();
+                    prove(&mut pipeline);
+                    pipeline
+                },
+                |pipeline| {
+                    verify(pipeline);
+                },
+                BatchSize::SmallInput,
+            );
+        });
+        group.finish();
+    }
 }
 
 criterion_main!(sha256);

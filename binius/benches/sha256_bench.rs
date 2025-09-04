@@ -9,93 +9,95 @@ use utils::{
 };
 
 fn sha256_no_lookup(c: &mut Criterion) {
-    // Measure the metrics
-    let input_size = SHA2_INPUTS[0];
-    let metrics = sha256_binius_no_lookup_metrics(input_size);
+    for input_size in SHA2_INPUTS {
+        // Measure the metrics
+        let metrics = sha256_binius_no_lookup_metrics(input_size);
 
-    let json_file = format!("sha256_{input_size}_binius_no_lookup_metrics.json");
-    write_json_metrics(&json_file, &metrics);
+        let json_file = format!("sha256_{input_size}_binius_no_lookup_metrics.json");
+        write_json_metrics(&json_file, &metrics);
 
-    // Run the benchmarks
-    let mut group = c.benchmark_group(format!("sha256_{input_size}_binius_no_lookup"));
-    group.sample_size(10);
-    let allocator = bumpalo::Bump::new();
+        // Run the benchmarks
+        let mut group = c.benchmark_group(format!("sha256_{input_size}_binius_no_lookup"));
+        group.sample_size(10);
+        let allocator = bumpalo::Bump::new();
 
-    group.bench_function(
-        format!("sha256_{input_size}_binius_no_lookup_prove"),
-        |bench| {
-            bench.iter_batched(
-                || sha256_no_lookup_prepare(&allocator),
-                |(constraint_system, args, witness, backend)| {
-                    prove(constraint_system, args, witness, backend);
-                },
-                BatchSize::SmallInput,
-            );
-        },
-    );
+        group.bench_function(
+            format!("sha256_{input_size}_binius_no_lookup_prove"),
+            |bench| {
+                bench.iter_batched(
+                    || sha256_no_lookup_prepare(&allocator),
+                    |(constraint_system, args, witness, backend)| {
+                        prove(constraint_system, args, witness, backend);
+                    },
+                    BatchSize::SmallInput,
+                );
+            },
+        );
 
-    group.bench_function(
-        format!("sha256_{input_size}_binius_no_lookup_verify"),
-        |bench| {
-            bench.iter_batched(
-                || {
-                    let (constraint_system, args, witness, backend) =
-                        sha256_no_lookup_prepare(&allocator);
-                    prove(constraint_system, args, witness, backend)
-                },
-                |(constraint_system, args, proof)| {
-                    verify(constraint_system, args, proof);
-                },
-                BatchSize::SmallInput,
-            );
-        },
-    );
-    group.finish();
+        group.bench_function(
+            format!("sha256_{input_size}_binius_no_lookup_verify"),
+            |bench| {
+                bench.iter_batched(
+                    || {
+                        let (constraint_system, args, witness, backend) =
+                            sha256_no_lookup_prepare(&allocator);
+                        prove(constraint_system, args, witness, backend)
+                    },
+                    |(constraint_system, args, proof)| {
+                        verify(constraint_system, args, proof);
+                    },
+                    BatchSize::SmallInput,
+                );
+            },
+        );
+        group.finish();   
+    }
 }
 
 fn sha256_with_lookup(c: &mut Criterion) {
-    // Measure the metrics
-    let input_size = SHA2_INPUTS[0];
-    let metrics = sha256_binius_with_lookup_metrics(input_size);
+    for input_size in SHA2_INPUTS {
+        // Measure the metrics
+        let metrics = sha256_binius_with_lookup_metrics(input_size);
 
-    let json_file = format!("sha256_{input_size}_binius_with_lookup_metrics.json");
-    write_json_metrics(&json_file, &metrics);
+        let json_file = format!("sha256_{input_size}_binius_with_lookup_metrics.json");
+        write_json_metrics(&json_file, &metrics);
 
-    // Run the benchmarks
-    let mut group = c.benchmark_group(format!("sha256_{input_size}_binius_with_lookup"));
-    group.sample_size(10);
-    let allocator = bumpalo::Bump::new();
+        // Run the benchmarks
+        let mut group = c.benchmark_group(format!("sha256_{input_size}_binius_with_lookup"));
+        group.sample_size(10);
+        let allocator = bumpalo::Bump::new();
 
-    group.bench_function(
-        format!("sha256_{input_size}_binius_with_lookup_prove"),
-        |bench| {
-            bench.iter_batched(
-                || sha256_with_lookup_prepare(&allocator),
-                |(constraint_system, args, witness, backend)| {
-                    prove(constraint_system, args, witness, backend);
-                },
-                BatchSize::SmallInput,
-            );
-        },
-    );
+        group.bench_function(
+            format!("sha256_{input_size}_binius_with_lookup_prove"),
+            |bench| {
+                bench.iter_batched(
+                    || sha256_with_lookup_prepare(&allocator),
+                    |(constraint_system, args, witness, backend)| {
+                        prove(constraint_system, args, witness, backend);
+                    },
+                    BatchSize::SmallInput,
+                );
+            },
+        );
 
-    group.bench_function(
-        format!("sha256_{input_size}_binius_with_lookup_verify"),
-        |bench| {
-            bench.iter_batched(
-                || {
-                    let (constraint_system, args, witness, backend) =
-                        sha256_with_lookup_prepare(&allocator);
-                    prove(constraint_system, args, witness, backend)
-                },
-                |(constraint_system, args, proof)| {
-                    verify(constraint_system, args, proof);
-                },
-                BatchSize::SmallInput,
-            );
-        },
-    );
-    group.finish();
+        group.bench_function(
+            format!("sha256_{input_size}_binius_with_lookup_verify"),
+            |bench| {
+                bench.iter_batched(
+                    || {
+                        let (constraint_system, args, witness, backend) =
+                            sha256_with_lookup_prepare(&allocator);
+                        prove(constraint_system, args, witness, backend)
+                    },
+                    |(constraint_system, args, proof)| {
+                        verify(constraint_system, args, proof);
+                    },
+                    BatchSize::SmallInput,
+                );
+            },
+        );
+        group.finish();   
+    }
 }
 
 criterion_main!(sha256);
