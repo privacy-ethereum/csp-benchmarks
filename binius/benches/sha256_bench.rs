@@ -50,7 +50,7 @@ fn sha256_no_lookup(c: &mut Criterion) {
                 );
             },
         );
-        group.finish();   
+        group.finish();
     }
 }
 
@@ -96,7 +96,7 @@ fn sha256_with_lookup(c: &mut Criterion) {
                 );
             },
         );
-        group.finish();   
+        group.finish();
     }
 }
 
