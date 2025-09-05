@@ -3,47 +3,57 @@ use plonky2_sha256::bench::{prove, sha256_no_lookup_prepare, verify};
 
 use plonky2::{plonk::config::PoseidonGoldilocksConfig, util::serialization::Write};
 use plonky2_u32::gates::arithmetic_u32::{U32GateSerializer, U32GeneratorSerializer};
-use utils::bench::{Metrics, write_json_metrics};
+use utils::{
+    bench::{Metrics, write_json_metrics},
+    metadata::SHA2_INPUTS,
+};
 
 const D: usize = 2;
 type C = PoseidonGoldilocksConfig;
 
 fn sha256_no_lookup(c: &mut Criterion) {
-    // Measure the metrics
-    let input_size = 2048;
-    let metrics = sha256_plonky2_no_lookup_metrics(input_size);
+    for input_size in SHA2_INPUTS {
+        // Measure the metrics
+        let metrics = sha256_plonky2_no_lookup_metrics(input_size);
 
-    let json_file = "sha256_2048_plonky2_no_lookup_metrics.json";
-    write_json_metrics(json_file, &metrics);
+        let json_file = format!("sha256_{input_size}_plonky2_no_lookup_metrics.json");
+        write_json_metrics(&json_file, &metrics);
 
-    // Run the benchmarks
-    let mut group = c.benchmark_group("sha256_2048_plonky2_no_lookup");
-    group.sample_size(10);
+        // Run the benchmarks
+        let mut group = c.benchmark_group(format!("sha256_{input_size}_plonky2_no_lookup"));
+        group.sample_size(10);
 
-    group.bench_function("sha256_2048_plonky2_no_lookup_prove", |bench| {
-        bench.iter_batched(
-            sha256_no_lookup_prepare,
-            |(data, pw)| {
-                prove(&data.prover_data(), pw);
+        group.bench_function(
+            format!("sha256_{input_size}_plonky2_no_lookup_prove"),
+            |bench| {
+                bench.iter_batched(
+                    sha256_no_lookup_prepare,
+                    |(data, pw)| {
+                        prove(&data.prover_data(), pw);
+                    },
+                    BatchSize::SmallInput,
+                );
             },
-            BatchSize::SmallInput,
         );
-    });
 
-    group.bench_function("sha256_2048_plonky2_no_lookup_verify", |bench| {
-        bench.iter_batched(
-            || {
-                let (data, pw) = sha256_no_lookup_prepare();
-                let verifier_data = data.verifier_data();
-                (prove(&data.prover_data(), pw), verifier_data)
+        group.bench_function(
+            format!("sha256_{input_size}_plonky2_no_lookup_verify"),
+            |bench| {
+                bench.iter_batched(
+                    || {
+                        let (data, pw) = sha256_no_lookup_prepare();
+                        let verifier_data = data.verifier_data();
+                        (prove(&data.prover_data(), pw), verifier_data)
+                    },
+                    |(proof, data)| {
+                        verify(&data, proof);
+                    },
+                    BatchSize::SmallInput,
+                );
             },
-            |(proof, data)| {
-                verify(&data, proof);
-            },
-            BatchSize::SmallInput,
         );
-    });
-    group.finish();
+        group.finish();
+    }
 }
 
 criterion_main!(sha256);
