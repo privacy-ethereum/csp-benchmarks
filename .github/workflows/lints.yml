@@ -40,11 +40,6 @@ jobs:
           default: true
           components: rustfmt, clippy
 
-      - name: Install SP1
-        uses: ./.github/actions/install-sp1
-        with:
-          token: ${{ secrets.GH_PAT }}
-
       - name: Install Powdr
         uses: ./.github/actions/install-powdr
 

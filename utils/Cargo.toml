@@ -4,19 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bincode = { workspace = true }
 serde = { workspace = true }
 serde_with = "3.8"
 serde_json = { workspace = true }
 tabled = "0.15"
 csv = "1.1"
 human-repr = { version = "1.0", features = ["1024"] }
-hex = { workspace = true }
-guests = { path = "../guests", features = ["with-ecdsa"] }
-pprof = { version = "0.14.0", features = ["prost-codec"] }
-tracing-chrome = "0.7.1"
-tracing-subscriber = "0.3.18"
-rand = { workspace = true }
 libc = "0.2"
 glob = "0.3"
 

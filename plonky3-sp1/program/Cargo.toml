@@ -1,8 +1,0 @@
-[package]
-version = "0.1.0"
-name = "sha-program"
-edition = "2024"
-
-[dependencies]
-sp1-zkvm = "4.1.7"
-sha-lib = { path = "../lib" }

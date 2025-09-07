@@ -1,0 +1,24 @@
+[package]
+name = "zkvm-csp-benchmarks"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rand = "0.9"
+utils = { path = "../utils" }
+
+# Ere
+ere-jolt = { git = "https://github.com/eth-act/ere", tag = "v0.0.11" }
+ere-risc0 = { git = "https://github.com/eth-act/ere", tag = "v0.0.11" }
+ere-sp1 = { git = "https://github.com/eth-act/ere", tag = "v0.0.11" }
+zkvm-interface = { git = "https://github.com/eth-act/ere", tag = "v0.0.11" }
+
+# Jolt patches
+[patch.crates-io]
+ark-ff = { git = "https://github.com/a16z/arkworks-algebra", branch = "v0.5.0-optimize-mul-u64" }
+ark-ec = { git = "https://github.com/a16z/arkworks-algebra", branch = "v0.5.0-optimize-mul-u64" }
+ark-serialize = { git = "https://github.com/a16z/arkworks-algebra", branch = "v0.5.0-optimize-mul-u64" }
+
+[[bench]]
+name = "sha256"
+harness = false
