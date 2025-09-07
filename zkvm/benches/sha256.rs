@@ -86,6 +86,6 @@ fn jolt_sha256() {
 
 fn main() {
     risc0_sha256();
-    sp1_sha256();
     jolt_sha256();
+    sp1_sha256();
 }
