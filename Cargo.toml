@@ -4,18 +4,12 @@ members = [
     "binius",
     "plonky2",
     "plonky3-powdr",
-    "plonky3-sp1/lib",
-    "plonky3-sp1/script",
     "provekit",
     "polyhedra-expander",
     "utils",
-    "ere/risc0",
     "ere/miden",
-    "ere/guests/rust/sha256",
 ]
-exclude = [
-    "plonky3-sp1/program", # Should be excluded, compiled for the Succinct toolchain via sp1_helper in script/build.rs
-]
+exclude = ["zkvm"]
 
 [workspace.dependencies]
 anyhow = "1.0.81"

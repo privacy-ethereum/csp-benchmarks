@@ -38,11 +38,6 @@ jobs:
           default: true
           components: llvm-tools, rustc-dev, rustfmt, clippy
 
-      - name: Install SP1
-        uses: ./.github/actions/install-sp1
-        with:
-          token: ${{ secrets.GH_PAT }}
-
       - name: Install Powdr
         uses: ./.github/actions/install-powdr
 
@@ -82,19 +77,11 @@ jobs:
           default: true
           components: llvm-tools, rustc-dev
 
-      - name: Install SP1
-        uses: ./.github/actions/install-sp1
-        with:
-          token: ${{ secrets.GH_PAT }}
-
       - name: Install Powdr
         uses: ./.github/actions/install-powdr
 
       - name: Install nightly-2024-08-01 with rust-src for Powdr
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
-
-      - name: Install RISC0
-        uses: ./.github/actions/install-risc0
 
       - name: Install Nargo
         uses: ./.github/actions/install-nargo

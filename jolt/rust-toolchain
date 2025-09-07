@@ -1,3 +1,0 @@
-[toolchain]
-channel = "nightly-2025-04-15"
-targets = ["riscv32im-unknown-none-elf"]
