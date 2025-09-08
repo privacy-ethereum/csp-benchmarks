@@ -78,7 +78,7 @@ pub fn prepare() -> (String, String) {
     let compile_result = compile(&SHA256Circuit::default(), CompileOptions::default()).unwrap();
 
     // Generate random message and compute its SHA-256
-    let mut rng = rand::rng();
+    let mut rng = rand::thread_rng();
     let data = [rng.next_u32() as u8; INPUT_LEN];
     let mut hash = Sha256::new();
     hash.update(data);

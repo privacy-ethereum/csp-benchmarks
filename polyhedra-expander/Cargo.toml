@@ -4,20 +4,20 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bin = { git = "https://github.com/alxkzmn/Expander", branch = "main" }
-circuit = { git = "https://github.com/alxkzmn/Expander", branch = "main" }
-circuit-std-rs = { git = "https://github.com/alxkzmn/ExpanderCompilerCollection" }
-expander_compiler = { git = "https://github.com/alxkzmn/ExpanderCompilerCollection" }
-gkr = { git = "https://github.com/alxkzmn/Expander", branch = "main" }
-gkr_engine = { git = "https://github.com/alxkzmn/Expander", branch = "main" }
-gkr_hashers = { git = "https://github.com/alxkzmn/Expander", branch = "main" }
-mersenne31 = { git = "https://github.com/alxkzmn/Expander", branch = "main" }
+bin = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
+circuit = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
+circuit-std-rs = { git = "https://github.com/PolyhedraZK/ExpanderCompilerCollection" }
+expander_compiler = { git = "https://github.com/PolyhedraZK/ExpanderCompilerCollection" }
+gkr = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
+gkr_engine = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
+gkr_hashers = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
+mersenne31 = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
 mpi = { git = "https://github.com/rsmpi/rsmpi", rev = "61796831954b679cbe267c1b704ddbcb7fef3715" }
-poly_commit = { git = "https://github.com/alxkzmn/Expander", branch = "main" }
-rand = "0.9.1"
-serdes = { git = "https://github.com/alxkzmn/Expander", branch = "main"}
-sha2 = "0.10.8"
-transcript = { git = "https://github.com/alxkzmn/Expander", branch = "main" }
+poly_commit = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
+rand = { workspace = true }
+serdes = { git = "https://github.com/PolyhedraZK/Expander", branch = "main"}
+sha2 = { workspace = true }
+transcript = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
 
 [dev-dependencies]
 criterion = "0.5.1"
