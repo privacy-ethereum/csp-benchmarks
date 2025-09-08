@@ -59,7 +59,7 @@ jobs:
           fi
           export PATH="$HOME/.sp1/bin:$PATH"
           echo "$HOME/.sp1/bin" >> "$GITHUB_PATH"
-          sp1up -v v4.2.0 --token "$GITHUB_TOKEN"
+          sp1up -v v5.2.1 --token "$GITHUB_TOKEN"
           cargo-prove prove --version
 
       - name: Check formatting
