@@ -1,19 +1,15 @@
 # Polyhedra Expander SHA256 benchmark
 
-The benchmark code is from Expander example: 
-- https://github.com/PolyhedraZK/ExpanderCompilerCollection/blob/master/circuit-std-rs/tests/sha256_gf2.rs
-
 ## How to run
-1. Enter the dir
+
 ```
 cd polyhedra-expander
+cargo bench
 ```
 
-2. Run the script
-```
-chmod +x ./expander_proving.sh
-./expander_proving.sh
-```
+# Measure SHA256 RAM footprint
 
-### NOTE
-1. Current sh scripts show correct performance metrics in only MacOS, not in ubuntu/linux.(Reason: `/usr/bin/time` util)
+```bash
+chmod +x ../measure_mem_avg.sh
+../measure_mem_avg.sh --json sha256_2048_polyhedra_expander_mem_report.json -- cargo r -r --bin measure
+```
