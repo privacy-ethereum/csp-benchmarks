@@ -8,8 +8,8 @@ use utils::{
 use zkvm_csp_benchmarks::{
     benchmark::Benchmark,
     programs::{
-        sha256::{Sha256, Sha256Config, Sha256Generator},
         JoltBuilder, Risc0Builder, Sp1Builder,
+        sha256::{Sha256, Sha256Config, Sha256Generator},
     },
     traits::Program,
 };
