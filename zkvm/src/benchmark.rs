@@ -1,9 +1,7 @@
 //! Benchmark module.
 
 use crate::traits::{BenchmarkConfig, DataGenerator, InputBuilder, Program, ZkVMBuilder};
-use std::marker::PhantomData;
-use std::path::PathBuf;
-use std::time::Instant;
+use std::{fs::canonicalize, marker::PhantomData, time::Instant};
 use utils::bench::Metrics;
 use zkvm_interface::{Compiler, PublicValues, zkVM, zkVMError};
 
@@ -31,8 +29,10 @@ where
         bench_name: &str,
         vm_builder: &impl ZkVMBuilder<C, V>,
     ) -> Result<Self, C::Error> {
-        // For now, hardcode RISC0 path - we can make this configurable later
-        let guest_path = PathBuf::from("guests").join(vm_name).join(bench_name);
+        let guest_path = canonicalize("guests")
+            .unwrap()
+            .join(vm_name)
+            .join(bench_name);
         let program = compiler.compile(&guest_path)?;
         let vm = vm_builder.build(program).unwrap();
 
