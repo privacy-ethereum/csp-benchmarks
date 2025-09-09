@@ -196,6 +196,10 @@ jobs:
         if: ${{ contains(matrix.crate, 'provekit') }}
         uses: ./.github/actions/install-nargo
 
+      - name: Install OpenMPI
+        if: ${{ contains(matrix.crate, 'polyhedra-expander') }}
+        uses: ./.github/actions/install-ompi
+
       - name: Run benches in ${{ matrix.crate }}
         run: |
           cd ${{ matrix.crate }}

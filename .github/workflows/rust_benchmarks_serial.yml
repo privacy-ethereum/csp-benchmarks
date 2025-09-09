@@ -96,6 +96,9 @@ jobs:
       - name: Install Nargo
         uses: ./.github/actions/install-nargo
 
+      - name: Install OpenMPI
+        uses: ./.github/actions/install-ompi
+
       - name: Run workspace benchmarks
         run: cargo bench
 
