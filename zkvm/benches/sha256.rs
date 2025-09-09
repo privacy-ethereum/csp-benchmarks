@@ -11,81 +11,36 @@ use zkvm_csp_benchmarks::{
         JoltBuilder, Risc0Builder, Sp1Builder,
         sha256::{Sha256, Sha256Config, Sha256Generator},
     },
-    traits::Program,
+    traits::{InputBuilder, Program, ZkVMBuilder},
 };
+use zkvm_interface::{Compiler, zkVM};
 
-/// SHA256 RISC0 benchmark.
-fn risc0_sha256() {
+/// Runs the SHA256 benchmark for the given zkVM.
+fn sha256_benchmark<C, V, B>(compiler: &C, vm_builder: &B, vm_name: &'static str)
+where
+    C: Compiler,
+    V: zkVM + InputBuilder<Sha256, Data = Vec<u8>>,
+    B: ZkVMBuilder<C, V>,
+{
     let configs = SHA2_INPUTS.map(Sha256Config::new);
-
-    let generator = Sha256Generator;
-    let benchmark = Benchmark::new(
-        &RV32_IM_RISC0_ZKVM_ELF,
-        "risc0",
-        Sha256::NAME,
-        &Risc0Builder,
-    )
-    .unwrap();
+    let benchmark = Benchmark::new(compiler, vm_name, Sha256::NAME, vm_builder).unwrap();
 
     let mut results = Vec::new();
     for config in &configs {
         let (mut output, peak_memory) = measure_peak_memory(|| {
             benchmark
-                .run::<Sha256, Sha256Config, Sha256Generator>(&generator, config)
+                .run::<Sha256, _, _>(&Sha256Generator, config)
                 .unwrap()
         });
         output.1.peak_memory = peak_memory;
         results.push(output.1);
     }
 
-    write_csv("risc0-sha256.csv", &results);
-}
-
-/// SHA256 SP1 benchmark.
-fn sp1_sha256() {
-    let configs = SHA2_INPUTS.map(Sha256Config::new);
-
-    let generator = Sha256Generator;
-    let benchmark =
-        Benchmark::new(&RV32_IM_SUCCINCT_ZKVM_ELF, "sp1", Sha256::NAME, &Sp1Builder).unwrap();
-
-    let mut results = Vec::new();
-    for config in &configs {
-        let (mut output, peak_memory) = measure_peak_memory(|| {
-            benchmark
-                .run::<Sha256, Sha256Config, Sha256Generator>(&generator, config)
-                .unwrap()
-        });
-        output.1.peak_memory = peak_memory;
-        results.push(output.1);
-    }
-
-    write_csv("sp1-sha256.csv", &results);
-}
-
-/// SHA256 Jolt benchmark.
-fn jolt_sha256() {
-    let configs = SHA2_INPUTS.map(Sha256Config::new);
-
-    let generator = Sha256Generator;
-    let benchmark = Benchmark::new(&JOLT_TARGET, "jolt", Sha256::NAME, &JoltBuilder).unwrap();
-
-    let mut results = Vec::new();
-    for config in &configs {
-        let (mut output, peak_memory) = measure_peak_memory(|| {
-            benchmark
-                .run::<Sha256, Sha256Config, Sha256Generator>(&generator, config)
-                .unwrap()
-        });
-        output.1.peak_memory = peak_memory;
-        results.push(output.1);
-    }
-
-    write_csv("jolt-sha256.csv", &results);
+    write_csv(&format!("{}-sha256.csv", vm_name), &results);
 }
 
 fn main() {
-    sp1_sha256();
-    risc0_sha256();
-    jolt_sha256();
+    sha256_benchmark(&RV32_IM_SUCCINCT_ZKVM_ELF, &Sp1Builder, "sp1");
+    sha256_benchmark(&RV32_IM_RISC0_ZKVM_ELF, &Risc0Builder, "risc0");
+    sha256_benchmark(&JOLT_TARGET, &JoltBuilder, "jolt");
 }

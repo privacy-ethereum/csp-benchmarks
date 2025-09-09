@@ -11,7 +11,7 @@ const CSV_OUTPUT: &str = "miden_sha256.csv";
 /// Miden SHA-256 benchmark harness.
 struct Sha256Benchmark {
     program: <MidenTarget as Compiler>::Program,
-    inputs: HashMap<usize, (usize, &'static [u8])>,
+    inputs: HashMap<usize, (usize, Vec<u8>)>,
 }
 
 impl Sha256Benchmark {
@@ -27,8 +27,7 @@ impl Sha256Benchmark {
             .map(|&size| {
                 let mut data = vec![0u8; size];
                 rand::thread_rng().fill_bytes(&mut data);
-                let static_data: &'static [u8] = Box::leak(data.into_boxed_slice());
-                (size, (size, static_data))
+                (size, (size, data))
             })
             .collect();
 
@@ -37,11 +36,11 @@ impl Sha256Benchmark {
 
     /// Runs a single benchmark iteration.
     fn run(&self, input_size: usize) -> Metrics {
-        let &(size, test_data) = self.inputs.get(&input_size).unwrap();
+        let (size, test_data) = self.inputs.get(&input_size).unwrap();
         let zkvm = EreMiden::new(self.program.clone(), ProverResourceType::Cpu);
 
         // Input size is placed in the stack on the ere side
-        let input = vec![InputItem::Bytes(test_data.to_vec())].into();
+        let input = vec![InputItem::Bytes(test_data.clone())].into();
 
         // Execute, prove, and verify, measuring performance at each step.
         let execution_report = zkvm.execute(&input).unwrap();
@@ -59,7 +58,7 @@ impl Sha256Benchmark {
             "".to_string(),
             true,
             "sha256".to_string(),
-            size,
+            *size,
         );
         metrics.proof_duration = proof_duration;
         metrics.verify_duration = verify_duration;
