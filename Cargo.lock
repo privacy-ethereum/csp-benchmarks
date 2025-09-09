@@ -9662,11 +9662,13 @@ dependencies = [
  "gkr_hashers",
  "mersenne31",
  "mpi",
+ "paste",
  "poly_commit",
  "rand 0.8.5",
  "serdes",
  "sha2 0.10.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "transcript",
+ "utils 0.1.0",
 ]
 
 [[package]]

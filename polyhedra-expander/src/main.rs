@@ -32,7 +32,7 @@ declare_circuit!(SHA256Circuit {
 
 pub fn check_sha256_var<C: Config, B: RootAPI<C>>(
     api: &mut B,
-    data: &Vec<Variable>, //  msg ‖ digest  (same trick as before)
+    #[allow(clippy::ptr_arg)] data: &Vec<Variable>, //  Expander API is enforcing it to be a Vec
 ) -> Vec<Variable> {
     let msg_len = data.len() - OUTPUT_LEN;
     let expected = data[msg_len..].to_vec();
@@ -79,15 +79,15 @@ fn main() {
     hash.update(data);
     let output = hash.finalize();
     let mut assignment = SHA256Circuit::default();
-    for i in 0..INPUT_LEN {
-        assignment.input[i] = M31::from(data[i] as u32);
+    for (i, input_byte) in data.iter().enumerate().take(INPUT_LEN) {
+        assignment.input[i] = M31::from(*input_byte as u32);
     }
-    for i in 0..OUTPUT_LEN {
-        assignment.output[i] = M31::from(output[i] as u32);
+    for (i, output_byte) in output.iter().enumerate().take(OUTPUT_LEN) {
+        assignment.output[i] = M31::from(*output_byte as u32);
     }
     let witness = compile_result
         .witness_solver
-        .solve_witness_with_hints(&assignment, &mut EmptyHintCaller)
+        .solve_witness_with_hints(&assignment, &EmptyHintCaller)
         .unwrap();
     let output = compile_result.layered_circuit.run(&witness);
     assert_eq!(output, vec![true]);
@@ -114,10 +114,10 @@ fn main() {
     let output_proof_file = "build/proof.txt";
 
     let (mut circuit, mut window) =
-        Circuit::<M31x1Config>::prover_load_circuit::<M31SnglConfig>(&circuit_file, &mpi_config);
+        Circuit::<M31x1Config>::prover_load_circuit::<M31SnglConfig>(circuit_file, &mpi_config);
     let prover = Prover::<M31SnglConfig>::new(mpi_config.clone());
 
-    circuit.prover_load_witness_file(&witness_file, &mpi_config);
+    circuit.prover_load_witness_file(witness_file, &mpi_config);
     let (claimed_v, proof) = prove::<M31SnglConfig>(&mut circuit, mpi_config.clone());
 
     if prover.mpi_config.is_root() {
@@ -132,15 +132,15 @@ fn main() {
 
     println!("loading circuit file");
 
-    let mut circuit = Circuit::<M31x1Config>::verifier_load_circuit::<M31SnglConfig>(&circuit_file);
+    let mut circuit = Circuit::<M31x1Config>::verifier_load_circuit::<M31SnglConfig>(circuit_file);
 
     println!("loading witness file");
 
-    circuit.verifier_load_witness_file(&witness_file, &verifier.mpi_config);
+    circuit.verifier_load_witness_file(witness_file, &verifier.mpi_config);
 
     println!("loading proof file");
 
-    let bytes = std::fs::read(&output_proof_file).expect("Unable to read proof from file.");
+    let bytes = std::fs::read(output_proof_file).expect("Unable to read proof from file.");
     let (proof, claimed_v) =
         load_proof_and_claimed_v::<<M31x1Config as FieldEngine>::ChallengeField>(&bytes)
             .expect("Unable to deserialize proof.");

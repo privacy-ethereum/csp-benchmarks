@@ -2,6 +2,7 @@
 name = "sha256_expander_benchmark"
 version = "0.1.0"
 edition = "2024"
+build = "build.rs"
 
 [dependencies]
 bin = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
@@ -18,6 +19,8 @@ rand = { workspace = true }
 serdes = { git = "https://github.com/PolyhedraZK/Expander", branch = "main"}
 sha2 = { workspace = true }
 transcript = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
+utils = { workspace = true }
+paste = "1.0"
 
 [dev-dependencies]
 criterion = "0.5.1"

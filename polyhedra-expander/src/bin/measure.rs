@@ -2,9 +2,11 @@ use bin::executor::dump_proof_and_claimed_v;
 use gkr_engine::MPIConfig;
 use sha256_expander_benchmark::bench::prepare;
 use sha256_expander_benchmark::bench::prove;
+use utils::metadata::SHA2_INPUTS;
 
 fn main() {
-    let (circuit_file, witness_file) = prepare();
+    //TODO refactor to measure RAM for varying input sizes
+    let (circuit_file, witness_file) = prepare(SHA2_INPUTS[0]);
 
     let universe = MPIConfig::init().unwrap();
     let world = universe.world();
