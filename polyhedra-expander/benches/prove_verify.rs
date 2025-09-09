@@ -9,11 +9,11 @@ use utils::bench::write_json_metrics;
 use utils::metadata::SHA2_INPUTS;
 
 fn criterion_benchmarks(c: &mut Criterion) {
-    for input_size in SHA2_INPUTS {
-        let universe = MPIConfig::init().expect("Failed to initialize MPI");
-        let world = universe.world();
-        let mpi_config = MPIConfig::prover_new(Some(&universe), Some(&world));
+    let universe = MPIConfig::init().expect("Failed to initialize MPI");
+    let world = universe.world();
+    let mpi_config = MPIConfig::prover_new(Some(&universe), Some(&world));
 
+    for input_size in SHA2_INPUTS {
         // Measure the metrics
         let metrics = sha256_expander_metrics(input_size, mpi_config.clone());
 
