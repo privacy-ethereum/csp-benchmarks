@@ -46,9 +46,8 @@ impl InputBuilder<Sha256> for EreRisc0 {
     type Data = Vec<u8>;
 
     fn build_input(data: Self::Data) -> Input {
-        let static_data: &'static [u8] = Box::leak(data.into_boxed_slice());
         let mut input = Input::new();
-        input.write(static_data);
+        input.write(data);
         input
     }
 }
