@@ -15,5 +15,5 @@ cargo bench
 
 ```bash
 chmod +x ../measure_mem_avg.sh
-../measure_mem_avg.sh --json sha256_2048_plonky2_no_lookup_mem_report.json -- cargo r -r --bin plonky2-measure-mem
+cargo run --release --bin plonky2-measure-mem
 ```
