@@ -15,5 +15,5 @@ cargo bench
 
 ```bash
 chmod +x ../measure_mem_avg.sh
-cargo run --release --bin measure-mem
+cargo run --release --bin measure_mem
 ```

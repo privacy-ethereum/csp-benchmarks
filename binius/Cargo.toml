@@ -38,12 +38,12 @@ name = "sha256_bench"
 harness = false
 
 [[bin]]
-name = "measure_lookup_mem"
-path = "src/bin/measure_lookup_mem.rs"
+name = "measure_mem_with_lookup"
+path = "src/bin/measure_mem_with_lookup.rs"
 
 [[bin]]
-name = "measure_no_lookup_mem"
-path = "src/bin/measure_no_lookup_mem.rs"
+name = "measure_mem_no_lookup"
+path = "src/bin/measure_mem_no_lookup.rs"
 
 [[bin]]
 name = "sha256_2048_binius_with_lookup_mem"
