@@ -15,7 +15,7 @@ fn main() {
             .output()
             .expect("failed to compile");
 
-        let _output = Command::new("sh")
+        let output = Command::new("sh")
             .arg(script)
             .arg("--json")
             .arg(json_file)
@@ -23,5 +23,7 @@ fn main() {
             .arg(binary_path)
             .output()
             .expect("failed to execute script");
+
+        println!("{}", String::from_utf8_lossy(&output.stdout));
     }
 }
