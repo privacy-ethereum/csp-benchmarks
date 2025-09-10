@@ -8,7 +8,7 @@ fn main() {
         let binary_name = format!("sha256_{}_plonky2_no_lookup_mem", input_size);
         let binary_path = format!("../target/release/{}", binary_name);
         let _compile_output = Command::new("cargo")
-            .arg("run")
+            .arg("build")
             .arg("--release")
             .arg("--bin")
             .arg(&binary_name)
