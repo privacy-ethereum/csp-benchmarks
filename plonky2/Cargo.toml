@@ -16,6 +16,7 @@ rand = { workspace = true }
 plonky2_u32 = { git = "https://github.com/alxkzmn/plonky2-u32", rev = "167d8a6" }
 criterion = { workspace = true }
 utils = { workspace = true }
+clap = { workspace = true }
 
 [[bench]]
 name = "prove_verify"
@@ -26,5 +27,5 @@ name = "measure_mem"
 path = "src/bin/measure_mem.rs"
 
 [[bin]]
-name = "sha256_2048_plonky2_no_lookup_mem"
-path = "src/bin/sha256_2048_plonky2_no_lookup_mem.rs"
+name = "sha256_no_lookup_mem"
+path = "src/bin/sha256_no_lookup_mem.rs"

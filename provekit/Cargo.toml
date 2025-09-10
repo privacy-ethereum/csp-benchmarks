@@ -7,6 +7,7 @@ edition = "2024"
 rand = { workspace = true }
 utils = { workspace = true }
 criterion = { workspace = true }
+clap = { workspace = true }
 noir-r1cs = { git = "https://github.com/worldfnd/ProveKit", branch = "main" }
 
 [[bin]]
@@ -14,8 +15,8 @@ name = "measure_mem"
 path = "src/bin/measure_mem.rs"
 
 [[bin]]
-name = "sha256_2048_provekit_mem"
-path = "src/bin/sha256_2048_provekit_mem.rs"
+name = "sha256_mem"
+path = "src/bin/sha256_mem.rs"
 
 [[bench]]
 name = "prove_verify"

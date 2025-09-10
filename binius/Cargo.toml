@@ -46,9 +46,9 @@ name = "measure_mem_no_lookup"
 path = "src/bin/measure_mem_no_lookup.rs"
 
 [[bin]]
-name = "sha256_2048_binius_with_lookup_mem"
-path = "src/bin/sha256_2048_binius_with_lookup_mem.rs"
+name = "sha256_with_lookup_mem"
+path = "src/bin/sha256_with_lookup_mem.rs"
 
 [[bin]]
-name = "sha256_2048_binius_no_lookup_mem"
-path = "src/bin/sha256_2048_binius_no_lookup_mem.rs"
+name = "sha256_no_lookup_mem"
+path = "src/bin/sha256_no_lookup_mem.rs"
