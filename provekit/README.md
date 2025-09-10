@@ -13,5 +13,5 @@ Measure RAM footprint:
 
 ```bash
 chmod +x ../measure_mem_avg.sh
-cargo run --release --bin provekit-measure-mem
+cargo run --release --bin measure-mem
 ```

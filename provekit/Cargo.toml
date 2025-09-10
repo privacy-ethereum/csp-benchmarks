@@ -10,7 +10,7 @@ criterion = { workspace = true }
 noir-r1cs = { git = "https://github.com/worldfnd/ProveKit", branch = "main" }
 
 [[bin]]
-name = "provekit-measure-mem"
+name = "measure-mem"
 path = "src/bin/measure_mem.rs"
 
 [[bin]]
