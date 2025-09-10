@@ -4,7 +4,7 @@ use crate::traits::{BenchmarkConfig, DataGenerator, InputBuilder, Program};
 use ere_jolt::EreJolt;
 use ere_risc0::EreRisc0;
 use ere_sp1::EreSP1;
-use rand::{rngs::StdRng, RngCore, SeedableRng};
+use rand::{RngCore, SeedableRng, rngs::StdRng};
 use zkvm_interface::Input;
 
 /// SHA256
