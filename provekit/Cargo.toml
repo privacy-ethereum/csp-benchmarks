@@ -13,6 +13,10 @@ noir-r1cs = { git = "https://github.com/worldfnd/ProveKit", branch = "main" }
 name = "provekit-measure-mem"
 path = "src/bin/measure_mem.rs"
 
+[[bin]]
+name = "sha256_2048_provekit_mem"
+path = "src/bin/sha256_2048_provekit_mem.rs"
+
 [[bench]]
 name = "prove_verify"
 harness = false
