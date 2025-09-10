@@ -1,6 +1,27 @@
-use plonky2_sha256::bench::{prove, sha256_no_lookup_prepare};
+use std::process::Command;
+use utils::metadata::SHA2_INPUTS;
 
 fn main() {
-    let (data, pw) = sha256_no_lookup_prepare();
-    let _proof = prove(&data.prover_data(), pw);
+    let script = "../measure_mem_avg.sh";
+    for input_size in SHA2_INPUTS {
+        let json_file = format!("sha256_{}_plonky2_no_lookup_mem_report.json", input_size);
+        let binary_name = format!("sha256_{}_plonky2_no_lookup_mem", input_size);
+        let binary_path = format!("../target/release/{}", binary_name);
+        let _compile_output = Command::new("cargo")
+            .arg("run")
+            .arg("--release")
+            .arg("--bin")
+            .arg(&binary_name)
+            .output()
+            .expect("failed to compile");
+
+        let _output = Command::new("sh")
+            .arg(script)
+            .arg("--json")
+            .arg(json_file)
+            .arg("--")
+            .arg(binary_path)
+            .output()
+            .expect("failed to execute script");
+    }
 }
