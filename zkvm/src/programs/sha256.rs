@@ -4,7 +4,7 @@ use crate::traits::{BenchmarkConfig, DataGenerator, InputBuilder, Program};
 use ere_jolt::EreJolt;
 use ere_risc0::EreRisc0;
 use ere_sp1::EreSP1;
-use rand::{RngCore, SeedableRng, rngs::StdRng};
+use rand::{rngs::StdRng, RngCore, SeedableRng};
 use zkvm_interface::Input;
 
 /// SHA256
@@ -42,32 +42,21 @@ impl DataGenerator<Sha256, Sha256Config> for Sha256Generator {
     }
 }
 
-impl InputBuilder<Sha256> for EreRisc0 {
-    type Data = Vec<u8>;
+// Default input builder
+macro_rules! impl_default_input_builder {
+    ($zkvm:ty) => {
+        impl InputBuilder<Sha256> for $zkvm {
+            type Data = Vec<u8>;
 
-    fn build_input(data: Self::Data) -> Input {
-        let mut input = Input::new();
-        input.write(data);
-        input
-    }
+            fn build_input(data: Self::Data) -> Input {
+                let mut input = Input::new();
+                input.write(data);
+                input
+            }
+        }
+    };
 }
 
-impl InputBuilder<Sha256> for EreSP1 {
-    type Data = Vec<u8>;
-
-    fn build_input(data: Self::Data) -> Input {
-        let mut input = Input::new();
-        input.write(data);
-        input
-    }
-}
-
-impl InputBuilder<Sha256> for EreJolt {
-    type Data = Vec<u8>;
-
-    fn build_input(data: Self::Data) -> Input {
-        let mut input = Input::new();
-        input.write(data);
-        input
-    }
-}
+impl_default_input_builder!(EreRisc0);
+impl_default_input_builder!(EreSP1);
+impl_default_input_builder!(EreJolt);

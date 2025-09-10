@@ -40,7 +40,7 @@ where
 }
 
 fn main() {
-    sha256_benchmark(&RV32_IM_SUCCINCT_ZKVM_ELF, &Sp1Builder, "sp1");
     sha256_benchmark(&RV32_IM_RISC0_ZKVM_ELF, &Risc0Builder, "risc0");
+    sha256_benchmark(&RV32_IM_SUCCINCT_ZKVM_ELF, &Sp1Builder, "sp1");
     sha256_benchmark(&JOLT_TARGET, &JoltBuilder, "jolt");
 }
