@@ -1,1 +1,1 @@
-pub const SHA2_INPUTS: [usize; 2] = [1024, 2048];
+pub const SHA2_INPUTS: [usize; 1] = [2048];
