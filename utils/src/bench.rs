@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_with::{DurationNanoSeconds, serde_as};
 use std::{
     fmt::Display,
+    process::Command,
     sync::{
         Arc,
         atomic::{AtomicBool, AtomicUsize, Ordering},
@@ -150,4 +151,31 @@ pub fn write_csv(out_path: &str, results: &[Metrics]) {
 pub fn write_json_metrics(output_path: &str, metrics: &Metrics) {
     let json = serde_json::to_string_pretty(metrics).unwrap();
     std::fs::write(output_path, json).unwrap();
+}
+
+pub fn compile_binary(binary_name: &str) {
+    let _compile_output = Command::new("cargo")
+        .arg("build")
+        .arg("--release")
+        .arg("--bin")
+        .arg(binary_name)
+        .output()
+        .expect("failed to compile");
+}
+
+pub fn run_measure_mem_script(json_file: &str, binary_path: &str, input_size: usize) {
+    let script = "../measure_mem_avg.sh";
+
+    let output = Command::new("sh")
+        .arg(script)
+        .arg("--json")
+        .arg(json_file)
+        .arg("--")
+        .arg(binary_path)
+        .arg("--input-size")
+        .arg(input_size.to_string())
+        .output()
+        .expect("failed to execute script");
+
+    println!("{}", String::from_utf8_lossy(&output.stdout));
 }

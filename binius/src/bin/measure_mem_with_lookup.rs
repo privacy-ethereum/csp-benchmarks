@@ -1,31 +1,15 @@
-use std::process::Command;
-use utils::metadata::SHA2_INPUTS;
+use utils::{
+    bench::{compile_binary, run_measure_mem_script},
+    metadata::SHA2_INPUTS,
+};
 
 fn main() {
-    let script = "../measure_mem_avg.sh";
-    let binary_name = "sha256_with_lookup_mem";
+    let sha256_binary_name = "sha256_with_lookup_mem";
     for input_size in SHA2_INPUTS {
+        compile_binary(sha256_binary_name);
+
+        let sha256_binary_path = format!("../target/release/{}", sha256_binary_name);
         let json_file = format!("sha256_{}_binius_with_lookup_mem_report.json", input_size);
-        let binary_path = format!("../target/release/{}", binary_name);
-        let _compile_output = Command::new("cargo")
-            .arg("build")
-            .arg("--release")
-            .arg("--bin")
-            .arg(&binary_name)
-            .output()
-            .expect("failed to compile");
-
-        let output = Command::new("sh")
-            .arg(script)
-            .arg("--json")
-            .arg(json_file)
-            .arg("--")
-            .arg(binary_path)
-            .arg("--input-size")
-            .arg(input_size.to_string())
-            .output()
-            .expect("failed to execute script");
-
-        println!("{}", String::from_utf8_lossy(&output.stdout));
+        run_measure_mem_script(&json_file, &sha256_binary_path, input_size);
     }
 }
