@@ -53,7 +53,7 @@ where
     where
         P: Program,
         B: BenchmarkConfig,
-        G: DataGenerator<P, B, Data = <V as InputBuilder<P>>::Data>,
+        G: DataGenerator<B, Data = <V as InputBuilder<P>>::Data>,
         V: InputBuilder<P>,
     {
         let (data, size) = generator.generate(config);
