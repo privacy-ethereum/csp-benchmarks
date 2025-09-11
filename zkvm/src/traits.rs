@@ -12,7 +12,7 @@ pub trait BenchmarkConfig {}
 
 /// Generate test data for a program with the given configuration
 /// The data can be used across different VMs
-pub trait DataGenerator<P: Program, C: BenchmarkConfig> {
+pub trait DataGenerator<C: BenchmarkConfig> {
     type Data;
 
     fn generate(&self, config: &C) -> (Self::Data, usize);

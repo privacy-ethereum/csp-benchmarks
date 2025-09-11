@@ -29,7 +29,7 @@ impl BenchmarkConfig for Sha256Config {}
 /// SHA256 input data generator
 pub struct Sha256Generator;
 
-impl DataGenerator<Sha256, Sha256Config> for Sha256Generator {
+impl DataGenerator<Sha256Config> for Sha256Generator {
     type Data = Vec<u8>;
 
     fn generate(&self, config: &Sha256Config) -> (Self::Data, usize) {
@@ -43,7 +43,7 @@ impl DataGenerator<Sha256, Sha256Config> for Sha256Generator {
 }
 
 // Default input builder
-macro_rules! impl_default_input_builder {
+macro_rules! impl_byte_vec_input_builder {
     ($zkvm:ty) => {
         impl InputBuilder<Sha256> for $zkvm {
             type Data = Vec<u8>;
@@ -57,6 +57,6 @@ macro_rules! impl_default_input_builder {
     };
 }
 
-impl_default_input_builder!(EreRisc0);
-impl_default_input_builder!(EreSP1);
-impl_default_input_builder!(EreJolt);
+impl_byte_vec_input_builder!(EreRisc0);
+impl_byte_vec_input_builder!(EreSP1);
+impl_byte_vec_input_builder!(EreJolt);
