@@ -11,13 +11,11 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    match args.input_size {
-        2048 => sha256_2048_powdr_mem(),
-        _ => panic!("Unsupported input size"),
-    }
+    sha256_mem(args.input_size);
 }
 
-fn sha256_2048_powdr_mem() {
+// TODO: variable input size
+fn sha256_mem(_input_size: usize) {
     let mut pipeline = prepare_pipeline();
 
     prove(&mut pipeline);

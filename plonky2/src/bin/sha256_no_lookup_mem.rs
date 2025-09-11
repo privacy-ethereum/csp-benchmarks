@@ -11,13 +11,11 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    match args.input_size {
-        2048 => sha256_2048_plonky2_no_lookup_mem(),
-        _ => panic!("Unsupported input size"),
-    }
+    sha256_no_lookup_mem(args.input_size);
 }
 
-fn sha256_2048_plonky2_no_lookup_mem() {
+// TODO: variable input size
+fn sha256_no_lookup_mem(_input_size: usize) {
     let (data, pw) = sha256_no_lookup_prepare();
     let _proof = prove(&data.prover_data(), pw);
 }

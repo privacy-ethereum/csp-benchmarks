@@ -11,13 +11,11 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    match args.input_size {
-        2048 => sha256_2048_binius_no_lookup_mem(),
-        _ => panic!("Unsupported input size"),
-    }
+    sha256_no_lookup_mem(args.input_size);
 }
 
-fn sha256_2048_binius_no_lookup_mem() {
+// TODO: variable input size
+fn sha256_no_lookup_mem(_input_size: usize) {
     let allocator = bumpalo::Bump::new();
 
     let (constraint_system, args, witness, backend) = sha256_no_lookup_prepare(&allocator);
