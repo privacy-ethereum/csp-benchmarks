@@ -28,11 +28,10 @@ pub fn prove(
     data.prove(pw).unwrap()
 }
 
-pub fn sha256_no_lookup_prepare() -> (CircuitData<F, C, D>, PartialWitness<F>) {
-    const MSG_BYTE_SIZE: usize = 2048;
-    let mut msg = vec![0; MSG_BYTE_SIZE];
+pub fn sha256_prepare(input_size: usize) -> (CircuitData<F, C, D>, PartialWitness<F>) {
+    let mut msg = vec![0; input_size];
     let mut rng = rand::thread_rng();
-    for msg_bit in msg.iter_mut().take(MSG_BYTE_SIZE - 1) {
+    for msg_bit in msg.iter_mut().take(input_size - 1) {
         *msg_bit = rng.gen_range(0..=1);
     }
 

@@ -1,5 +1,5 @@
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
-use plonky2_sha256::bench::{prove, sha256_no_lookup_prepare, verify};
+use plonky2_sha256::bench::{prove, sha256_prepare, verify};
 
 use plonky2::{plonk::config::PoseidonGoldilocksConfig, util::serialization::Write};
 use plonky2_u32::gates::arithmetic_u32::{U32GateSerializer, U32GeneratorSerializer};
@@ -27,7 +27,7 @@ fn sha256_no_lookup(c: &mut Criterion) {
             format!("sha256_{input_size}_plonky2_no_lookup_prove"),
             |bench| {
                 bench.iter_batched(
-                    sha256_no_lookup_prepare,
+                    || sha256_prepare(input_size),
                     |(data, pw)| {
                         prove(&data.prover_data(), pw);
                     },
@@ -41,7 +41,7 @@ fn sha256_no_lookup(c: &mut Criterion) {
             |bench| {
                 bench.iter_batched(
                     || {
-                        let (data, pw) = sha256_no_lookup_prepare();
+                        let (data, pw) = sha256_prepare(input_size);
                         let verifier_data = data.verifier_data();
                         (prove(&data.prover_data(), pw), verifier_data)
                     },
@@ -68,7 +68,7 @@ fn sha256_plonky2_no_lookup_metrics(input_size: usize) -> Metrics {
         input_size,
     );
 
-    let (data, pw) = sha256_no_lookup_prepare();
+    let (data, pw) = sha256_prepare(input_size);
 
     let gate_serializer = U32GateSerializer;
     let common_data_size = data.common.to_bytes(&gate_serializer).unwrap().len();
