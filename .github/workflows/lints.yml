@@ -51,6 +51,9 @@ jobs:
       - name: Install nightly-2024-08-01 with rust-src for Powdr
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
+      - name: Install OpenMPI
+        uses: ./.github/actions/install-ompi
+
       - name: Build full workspace
         run: cargo build --workspace
 
