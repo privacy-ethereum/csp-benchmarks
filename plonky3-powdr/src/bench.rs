@@ -1,5 +1,6 @@
 // Most of the code borrowed from powdr/src/lib.rs
 
+use rand::RngCore;
 use std::{
     fs::{self, File},
     path::{Path, PathBuf},
@@ -14,7 +15,10 @@ fn pil_file_path(asm_name: &Path) -> PathBuf {
 }
 
 pub fn prepare_pipeline(input_size: usize) -> powdr::Pipeline<powdr::GoldilocksField> {
-    let input_data = vec![5u8; input_size];
+    // randomize the input data
+    let mut input_data = vec![0u8; input_size];
+    let mut rng = rand::thread_rng();
+    rng.fill_bytes(&mut input_data);
 
     let session = Session::builder()
         .guest_path("./guest")
