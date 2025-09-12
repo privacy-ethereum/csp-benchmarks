@@ -13,12 +13,15 @@ fn pil_file_path(asm_name: &Path) -> PathBuf {
     asm_name.with_file_name(opt_file_stem).with_extension("pil")
 }
 
-pub fn prepare_pipeline() -> powdr::Pipeline<powdr::GoldilocksField> {
+pub fn prepare_pipeline(input_size: usize) -> powdr::Pipeline<powdr::GoldilocksField> {
+    let input_data = vec![5u8; input_size];
+
     let session = Session::builder()
         .guest_path("./guest")
         .out_path("powdr-target")
         .chunk_size_log2(18)
-        .build();
+        .build()
+        .write(1, &input_data);
 
     let mut pipeline = session.into_pipeline();
 
@@ -95,7 +98,6 @@ pub fn prove(pipeline: &mut powdr::Pipeline<powdr::GoldilocksField>) {
     let generate_proof = |pipeline: &mut Pipeline<GoldilocksField>| -> Result<(), Vec<String>> {
         pipeline.compute_witness()?;
         pipeline.compute_proof().unwrap();
-        //println!("Proof size: {} MB", proof.len() as f64 / 1024.0 / 1024.0);
         Ok(())
     };
 

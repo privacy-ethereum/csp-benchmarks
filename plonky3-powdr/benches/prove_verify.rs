@@ -19,7 +19,7 @@ fn sha256_bench(c: &mut Criterion) {
 
         group.bench_function(format!("sha256_{input_size}_powdr_prove"), |bench| {
             bench.iter_batched(
-                prepare_pipeline,
+                || prepare_pipeline(input_size),
                 |mut pipeline| {
                     prove(&mut pipeline);
                 },
@@ -30,7 +30,7 @@ fn sha256_bench(c: &mut Criterion) {
         group.bench_function(format!("sha256_{input_size}_powdr_verify"), |bench| {
             bench.iter_batched(
                 || {
-                    let mut pipeline = prepare_pipeline();
+                    let mut pipeline = prepare_pipeline(input_size);
                     prove(&mut pipeline);
                     pipeline
                 },
@@ -56,7 +56,7 @@ fn sha256_powdr_metrics(input_size: usize) -> Metrics {
         input_size,
     );
 
-    let mut pipeline = prepare_pipeline();
+    let mut pipeline = prepare_pipeline(input_size);
 
     // Load the proving key and constants from the files.
     let pk_bytes = std::fs::read("powdr-target/pkey.bin").expect("Unable to read file");
