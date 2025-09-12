@@ -1,0 +1,12 @@
+name: "Install OpenMPI"
+description: "Installs the OpenMPI library"
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        brew update
+        brew install open-mpi
+        mpirun --version
+        which mpicc

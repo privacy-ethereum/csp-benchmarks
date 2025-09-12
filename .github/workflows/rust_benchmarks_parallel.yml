@@ -64,6 +64,9 @@ jobs:
       - name: Install nightly-2024-08-01 with rust-src for Powdr
         run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
+      - name: Install OpenMPI for polyhedra-expander
+        uses: ./.github/actions/install-ompi
+
       - name: Build full workspace (release)
         run: cargo build --release --workspace
 
@@ -195,6 +198,10 @@ jobs:
       - name: Install Nargo
         if: ${{ contains(matrix.crate, 'provekit') }}
         uses: ./.github/actions/install-nargo
+
+      - name: Install OpenMPI for polyhedra-expander
+        if: ${{ contains(matrix.crate, 'polyhedra-expander') }}
+        uses: ./.github/actions/install-ompi
 
       - name: Run benches in ${{ matrix.crate }}
         run: |
