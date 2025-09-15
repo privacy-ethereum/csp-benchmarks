@@ -25,24 +25,10 @@ env:
   GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
 jobs:
-  prepare-cache:
+  prepare-deps:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Cache everything
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin
-            ~/.cargo/registry/index
-            ~/.cargo/registry/cache
-            ~/.cargo/git/db
-            ~/.rustup
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
 
       - name: Setup & build Ligero
         uses: ./.github/actions/install-ligero
@@ -52,11 +38,11 @@ jobs:
           install_prefix: ${{ github.workspace }}/.deps/install
           cmake_build_type: Release
 
-  detect-crates:
-    needs: prepare-cache
+  detect-folders:
+    needs: prepare-deps
     runs-on: macos-latest
     outputs:
-      crates: ${{ steps.set.outputs.crates }}
+      folders: ${{ steps.set.outputs.folders }}
     steps:
       - name: Check out full history
         uses: actions/checkout@v4
@@ -78,7 +64,7 @@ jobs:
           # expose for later steps
           echo "BASE_REF=${REMOTE}/${BASE_BRANCH}" >> "$GITHUB_OUTPUT"
 
-      - name: Detect changed top-level non-Rust folders
+      - name: Detect changed top-level folders
         id: set
         run: |
           BASE_REF="${{ steps.base.outputs.BASE_REF }}"
@@ -110,42 +96,37 @@ jobs:
           json=$(printf '%s\n' "${changed[@]}" | jq -R -s -c 'split("\n") | map(select(length>0))')
 
           echo "Detected changed folders: '$json'"
-          echo "crates=$json" >> "$GITHUB_OUTPUT"
+          echo "folders=$json" >> "$GITHUB_OUTPUT"
 
-  bench:
-    if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
-    needs: [prepare-cache, detect-crates]
+  run-benchmarks:
+    if: ${{ needs.detect-folders.outputs.folders != '' && needs.detect-folders.outputs.folders != '[]' }}
+    needs: [prepare-deps, detect-folders]
     runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
-        crate: ${{ fromJson(needs.detect-crates.outputs.crates) }}
+        folder: ${{ fromJson(needs.detect-folders.outputs.folders) }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth:
 
-      - name: Restore Cargo cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
-
-      - name: Run benches in ${{ matrix.crate }}
+      - name: Run benches in ${{ matrix.folder }}
         run: |
-          cd ${{ matrix.crate }}
-          cargo bench
+          set -euo pipefail
+          cd "${{ matrix.folder }}"
+          if [[ -f ./benchmark.sh ]]; then
+            bash ./benchmark.sh | tee benchmark.log
+          else
+            echo "benchmark.sh not found in ${{ matrix.folder }}" >&2
+            exit 1
+          fi
 
-      - name: Upload reports for ${{ matrix.crate }}
+      - name: Upload logs for ${{ matrix.folder }}
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: "criterion-${{ matrix.crate }}"
-          path: ${{ matrix.crate }}/target/criterion
+          name: "benchmark-logs-${{ matrix.folder }}"
+          path: ${{ matrix.folder }}/benchmark.log
           retention-days: 30
