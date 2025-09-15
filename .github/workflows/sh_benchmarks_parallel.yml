@@ -1,4 +1,4 @@
-name: Benchmarks (parallel)
+name: Non-Rust Benchmarks (parallel)
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}

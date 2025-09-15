@@ -1,4 +1,4 @@
-name: Benchmarks (serial)
+name: Rust Benchmarks (serial)
 
 on:
   workflow_dispatch:
