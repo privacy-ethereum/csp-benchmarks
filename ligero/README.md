@@ -1,6 +1,17 @@
-## Benchmarking SHA256 with Ligero
+# Ligetron Benchmarks
 
-Benchmarking SHA256 with [Ligero](https://eprint.iacr.org/2022/1608.pdf) was performed using Ligetron:
-https://platform.ligetron.com/marketplace/project?id=78180426-2a09-4c36-ac68-52f1ab4ffbe6&version=1.0.
+Ligetron platform is using a [Ligero ZK proving system](https://eprint.iacr.org/2022/1608.pdf).
 
-The platform makes use of WebGPU, please make sure that WebGPU is enabled in your browser settings before running the benchmarks.
+## Installation & Test Run
+
+On macOS:
+
+```bash
+./osx_local_setup.sh
+```
+
+## Benchmarking
+
+```bash
+./benchmark.sh
+```
