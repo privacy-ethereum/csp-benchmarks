@@ -5,6 +5,8 @@ set -euo pipefail
 # Usage: benchmark.sh [--ligetron-dir <path>]
 
 LIGETRON_DIR="${LIGETRON_DIR:-}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+MEASURE_RAM_SCRIPT="${SCRIPT_DIR}/../measure_mem_avg.sh"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -17,7 +19,6 @@ done
 
 if [[ -z "${LIGETRON_DIR}" ]]; then
   # default to third_party/ligetron next to this script
-  SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
   LIGETRON_DIR="${SCRIPT_DIR}/third_party/ligetron"
 fi
 
@@ -47,6 +48,15 @@ step "Prover:"
 
 step "Verifier:"
 ./webgpu_verifier "${VERIFIER_JSON}" || { warn "Verifier returned non-zero"; }
+
+step "RAM measurement"
+if [[ -f "${MEASURE_RAM_SCRIPT}" ]]; then
+  MEM_JSON="${SCRIPT_DIR}/sha256_ligetron_mem_report.json"
+  bash "${MEASURE_RAM_SCRIPT}" -o "${MEM_JSON}" -- ./webgpu_prover "${PROVER_JSON}" || warn "Memory measurement failed"
+  ok "Memory report: ${MEM_JSON}"
+else
+  warn "measure_mem_avg.sh not found: ${MEASURE_RAM_SCRIPT}"
+fi
 
 popd >/dev/null
 
