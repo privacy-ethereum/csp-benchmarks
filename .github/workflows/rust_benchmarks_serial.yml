@@ -97,7 +97,7 @@ jobs:
         if: always()
         with:
           name: criterion-reports
-          path: target/criterion
+          path: ./target/criterion
           retention-days: 30
 
       - name: Collect benchmarks

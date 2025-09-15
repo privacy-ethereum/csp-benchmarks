@@ -200,11 +200,6 @@ jobs:
           name: "criterion-${{ matrix.crate }}"
           path: ./target/criterion
           retention-days: 30
-
-      - name: Run RAM measurement in ${{ matrix.crate }}
-        run: |
-          cd ${{ matrix.crate }}
-          cargo run --release --bin measure_mem
       
       - name: Collect benchmarks
         run: |
