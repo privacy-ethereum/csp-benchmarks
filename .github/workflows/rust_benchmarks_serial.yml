@@ -109,6 +109,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: "collected_benchmarks"
+          name: collected-benchmarks
           path: ./collected_benchmarks.json
           retention-days: 30
