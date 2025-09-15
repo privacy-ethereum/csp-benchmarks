@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Run Ligetron demo prover & verifier (Edit Distance)
+# Run Ligetron SHA-256 benchmark
 # Usage: benchmark.sh [--ligetron-dir <path>]
 
 LIGETRON_DIR="${LIGETRON_DIR:-}"
@@ -30,12 +30,13 @@ step() { printf "\n\033[1;34m==> %s\033[0m\n" "$*"; }
 ok()   { printf "\033[1;32m✓ %s\033[0m\n" "$*"; }
 warn() { printf "\033[1;33m! %s\033[0m\n" "$*"; }
 
-step "Running demo prover & verifier (Edit Distance)"
+step "Running Ligetron SHA-256 benchmark"
 
 pushd "${LIGETRON_DIR}/build" >/dev/null || { echo "Missing build directory: ${LIGETRON_DIR}/build" >&2; exit 1; }
 
-PROVER_JSON='{"program":"../sdk/build/examples/edit.wasm","shader-path":"../shader","packing":8192,"private-indices":[1],"args":[{"str":"abcdeabcdeabcde"},{"str":"bcdefabcdeabcde"},{"i64":15},{"i64":15}]}'
-VERIFIER_JSON='{"program":"../sdk/build/examples/edit.wasm","shader-path":"../shader","packing":8192,"private-indices":[1],"args":[{"str":"xxxxxxxxxxxxxxx"},{"str":"bcdefabcdeabcde"},{"i64":15},{"i64":15}]}'
+# SHA-256 circuit expects: [1] input str, [2] input length (i64), [3] expected digest (hex)
+PROVER_JSON='{"program":"../sdk/build/examples/sha256.wasm","shader-path":"../shader","packing":8192,"private-indices":[1],"args":[{"str":"abcdeabcdeabcde"},{"i64":15},{"hex":"0xfb3d5042fc80a5df2b0dc63d70b93b9e226f327f16e36591865a320daa458d7b"}]}'
+VERIFIER_JSON='{"program":"../sdk/build/examples/sha256.wasm","shader-path":"../shader","packing":8192,"private-indices":[1],"args":[{"str":"xxxxxxxxxxxxxxx"},{"i64":15},{"hex":"0xfb3d5042fc80a5df2b0dc63d70b93b9e226f327f16e36591865a320daa458d7b"}]}'
 
 if [[ ! -x "./webgpu_prover" || ! -x "./webgpu_verifier" ]]; then
   warn "webgpu_prover/webgpu_verifier not found or not executable. Did the native build succeed?"
