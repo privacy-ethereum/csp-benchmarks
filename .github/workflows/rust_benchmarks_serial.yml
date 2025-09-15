@@ -99,3 +99,16 @@ jobs:
           name: criterion-reports
           path: target/criterion
           retention-days: 30
+
+      - name: Collect benchmarks
+        run: |
+          cd utils
+          cargo run --release --bin collect_benchmarks
+
+      - name: Upload collected reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "collected_benchmarks"
+          path: ./collected_benchmarks.json
+          retention-days: 30
