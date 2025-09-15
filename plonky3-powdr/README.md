@@ -13,11 +13,6 @@ cargo run -r --bin plonky3-powdr-sha
 ## Benchmarking
 
 ```bash
-cargo bench
-```
-
-Measure RAM footprint:
-```bash
 chmod +x ../measure_mem_avg.sh
-cargo run --release --bin measure_mem
+cargo bench
 ```

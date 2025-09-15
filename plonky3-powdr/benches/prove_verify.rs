@@ -1,7 +1,7 @@
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use sha::bench::{prepare_pipeline, prove, verify};
 use utils::{
-    bench::{Metrics, write_json_metrics},
+    bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics},
     metadata::SHA2_INPUTS,
 };
 
@@ -13,7 +13,15 @@ fn sha256_bench(c: &mut Criterion) {
         let json_file = format!("sha256_{input_size}_powdr_metrics.json");
         write_json_metrics(&json_file, &metrics);
 
-        // Run the benchmarks
+        // RAM measurement
+        let sha256_binary_name = "sha256_mem";
+        compile_binary(sha256_binary_name);
+
+        let sha256_binary_path = format!("../target/release/{}", sha256_binary_name);
+        let json_file = format!("sha256_{}_powdr_mem_report.json", input_size);
+        run_measure_mem_script(&json_file, &sha256_binary_path, input_size);
+
+        // Run the (criterion) benchmarks
         let mut group = c.benchmark_group(format!("sha256_{input_size}_powdr"));
         group.sample_size(10);
 

@@ -23,9 +23,5 @@ name = "prove_verify"
 harness = false
 
 [[bin]]
-name = "measure_mem"
-path = "src/bin/measure_mem.rs"
-
-[[bin]]
 name = "sha256_no_lookup_mem"
 path = "src/bin/sha256_no_lookup_mem.rs"

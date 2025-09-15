@@ -11,10 +11,6 @@ clap = { workspace = true }
 noir-r1cs = { git = "https://github.com/worldfnd/ProveKit", branch = "main" }
 
 [[bin]]
-name = "measure_mem"
-path = "src/bin/measure_mem.rs"
-
-[[bin]]
 name = "sha256_mem"
 path = "src/bin/sha256_mem.rs"
 

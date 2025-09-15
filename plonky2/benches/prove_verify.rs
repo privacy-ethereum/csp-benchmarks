@@ -4,7 +4,7 @@ use plonky2_sha256::bench::{prove, sha256_prepare, verify};
 use plonky2::{plonk::config::PoseidonGoldilocksConfig, util::serialization::Write};
 use plonky2_u32::gates::arithmetic_u32::{U32GateSerializer, U32GeneratorSerializer};
 use utils::{
-    bench::{Metrics, write_json_metrics},
+    bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics},
     metadata::SHA2_INPUTS,
 };
 
@@ -19,7 +19,15 @@ fn sha256_no_lookup(c: &mut Criterion) {
         let json_file = format!("sha256_{input_size}_plonky2_no_lookup_metrics.json");
         write_json_metrics(&json_file, &metrics);
 
-        // Run the benchmarks
+        // RAM measurement
+        let sha256_binary_name = "sha256_no_lookup_mem";
+        compile_binary(sha256_binary_name);
+
+        let sha256_binary_path = format!("../target/release/{}", sha256_binary_name);
+        let json_file = format!("sha256_{}_plonky2_no_lookup_mem_report.json", input_size);
+        run_measure_mem_script(&json_file, &sha256_binary_path, input_size);
+
+        // Run the (criterion) benchmarks
         let mut group = c.benchmark_group(format!("sha256_{input_size}_plonky2_no_lookup"));
         group.sample_size(10);
 
