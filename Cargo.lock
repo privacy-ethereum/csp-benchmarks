@@ -5972,7 +5972,7 @@ dependencies = [
 [[package]]
 name = "poseidon"
 version = "0.2.0"
-source = "git+https://github.com/privacy-scaling-explorations/poseidon?tag=v2024_01_31#d29f35d9744e0c58b63679a15730ff2fab470ef2"
+source = "git+https://github.com/privacy-ethereum/poseidon?tag=v2024_01_31#d29f35d9744e0c58b63679a15730ff2fab470ef2"
 dependencies = [
  "halo2curves 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "subtle",

@@ -80,8 +80,8 @@ jobs:
         id: base
         run: |
           REMOTE=origin
-          if [[ "${GITHUB_REPOSITORY}" != "privacy-scaling-explorations/csp-benchmarks" ]]; then
-            git remote add upstream https://github.com/privacy-scaling-explorations/csp-benchmarks.git
+          if [[ "${GITHUB_REPOSITORY}" != "privacy-ethereum/csp-benchmarks" ]]; then
+            git remote add upstream https://github.com/privacy-ethereum/csp-benchmarks.git
             REMOTE=upstream
           fi
 

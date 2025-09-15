@@ -1,7 +1,5 @@
 name: Ligero setup & build (macOS)
-description: Install deps (Dawn, WABT, emsdk), then build ligero-prover SDK+native. No runtime tests.
-runs:
-  using: "composite"
+description: Install deps (Dawn, WABT, emsdk), then build ligero-prover SDK+native.
 
 inputs:
   ligero_path:
@@ -32,120 +30,122 @@ outputs:
     description: Install prefix used for dependencies
     value: ${{ inputs.install_prefix }}
 
-steps:
-  - name: Resolve paths
-    id: paths
-    shell: bash
-    run: |
-      set -euo pipefail
-      LIGERO="${{ inputs.ligero_path }}"
-      echo "build_dir=${LIGERO}/build" >> "$GITHUB_OUTPUT"
-      echo "sdk_build_dir=${LIGERO}/sdk/build" >> "$GITHUB_OUTPUT"
+runs:
+  using: "composite"
+  steps:
+    - name: Resolve paths
+      id: paths
+      shell: bash
+      run: |
+        set -euo pipefail
+        LIGERO="${{ inputs.ligero_path }}"
+        echo "build_dir=${LIGERO}/build" >> "$GITHUB_OUTPUT"
+        echo "sdk_build_dir=${LIGERO}/sdk/build" >> "$GITHUB_OUTPUT"
 
-  - name: Brew deps
-    shell: bash
-    run: |
-      set -euo pipefail
-      brew update
-      brew install cmake gmp mpfr libomp llvm boost nlohmann-json ccache
+    - name: Brew deps
+      shell: bash
+      run: |
+        set -euo pipefail
+        brew update
+        brew install cmake gmp mpfr libomp llvm boost nlohmann-json ccache
 
-  - name: Prepare dirs
-    shell: bash
-    run: |
-      set -euo pipefail
-      mkdir -p .deps/src .deps/build "${{ inputs.install_prefix }}" third_party
+    - name: Prepare dirs
+      shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p .deps/src .deps/build "${{ inputs.install_prefix }}" third_party
 
-  # Cache ALL installed deps (Dawn + WABT) in one folder keyed by OS + Dawn commit.
-  - name: Cache deps install
-    id: cache-deps
-    uses: actions/cache@v4
-    with:
-      path: ${{ inputs.install_prefix }}
-      key: deps-${{ runner.os }}-${{ inputs.dawn_commit }}-v1
+    # Cache ALL installed deps (Dawn + WABT) in one folder keyed by Dawn commit.
+    - name: Cache deps install
+      id: cache-deps
+      uses: actions/cache@v4
+      with:
+        path: ${{ inputs.install_prefix }}
+        key: deps-macos-${{ inputs.dawn_commit }}-v1
 
-  # ---------- Dawn ----------
-  - name: Build & install Dawn
-    if: steps.cache-deps.outputs.cache-hit != 'true'
-    shell: bash
-    run: |
-      set -euo pipefail
-      cd third_party
-      if [ ! -d dawn ]; then
-        git clone https://dawn.googlesource.com/dawn
-      fi
-      cd dawn
-      git fetch --all
-      git checkout "${{ inputs.dawn_commit }}"
-      mkdir -p release && cd release
-      cmake -DDAWN_FETCH_DEPENDENCIES=ON \
-            -DDAWN_ENABLE_INSTALL=ON \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX="${{ inputs.install_prefix }}" ..
-      cmake --build . -j
-      cmake --install .
+    # ---------- Dawn ----------
+    - name: Build & install Dawn
+      if: steps.cache-deps.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+        cd third_party
+        if [ ! -d dawn ]; then
+          git clone https://dawn.googlesource.com/dawn
+        fi
+        cd dawn
+        git fetch --all
+        git checkout "${{ inputs.dawn_commit }}"
+        mkdir -p release && cd release
+        cmake -DDAWN_FETCH_DEPENDENCIES=ON \
+              -DDAWN_ENABLE_INSTALL=ON \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_INSTALL_PREFIX="${{ inputs.install_prefix }}" ..
+        cmake --build . -j
+        cmake --install .
 
-  # ---------- WABT ----------
-  - name: Build & install WABT
-    if: steps.cache-deps.outputs.cache-hit != 'true'
-    shell: bash
-    run: |
-      set -euo pipefail
-      cd third_party
-      if [ ! -d wabt ]; then
-        git clone https://github.com/WebAssembly/wabt.git
-      fi
-      cd wabt
-      git submodule update --init
-      mkdir -p build && cd build
-      cmake -DCMAKE_CXX_COMPILER=clang++ \
-            -DCMAKE_INSTALL_PREFIX="${{ inputs.install_prefix }}" ..
-      cmake --build . -j
-      cmake --install .
+    # ---------- WABT ----------
+    - name: Build & install WABT
+      if: steps.cache-deps.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+        cd third_party
+        if [ ! -d wabt ]; then
+          git clone https://github.com/WebAssembly/wabt.git
+        fi
+        cd wabt
+        git submodule update --init
+        mkdir -p build && cd build
+        cmake -DCMAKE_CXX_COMPILER=clang++ \
+              -DCMAKE_INSTALL_PREFIX="${{ inputs.install_prefix }}" ..
+        cmake --build . -j
+        cmake --install .
 
-  # ---------- Emscripten ----------
-  - name: Setup Emscripten (emsdk)
-    uses: mymindstorm/setup-emsdk@v14
-    with:
-      version: latest
-      update: true
+    # ---------- Emscripten ----------
+    - name: Setup Emscripten (emsdk)
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: latest
+        update: true
 
-  - name: Verify emcc
-    shell: bash
-    run: emcc -v
+    - name: Verify emcc
+      shell: bash
+      run: emcc -v
 
-  # ---------- Build SDK (emscripten) ----------
-  - name: Build SDK (emscripten)
-    shell: bash
-    run: |
-      set -euo pipefail
-      emcmake cmake -S "${{ inputs.ligero_path }}/sdk" -B "${{ inputs.ligero_path }}/sdk/build"
-      cmake --build "${{ inputs.ligero_path }}/sdk/build" -j
+    # ---------- Build SDK (emscripten) ----------
+    - name: Build SDK (emscripten)
+      shell: bash
+      run: |
+        set -euo pipefail
+        emcmake cmake -S "${{ inputs.ligero_path }}/sdk" -B "${{ inputs.ligero_path }}/sdk/build"
+        cmake --build "${{ inputs.ligero_path }}/sdk/build" -j
 
-  # ---------- Build native ----------
-  - name: Cache ccache
-    uses: actions/cache@v4
-    with:
-      path: |
-        ~/.ccache
-        ~/Library/Caches/ccache
-      key: ccache-${{ runner.os }}-v1
+    # ---------- Build native ----------
+    - name: Cache ccache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.ccache
+          ~/Library/Caches/ccache
+        key: ccache-macos-v1
 
-  - name: Enable ccache
-    shell: bash
-    run: |
-      echo "CMAKE_C_COMPILER_LAUNCHER=ccache" >> $GITHUB_ENV
-      echo "CMAKE_CXX_COMPILER_LAUNCHER=ccache" >> $GITHUB_ENV
-      ccache -s || true
+    - name: Enable ccache
+      shell: bash
+      run: |
+        echo "CMAKE_C_COMPILER_LAUNCHER=ccache" >> $GITHUB_ENV
+        echo "CMAKE_CXX_COMPILER_LAUNCHER=ccache" >> $GITHUB_ENV
+        ccache -s || true
 
-  - name: Configure & build native
-    shell: bash
-    run: |
-      set -euo pipefail
-      cmake -S "${{ inputs.ligero_path }}" -B "${{ inputs.ligero_path }}/build" \
-            -DCMAKE_BUILD_TYPE=${{ inputs.cmake_build_type }} \
-            -DCMAKE_PREFIX_PATH="${{ inputs.install_prefix }}"
-      cmake --build "${{ inputs.ligero_path }}/build" -j
+    - name: Configure & build native
+      shell: bash
+      run: |
+        set -euo pipefail
+        cmake -S "${{ inputs.ligero_path }}" -B "${{ inputs.ligero_path }}/build" \
+              -DCMAKE_BUILD_TYPE=${{ inputs.cmake_build_type }} \
+              -DCMAKE_PREFIX_PATH="${{ inputs.install_prefix }}"
+        cmake --build "${{ inputs.ligero_path }}/build" -j
 
-  - name: ccache stats
-    shell: bash
-    run: ccache -s || true
+    - name: ccache stats
+      shell: bash
+      run: ccache -s || true
