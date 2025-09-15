@@ -14,9 +14,8 @@ fn main() {
     sha256_mem(args.input_size);
 }
 
-// TODO: variable input size
-fn sha256_mem(_input_size: usize) {
-    let mut pipeline = prepare_pipeline();
+fn sha256_mem(input_size: usize) {
+    let mut pipeline = prepare_pipeline(input_size);
 
     prove(&mut pipeline);
 }

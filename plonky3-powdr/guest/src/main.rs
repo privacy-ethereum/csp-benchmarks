@@ -1,6 +1,7 @@
 #![allow(unused_imports)]
 
 use powdr_riscv_runtime;
+use powdr_riscv_runtime::io::read;
 use sha2::{Digest, Sha256};
 
 fn sha2(input: &[u8]) -> [u8; 32] {
@@ -11,6 +12,9 @@ fn sha2(input: &[u8]) -> [u8; 32] {
 }
 
 fn main() {
-    let msg = &[5u8; 2048];
-    let _ = sha2(msg);
+    // Any serde-deserializable type can be read from a channel.
+    // Read some data from channel 1.
+    let msg: Vec<u8> = read(1);
+
+    let _ = sha2(&msg);
 }
