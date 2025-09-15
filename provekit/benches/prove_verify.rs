@@ -1,7 +1,9 @@
 use criterion::{BatchSize, Criterion, black_box, criterion_group, criterion_main};
 use provekit::ProvekitSha256Benchmark;
-use utils::bench::{Metrics, write_json_metrics};
-use utils::metadata::SHA2_INPUTS;
+use utils::{
+    bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics},
+    metadata::SHA2_INPUTS,
+};
 
 fn sha256_benchmarks(c: &mut Criterion) {
     for &input_size in SHA2_INPUTS.iter() {
