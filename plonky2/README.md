@@ -7,13 +7,7 @@ This code is a fork of https://github.com/polymerdao/plonky2-sha256/tree/main
 
 ## Benchmarking SHA256 with Plonky2
 
-```
-cargo bench
-```
-
-## Measuring RAM requirements
-
 ```bash
 chmod +x ../measure_mem_avg.sh
-cargo run --release --bin measure_mem
+cargo bench
 ```
