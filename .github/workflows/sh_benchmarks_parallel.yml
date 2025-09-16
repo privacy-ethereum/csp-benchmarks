@@ -139,18 +139,20 @@ jobs:
       - name: Run benches in ${{ matrix.folder }}
         run: |
           set -euo pipefail
-          cd "${{ matrix.folder }}"
           if [[ -f ./benchmark.sh ]]; then
-            bash ./benchmark.sh | tee benchmark.log
+            bash ./benchmark.sh --system-dir "./${{ matrix.folder }}"
           else
-            echo "benchmark.sh not found in ${{ matrix.folder }}" >&2
+            echo "benchmark.sh not found in repository root" >&2
             exit 1
           fi
 
-      - name: Upload logs for ${{ matrix.folder }}
+      - name: Upload outputs for ${{ matrix.folder }}
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: "benchmark-logs-${{ matrix.folder }}"
-          path: ${{ matrix.folder }}/benchmark.log
+          name: "benchmark-outputs-${{ matrix.folder }}"
+          path: |
+            ${{ matrix.folder }}/hyperfine_*.json
+            ${{ matrix.folder }}/*_mem_report_*.json
+          if-no-files-found: warn
           retention-days: 30

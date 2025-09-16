@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Generic benchmark orchestrator for non-Rust systems.
+# Usage: benchmark.sh --system-dir <path>
+
+SYSTEM_DIR=""
+RUNS=10
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --system-dir)
+      SYSTEM_DIR="$2"; shift 2 ;;
+    *)
+      echo "Unknown argument: $1" >&2; exit 2 ;;
+  esac
+done
+
+if [[ -z "$SYSTEM_DIR" ]]; then
+  echo "--system-dir is required (path containing prepare.sh, prove.sh, verify.sh)" >&2
+  exit 2
+fi
+
+if [[ ! -d "$SYSTEM_DIR" ]]; then
+  echo "system dir does not exist: $SYSTEM_DIR" >&2
+  exit 1
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+UTILS_BIN="${SCRIPT_DIR}/target/release/utils"
+MEASURE_RAM_SCRIPT="${SCRIPT_DIR}/measure_mem_avg.sh"
+
+step() { printf "\n\033[1;34m==> %s\033[0m\n" "$*"; }
+ok()   { printf "\033[1;32m✓ %s\033[0m\n" "$*"; }
+warn() { printf "\033[1;33m! %s\033[0m\n" "$*"; }
+
+if [[ ! -x "$UTILS_BIN" ]]; then
+  echo "utils binary not found or not executable: $UTILS_BIN" >&2
+  exit 1
+fi
+
+PREPARE_SH="${SYSTEM_DIR}/prepare.sh"
+PROVE_SH="${SYSTEM_DIR}/prove.sh"
+VERIFY_SH="${SYSTEM_DIR}/verify.sh"
+
+for f in "$PREPARE_SH" "$PROVE_SH" "$VERIFY_SH"; do
+  [[ -x "$f" ]] || { echo "required script not executable: $f" >&2; exit 1; }
+done
+
+step "Running benchmarks for system: $SYSTEM_DIR"
+
+sizes_len="$($UTILS_BIN sizes len)"
+[[ -n "$sizes_len" ]] || { echo "Failed to obtain sizes length from utils" >&2; exit 1; }
+
+STATE_DIR="$SYSTEM_DIR/.bench_state"
+mkdir -p "$STATE_DIR"
+
+for (( i=0; i<sizes_len; i++ )); do
+  INPUT_SIZE="$($UTILS_BIN sizes get --index "$i")"
+
+  PROVER_JSON_FILE="$STATE_DIR/prover_${INPUT_SIZE}.json"
+  VERIFIER_JSON_FILE="$STATE_DIR/verifier_${INPUT_SIZE}.json"
+
+  step "Prover (size ${INPUT_SIZE}):"
+  hyperfine --runs "$RUNS" \
+    --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
+    "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
+    --export-json "$SYSTEM_DIR/hyperfine_sha256_${INPUT_SIZE}_prover_metrics.json"
+
+  step "Verifier (size ${INPUT_SIZE}):"
+  hyperfine --runs "$RUNS" \
+    --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
+    "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
+    --export-json "$SYSTEM_DIR/hyperfine_sha256_${INPUT_SIZE}_verifier_metrics.json"
+
+  if [[ -f "$MEASURE_RAM_SCRIPT" ]]; then
+    step "RAM measurement (size ${INPUT_SIZE})"
+    MEM_JSON="$SYSTEM_DIR/sha256_mem_report_${INPUT_SIZE}.json"
+    bash "$MEASURE_RAM_SCRIPT" -o "$MEM_JSON" -- bash -lc "STATE_JSON=\"$PROVER_JSON_FILE\" bash \"$PROVE_SH\"" || warn "Memory measurement failed"
+    ok "Memory report: $MEM_JSON"
+  fi
+done
+
+ok "Benchmark complete"
+
+
