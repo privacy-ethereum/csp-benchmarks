@@ -12,6 +12,10 @@ csv = "1.1"
 human-repr = { version = "1.0", features = ["1024"] }
 libc = "0.2"
 glob = "0.3"
+rand = { workspace = true }
+sha2 = { workspace = true }
+clap = { workspace = true }
+hex = { workspace = true }
 
 [[bin]]
 name = "collect_benchmarks"

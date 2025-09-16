@@ -1,4 +1,6 @@
+use rand::RngCore;
 use serde::Serialize;
+use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
@@ -13,4 +15,15 @@ pub fn write_json<T: Serialize>(data: &T, output_path: &str) {
     let mut file = File::create(path).expect("Failed to create file");
     file.write_all(json_data.as_bytes())
         .expect("Failed to write to file");
+}
+
+pub fn generate_sha256_input(input_size: usize) -> (Vec<u8>, Vec<u8>) {
+    let mut message_bytes = vec![0u8; input_size];
+    let mut rng = rand::thread_rng();
+    rng.fill_bytes(&mut message_bytes);
+
+    let mut hasher = Sha256::new();
+    hasher.update(&message_bytes);
+    let digest_bytes = hasher.finalize().to_vec();
+    (message_bytes, digest_bytes)
 }

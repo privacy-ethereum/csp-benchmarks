@@ -112,6 +112,30 @@ jobs:
         with:
           fetch-depth:
 
+      - name: Ensure jq present
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            brew update >/dev/null
+            brew install jq
+          fi
+
+      - name: Install hyperfine
+        run: |
+          if ! command -v hyperfine >/dev/null 2>&1; then
+            brew update >/dev/null
+            brew install hyperfine
+          fi
+
+      - name: Install Rust toolchain (stable)
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+
+      - name: Build only utils (release)
+        run: cargo build --release -p utils
+
       - name: Run benches in ${{ matrix.folder }}
         run: |
           set -euo pipefail

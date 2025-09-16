@@ -8,8 +8,6 @@ use plonky2::{
         proof::ProofWithPublicInputs,
     },
 };
-use rand::Rng;
-use sha2::{Digest, Sha256};
 
 use crate::circuit::{array_to_bits, make_circuits};
 
@@ -29,16 +27,7 @@ pub fn prove(
 }
 
 pub fn sha256_prepare(input_size: usize) -> (CircuitData<F, C, D>, PartialWitness<F>) {
-    let mut msg = vec![0; input_size];
-    let mut rng = rand::thread_rng();
-    for msg_bit in msg.iter_mut().take(input_size - 1) {
-        *msg_bit = rng.gen_range(0..=1);
-    }
-
-    let mut hasher = Sha256::new();
-    hasher.update(&msg);
-    let hash = hasher.finalize();
-    // println!("Hash: {:#04X}", hash);
+    let (msg, hash) = utils::generate_sha256_input(input_size);
 
     let msg_bits = array_to_bits(&msg);
     let len = msg.len() * 8;

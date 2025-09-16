@@ -13,5 +13,6 @@ On macOS:
 ## Benchmarking
 
 ```bash
+cargo build --release -p utils
 ./benchmark.sh
 ```
