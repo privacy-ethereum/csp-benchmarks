@@ -1,19 +1,22 @@
 // Copyright 2024-2025 Irreducible Inc.
 
-use binius::bench::{prove, sha256_no_lookup_prepare, sha256_with_lookup_prepare, verify};
-use binius_utils::SerializeBytes;
+use binius::{prepare, prove, verify};
+use binius_core::ValuesData;
+use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
+use binius_utils::serialization::SerializeBytes;
+use binius_verifier::hash::{StdCompression, StdDigest};
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use utils::{
     bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics},
     metadata::SHA2_INPUTS,
 };
 
-fn sha256_no_lookup(c: &mut Criterion) {
+fn sha256_bench(c: &mut Criterion) {
     for input_size in SHA2_INPUTS {
         // Measure the metrics
-        let metrics = sha256_binius_no_lookup_metrics(input_size);
+        let metrics = sha256_binius64_metrics(input_size);
 
-        let json_file = format!("sha256_{input_size}_binius_no_lookup_metrics.json");
+        let json_file = format!("sha256_{input_size}_binius64_metrics.json");
         write_json_metrics(&json_file, &metrics);
 
         // RAM measurement
@@ -21,150 +24,86 @@ fn sha256_no_lookup(c: &mut Criterion) {
         compile_binary(sha256_binary_name);
 
         let sha256_binary_path = format!("../target/release/{}", sha256_binary_name);
-        let json_file = format!("sha256_{}_binius_no_lookup_mem_report.json", input_size);
+        let json_file = format!("sha256_{}_binius64_mem_report.json", input_size);
         run_measure_mem_script(&json_file, &sha256_binary_path, input_size);
 
         // Run the (criterion) benchmarks
-        let mut group = c.benchmark_group(format!("sha256_{input_size}_binius_no_lookup"));
+        let mut group = c.benchmark_group(format!("sha256_{input_size}_binius64"));
         group.sample_size(10);
-        let allocator = bumpalo::Bump::new();
 
-        group.bench_function(
-            format!("sha256_{input_size}_binius_no_lookup_prove"),
-            |bench| {
-                bench.iter_batched(
-                    || sha256_no_lookup_prepare(&allocator),
-                    |(constraint_system, args, witness, backend)| {
-                        prove(constraint_system, args, witness, backend);
-                    },
-                    BatchSize::SmallInput,
-                );
-            },
-        );
+        group.bench_function(format!("sha256_{input_size}_binius64_prove"), |bench| {
+            bench.iter_batched(
+                || prepare(input_size).expect("Failed to prepare sha256 circuit for prove/verify"),
+                |(_, prover, witness, _)| {
+                    prove::<StdDigest, StdCompression, ParallelCompressionAdaptor<StdCompression>>(
+                        &prover, witness,
+                    )
+                },
+                BatchSize::SmallInput,
+            );
+        });
 
-        group.bench_function(
-            format!("sha256_{input_size}_binius_no_lookup_verify"),
-            |bench| {
-                bench.iter_batched(
-                    || {
-                        let (constraint_system, args, witness, backend) =
-                            sha256_no_lookup_prepare(&allocator);
-                        prove(constraint_system, args, witness, backend)
-                    },
-                    |(constraint_system, args, proof)| {
-                        verify(constraint_system, args, proof);
-                    },
-                    BatchSize::SmallInput,
-                );
-            },
-        );
-        group.finish();
-    }
-}
-
-fn sha256_with_lookup(c: &mut Criterion) {
-    for input_size in SHA2_INPUTS {
-        // Measure the metrics
-        let metrics = sha256_binius_with_lookup_metrics(input_size);
-
-        let json_file = format!("sha256_{input_size}_binius_with_lookup_metrics.json");
-        write_json_metrics(&json_file, &metrics);
-
-        // RAM measurement
-        let sha256_binary_name = "sha256_with_lookup_mem";
-        compile_binary(sha256_binary_name);
-
-        let sha256_binary_path = format!("../target/release/{}", sha256_binary_name);
-        let json_file = format!("sha256_{}_binius_with_lookup_mem_report.json", input_size);
-        run_measure_mem_script(&json_file, &sha256_binary_path, input_size);
-
-        // Run the benchmarks
-        let mut group = c.benchmark_group(format!("sha256_{input_size}_binius_with_lookup"));
-        group.sample_size(10);
-        let allocator = bumpalo::Bump::new();
-
-        group.bench_function(
-            format!("sha256_{input_size}_binius_with_lookup_prove"),
-            |bench| {
-                bench.iter_batched(
-                    || sha256_with_lookup_prepare(&allocator),
-                    |(constraint_system, args, witness, backend)| {
-                        prove(constraint_system, args, witness, backend);
-                    },
-                    BatchSize::SmallInput,
-                );
-            },
-        );
-
-        group.bench_function(
-            format!("sha256_{input_size}_binius_with_lookup_verify"),
-            |bench| {
-                bench.iter_batched(
-                    || {
-                        let (constraint_system, args, witness, backend) =
-                            sha256_with_lookup_prepare(&allocator);
-                        prove(constraint_system, args, witness, backend)
-                    },
-                    |(constraint_system, args, proof)| {
-                        verify(constraint_system, args, proof);
-                    },
-                    BatchSize::SmallInput,
-                );
-            },
-        );
+        group.bench_function(format!("sha256_{input_size}_binius64_verify"), |bench| {
+            bench.iter_batched(
+                || {
+                    let (verifier, prover, witness, _) = prepare(input_size)
+                        .expect("Failed to prepare sha256 circuit for prove/verify");
+                    let proof = prove::<
+                        StdDigest,
+                        StdCompression,
+                        ParallelCompressionAdaptor<StdCompression>,
+                    >(&prover, witness.clone())
+                    .expect("Failed to prove sha256 circuit");
+                    (verifier, proof, witness)
+                },
+                |(verifier, proof, witness)| {
+                    verify::<StdDigest, StdCompression, ParallelCompressionAdaptor<StdCompression>>(
+                        &verifier, witness, &proof,
+                    )
+                },
+                BatchSize::SmallInput,
+            );
+        });
         group.finish();
     }
 }
 
 criterion_main!(sha256);
-criterion_group!(sha256, sha256_no_lookup, sha256_with_lookup);
+criterion_group!(sha256, sha256_bench);
 
-fn sha256_binius_with_lookup_metrics(input_size: usize) -> Metrics {
+fn sha256_binius64_metrics(input_size: usize) -> Metrics {
     let mut metrics = Metrics::new(
-        "binius".to_string(),
-        "with_lookup".to_string(),
+        "binius64".to_string(),
+        "".to_string(),
         false,
         "sha256".to_string(),
         input_size,
     );
 
-    let allocator = bumpalo::Bump::new();
+    let (_verifier, prover, witness, cs) =
+        prepare(input_size).expect("Failed to prepare sha256 circuit for prove/verify");
 
-    let (constraint_system, args, witness, backend) = sha256_with_lookup_prepare(&allocator);
+    let mut buf: Vec<u8> = Vec::new();
+    cs.serialize(&mut buf)
+        .expect("Failed to serialize constraint system into byte array");
 
-    let mut buffer: Vec<u8> = Vec::new();
-    constraint_system
-        .serialize(&mut buffer, binius_utils::SerializationMode::CanonicalTower)
-        .expect("Failed to serialize constraint system");
-    metrics.preprocessing_size = buffer.len();
+    let pub_witness_data = ValuesData::from(witness.public());
+    pub_witness_data
+        .serialize(&mut buf)
+        .expect("Failed to serialize public witness into byte array");
 
-    let (_, _, proof) = prove(constraint_system, args, witness, backend);
-    metrics.proof_size = proof.get_proof_size();
+    let non_pub_witness_data = ValuesData::from(witness.non_public());
+    non_pub_witness_data
+        .serialize(&mut buf)
+        .expect("Failed to serialize non public witness into byte array");
 
-    metrics
-}
+    metrics.preprocessing_size = buf.len();
 
-fn sha256_binius_no_lookup_metrics(input_size: usize) -> Metrics {
-    let mut metrics = Metrics::new(
-        "binius".to_string(),
-        "no_lookup".to_string(),
-        false,
-        "sha256".to_string(),
-        input_size,
-    );
-
-    let allocator = bumpalo::Bump::new();
-
-    let (constraint_system, args, witness, backend) = sha256_no_lookup_prepare(&allocator);
-
-    let mut buffer: Vec<u8> = Vec::new();
-    constraint_system
-        .serialize(&mut buffer, binius_utils::SerializationMode::CanonicalTower)
-        .expect("Failed to serialize constraint system");
-    metrics.preprocessing_size = buffer.len();
-
-    let (_, _, proof) = prove(constraint_system, args, witness, backend);
-    metrics.proof_size = proof.get_proof_size();
+    let proof = prove::<StdDigest, StdCompression, ParallelCompressionAdaptor<StdCompression>>(
+        &prover, witness,
+    )
+    .expect("Failed to prove sha256 circuit");
+    metrics.proof_size = proof.len();
 
     metrics
 }

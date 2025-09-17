@@ -1,0 +1,26 @@
+use anyhow::Result;
+use binius::{prepare, prove};
+use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
+use binius_verifier::hash::{StdCompression, StdDigest};
+use clap::Parser;
+
+#[derive(Parser, Debug)]
+struct Args {
+    /// Input size parameter
+    #[arg(long)]
+    input_size: usize,
+}
+
+fn main() {
+    let args = Args::parse();
+
+    sha256_mem(args.input_size).expect("Failed to run prove process");
+}
+
+fn sha256_mem(input_size: usize) -> Result<()> {
+    let (_, prover, witness, _) = prepare(input_size)?;
+    let _ = prove::<StdDigest, StdCompression, ParallelCompressionAdaptor<StdCompression>>(
+        &prover, witness,
+    )?;
+    Ok(())
+}

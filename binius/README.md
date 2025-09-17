@@ -6,5 +6,5 @@ These benchmarks use official circuits from the Binius project: https://github.c
 
 ```bash
 chmod +x ../measure_mem_avg.sh
-cargo bench
+RUSTFLAGS="-C target-cpu=native" cargo bench
 ```

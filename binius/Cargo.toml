@@ -7,40 +7,26 @@ edition = "2024"
 
 [dependencies]
 anyhow = { workspace = true }
-alloy-primitives = "0.8.14"
-array-util = "1.0.2"
-binius_circuits = { git = "https://github.com/alxkzmn/binius", default-features = false }
-binius_core = { git = "https://github.com/alxkzmn/binius", default-features = false }
-binius_field = { git = "https://github.com/alxkzmn/binius", default-features = false }
-binius_hal = { git = "https://github.com/alxkzmn/binius", default-features = false }
-binius_hash = { git = "https://github.com/alxkzmn/binius", default-features = false }
-binius_m3 = { git = "https://github.com/alxkzmn/binius", default-features = false }
-binius_macros = { git = "https://github.com/alxkzmn/binius", default-features = false }
-binius_math = { git = "https://github.com/alxkzmn/binius", default-features = false }
-binius_utils = { git = "https://github.com/alxkzmn/binius", default-features = false }
-bumpalo = { version = "3.16.0", features = ["collections"] }
-bytemuck = { version = "1.18.0", features = [
-    "derive",
-    "min_const_generics",
-    "must_cast",
-] }
-bytesize = "1.3.0"
 clap = { workspace = true }
-itertools = { workspace = true }
 rand = { workspace = true }
-tracing-profile = "0.10.3"
 tracing = { workspace = true }
 criterion = { workspace = true }
 utils = { workspace = true }
+sha2 = { workspace = true }
+
+tracing-profile = "0.10.3"
+binius-frontend = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-circuits = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-examples = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-prover = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-verifier = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-core = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-utils = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
 
 [[bench]]
 name = "sha256_bench"
 harness = false
 
 [[bin]]
-name = "sha256_with_lookup_mem"
-path = "src/bin/sha256_with_lookup_mem.rs"
-
-[[bin]]
-name = "sha256_no_lookup_mem"
-path = "src/bin/sha256_no_lookup_mem.rs"
+name = "sha256_mem"
+path = "src/bin/sha256_mem.rs"
