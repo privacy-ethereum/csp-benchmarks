@@ -1,10 +1,10 @@
 // Copyright 2024-2025 Irreducible Inc.
 
-use binius64::{prepare, prove, verify};
 use binius_core::ValuesData;
 use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_utils::serialization::SerializeBytes;
 use binius_verifier::hash::{StdCompression, StdDigest};
+use binius64::{prepare, prove, verify};
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use utils::{
     bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics},

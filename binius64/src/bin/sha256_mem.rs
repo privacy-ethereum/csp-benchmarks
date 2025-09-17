@@ -1,7 +1,7 @@
 use anyhow::Result;
-use binius64::{prepare, prove};
 use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_verifier::hash::{StdCompression, StdDigest};
+use binius64::{prepare, prove};
 use clap::Parser;
 
 #[derive(Parser, Debug)]
