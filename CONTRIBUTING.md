@@ -24,12 +24,12 @@ NOTE: Criterion report files are generated under the `target/criterion` director
 
 Example:
 
-* When you want to add a benchmark for Binius with lookup for target function `sha256` with input size `2048`:
-	+ Metrics: `sha256_2048_binius_with_lookup_metrics.json`
-	+ Memory report: `sha256_2048_binius_with_lookup_mem_report.json`
-	+ Criterion IDs: `sha256_2048_binius_with_lookup_prove` and `sha256_2048_binius_with_lookup_verify`
+* When you want to add a benchmark for plonky2 with no-lookup for target function `sha256` with input size `2048`:
+	+ Metrics: `sha256_2048_plonky2_no_lookup_metrics.json`
+	+ Memory report: `sha256_2048_plonky2_no_lookup_mem_report.json`
+	+ Criterion IDs: `sha256_2048_plonky2_no_lookup_prove` and `sha256_2048_plonky2_no_lookup_verify`
 
-You can reference the existing benchmarks for naming. (e.g. [./binius/benches/sha256_bench.rs](https://github.com/privacy-scaling-explorations/csp-benchmarks/blob/collect-benchmarks-0/binius/benches/sha256_bench.rs))
+You can reference the existing benchmarks for naming. (e.g. [./plonky2/benches/prove_verify.rs](https://github.com/privacy-ethereum/csp-benchmarks/blob/CSP-Q3-2025/plonky2/benches/prove_verify.rs#L14-L68))
 
 #### Contents
 
@@ -63,7 +63,7 @@ pub struct Metrics {
 Example:
 ```json
 {
-  "name": "binius",
+  "name": "plonky2",
   "feat": "no_lookup",
   "is_zkvm": false,
   "target": "sha256",
@@ -76,7 +76,7 @@ Example:
   "peak_memory": 0
 }
 ```
-You can reference how to create JSON files of metrics in the existing benchmarks.(e.g. [./binius/benches/sha256_bench.rs](https://github.com/privacy-scaling-explorations/csp-benchmarks/blob/collect-benchmarks-0/binius/benches/sha256_bench.rs))
+You can reference how to create JSON files of metrics in the existing benchmarks.(e.g. [./plonky2/benches/prove_verify.rs](https://github.com/privacy-ethereum/csp-benchmarks/blob/CSP-Q3-2025/plonky2/benches/prove_verify.rs#L16-L20))
 
 * Memory report: should be like the following:
 ```json
@@ -85,6 +85,6 @@ You can reference how to create JSON files of metrics in the existing benchmarks
 }
 ```
 We provide the shell script to make this JSON file - `./measure_mem_avg.sh`.  
-You can reference how to use the script in README file of existing benchmarks.(e.g. [./binius/README.md](https://github.com/privacy-scaling-explorations/csp-benchmarks/blob/collect-benchmarks-0/binius/README.md#measure-sha256-ram-footprint))
+You can reference how we do the memory measurement in the existing benchmarks.(e.g. [./plonky2/benches/prove_verify.rs](https://github.com/privacy-ethereum/csp-benchmarks/blob/CSP-Q3-2025/plonky2/benches/prove_verify.rs#L22-L28))
 
-For more details, please check the existing benchmarks like `binius` and `plonky2`.
+For more details, please check the existing benchmarks like `binius64` and `plonky2`.
