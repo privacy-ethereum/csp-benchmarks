@@ -1,7 +1,7 @@
 [workspace]
 resolver = "3"
 members = [
-    "binius",
+    "binius64",
     "plonky2",
     "plonky3-powdr",
     "provekit",
