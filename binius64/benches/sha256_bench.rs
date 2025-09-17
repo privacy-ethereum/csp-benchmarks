@@ -1,6 +1,6 @@
 // Copyright 2024-2025 Irreducible Inc.
 
-use binius::{prepare, prove, verify};
+use binius64::{prepare, prove, verify};
 use binius_core::ValuesData;
 use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_utils::serialization::SerializeBytes;

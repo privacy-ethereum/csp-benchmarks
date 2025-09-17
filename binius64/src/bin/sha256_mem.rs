@@ -1,5 +1,5 @@
 use anyhow::Result;
-use binius::{prepare, prove};
+use binius64::{prepare, prove};
 use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_verifier::hash::{StdCompression, StdDigest};
 use clap::Parser;

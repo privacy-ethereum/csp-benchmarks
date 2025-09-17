@@ -1030,27 +1030,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "binius"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "binius-circuits",
- "binius-core",
- "binius-examples",
- "binius-frontend",
- "binius-prover",
- "binius-utils",
- "binius-verifier",
- "clap",
- "criterion",
- "rand 0.8.5",
- "sha2",
- "tracing",
- "tracing-profile",
- "utils 0.1.0",
-]
-
-[[package]]
 name = "binius-circuits"
 version = "0.1.0"
 source = "git+https://github.com/IrreducibleOSS/binius64#f539683c8a6593d5d8df3658e45b8cdffb93a522"
@@ -1246,6 +1225,27 @@ dependencies = [
  "sha2",
  "thiserror 2.0.16",
  "tracing",
+]
+
+[[package]]
+name = "binius64"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "binius-circuits",
+ "binius-core",
+ "binius-examples",
+ "binius-frontend",
+ "binius-prover",
+ "binius-utils",
+ "binius-verifier",
+ "clap",
+ "criterion",
+ "rand 0.8.5",
+ "sha2",
+ "tracing",
+ "tracing-profile",
+ "utils 0.1.0",
 ]
 
 [[package]]
