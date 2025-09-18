@@ -8,11 +8,12 @@ set -euo pipefail
 # - Builds Dawn (WebGPU)
 # - Builds WABT
 # - Installs Emscripten (emsdk)
-# - Clones and builds Ligetron SDK (emscripten)
+# - Builds Ligetron SDK (emscripten)
 # - Builds Ligetron native
 # - Runs test prover & verifier
 #
 # Re-runnable: clones are skipped if folders exist.
+# Use --reinstall to force a clean rebuild of third-party and Ligetron builds.
 
 ### Helpers
 step() { printf "\n\033[1;34m==> %s\033[0m\n" "$*"; }
@@ -23,9 +24,30 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
   echo "This script is for macOS (Darwin) only."; exit 1
 fi
 
+REINSTALL=0
+for arg in "$@"; do
+  case "$arg" in
+    --reinstall|-r)
+      REINSTALL=1
+      ;;
+    -h|--help)
+      echo "Usage: $0 [--reinstall]"; exit 0
+      ;;
+    *)
+      warn "Unknown argument: $arg"
+      ;;
+  esac
+done
+
 ROOT_DIR="$(pwd)"
 TP_DIR="${ROOT_DIR}/third_party"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 mkdir -p "${TP_DIR}"
+
+if [[ "${REINSTALL}" == "1" ]]; then
+  step "Reinstall mode enabled: cleaning build caches before rebuilding"
+fi
 
 # -----------------------
 # Homebrew + dependencies
@@ -68,6 +90,10 @@ step "Building & installing Dawn @ ${DAWN_COMMIT}"
 pushd "${DAWN_DIR}" >/dev/null
 git fetch --all
 git checkout "${DAWN_COMMIT}"
+if [[ "${REINSTALL}" == "1" ]]; then
+  # Clean stale build cache to avoid CMake source-dir mismatch
+  rm -rf release
+fi
 mkdir -p release
 pushd release >/dev/null
 cmake -DDAWN_FETCH_DEPENDENCIES=ON -DDAWN_ENABLE_INSTALL=ON -DCMAKE_BUILD_TYPE=Release ..
@@ -90,6 +116,10 @@ fi
 step "Building & installing WABT (clang++)"
 pushd "${WABT_DIR}" >/dev/null
 git submodule update --init
+if [[ "${REINSTALL}" == "1" ]]; then
+  # Clean stale build cache
+  rm -rf build
+fi
 mkdir -p build
 pushd build >/dev/null
 cmake -DCMAKE_CXX_COMPILER="${CXX}" ..
@@ -119,24 +149,25 @@ popd >/dev/null
 ok "emsdk ready (emcmake available)"
 
 # -----------------------
-# Clone Ligetron
+# Ligetron submodule
 # -----------------------
-LIGETRON_DIR="${TP_DIR}/ligetron"
+LIGETRON_DIR="${SCRIPT_DIR}/ligero-prover"
 if [[ ! -d "${LIGETRON_DIR}" ]]; then
-  step "Cloning Ligetron"
-  git clone https://github.com/ligeroinc/ligero-prover.git "${LIGETRON_DIR}"
-else
-  step "Ligetron already present; pulling latest"
-  pushd "${LIGETRON_DIR}" >/dev/null
-  git pull || true
-  popd >/dev/null
+  step "Ligetron submodule not found; initializing"
+  git -C "${REPO_ROOT}" submodule update --init --recursive ligetron/ligero-prover || {
+    warn "Failed to init submodule. Run: git submodule update --init --recursive"; exit 1; }
 fi
+ok "Ligetron submodule ready"
 
 # -----------------------
 # Build Ligetron SDK (Web)
 # -----------------------
 step "Building Ligetron SDK with emscripten"
 pushd "${LIGETRON_DIR}/sdk" >/dev/null
+if [[ "${REINSTALL}" == "1" ]]; then
+  # Clean stale build cache
+  rm -rf build
+fi
 mkdir -p build
 pushd build >/dev/null
 # Ensure emsdk env is live for this subshell
@@ -153,6 +184,10 @@ ok "Ligetron SDK built"
 # -----------------------
 step "Building Ligetron native (Release)"
 pushd "${LIGETRON_DIR}" >/dev/null
+if [[ "${REINSTALL}" == "1" ]]; then
+  # Clean stale build cache
+  rm -rf build
+fi
 mkdir -p build
 pushd build >/dev/null
 cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -164,10 +199,6 @@ ok "Ligetron native built"
 # -----------------------
 # Run demo prover & verifier
 # -----------------------
-bash "$(dirname "$0")/benchmark.sh" --ligetron-dir "${LIGETRON_DIR}"
+bash ../benchmark.sh --system-dir "${SCRIPT_DIR}"
 
 ok "All done!"
-echo
-echo "Binaries: ${LIGETRON_DIR}/build"
-echo "SDK wasm: ${LIGETRON_DIR}/sdk/build/examples/edit.wasm"
-echo "If you need the Web build later, set CMAKE_PREFIX_PATH to your dependency prefixes and build in ${LIGETRON_DIR}/build-web."
