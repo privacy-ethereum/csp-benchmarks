@@ -35,7 +35,7 @@ jobs:
       - name: Setup & build Ligero
         uses: ./.github/actions/install-ligero
         with:
-          ligero_path: ./ligero
+          ligero_path: ./ligero/third_party/ligetron
           dawn_commit: 41d631c0cbcd46ddc723222fc80890f4305dbc65
           install_prefix: ${{ github.workspace }}/.deps/install
           cmake_build_type: Release

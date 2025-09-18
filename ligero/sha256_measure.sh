@@ -14,12 +14,9 @@ OUT_JSON="${SIZES_JSON:-}"
 # Run one proving cycle to generate artifacts for measurement
 "$SCRIPT_DIR/sha256_prove.sh" >/dev/null 2>&1 || true
 
-# In Ligero, the prover writes a proof file named proof.data in the current working directory.
-# benchmark.sh runs from the repo root, so check $PWD first; then fall back to other locations.
+# In Ligetron, the prover writes a proof file named proof.data in the current working directory.
 CANDIDATES=(
   "${PWD}/proof.data"
-  #"${SCRIPT_DIR}/../proof.data"
-  #"${SCRIPT_DIR}/proof.data"
 )
 
 proof_path=""
@@ -37,8 +34,12 @@ fi
 
 proof_size_bytes=$(stat -f %z "$proof_path" 2>/dev/null || stat -c %s "$proof_path")
 
-# TODO: preprocessing_size_bytes measurement (not yet implemented for Ligero)
-preprocessing_size_bytes=0
+# Preprocessing artifacts: WASM used by the prover and the prover binary itself
+WASM_PATH="${SCRIPT_DIR}/third_party/ligetron/sdk/build/examples/sha256.wasm"
+PROVER_BIN_PATH="${SCRIPT_DIR}/third_party/ligetron/build/webgpu_prover"
+wasm_size=$(stat -f %z "$WASM_PATH" 2>/dev/null || stat -c %s "$WASM_PATH")
+prover_size=$(stat -f %z "$PROVER_BIN_PATH" 2>/dev/null || stat -c %s "$PROVER_BIN_PATH")
+preprocessing_size_bytes=$(( wasm_size + prover_size ))
 
 json_output=$(jq -n \
   --argjson proof_size "$proof_size_bytes" \
