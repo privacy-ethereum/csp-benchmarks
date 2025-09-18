@@ -1,0 +1,3 @@
+[submodule "ligero/ligero-prover"]
+	path = ligero/ligero-prover
+	url = https://github.com/ligeroinc/ligero-prover.git
