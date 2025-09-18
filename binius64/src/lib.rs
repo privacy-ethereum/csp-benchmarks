@@ -28,7 +28,6 @@ fn setup_sha256(
     log_inv_rate: usize,
     key_collection: Option<KeyCollection>,
 ) -> Result<(StdVerifier, StdProver)> {
-    let _setup_guard = tracing::info_span!("Setup", log_inv_rate).entered();
     let parallel_compression = ParallelCompressionAdaptor::new(StdCompression::default());
     let compression = parallel_compression.compression().clone();
     let verifier = Verifier::setup(cs, log_inv_rate, compression)?;
@@ -44,8 +43,7 @@ fn setup_sha256(
 pub fn prepare(input_size: usize) -> Result<(StdVerifier, StdProver, ValueVec, ConstraintSystem)> {
     // Extract common arguments
     let log_inv_rate = 1;
-    let compression = CompressionType::Sha256;
-    tracing::info!("compression type: {compression:?}");
+    // let compression = CompressionType::Sha256;
 
     // Parse Params and Instance from matches
     let params = Params {
@@ -58,26 +56,20 @@ pub fn prepare(input_size: usize) -> Result<(StdVerifier, StdProver, ValueVec, C
     };
 
     // Build the circuit
-    let build_scope = tracing::info_span!("Building circuit").entered();
     let mut builder = CircuitBuilder::new();
     let example = Sha256Example::build(params, &mut builder)?;
     let circuit = builder.build();
-    drop(build_scope);
 
     // Set up prover and verifier
     let cs = circuit.constraint_system().clone();
 
     // Population of the input to the witness and then evaluating the circuit.
-    let witness_population = tracing::info_span!("Generating witness").entered();
     let mut filler = circuit.new_witness_filler();
-    tracing::info_span!("Input population")
-        .in_scope(|| example.populate_witness(instance, &mut filler))?;
-    tracing::info_span!("Circuit evaluation")
-        .in_scope(|| circuit.populate_wire_witness(&mut filler))?;
+    example.populate_witness(instance, &mut filler)?; // input population
+    circuit.populate_wire_witness(&mut filler)?; // circuit evaluation
     let witness = filler.into_value_vec();
-    drop(witness_population);
 
-    tracing::info!("Using SHA256 compression for Merkle tree");
+    // Using SHA256 compression for Merkle tree
     let (verifier, prover) = setup_sha256(cs.clone(), log_inv_rate as usize, None)?;
 
     Ok((verifier, prover, witness, cs))
@@ -99,7 +91,6 @@ where
     prover.prove(witness.clone(), &mut prover_transcript)?;
 
     let proof = prover_transcript.finalize();
-    tracing::info!("Proof size: {} KiB", proof.len() / 1024);
 
     Ok(proof)
 }
