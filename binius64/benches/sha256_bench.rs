@@ -1,6 +1,5 @@
 // Copyright 2024-2025 Irreducible Inc.
 
-use binius_core::ValuesData;
 use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_utils::serialization::SerializeBytes;
 use binius_verifier::hash::{StdCompression, StdDigest};
