@@ -20,7 +20,7 @@ fn sha256_bench(c: &mut Criterion) {
         write_json_metrics(&json_file, &metrics);
 
         // RAM measurement
-        let sha256_binary_name = "sha256_no_lookup_mem";
+        let sha256_binary_name = "sha256_mem";
         compile_binary(sha256_binary_name);
 
         let sha256_binary_path = format!("../target/release/{}", sha256_binary_name);
