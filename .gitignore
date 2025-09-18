@@ -20,3 +20,5 @@ Dockerfile
 rust-project.json
 tmp/
 *.json
+// Ligetron proof files
+*.data

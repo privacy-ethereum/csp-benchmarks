@@ -154,6 +154,6 @@ jobs:
           name: "benchmark-outputs-${{ matrix.folder }}"
           path: |
             ${{ matrix.folder }}/hyperfine_*.json
-            ${{ matrix.folder }}/*_mem_report_*.json
+            ${{ matrix.folder }}/*_mem_report.json
           if-no-files-found: warn
           retention-days: 30

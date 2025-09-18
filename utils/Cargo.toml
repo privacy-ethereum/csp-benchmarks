@@ -16,7 +16,12 @@ rand = { workspace = true }
 sha2 = { workspace = true }
 clap = { workspace = true }
 hex = { workspace = true }
+regex = "1"
 
 [[bin]]
 name = "collect_benchmarks"
 path = "src/bin/collect_benchmarks.rs"
+
+[[bin]]
+name = "format_hyperfine"
+path = "src/bin/format_hyperfine.rs"

@@ -62,24 +62,40 @@ for (( i=0; i<sizes_len; i++ )); do
   VERIFIER_JSON_FILE="$STATE_DIR/verifier_${INPUT_SIZE}.json"
 
   step "Prover (size ${INPUT_SIZE}):"
-  hyperfine --runs "$RUNS" \
+  hyperfine -u microsecond --runs "$RUNS" \
     --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
     "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
     --export-json "$SYSTEM_DIR/hyperfine_sha256_${INPUT_SIZE}_prover_metrics.json"
 
   step "Verifier (size ${INPUT_SIZE}):"
-  hyperfine --runs "$RUNS" \
+  hyperfine -u microsecond --runs "$RUNS" \
     --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
     "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
     --export-json "$SYSTEM_DIR/hyperfine_sha256_${INPUT_SIZE}_verifier_metrics.json"
 
   if [[ -f "$MEASURE_RAM_SCRIPT" ]]; then
     step "RAM measurement (size ${INPUT_SIZE})"
-    MEM_JSON="$SYSTEM_DIR/sha256_mem_report_${INPUT_SIZE}.json"
+    MEM_JSON="$SYSTEM_DIR/sha256_${INPUT_SIZE}_mem_report.json"
     bash "$MEASURE_RAM_SCRIPT" -o "$MEM_JSON" -- bash -lc "STATE_JSON=\"$PROVER_JSON_FILE\" bash \"$PROVE_SH\"" || warn "Memory measurement failed"
     ok "Memory report: $MEM_JSON"
   fi
 done
+
+step "Benchmark complete"
+step "Post-processing hyperfine outputs into Metrics JSONs"
+
+FORMATTER_BIN="${SCRIPT_DIR}/target/release/format_hyperfine"
+if [[ ! -x "$FORMATTER_BIN" ]]; then
+  step "Building format_hyperfine binary"
+  (cd "$SCRIPT_DIR" && cargo build --release -p utils --bin format_hyperfine >/dev/null 2>&1) || warn "Failed to build format_hyperfine"
+fi
+
+if [[ -x "$FORMATTER_BIN" ]]; then
+  step "Formatting hyperfine outputs into Metrics JSON"
+  "$FORMATTER_BIN" --system-dir "$SYSTEM_DIR" || warn "format_hyperfine failed"
+else
+  warn "format_hyperfine binary not found; skipping formatting"
+fi
 
 ok "Benchmark complete"
 

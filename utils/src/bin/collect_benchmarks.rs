@@ -17,6 +17,7 @@ fn main() -> io::Result<()> {
         if path.is_dir() {
             let metrics_file_paths = find_metrics_files(&path);
             for metrics_file_path in metrics_file_paths {
+                println!("Extracting metrics from {}", metrics_file_path.display());
                 let metrics = extract_metrics(&path, &metrics_file_path)?;
                 benchmarks.push(metrics);
             }
@@ -60,6 +61,7 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> 
                 "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_prove/new/estimates.json"
             ))
         };
+        println!("Reading proof duration from {}", crit_path_p.display());
 
         let proof_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_p)?)?;
         if let Some(est) = proof_crit.get("mean").and_then(|m| m.get("point_estimate")) {
@@ -77,6 +79,7 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> 
                 "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_verify/new/estimates.json"
             ))
         };
+        println!("Reading verify duration from {}", crit_path_v.display());
         let verify_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_v)?)?;
         if let Some(est) = verify_crit
             .get("mean")
@@ -96,6 +99,7 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> 
                 "{target}_{input_size}_{proving_system}_{feat}_mem_report.json"
             ))
         };
+        println!("Reading peak memory from {}", mem_path.display());
         let mem: Value = serde_json::from_str(&fs::read_to_string(&mem_path)?)?;
         if let Some(m) = mem.get("peak_memory") {
             metrics.peak_memory = m.as_u64().unwrap() as usize;
