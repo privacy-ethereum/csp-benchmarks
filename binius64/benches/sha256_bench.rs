@@ -87,16 +87,6 @@ fn sha256_binius64_metrics(input_size: usize) -> Metrics {
     cs.serialize(&mut buf)
         .expect("Failed to serialize constraint system into byte array");
 
-    let pub_witness_data = ValuesData::from(witness.public());
-    pub_witness_data
-        .serialize(&mut buf)
-        .expect("Failed to serialize public witness into byte array");
-
-    let non_pub_witness_data = ValuesData::from(witness.non_public());
-    non_pub_witness_data
-        .serialize(&mut buf)
-        .expect("Failed to serialize non public witness into byte array");
-
     metrics.preprocessing_size = buf.len();
 
     let proof = prove::<StdDigest, StdCompression, ParallelCompressionAdaptor<StdCompression>>(
