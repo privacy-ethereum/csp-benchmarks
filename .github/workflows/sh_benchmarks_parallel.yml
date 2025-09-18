@@ -26,6 +26,8 @@ env:
 
 jobs:
   prepare-deps:
+    needs: detect-folders
+    if: ${{ needs.detect-folders.outputs.folders != '' && needs.detect-folders.outputs.folders != '[]' }}
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +41,6 @@ jobs:
           cmake_build_type: Release
 
   detect-folders:
-    needs: prepare-deps
     runs-on: macos-latest
     outputs:
       folders: ${{ steps.set.outputs.folders }}

@@ -25,48 +25,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
 jobs:
-  prepare-cache:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Cache everything
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin
-            ~/.cargo/registry/index
-            ~/.cargo/registry/cache
-            ~/.cargo/git/db
-            ~/.rustup
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
-
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2025-08-18-aarch64-apple-darwin
-          override: true
-          profile: default
-          default: true
-          components: llvm-tools, rustc-dev, rustfmt, clippy
-
-      - name: Install Powdr
-        uses: ./.github/actions/install-powdr
-
-      - name: Install nightly-2024-08-01 with rust-src for Powdr
-        run: rustup toolchain install nightly-2024-08-01 --component rust-src
-
-      - name: Install OpenMPI for polyhedra-expander
-        uses: ./.github/actions/install-ompi
-
-      - name: Build full workspace (release)
-        run: cargo build --release --workspace
-
   detect-crates:
-    needs: prepare-cache
     runs-on: macos-latest
     outputs:
       crates: ${{ steps.set.outputs.crates }}
@@ -137,6 +96,48 @@ jobs:
 
           echo "Detected changed crates: '$json'"
           echo "crates=$json" >> "$GITHUB_OUTPUT"
+
+  prepare-cache:
+    needs: detect-crates
+    if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache everything
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            ~/.rustup
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2025-08-18-aarch64-apple-darwin
+          override: true
+          profile: default
+          default: true
+          components: llvm-tools, rustc-dev, rustfmt, clippy
+
+      - name: Install Powdr
+        uses: ./.github/actions/install-powdr
+
+      - name: Install nightly-2024-08-01 with rust-src for Powdr
+        run: rustup toolchain install nightly-2024-08-01 --component rust-src
+
+      - name: Install OpenMPI for polyhedra-expander
+        uses: ./.github/actions/install-ompi
+
+      - name: Build full workspace (release)
+        run: cargo build --release --workspace
 
   bench:
     if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
