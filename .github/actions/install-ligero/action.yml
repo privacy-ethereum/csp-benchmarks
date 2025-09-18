@@ -142,6 +142,13 @@ runs:
         path: ${{ inputs.ligero_path }}/sdk/build
         key: sdk-build-${{ runner.os }}-${{ hashFiles(format('{0}/sdk/CMakeLists.txt', inputs.ligero_path)) }}-${{ hashFiles(format('{0}/sdk/src/**', inputs.ligero_path)) }}
 
+    - name: Reset SDK CMake cache (avoid stale EMSDK toolchain paths)
+      shell: bash
+      run: |
+        set -euo pipefail
+        rm -f "${{ inputs.ligero_path }}/sdk/build/CMakeCache.txt"
+        rm -rf "${{ inputs.ligero_path }}/sdk/build/CMakeFiles"
+
     - name: Build SDK (emscripten)
       shell: bash
       run: |
