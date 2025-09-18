@@ -11,8 +11,8 @@ set -euo pipefail
 : "${STATE_JSON:?STATE_JSON is required}"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROGRAM_PATH="${SCRIPT_DIR}/third_party/ligetron/sdk/build/examples/sha256.wasm"
-SHADER_PATH="${SCRIPT_DIR}/third_party/ligetron/shader"
+PROGRAM_PATH="${SCRIPT_DIR}/ligero-prover/sdk/build/examples/sha256.wasm"
+SHADER_PATH="${SCRIPT_DIR}/ligero-prover/shader"
 
 GEN="$("$UTILS_BIN" sha256 -n "$INPUT_SIZE")"
 MSG="$(printf "%s\n" "$GEN" | sed -n '1p')"

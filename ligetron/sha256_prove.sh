@@ -7,6 +7,6 @@ set -euo pipefail
 : "${STATE_JSON:?STATE_JSON is required}"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec "$SCRIPT_DIR/third_party/ligetron/build/webgpu_verifier" "$(cat "$STATE_JSON")"
+exec "$SCRIPT_DIR/ligero-prover/build/webgpu_prover" "$(cat "$STATE_JSON")"
 
 

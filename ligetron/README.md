@@ -4,15 +4,19 @@ Ligetron platform is using a [Ligero ZK proving system](https://eprint.iacr.org/
 
 ## Installation & Test Run
 
-On macOS:
+### On OSX
+
+From the root directory:
 
 ```bash
+cd ligetron
 ./osx_local_setup.sh
 ```
 
 ## Benchmarking
 
 ```bash
+cd ../
 cargo build --release -p utils
 ./benchmark.sh
 ```

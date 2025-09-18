@@ -35,8 +35,8 @@ fi
 proof_size_bytes=$(stat -f %z "$proof_path" 2>/dev/null || stat -c %s "$proof_path")
 
 # Preprocessing artifacts: WASM used by the prover and the prover binary itself
-WASM_PATH="${SCRIPT_DIR}/third_party/ligetron/sdk/build/examples/sha256.wasm"
-PROVER_BIN_PATH="${SCRIPT_DIR}/third_party/ligetron/build/webgpu_prover"
+WASM_PATH="${SCRIPT_DIR}/ligero-prover/sdk/build/examples/sha256.wasm"
+PROVER_BIN_PATH="${SCRIPT_DIR}/ligero-prover/build/webgpu_prover"
 wasm_size=$(stat -f %z "$WASM_PATH" 2>/dev/null || stat -c %s "$WASM_PATH")
 prover_size=$(stat -f %z "$PROVER_BIN_PATH" 2>/dev/null || stat -c %s "$PROVER_BIN_PATH")
 preprocessing_size_bytes=$(( wasm_size + prover_size ))
