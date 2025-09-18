@@ -2,15 +2,18 @@
 set -euo pipefail
 
 # Generic benchmark orchestrator for non-Rust systems.
-# Usage: benchmark.sh --system-dir <path>
+# Usage: benchmark.sh --system-dir <path> [--targets "sha256,poseidon,..."]
 
 SYSTEM_DIR=""
 RUNS=10
+TARGETS=("sha256")
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --system-dir)
       SYSTEM_DIR="$2"; shift 2 ;;
+    --targets)
+      IFS=',' read -r -a TARGETS <<< "$2"; shift 2 ;;
     *)
       echo "Unknown argument: $1" >&2; exit 2 ;;
   esac
@@ -39,14 +42,6 @@ if [[ ! -x "$UTILS_BIN" ]]; then
   exit 1
 fi
 
-PREPARE_SH="${SYSTEM_DIR}/prepare.sh"
-PROVE_SH="${SYSTEM_DIR}/prove.sh"
-VERIFY_SH="${SYSTEM_DIR}/verify.sh"
-
-for f in "$PREPARE_SH" "$PROVE_SH" "$VERIFY_SH"; do
-  [[ -x "$f" ]] || { echo "required script not executable: $f" >&2; exit 1; }
-done
-
 step "Running benchmarks for system: $SYSTEM_DIR"
 
 sizes_len="$($UTILS_BIN sizes len)"
@@ -55,30 +50,47 @@ sizes_len="$($UTILS_BIN sizes len)"
 STATE_DIR="$SYSTEM_DIR/.bench_state"
 mkdir -p "$STATE_DIR"
 
-for (( i=0; i<sizes_len; i++ )); do
-  INPUT_SIZE="$($UTILS_BIN sizes get --index "$i")"
+for target in "${TARGETS[@]}"; do
+  TARGET="$target"
 
-  PROVER_JSON_FILE="$STATE_DIR/prover_${INPUT_SIZE}.json"
-  VERIFIER_JSON_FILE="$STATE_DIR/verifier_${INPUT_SIZE}.json"
+  PREPARE_SH="${SYSTEM_DIR}/${TARGET}_prepare.sh"
+  PROVE_SH="${SYSTEM_DIR}/${TARGET}_prove.sh"
+  VERIFY_SH="${SYSTEM_DIR}/${TARGET}_verify.sh"
+  MEASURE_SH="${SYSTEM_DIR}/${TARGET}_measure.sh"
 
-  step "Prover (size ${INPUT_SIZE}):"
-  hyperfine -u microsecond --runs "$RUNS" \
-    --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
-    "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
-    --export-json "$SYSTEM_DIR/hyperfine_sha256_${INPUT_SIZE}_prover_metrics.json"
+  if [[ ! -x "$PREPARE_SH" ]]; then
+    warn "Skipping target $TARGET: prepare script not found/executable"
+    continue
+  fi
 
-  step "Verifier (size ${INPUT_SIZE}):"
-  hyperfine -u microsecond --runs "$RUNS" \
-    --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
-    "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
-    --export-json "$SYSTEM_DIR/hyperfine_sha256_${INPUT_SIZE}_verifier_metrics.json"
+  for (( i=0; i<sizes_len; i++ )); do
+    INPUT_SIZE="$($UTILS_BIN sizes get --index "$i")"
 
-  if [[ -f "$MEASURE_RAM_SCRIPT" ]]; then
-    step "RAM measurement (size ${INPUT_SIZE})"
-    MEM_JSON="$SYSTEM_DIR/sha256_${INPUT_SIZE}_mem_report.json"
+    PROVER_JSON_FILE="$STATE_DIR/prover_${INPUT_SIZE}.json"
+    VERIFIER_JSON_FILE="$STATE_DIR/verifier_${INPUT_SIZE}.json"
+
+    step "[$TARGET] Prover (size ${INPUT_SIZE}):"
+    hyperfine --runs "$RUNS" \
+      --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
+      "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
+      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json"
+
+    step "[$TARGET] Verifier (size ${INPUT_SIZE}):"
+    hyperfine --runs "$RUNS" \
+      --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
+      "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
+      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
+
+    step "[$TARGET] RAM measurement (size ${INPUT_SIZE})"
+    MEM_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_mem_report.json"
     bash "$MEASURE_RAM_SCRIPT" -o "$MEM_JSON" -- bash -lc "STATE_JSON=\"$PROVER_JSON_FILE\" bash \"$PROVE_SH\"" || warn "Memory measurement failed"
     ok "Memory report: $MEM_JSON"
-  fi
+
+    step "[$TARGET] Size measurement (size ${INPUT_SIZE})"
+    SIZES_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_sizes.json"
+    SIZES_JSON="$SIZES_JSON" STATE_JSON="$PROVER_JSON_FILE" bash "$MEASURE_SH" || warn "Size measurement failed"
+    ok "Sizes report: $SIZES_JSON"
+  done
 done
 
 step "Benchmark complete"

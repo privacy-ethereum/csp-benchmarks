@@ -77,10 +77,13 @@ fn main() -> std::io::Result<()> {
             "hyperfine_{target}_{input_size}_verifier_metrics.json"
         ));
         let mem_path = system_dir.join(format!("{target}_{input_size}_mem_report.json"));
+        let sizes_path = system_dir.join(format!("{target}_{input_size}_sizes.json"));
 
         // Parse hyperfine JSONs to extract mean seconds
         let prover_mean_sec = read_hyperfine_mean_seconds(&prover_path)?;
+        println!("Reading prover time from {}", prover_path.display());
         let verifier_mean_sec = read_hyperfine_mean_seconds(&verifier_path)?;
+        println!("Reading verifier time from {}", verifier_path.display());
 
         let mut metrics = Metrics::new(
             proving_system.clone(),
@@ -94,7 +97,16 @@ fn main() -> std::io::Result<()> {
 
         if mem_path.exists() {
             if let Ok(mem_bytes) = read_peak_memory_bytes(&mem_path) {
+                println!("Reading peak memory from {}", mem_path.display());
                 metrics.peak_memory = mem_bytes;
+            }
+        }
+
+        if sizes_path.exists() {
+            if let Ok((proof_size, preprocessing_size)) = read_sizes_bytes(&sizes_path) {
+                println!("Reading sizes from {}", sizes_path.display());
+                metrics.proof_size = proof_size;
+                metrics.preprocessing_size = preprocessing_size;
             }
         }
 
@@ -107,6 +119,7 @@ fn main() -> std::io::Result<()> {
         let _ = fs::remove_file(&prover_path);
         let _ = fs::remove_file(&verifier_path);
         let _ = fs::remove_file(&mem_path);
+        let _ = fs::remove_file(&sizes_path);
     }
 
     Ok(())
@@ -130,6 +143,19 @@ fn read_peak_memory_bytes(path: &Path) -> std::io::Result<usize> {
         .and_then(|m| m.as_u64())
         .map(|n| n as usize)
         .ok_or_else(|| io_err("missing peak_memory"))
+}
+
+fn read_sizes_bytes(path: &Path) -> std::io::Result<(usize, usize)> {
+    let v: Value = serde_json::from_str(&fs::read_to_string(path)?)?;
+    let proof = v
+        .get("proof_size")
+        .and_then(|m| m.as_u64())
+        .ok_or_else(|| io_err("missing proof_size"))? as usize;
+    let prep = v
+        .get("preprocessing_size")
+        .and_then(|m| m.as_u64())
+        .unwrap_or(0) as usize;
+    Ok((proof, prep))
 }
 
 fn to_duration_ns(seconds: f64) -> Duration {

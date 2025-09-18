@@ -201,7 +201,7 @@ jobs:
           name: "criterion-${{ matrix.crate }}"
           path: ./target/criterion
           retention-days: 30
-      
+
       - name: Collect benchmarks
         run: |
           cd utils
