@@ -17,7 +17,7 @@ use binius_verifier::{
 use sha2::digest::{Digest, FixedOutputReset, Output, core_api::BlockSizeUser};
 
 use binius_examples::{
-    CompressionType, ExampleCircuit, StdProver, StdVerifier,
+    ExampleCircuit, StdProver, StdVerifier,
     circuits::sha256::{Instance, Params, Sha256Example},
 };
 
