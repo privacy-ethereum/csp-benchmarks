@@ -70,7 +70,7 @@ for target in "${TARGETS[@]}"; do
     VERIFIER_JSON_FILE="$STATE_DIR/verifier_${INPUT_SIZE}.json"
 
     step "[$TARGET] Prover (size ${INPUT_SIZE}):"
-    hyperfine --runs "$RUNS" \
+    hyperfine --show-output --runs "$RUNS" \
       --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
       "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
       --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json"
