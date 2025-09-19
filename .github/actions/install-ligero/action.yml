@@ -156,14 +156,12 @@ runs:
     - name: Cache native build
       id: cache-native
       uses: actions/cache@v4
-      if: ${{ inputs.build_native == 'true' }}
       with:
         path: ${{ inputs.ligero_path }}/build
         key: native-build-${{ runner.os }}-Release-${{ hashFiles(format('{0}/CMakeLists.txt', inputs.ligero_path)) }}-${{ hashFiles(format('{0}/src/**', inputs.ligero_path)) }}
 
     - name: Configure & build native
       shell: bash
-      if: ${{ inputs.build_native == 'true' }}
       run: |
         set -euo pipefail
         cmake -S "${{ inputs.ligero_path }}" -B "${{ inputs.ligero_path }}/build" \
