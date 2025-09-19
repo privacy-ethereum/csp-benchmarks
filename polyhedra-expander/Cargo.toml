@@ -8,6 +8,7 @@ build = "build.rs"
 bin = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
 circuit = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
 circuit-std-rs = { git = "https://github.com/PolyhedraZK/ExpanderCompilerCollection" }
+clap = { workspace = true }
 expander_compiler = { git = "https://github.com/PolyhedraZK/ExpanderCompilerCollection" }
 gkr = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
 gkr_engine = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
@@ -30,8 +31,8 @@ name = "prove_verify"
 harness = false
 
 [[bin]]
-name = "measure"
-path = "src/bin/measure.rs"
+name = "sha256_mem"
+path = "src/bin/sha256_mem.rs"
 
 [profile.release]
 opt-level = 3

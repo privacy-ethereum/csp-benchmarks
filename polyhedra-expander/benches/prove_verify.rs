@@ -5,6 +5,8 @@ use sha256_expander_benchmark::bench::prepare;
 use sha256_expander_benchmark::bench::prove;
 use sha256_expander_benchmark::bench::verify;
 use utils::bench::Metrics;
+use utils::bench::compile_binary;
+use utils::bench::run_measure_mem_script;
 use utils::bench::write_json_metrics;
 use utils::metadata::SHA2_INPUTS;
 
@@ -12,13 +14,20 @@ fn criterion_benchmarks(c: &mut Criterion) {
     let universe = MPIConfig::init().expect("Failed to initialize MPI");
     let world = universe.world();
     let mpi_config = MPIConfig::prover_new(Some(&universe), Some(&world));
-
     for input_size in SHA2_INPUTS {
         // Measure the metrics
         let metrics = sha256_expander_metrics(input_size, mpi_config.clone());
 
         let json_file = format!("sha256_{input_size}_expander_metrics.json");
         write_json_metrics(&json_file, &metrics);
+
+        // RAM measurement
+        let sha256_binary_name = "sha256_mem";
+        compile_binary(sha256_binary_name);
+
+        let sha256_binary_path = format!("../target/release/{}", sha256_binary_name);
+        let json_file = format!("sha256_{}_expander_mem_report.json", input_size);
+        run_measure_mem_script(&json_file, &sha256_binary_path, input_size);
 
         let mut group = c.benchmark_group(format!("sha256_{input_size}_expander"));
         group.sample_size(10);

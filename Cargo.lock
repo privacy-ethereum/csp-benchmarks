@@ -8162,6 +8162,7 @@ dependencies = [
  "bin",
  "circuit",
  "circuit-std-rs",
+ "clap",
  "criterion",
  "expander_compiler",
  "gkr",
