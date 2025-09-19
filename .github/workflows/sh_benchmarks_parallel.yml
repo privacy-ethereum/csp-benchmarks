@@ -25,24 +25,6 @@ env:
   GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
 jobs:
-  prepare-deps:
-    needs: detect-folders
-    if: ${{ needs.detect-folders.outputs.folders != '' && needs.detect-folders.outputs.folders != '[]' }}
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Setup & build Ligetron
-        uses: ./.github/actions/install-ligero
-        with:
-          ligero_path: ./ligetron/ligero-prover
-          dawn_commit: 41d631c0cbcd46ddc723222fc80890f4305dbc65
-          install_prefix: ${{ github.workspace }}/.deps/install
-          cmake_build_type: Release
-
   detect-folders:
     runs-on: macos-latest
     outputs:
@@ -104,7 +86,7 @@ jobs:
 
   run-benchmarks:
     if: ${{ needs.detect-folders.outputs.folders != '' && needs.detect-folders.outputs.folders != '[]' }}
-    needs: [prepare-deps, detect-folders]
+    needs: [detect-folders]
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -116,6 +98,14 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+
+      - name: Setup & build Ligetron (only when folder is ligetron)
+        if: ${{ matrix.folder == 'ligetron' }}
+        uses: ./.github/actions/install-ligero
+        with:
+          ligero_path: ./ligetron/ligero-prover
+          dawn_commit: 41d631c0cbcd46ddc723222fc80890f4305dbc65
+          install_prefix: ${{ github.workspace }}/.deps/install
 
       - name: Ensure jq present
         run: |
