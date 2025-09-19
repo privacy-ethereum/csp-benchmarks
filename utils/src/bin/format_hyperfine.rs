@@ -95,19 +95,19 @@ fn main() -> std::io::Result<()> {
         metrics.proof_duration = to_duration_ns(prover_mean_sec);
         metrics.verify_duration = to_duration_ns(verifier_mean_sec);
 
-        if mem_path.exists() {
-            if let Ok(mem_bytes) = read_peak_memory_bytes(&mem_path) {
-                println!("Reading peak memory from {}", mem_path.display());
-                metrics.peak_memory = mem_bytes;
-            }
+        if mem_path.exists()
+            && let Ok(mem_bytes) = read_peak_memory_bytes(&mem_path)
+        {
+            println!("Reading peak memory from {}", mem_path.display());
+            metrics.peak_memory = mem_bytes;
         }
 
-        if sizes_path.exists() {
-            if let Ok((proof_size, preprocessing_size)) = read_sizes_bytes(&sizes_path) {
-                println!("Reading sizes from {}", sizes_path.display());
-                metrics.proof_size = proof_size;
-                metrics.preprocessing_size = preprocessing_size;
-            }
+        if sizes_path.exists()
+            && let Ok((proof_size, preprocessing_size)) = read_sizes_bytes(&sizes_path)
+        {
+            println!("Reading sizes from {}", sizes_path.display());
+            metrics.proof_size = proof_size;
+            metrics.preprocessing_size = preprocessing_size;
         }
 
         let out_file = system_dir.join(format!(
@@ -131,7 +131,7 @@ fn read_hyperfine_mean_seconds(path: &Path) -> std::io::Result<f64> {
         .get("results")
         .and_then(|r| r.as_array())
         .ok_or_else(|| io_err("missing results array"))?;
-    let first = results.get(0).ok_or_else(|| io_err("results empty"))?;
+    let first = results.first().ok_or_else(|| io_err("results empty"))?;
     let rec: HyperfineRecord =
         serde_json::from_value(first.clone()).map_err(|_| io_err("invalid hyperfine record"))?;
     Ok(rec.mean)
@@ -164,5 +164,5 @@ fn to_duration_ns(seconds: f64) -> Duration {
 }
 
 fn io_err(msg: &str) -> std::io::Error {
-    std::io::Error::new(std::io::ErrorKind::Other, msg)
+    std::io::Error::other(msg)
 }

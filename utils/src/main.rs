@@ -50,7 +50,7 @@ fn main() {
             let mut rng = rand::thread_rng();
             let mut message = String::with_capacity(size);
             for _ in 0..size {
-                let idx = rng.sample(&dist);
+                let idx = rng.sample(dist);
                 message.push(alphabet[idx]);
             }
 

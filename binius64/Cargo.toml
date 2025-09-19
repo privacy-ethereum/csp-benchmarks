@@ -1,0 +1,32 @@
+[package]
+name = "binius64"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+rand = { workspace = true }
+tracing = { workspace = true }
+criterion = { workspace = true }
+utils = { workspace = true }
+sha2 = { workspace = true }
+
+tracing-profile = "0.10.3"
+binius-frontend = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-circuits = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-examples = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-prover = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-verifier = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-core = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-utils = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+
+[[bench]]
+name = "sha256_bench"
+harness = false
+
+[[bin]]
+name = "sha256_mem"
+path = "src/bin/sha256_mem.rs"
