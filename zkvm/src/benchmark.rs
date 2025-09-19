@@ -1,9 +1,10 @@
 //! Benchmark module.
 
 use crate::traits::{BenchmarkConfig, DataGenerator, InputBuilder, Program, ZkVMBuilder};
-use std::{fs::canonicalize, marker::PhantomData, time::Instant};
+use std::path::PathBuf;
+use std::{marker::PhantomData, time::Instant};
 use utils::bench::Metrics;
-use zkvm_interface::{Compiler, PublicValues, zkVM, zkVMError};
+use zkvm_interface::{Compiler, Input, PublicValues, zkVM, zkVMError};
 
 /// Benchmark instance struct
 pub struct Benchmark<C, V>
@@ -29,10 +30,15 @@ where
         bench_name: &str,
         vm_builder: &impl ZkVMBuilder<C, V>,
     ) -> Result<Self, C::Error> {
-        let guest_path = canonicalize("guests")
-            .unwrap()
-            .join(vm_name)
-            .join(bench_name);
+        let project_root: PathBuf = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let guest_path = project_root.join("guests").join(vm_name).join(bench_name);
+
+        assert!(
+            guest_path.exists(),
+            "Guest path does not exist: {}",
+            guest_path.display()
+        );
+
         let program = compiler.compile(&guest_path)?;
         let vm = vm_builder.build(program).unwrap();
 
@@ -45,7 +51,7 @@ where
     }
 
     /// Benchmark runner.
-    pub fn run<P, B, G>(
+    pub fn bench<P, B, G>(
         &self,
         generator: &G,
         config: &B,
@@ -86,5 +92,26 @@ where
         metrics.proof_size = proof.len();
 
         Ok((public_values, metrics))
+    }
+
+    /// Executes the program and returns the output.
+    /// This method doesn't do any measurement.
+    pub fn execute<P, B, G>(
+        &self,
+        generator: &G,
+        config: &B,
+    ) -> Result<(Input, usize, Vec<u8>), zkVMError>
+    where
+        P: Program,
+        B: BenchmarkConfig,
+        G: DataGenerator<B, Data = <V as InputBuilder<P>>::Data>,
+        V: InputBuilder<P>,
+    {
+        let (data, size) = generator.generate(config);
+        let input = V::build_input(data);
+
+        let (raw_public_values, _) = self.vm.execute(&input)?;
+
+        Ok((input, size, raw_public_values))
     }
 }

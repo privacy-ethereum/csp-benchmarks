@@ -7,7 +7,6 @@ members = [
     "provekit",
     "polyhedra-expander",
     "utils",
-    "ere/miden",
 ]
 exclude = ["zkvm"]
 
