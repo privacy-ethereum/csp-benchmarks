@@ -15,9 +15,7 @@ use gkr_hashers::SHA256hasher;
 use mersenne31::M31;
 use mersenne31::M31Ext3;
 use poly_commit::OrionPCSForGKR;
-use rand::RngCore;
 use serdes::ExpSerde;
-use sha2::{Digest, Sha256};
 use transcript::BytesHashTranscript;
 
 // Constants and circuit definition
@@ -106,15 +104,11 @@ macro_rules! prepare_arm {
         let compile_result =
             compile(&$Circuit::<Variable>::default(), CompileOptions::default()).unwrap();
 
-        let mut rng = rand::thread_rng();
         const LEN: usize = $LEN;
-        let data = [rng.next_u32() as u8; LEN];
-        let mut hash = Sha256::new();
-        hash.update(data);
-        let output = hash.finalize();
+        let (message_bytes, output) = utils::generate_sha256_input(LEN);
 
         let mut assignment = $Circuit::<M31>::default();
-        for (i, input_byte) in data.iter().enumerate().take(LEN) {
+        for (i, input_byte) in message_bytes.iter().enumerate().take(LEN) {
             assignment.input[i] = M31::from(*input_byte as u32);
         }
         for i in 0..OUTPUT_LEN {

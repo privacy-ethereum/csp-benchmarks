@@ -1,5 +1,4 @@
 use noir_r1cs::{NoirProof, NoirProofScheme};
-use rand::RngCore;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
@@ -38,8 +37,6 @@ impl ProvekitSha256Benchmark {
             );
         }
 
-        let mut rng = rand::thread_rng();
-
         let package_name = format!("sha256_bench_{input_size}");
         let circuit_path = workspace_root
             .join("target")
@@ -52,8 +49,7 @@ impl ProvekitSha256Benchmark {
         let circuit_member_dir = workspace_root.join(CIRCUIT_SUB_PATH).join(dir_name);
         fs::create_dir_all(&circuit_member_dir).expect("Failed to create circuit dir");
 
-        let mut data = vec![0u8; input_size];
-        rng.fill_bytes(&mut data);
+        let (data, _digest) = utils::generate_sha256_input(input_size);
         let toml_content = format!(
             "input = [{}]\ninput_len = {input_size}",
             data.iter()

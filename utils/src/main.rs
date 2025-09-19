@@ -1,7 +1,5 @@
 use clap::{Parser, Subcommand};
 use hex::ToHex;
-use rand::RngCore;
-use sha2::{Digest, Sha256};
 
 /// CLI to generate benchmark inputs and query available sizes
 #[derive(Parser, Debug)]
@@ -45,13 +43,7 @@ fn main() {
 
     match cli.command {
         Command::Sha256 { size } => {
-            let mut message_bytes = vec![0u8; size];
-            rand::thread_rng().fill_bytes(&mut message_bytes);
-
-            let mut hasher = Sha256::new();
-            hasher.update(&message_bytes);
-            let digest = hasher.finalize().to_vec();
-
+            let (message_bytes, digest) = utils::generate_sha256_input(size);
             println!("{}", message_bytes.encode_hex::<String>());
             println!("{}", digest.encode_hex::<String>());
         }
