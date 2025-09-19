@@ -20,7 +20,7 @@ fn criterion_benchmarks(c: &mut Criterion) {
         let json_file = format!("sha256_{input_size}_expander_metrics.json");
         write_json_metrics(&json_file, &metrics);
 
-        let mut group = c.benchmark_group("sha256_expander");
+        let mut group = c.benchmark_group(format!("sha256_{input_size}_expander"));
         group.sample_size(10);
 
         // Proving benchmark
