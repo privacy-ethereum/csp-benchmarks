@@ -23,7 +23,7 @@ if [[ -z "$MSG" || -z "$HEX_NO_PREFIX" ]]; then
   exit 2
 fi
 
-JQ_PROG='{program:$prog, "shader-path":$shader, packing:8192, "private-indices":[1], args:[{str:$msg},{i64:$len},{hex:$dig}]}'
+JQ_PROG='{program:$prog, "shader-path":$shader, packing:8192, "private-indices":[1], args:[{hex:$msg},{i64:$len},{hex:$dig}]}'
 
 jq -nc \
   --arg prog "$PROGRAM_PATH" \

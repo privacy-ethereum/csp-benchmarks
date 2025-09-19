@@ -15,19 +15,9 @@ OUT_JSON="${SIZES_JSON:-}"
 "$SCRIPT_DIR/sha256_prove.sh" >/dev/null 2>&1 || true
 
 # In Ligetron, the prover writes a proof file named proof.data in the current working directory.
-CANDIDATES=(
-  "${PWD}/proof.data"
-)
+proof_path="${PWD}/proof.data"
 
-proof_path=""
-for p in "${CANDIDATES[@]}"; do
-  if [[ -f "$p" ]]; then
-    proof_path="$p"
-    break
-  fi
-done
-
-if [[ -z "$proof_path" ]]; then
+if [[ ! -f "$proof_path" ]]; then
   echo "proof.data not found for Ligero size measurement" >&2
   exit 1
 fi

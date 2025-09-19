@@ -11,7 +11,7 @@ use utils::bench::Metrics;
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Format hyperfine + RAM outputs into Metrics JSON and clean up", long_about = None)]
 struct Cli {
-    /// Path to the non-Rust system directory (e.g., ./ligero)
+    /// Path to the non-Rust system directory (e.g., ./ligetron)
     #[arg(long, value_name = "DIR", default_value = ".")]
     system_dir: String,
 
@@ -29,6 +29,7 @@ struct HyperfineRecord {
     mean: f64,
 }
 
+/// Formats hyperfine + RAM outputs into Metrics JSON and cleans up
 fn main() -> std::io::Result<()> {
     let cli = Cli::parse();
 

@@ -68,12 +68,6 @@ ok "Homebrew deps installed"
 # Prefer Xcode clang; if you want brew llvm, uncomment exports below.
 export CC="${CC:-clang}"
 export CXX="${CXX:-clang++}"
-# If you hit toolchain issues, you can force brew LLVM like this:
-# export CC="$(brew --prefix llvm)/bin/clang"
-# export CXX="$(brew --prefix llvm)/bin/clang++"
-# export LDFLAGS="-L$(brew --prefix llvm)/lib ${LDFLAGS:-}"
-# export CPPFLAGS="-I$(brew --prefix llvm)/include ${CPPFLAGS:-}"
-# export PATH="$(brew --prefix llvm)/bin:${PATH}"
 
 # -----------------------
 # Build Dawn (WebGPU)

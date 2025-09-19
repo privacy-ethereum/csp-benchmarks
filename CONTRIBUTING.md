@@ -153,7 +153,7 @@ GEN="$("$UTILS_BIN" sha256 -n "$INPUT_SIZE")"
 MSG="$(printf "%s\n" "$GEN" | sed -n '1p')"
 HEX_NO_PREFIX="$(printf "%s\n" "$GEN" | sed -n '2p')"
 
-JQ_PROG='{program:$prog, "shader-path":$shader, packing:8192, "private-indices":[1], args:[{str:$msg},{i64:$len},{hex:$dig}]}'
+JQ_PROG='{program:$prog, "shader-path":$shader, packing:8192, "private-indices":[1], args:[{hex:$msg},{i64:$len},{hex:$dig}]}'
 
 jq -nc \
   --arg prog "$PROGRAM_PATH" \

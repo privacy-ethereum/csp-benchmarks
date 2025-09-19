@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use hex::ToHex;
-use rand::{Rng, distributions::Uniform};
+use rand::RngCore;
 use sha2::{Digest, Sha256};
 
 /// CLI to generate benchmark inputs and query available sizes
@@ -13,7 +13,7 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Command {
-    /// Generate inputs for sha256: prints ASCII message then hex digest
+    /// Generate inputs for sha256: prints hex-encoded message bytes then hex digest
     Sha256 {
         /// Input size in bytes (default 15 to match existing non-Rust example)
         #[arg(long, short = 'n', default_value_t = 15)]
@@ -45,20 +45,14 @@ fn main() {
 
     match cli.command {
         Command::Sha256 { size } => {
-            let alphabet: Vec<char> = (b'a'..=b'z').map(char::from).collect();
-            let dist = Uniform::from(0..alphabet.len());
-            let mut rng = rand::thread_rng();
-            let mut message = String::with_capacity(size);
-            for _ in 0..size {
-                let idx = rng.sample(dist);
-                message.push(alphabet[idx]);
-            }
+            let mut message_bytes = vec![0u8; size];
+            rand::thread_rng().fill_bytes(&mut message_bytes);
 
             let mut hasher = Sha256::new();
-            hasher.update(message.as_bytes());
+            hasher.update(&message_bytes);
             let digest = hasher.finalize().to_vec();
 
-            println!("{}", message);
+            println!("{}", message_bytes.encode_hex::<String>());
             println!("{}", digest.encode_hex::<String>());
         }
         Command::Sizes {

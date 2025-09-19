@@ -1,6 +1,6 @@
 # Ligetron Benchmarks
 
-Ligetron platform is using a [Ligero ZK proving system](https://eprint.iacr.org/2022/1608.pdf).
+[Ligetron platform](https://github.com/ligeroinc/ligero-prover) is using a [Ligero ZK proving system](https://eprint.iacr.org/2022/1608.pdf).
 
 ## Installation & Test Run
 

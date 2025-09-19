@@ -104,7 +104,6 @@ jobs:
         uses: ./.github/actions/install-ligero
         with:
           ligero_path: ./ligetron/ligero-prover
-          dawn_commit: 41d631c0cbcd46ddc723222fc80890f4305dbc65
           install_prefix: ${{ github.workspace }}/.deps/install
 
       - name: Ensure jq present
@@ -128,7 +127,7 @@ jobs:
           override: true
           profile: minimal
 
-      - name: Build only utils (release)
+      - name: Build utils
         run: cargo build --release -p utils
 
       - name: Run benches in ${{ matrix.folder }}
