@@ -147,7 +147,19 @@ jobs:
         with:
           name: "benchmark-outputs-${{ matrix.folder }}"
           path: |
-            ${{ matrix.folder }}/hyperfine_*.json
-            ${{ matrix.folder }}/*_mem_report.json
+            ${{ matrix.folder }}/*_metrics.json
           if-no-files-found: warn
+          retention-days: 30
+
+      - name: Collect benchmarks
+        run: |
+          cd utils
+          cargo run --release --bin collect_benchmarks
+
+      - name: Upload collected reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "collected-benchmarks-${{ matrix.folder }}"
+          path: ./collected_benchmarks.json
           retention-days: 30
