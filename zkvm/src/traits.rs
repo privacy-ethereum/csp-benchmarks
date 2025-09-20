@@ -1,6 +1,6 @@
 //! Traits module.
 
-use zkvm_interface::{Compiler, Input, zkVM, zkVMError};
+use zkvm_interface::{Compiler, Input, zkVM};
 
 /// Program to be benchmarked
 pub trait Program {
@@ -26,5 +26,7 @@ pub trait InputBuilder<P: Program> {
 
 /// Build a zkVM instance with a loaded program
 pub trait ZkVMBuilder<C: Compiler, V: zkVM> {
-    fn build(&self, program: C::Program) -> Result<V, zkVMError>;
+    type Error: std::error::Error + Send + Sync + 'static;
+
+    fn build(&self, program: C::Program) -> Result<V, Self::Error>;
 }

@@ -1,0 +1,61 @@
+use.std::crypto::hashes::sha256
+
+#! Generic SHA-256 driver (uses stdlib `sha256::hash_memory`)
+#!
+#! Input (advice tape):
+#!   - First word: `len` (message length in bytes)
+#!   - Then, for each 16-byte block of the message (ceil(len/16) blocks):
+#!       4 × 32-bit **big-endian** message words, pushed in this order per block:
+#!       [w3, w2, w1, w0]
+#!     (This ordering matches how `mem_storew` consumes the stack in this program so
+#!      the block is written to memory as [w0, w1, w2, w3] at the destination.)
+#!
+#! Behavior:
+#!   - Writes the message into memory starting at address 10000 in 16-byte chunks.
+#!   - Calls `exec.sha256::hash_memory` with `[addr, len] = [10000, len]`.
+#!   - Leaves only the 8-word SHA-256 digest on the stack.
+#!
+#! Output (stack):
+#!   - [dig0, dig1, dig2, dig3, dig4, dig5, dig6, dig7]
+#!     (Eight 32-bit words of the SHA-256 digest, big-endian per word.)
+begin
+    # Read message length (bytes) from advice, keep a copy in mem[1]
+    adv_push.1
+    u32assert
+    dup
+    mem_store.1                    # mem[1] = len
+
+    # Compute number of 16-byte blocks: words16 = ceil(len / 16)
+    u32overflowing_add.15 assertz
+    u32div.16
+    mem_store.2                    # mem[2] = remaining 16B blocks
+
+    # Initialize base address (immutable pointer for hashing)
+    push.10000
+    mem_store.0                    # mem[0] = base
+
+    # For each 16B block: read 4×u32 (BE) from advice and store to memory
+    mem_load.2 u32assert neq.0
+    while.true
+        adv_push.1 u32assert       # w3
+        adv_push.1 u32assert       # w2
+        adv_push.1 u32assert       # w1
+        adv_push.1 u32assert       # w0
+        mem_load.0 mem_storew dropw
+
+        # Advance write pointer; decrement remaining block count
+        mem_load.0 u32overflowing_add.4 assertz mem_store.0
+        mem_load.2 u32overflowing_sub.1 assertz dup mem_store.2 u32assert neq.0
+    end
+    drop                            # drop loop flag
+
+    # Hash memory → digest (requires stack [addr, len] with addr on top)
+    mem_load.1                      # len
+    push.10000                      # addr
+    exec.sha256::hash_memory
+
+    # Truncate to keep only 8-word digest
+    swapdw
+    dropw
+    dropw
+end
