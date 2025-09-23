@@ -30,7 +30,7 @@ name = "acir_field"
 version = "1.0.0-beta.6"
 source = "git+https://github.com/noir-lang/noir?rev=v1.0.0-beta.6#e796dfd67726cbc28eb9991782533b211025928d"
 dependencies = [
- "ark-bn254 0.5.0",
+ "ark-bn254",
  "ark-ff 0.5.0",
  "ark-std 0.5.0",
  "cfg-if",
@@ -105,7 +105,6 @@ checksum = "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75"
 dependencies = [
  "cfg-if",
  "const-random",
- "getrandom 0.3.3",
  "once_cell",
  "version_check",
  "zerocopy",
@@ -127,42 +126,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
-name = "alloy-primitives"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0628ec0ba5b98b3370bb6be17b12f23bfce8ee4ad83823325a20546d9b03b78"
-dependencies = [
- "alloy-rlp",
- "bytes",
- "cfg-if",
- "const-hex",
- "derive_more",
- "hex-literal 0.4.1",
- "itoa",
- "ruint",
- "tiny-keccak",
-]
-
-[[package]]
 name = "alloy-rlp"
 version = "0.3.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f70d83b765fdc080dbcd4f4db70d8d23fe4761f2f02ebfa9146b833900634b4"
 dependencies = [
- "alloy-rlp-derive",
  "arrayvec",
  "bytes",
-]
-
-[[package]]
-name = "alloy-rlp-derive"
-version = "0.3.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64b728d511962dda67c1bc7ea7c03736ec275ed2cf4c35d9585298ac9ccf3b73"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.106",
 ]
 
 [[package]]
@@ -282,7 +252,7 @@ dependencies = [
  "ark-std 0.4.0",
  "criterion",
  "ethnum",
- "halo2curves 0.6.1 (git+https://github.com/PolyhedraZK/halo2curves)",
+ "halo2curves",
  "itertools 0.13.0",
  "log",
  "rand 0.8.5",
@@ -299,17 +269,6 @@ dependencies = [
  "ark-ec 0.4.2",
  "ark-ff 0.4.2",
  "ark-serialize 0.4.2",
- "ark-std 0.4.0",
-]
-
-[[package]]
-name = "ark-bn254"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a22f4561524cd949590d78d7d4c5df8f592430d221f7f3c9497bbafd8972120f"
-dependencies = [
- "ark-ec 0.4.2",
- "ark-ff 0.4.2",
  "ark-std 0.4.0",
 ]
 
@@ -531,7 +490,7 @@ version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ef677b59f5aff4123207c4dceb1c0ec8fdde2d4af7886f48be42ad864bfa0352"
 dependencies = [
- "ark-bn254 0.5.0",
+ "ark-bn254",
  "ark-ec 0.5.0",
  "ark-ff 0.5.0",
  "ark-std 0.5.0",
@@ -692,56 +651,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
 
 [[package]]
-name = "ascii-canvas"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8824ecca2e851cec16968d54a01dd372ef8f95b244fb84b84e70128be347c3c6"
-dependencies = [
- "term",
-]
-
-[[package]]
-name = "askama"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b79091df18a97caea757e28cd2d5fda49c6cd4bd01ddffd7ff01ace0c0ad2c28"
-dependencies = [
- "askama_derive",
- "askama_escape",
-]
-
-[[package]]
-name = "askama_derive"
-version = "0.12.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "19fe8d6cb13c4714962c072ea496f3392015f0989b1a2847bb4b2d9effd71d83"
-dependencies = [
- "askama_parser",
- "basic-toml",
- "mime",
- "mime_guess",
- "proc-macro2",
- "quote",
- "serde",
- "syn 2.0.106",
-]
-
-[[package]]
-name = "askama_escape"
-version = "0.10.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "619743e34b5ba4e9703bba34deac3427c72507c7159f5fd030aea8cac0cfe341"
-
-[[package]]
-name = "askama_parser"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "acb1161c6b64d1c3d83108213c2a2533a342ac225aabd0bda218278c2ddb00c0"
-dependencies = [
- "nom",
-]
-
-[[package]]
 name = "async-trait"
 version = "0.1.89"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -766,18 +675,6 @@ name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
-
-[[package]]
-name = "auto_enums"
-version = "0.8.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c170965892137a3a9aeb000b4524aa3cc022a310e709d848b6e1cdce4ab4781"
-dependencies = [
- "derive_utils",
- "proc-macro2",
- "quote",
- "syn 2.0.106",
-]
 
 [[package]]
 name = "auto_impl"
@@ -913,15 +810,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55248b47b0caf0546f7988906588779981c43bb1bc9d0c44087278f80cdb44ba"
 
 [[package]]
-name = "basic-toml"
-version = "0.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba62675e8242a4c4e806d12f11d136e626e6c8361d6b829310732241652a178a"
-dependencies = [
- "serde",
-]
-
-[[package]]
 name = "bech32"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1019,7 +907,7 @@ dependencies = [
  "binius-core",
  "binius-frontend",
  "cranelift-entity",
- "hex-literal 1.0.0",
+ "hex-literal",
  "num-bigint",
  "num-integer",
  "petgraph 0.8.2",
@@ -1028,7 +916,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
- "sha3 0.10.8",
+ "sha3",
  "smallvec",
 ]
 
@@ -1099,7 +987,7 @@ source = "git+https://github.com/IrreducibleOSS/binius64#f539683c8a6593d5d8df365
 dependencies = [
  "binius-core",
  "cranelift-entity",
- "hex-literal 1.0.0",
+ "hex-literal",
  "num-bigint",
  "num-integer",
  "petgraph 0.8.2",
@@ -1109,7 +997,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
- "sha3 0.10.8",
+ "sha3",
  "smallvec",
 ]
 
@@ -1238,27 +1126,12 @@ checksum = "0669d5a35b64fdb5ab7fb19cae13148b6b5cbdf4b8247faf54ece47f699c8cef"
 
 [[package]]
 name = "bit-set"
-version = "0.5.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0700ddab506f33b20a03b13996eccd309a48e5ff77d0d95926aa0210fb4e95f1"
-dependencies = [
- "bit-vec 0.6.3",
-]
-
-[[package]]
-name = "bit-set"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08807e080ed7f9d5433fa9b275196cfc35414f66a0c79d864dc51a0d825231a3"
 dependencies = [
- "bit-vec 0.8.0",
+ "bit-vec",
 ]
-
-[[package]]
-name = "bit-vec"
-version = "0.6.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "349f9b6a179ed607305526ca489b34ad0a41aed5f7980fa90eb03160b69598fb"
 
 [[package]]
 name = "bit-vec"
@@ -1382,16 +1255,6 @@ dependencies = [
 
 [[package]]
 name = "block-buffer"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4152116fd6e9dadb291ae18fc1ec3575ed6d84c29642d97890f4b4a3417297e4"
-dependencies = [
- "block-padding",
- "generic-array",
-]
-
-[[package]]
-name = "block-buffer"
 version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3078c7629b62d3f0439517fa394996acacc5cbc91c5a20d8c658e77abd503a71"
@@ -1419,19 +1282,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "block-padding"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
-
-[[package]]
 name = "bn254_blackbox_solver"
 version = "1.0.0-beta.6"
 source = "git+https://github.com/noir-lang/noir?rev=v1.0.0-beta.6#e796dfd67726cbc28eb9991782533b211025928d"
 dependencies = [
  "acir",
  "acvm_blackbox_solver",
- "ark-bn254 0.5.0",
+ "ark-bn254",
  "ark-ec 0.5.0",
  "ark-ff 0.5.0",
  "ark-grumpkin",
@@ -1623,7 +1480,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "57663b653d948a338bfb3eeba9bb2fd5fcfaecb9e199e87e1eda4d9e8b240fd9"
 dependencies = [
  "ciborium-io",
- "half 2.6.0",
+ "half",
 ]
 
 [[package]]
@@ -1672,7 +1529,7 @@ dependencies = [
  "gf2",
  "gkr",
  "gkr_hashers",
- "halo2curves 0.6.1 (git+https://github.com/PolyhedraZK/halo2curves)",
+ "halo2curves",
  "mersenne31",
  "num-bigint",
  "num-traits",
@@ -1771,7 +1628,7 @@ checksum = "3538270d33cc669650c4b093848450d380def10c331d38c768e34cac80576e6e"
 dependencies = [
  "serde",
  "termcolor",
- "unicode-width 0.1.14",
+ "unicode-width",
 ]
 
 [[package]]
@@ -1829,32 +1686,6 @@ dependencies = [
  "quote",
  "syn 2.0.106",
  "transcript",
-]
-
-[[package]]
-name = "console"
-version = "0.15.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "054ccb5b10f9f2cbf51eb355ca1d05c2d279ce1804688d0db74b4733a5aeafd8"
-dependencies = [
- "encode_unicode",
- "libc",
- "once_cell",
- "unicode-width 0.2.1",
- "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "const-hex"
-version = "1.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dccd746bf9b1038c0507b7cec21eb2b11222db96a2902c96e8c185d6d20fb9c4"
-dependencies = [
- "cfg-if",
- "cpufeatures",
- "hex",
- "proptest",
- "serde",
 ]
 
 [[package]]
@@ -2026,15 +1857,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "790eea4361631c5e7d22598ecd5723ff611904e3344ce8720784c93e3d83d40b"
 
 [[package]]
-name = "crossbeam-channel"
-version = "0.5.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "82b8f8f868b36967f9606790d1903570de9ceaf870a7bf9fbbd3016d636a2cb2"
-dependencies = [
- "crossbeam-utils",
-]
-
-[[package]]
 name = "crossbeam-deque"
 version = "0.8.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2184,20 +2006,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dashmap"
-version = "6.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5041cc499144891f3790297212f32a74fb938e5136a14943f338ef9e0ae276cf"
-dependencies = [
- "cfg-if",
- "crossbeam-utils",
- "hashbrown 0.14.5",
- "lock_api",
- "once_cell",
- "parking_lot_core",
-]
-
-[[package]]
 name = "data-encoding"
 version = "2.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2249,23 +2057,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "derive_utils"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ccfae181bab5ab6c5478b2ccb69e4c68a02f8c3ec72f6616bfec9dbc599d2ee0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.106",
-]
-
-[[package]]
-name = "diff"
-version = "0.1.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56254986775e3233ffa9c4d7d3faaf6d36a2c09d30b20687e9f88bc8bafc16c8"
-
-[[package]]
 name = "digest"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2280,7 +2071,7 @@ version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ed9a281f7bc9b7576e61468ba615a66a5c8cfdff42420a70aa82701a3b1e292"
 dependencies = [
- "block-buffer 0.10.4",
+ "block-buffer",
  "const-oid",
  "crypto-common",
  "subtle",
@@ -2323,19 +2114,6 @@ name = "dyn-clone"
 version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
-
-[[package]]
-name = "ecc"
-version = "0.1.0"
-source = "git+https://github.com/powdr-labs/halo2wrong?rev=77aae5158339afb4a79567b6124410432b113805#77aae5158339afb4a79567b6124410432b113805"
-dependencies = [
- "integer",
- "num-bigint",
- "num-integer",
- "num-traits",
- "rand 0.8.5",
- "subtle",
-]
 
 [[package]]
 name = "ecdsa"
@@ -2413,15 +2191,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
 
 [[package]]
-name = "ena"
-version = "0.14.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d248bdd43ce613d87415282f69b9bb99d947d290b10962dd6c56233312c2ad5"
-dependencies = [
- "log",
-]
-
-[[package]]
 name = "encode_unicode"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2450,17 +2219,6 @@ name = "enum-ordinalize-derive"
 version = "4.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d28318a75d4aead5c4db25382e8ef717932d0346600cacae6357eb5941bc5ff"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.106",
-]
-
-[[package]]
-name = "enumn"
-version = "0.1.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f9ed6b3789237c8a0c1c505af1c7eb2c560df6186f01b098c3a1064ea532f38"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2574,7 +2332,7 @@ dependencies = [
  "gkr_engine",
  "gkr_hashers",
  "goldilocks",
- "halo2curves 0.6.1 (git+https://github.com/PolyhedraZK/halo2curves)",
+ "halo2curves",
  "macros",
  "mersenne31",
  "mpi",
@@ -2605,12 +2363,6 @@ dependencies = [
  "indenter",
  "once_cell",
 ]
-
-[[package]]
-name = "fallible-iterator"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2acce4a10f12dc2fb14a218589d4f1f62ef011b2d0cc4b3cb1bba8e94da14649"
 
 [[package]]
 name = "fastrand"
@@ -2803,12 +2555,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gcd"
-version = "2.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d758ba1b47b00caf47f24925c0074ecb20d6dfcffe7f6d53395c0465674841a"
-
-[[package]]
 name = "generic-array"
 version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2877,7 +2623,7 @@ dependencies = [
  "ark-std 0.4.0",
  "cfg-if",
  "ethnum",
- "halo2curves 0.6.1 (git+https://github.com/PolyhedraZK/halo2curves)",
+ "halo2curves",
  "log",
  "rand 0.8.5",
  "raw-cpuid",
@@ -2903,11 +2649,6 @@ name = "gimli"
 version = "0.31.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "07e28edb80900c19c28f1072f2e8aeca7fa06b23cd4169cefe1af5aa3260783f"
-dependencies = [
- "fallible-iterator",
- "indexmap 2.11.0",
- "stable_deref_trait",
-]
 
 [[package]]
 name = "git2"
@@ -2939,7 +2680,7 @@ dependencies = [
  "gkr_engine",
  "gkr_hashers",
  "goldilocks",
- "halo2curves 0.6.1 (git+https://github.com/PolyhedraZK/halo2curves)",
+ "halo2curves",
  "log",
  "mersenne31",
  "mpi",
@@ -2981,7 +2722,7 @@ version = "0.1.0"
 source = "git+https://github.com/PolyhedraZK/Expander?branch=main#be01620e672429a2414cb37dfdbede2a263a4e99"
 dependencies = [
  "arith",
- "halo2curves 0.6.1 (git+https://github.com/PolyhedraZK/halo2curves)",
+ "halo2curves",
  "serdes",
  "sha2",
  "tiny-keccak",
@@ -2992,17 +2733,6 @@ name = "glob"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0cc23270f6e1808e30a928bdc84dea0b9b4136a8bc82338574f23baf47bbd280"
-
-[[package]]
-name = "goblin"
-version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b363a30c165f666402fe6a3024d3bec7ebc898f96a4a23bd1c99f8dbf3f4f47"
-dependencies = [
- "log",
- "plain",
- "scroll",
-]
 
 [[package]]
 name = "goldilocks"
@@ -3067,70 +2797,12 @@ dependencies = [
 
 [[package]]
 name = "half"
-version = "1.8.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b43ede17f21864e81be2fa654110bf1e793774238d86ef8555c37e6519c0403"
-
-[[package]]
-name = "half"
 version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "459196ed295495a68f7d7fe1d84f6c4b7ff0e21fe3017b2f283c6fac3ad803c9"
 dependencies = [
  "cfg-if",
  "crunchy",
-]
-
-[[package]]
-name = "halo2_proofs"
-version = "0.3.0"
-source = "git+https://github.com/powdr-labs/halo2.git?rev=fb8087565115ff38da4074b9d1777e9a97222caa#fb8087565115ff38da4074b9d1777e9a97222caa"
-dependencies = [
- "blake2b_simd",
- "ff",
- "group",
- "halo2curves 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "rand_chacha 0.3.1",
- "rand_core 0.6.4",
- "rayon",
- "sha3 0.9.1",
- "tracing",
-]
-
-[[package]]
-name = "halo2_solidity_verifier"
-version = "0.1.0"
-source = "git+https://github.com/powdr-labs/halo2-solidity-verifier.git?rev=ecae7fd2f62178c18b5fe18011630aa71da3371f#ecae7fd2f62178c18b5fe18011630aa71da3371f"
-dependencies = [
- "askama",
- "halo2_proofs",
- "hex",
- "itertools 0.11.0",
- "revm",
- "ruint",
- "sha3 0.10.8",
-]
-
-[[package]]
-name = "halo2curves"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db81d01d0bbfec9f624d7590fc6929ee2537a64ec1e080d8f8c9e2d2da291405"
-dependencies = [
- "blake2b_simd",
- "ff",
- "group",
- "lazy_static",
- "num-bigint",
- "num-traits",
- "pairing",
- "pasta_curves",
- "paste",
- "rand 0.8.5",
- "rand_core 0.6.4",
- "rayon",
- "static_assertions",
- "subtle",
 ]
 
 [[package]]
@@ -3155,17 +2827,6 @@ dependencies = [
  "static_assertions",
  "subtle",
  "unroll",
-]
-
-[[package]]
-name = "halo2wrong"
-version = "0.1.0"
-source = "git+https://github.com/powdr-labs/halo2wrong?rev=77aae5158339afb4a79567b6124410432b113805#77aae5158339afb4a79567b6124410432b113805"
-dependencies = [
- "halo2_proofs",
- "num-bigint",
- "num-integer",
- "num-traits",
 ]
 
 [[package]]
@@ -3285,12 +2946,6 @@ checksum = "5313b072ce3c597065a808dbf612c4c8e8590bdbf8b579508bf7a762c5eae6cd"
 dependencies = [
  "arrayvec",
 ]
-
-[[package]]
-name = "hex-literal"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
 
 [[package]]
 name = "hex-literal"
@@ -3557,19 +3212,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ibig"
-version = "0.3.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d1fcc7f316b2c079dde77564a1360639c1a956a23fa96122732e416cb10717bb"
-dependencies = [
- "cfg-if",
- "num-traits",
- "rand 0.8.5",
- "serde",
- "static_assertions",
-]
-
-[[package]]
 name = "icu_collections"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3746,42 +3388,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "indicatif"
-version = "0.17.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "183b3088984b400f4cfac3620d5e076c84da5364016b4f49473de574b2586235"
-dependencies = [
- "console",
- "number_prefix",
- "portable-atomic",
- "unicode-width 0.2.1",
- "web-time",
-]
-
-[[package]]
-name = "inferno"
-version = "0.11.21"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "232929e1d75fe899576a3d5c7416ad0d88dbfbb3c3d6aa00873a7408a50ddb88"
-dependencies = [
- "ahash",
- "clap",
- "crossbeam-channel",
- "crossbeam-utils",
- "dashmap",
- "env_logger 0.11.8",
- "indexmap 2.11.0",
- "is-terminal",
- "itoa",
- "log",
- "num-format",
- "once_cell",
- "quick-xml",
- "rgb",
- "str_stack",
-]
-
-[[package]]
 name = "inout"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3797,19 +3403,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf64c2edc8226891a71f127587a2861b132d2b942310843814d5001d99a1d307"
 dependencies = [
  "smallvec",
-]
-
-[[package]]
-name = "integer"
-version = "0.1.0"
-source = "git+https://github.com/powdr-labs/halo2wrong?rev=77aae5158339afb4a79567b6124410432b113805#77aae5158339afb4a79567b6124410432b113805"
-dependencies = [
- "maingate",
- "num-bigint",
- "num-integer",
- "num-traits",
- "rand 0.8.5",
- "subtle",
 ]
 
 [[package]]
@@ -4102,37 +3695,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lalrpop"
-version = "0.19.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a1cbf952127589f2851ab2046af368fd20645491bb4b376f04b7f94d7a9837b"
-dependencies = [
- "ascii-canvas",
- "bit-set 0.5.3",
- "diff",
- "ena",
- "is-terminal",
- "itertools 0.10.5",
- "lalrpop-util",
- "petgraph 0.6.5",
- "regex",
- "regex-syntax 0.6.29",
- "string_cache",
- "term",
- "tiny-keccak",
- "unicode-xid",
-]
-
-[[package]]
-name = "lalrpop-util"
-version = "0.19.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3c48237b9604c5a4702de6b824e02006c3214327564636aef27c1028a8fa0ed"
-dependencies = [
- "regex",
-]
-
-[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4267,19 +3829,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "maingate"
-version = "0.1.0"
-source = "git+https://github.com/powdr-labs/halo2wrong?rev=77aae5158339afb4a79567b6124410432b113805#77aae5158339afb4a79567b6124410432b113805"
-dependencies = [
- "halo2wrong",
- "num-bigint",
- "num-integer",
- "num-traits",
- "rand 0.8.5",
- "subtle",
-]
-
-[[package]]
 name = "matchers"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4331,7 +3880,7 @@ dependencies = [
  "cfg-if",
  "ethnum",
  "gkr_hashers",
- "halo2curves 0.6.1 (git+https://github.com/PolyhedraZK/halo2curves)",
+ "halo2curves",
  "log",
  "rand 0.8.5",
  "raw-cpuid",
@@ -4379,15 +3928,6 @@ dependencies = [
  "libc",
  "wasi 0.11.1+wasi-snapshot-preview1",
  "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "mktemp"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69fed8fbcd01affec44ac226784c6476a6006d98d13e33bc0ca7977aaf046bd8"
-dependencies = [
- "uuid",
 ]
 
 [[package]]
@@ -4480,12 +4020,6 @@ dependencies = [
  "security-framework-sys",
  "tempfile",
 ]
-
-[[package]]
-name = "new_debug_unreachable"
-version = "1.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "650eef8c711430f1a879fdd01d4745a7deea475becfb90269c06775983bbf086"
 
 [[package]]
 name = "nix"
@@ -4814,7 +4348,6 @@ dependencies = [
  "num-integer",
  "num-traits",
  "rand 0.8.5",
- "serde",
 ]
 
 [[package]]
@@ -4849,27 +4382,6 @@ name = "num-conv"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51d515d32fb182ee37cda2ccdcb92950d6a3c2893aa280e540671c2cd0f3b1d9"
-
-[[package]]
-name = "num-derive"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed3955f1a9c7c0c15e092f9c887db08b1fc683305fdf6eb6684f22555355e202"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.106",
-]
-
-[[package]]
-name = "num-format"
-version = "0.4.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a652d9771a63711fd3c3deb670acfbe5c30a4072e664d7a3bf5a9e1056ac72c3"
-dependencies = [
- "arrayvec",
- "itoa",
-]
 
 [[package]]
 name = "num-integer"
@@ -4923,24 +4435,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "number_prefix"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "830b246a0e5f20af87141b25c173cd1b609bd7779a4617d6ec582abaf90870f3"
-
-[[package]]
-name = "nums"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf3c74f925fb8cfc49a8022f2afce48a0683b70f9e439885594e84c5edbf5b01"
-dependencies = [
- "num-bigint",
- "num-integer",
- "num-traits",
- "rand 0.8.5",
-]
-
-[[package]]
 name = "object"
 version = "0.36.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4966,12 +4460,6 @@ name = "oorandom"
 version = "11.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6790f58c7ff633d8771f42965289203411a5e5c68388703c06e14f24770b41e"
-
-[[package]]
-name = "opaque-debug"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381"
 
 [[package]]
 name = "openssl"
@@ -5042,313 +4530,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "p3-air"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "p3-field",
- "p3-matrix",
-]
-
-[[package]]
-name = "p3-baby-bear"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "p3-field",
- "p3-mds",
- "p3-monty-31",
- "p3-poseidon2",
- "p3-symmetric",
- "rand 0.8.5",
- "serde",
-]
-
-[[package]]
-name = "p3-challenger"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "p3-field",
- "p3-maybe-rayon",
- "p3-symmetric",
- "p3-util",
- "tracing",
-]
-
-[[package]]
-name = "p3-circle"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "p3-challenger",
- "p3-commit",
- "p3-dft",
- "p3-field",
- "p3-fri",
- "p3-matrix",
- "p3-maybe-rayon",
- "p3-util",
- "serde",
- "tracing",
-]
-
-[[package]]
-name = "p3-commit"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "p3-challenger",
- "p3-dft",
- "p3-field",
- "p3-matrix",
- "p3-util",
- "serde",
-]
-
-[[package]]
-name = "p3-dft"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "p3-field",
- "p3-matrix",
- "p3-maybe-rayon",
- "p3-util",
- "tracing",
-]
-
-[[package]]
-name = "p3-field"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "num-bigint",
- "num-integer",
- "num-traits",
- "nums",
- "p3-maybe-rayon",
- "p3-util",
- "rand 0.8.5",
- "serde",
- "tracing",
-]
-
-[[package]]
-name = "p3-fri"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "p3-challenger",
- "p3-commit",
- "p3-dft",
- "p3-field",
- "p3-interpolation",
- "p3-matrix",
- "p3-maybe-rayon",
- "p3-util",
- "serde",
- "tracing",
-]
-
-[[package]]
-name = "p3-goldilocks"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "num-bigint",
- "p3-dft",
- "p3-field",
- "p3-mds",
- "p3-poseidon2",
- "p3-symmetric",
- "p3-util",
- "rand 0.8.5",
- "serde",
-]
-
-[[package]]
-name = "p3-interpolation"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "p3-field",
- "p3-matrix",
- "p3-util",
-]
-
-[[package]]
-name = "p3-koala-bear"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "p3-field",
- "p3-mds",
- "p3-monty-31",
- "p3-poseidon2",
- "p3-symmetric",
- "rand 0.8.5",
- "serde",
-]
-
-[[package]]
-name = "p3-matrix"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "p3-field",
- "p3-maybe-rayon",
- "p3-util",
- "rand 0.8.5",
- "serde",
- "tracing",
- "transpose",
-]
-
-[[package]]
-name = "p3-maybe-rayon"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "rayon",
-]
-
-[[package]]
-name = "p3-mds"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "p3-dft",
- "p3-field",
- "p3-matrix",
- "p3-symmetric",
- "p3-util",
- "rand 0.8.5",
-]
-
-[[package]]
-name = "p3-merkle-tree"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "p3-commit",
- "p3-field",
- "p3-matrix",
- "p3-maybe-rayon",
- "p3-symmetric",
- "p3-util",
- "serde",
- "tracing",
-]
-
-[[package]]
-name = "p3-mersenne-31"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "num-bigint",
- "p3-dft",
- "p3-field",
- "p3-matrix",
- "p3-maybe-rayon",
- "p3-mds",
- "p3-poseidon2",
- "p3-symmetric",
- "p3-util",
- "rand 0.8.5",
- "serde",
-]
-
-[[package]]
-name = "p3-monty-31"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "num-bigint",
- "p3-dft",
- "p3-field",
- "p3-matrix",
- "p3-maybe-rayon",
- "p3-mds",
- "p3-poseidon2",
- "p3-symmetric",
- "p3-util",
- "rand 0.8.5",
- "serde",
- "tracing",
- "transpose",
-]
-
-[[package]]
-name = "p3-poseidon"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "p3-field",
- "p3-mds",
- "p3-symmetric",
- "rand 0.8.5",
-]
-
-[[package]]
-name = "p3-poseidon2"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "gcd",
- "p3-field",
- "p3-mds",
- "p3-symmetric",
- "rand 0.8.5",
-]
-
-[[package]]
-name = "p3-symmetric"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "p3-field",
- "serde",
-]
-
-[[package]]
-name = "p3-uni-stark"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "itertools 0.13.0",
- "p3-air",
- "p3-challenger",
- "p3-commit",
- "p3-dft",
- "p3-field",
- "p3-matrix",
- "p3-maybe-rayon",
- "p3-util",
- "serde",
- "tracing",
-]
-
-[[package]]
-name = "p3-util"
-version = "0.1.0"
-source = "git+https://github.com/plonky3/Plonky3.git?rev=2192432ddf28e7359dd2c577447886463e6124f0#2192432ddf28e7359dd2c577447886463e6124f0"
-dependencies = [
- "serde",
-]
-
-[[package]]
 name = "p384"
 version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5377,7 +4558,7 @@ checksum = "9ad43c07024ef767f9160710b3a6773976194758c7919b17e63b863db0bdf7fb"
 dependencies = [
  "bytecount",
  "fnv",
- "unicode-width 0.1.14",
+ "unicode-width",
 ]
 
 [[package]]
@@ -5540,15 +4721,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "phf_shared"
-version = "0.11.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "67eabc2ef2a60eb7faa00097bd1ffdb5bd28e62bf39990626a582201b7a754e5"
-dependencies = [
- "siphasher",
-]
-
-[[package]]
 name = "pin-project"
 version = "1.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5606,12 +4778,6 @@ name = "pkg-config"
 version = "0.3.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7edddbd0b52d732b21ad9a5fab5c704c14cd949e5e9a1ec5929a24fded1b904c"
-
-[[package]]
-name = "plain"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 
 [[package]]
 name = "plonky2"
@@ -5737,7 +4903,7 @@ dependencies = [
  "ethnum",
  "gf2",
  "gkr_engine",
- "halo2curves 0.6.1 (git+https://github.com/PolyhedraZK/halo2curves)",
+ "halo2curves",
  "itertools 0.13.0",
  "polynomials",
  "rand 0.8.5",
@@ -5759,7 +4925,7 @@ dependencies = [
  "arith",
  "ark-std 0.4.0",
  "criterion",
- "halo2curves 0.6.1 (git+https://github.com/PolyhedraZK/halo2curves)",
+ "halo2curves",
  "itertools 0.13.0",
  "rand 0.8.5",
  "serdes",
@@ -5778,15 +4944,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8a2f0d8d040d7848a709caf78912debcc3f33ee4b3cac47d73d1e1069e83507"
 dependencies = [
  "portable-atomic",
-]
-
-[[package]]
-name = "poseidon"
-version = "0.2.0"
-source = "git+https://github.com/privacy-scaling-explorations/poseidon?tag=v2024_01_31#d29f35d9744e0c58b63679a15730ff2fab470ef2"
-dependencies = [
- "halo2curves 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "subtle",
 ]
 
 [[package]]
@@ -5812,445 +4969,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "powdr"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "log",
- "powdr-ast",
- "powdr-backend",
- "powdr-executor",
- "powdr-number",
- "powdr-parser",
- "powdr-pil-analyzer",
- "powdr-pilopt",
- "powdr-pipeline",
- "powdr-riscv",
- "powdr-riscv-executor",
- "serde",
-]
-
-[[package]]
-name = "powdr-airgen"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "itertools 0.13.0",
- "log",
- "powdr-analysis",
- "powdr-ast",
- "powdr-number",
-]
-
-[[package]]
-name = "powdr-analysis"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "itertools 0.13.0",
- "lazy_static",
- "log",
- "powdr-asm-to-pil",
- "powdr-ast",
- "powdr-number",
- "powdr-parser",
-]
-
-[[package]]
-name = "powdr-asm-to-pil"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "lazy_static",
- "log",
- "powdr-ast",
- "powdr-number",
- "powdr-parser",
- "powdr-parser-util",
- "pretty_assertions",
-]
-
-[[package]]
-name = "powdr-asmopt"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "powdr-analysis",
- "powdr-ast",
- "powdr-parser",
- "powdr-pilopt",
-]
-
-[[package]]
-name = "powdr-ast"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "auto_enums",
- "derive_more",
- "itertools 0.13.0",
- "num-traits",
- "powdr-number",
- "powdr-parser-util",
- "schemars 0.8.22",
- "serde",
- "serde_cbor",
-]
-
-[[package]]
-name = "powdr-backend"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "bincode",
- "halo2_proofs",
- "halo2_solidity_verifier",
- "halo2curves 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "hex",
- "itertools 0.13.0",
- "log",
- "mktemp",
- "num-integer",
- "num-traits",
- "p3-commit",
- "p3-matrix",
- "p3-uni-stark",
- "powdr-ast",
- "powdr-backend-utils",
- "powdr-executor",
- "powdr-number",
- "powdr-parser",
- "powdr-parser-util",
- "powdr-pil-analyzer",
- "powdr-plonky3",
- "rand 0.8.5",
- "rayon",
- "serde",
- "serde_json",
- "snark-verifier",
- "strum",
- "thiserror 1.0.69",
-]
-
-[[package]]
-name = "powdr-backend-utils"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "itertools 0.13.0",
- "log",
- "powdr-ast",
- "powdr-executor-utils",
- "powdr-number",
- "powdr-parser",
- "powdr-pil-analyzer",
-]
-
-[[package]]
-name = "powdr-executor"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "auto_enums",
- "bit-vec 0.6.3",
- "derive_more",
- "indicatif",
- "itertools 0.13.0",
- "lazy_static",
- "libloading",
- "log",
- "num-traits",
- "powdr-ast",
- "powdr-executor-utils",
- "powdr-jit-compiler",
- "powdr-number",
- "powdr-parser-util",
- "powdr-pil-analyzer",
- "rayon",
- "serde",
-]
-
-[[package]]
-name = "powdr-executor-utils"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "powdr-ast",
- "powdr-number",
- "serde",
-]
-
-[[package]]
-name = "powdr-importer"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "powdr-ast",
- "powdr-number",
- "powdr-parser",
- "powdr-parser-util",
- "pretty_assertions",
-]
-
-[[package]]
-name = "powdr-isa-utils"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-
-[[package]]
-name = "powdr-jit-compiler"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "itertools 0.13.0",
- "lazy_static",
- "libloading",
- "log",
- "mktemp",
- "powdr-ast",
- "powdr-number",
- "powdr-parser",
-]
-
-[[package]]
-name = "powdr-linker"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "itertools 0.13.0",
- "lazy_static",
- "log",
- "powdr-analysis",
- "powdr-ast",
- "powdr-number",
- "powdr-parser-util",
- "pretty_assertions",
- "strum",
-]
-
-[[package]]
-name = "powdr-number"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "ark-bn254 0.4.0",
- "ark-ff 0.4.2",
- "ark-serialize 0.4.2",
- "csv",
- "derive_more",
- "ibig",
- "num-bigint",
- "num-traits",
- "p3-baby-bear",
- "p3-field",
- "p3-koala-bear",
- "p3-mersenne-31",
- "schemars 0.8.22",
- "serde",
- "serde_cbor",
- "serde_with",
-]
-
-[[package]]
-name = "powdr-parser"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "derive_more",
- "lalrpop",
- "lalrpop-util",
- "lazy_static",
- "num-traits",
- "powdr-ast",
- "powdr-number",
- "powdr-parser-util",
-]
-
-[[package]]
-name = "powdr-parser-util"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "codespan-reporting",
- "lalrpop-util",
- "schemars 0.8.22",
- "serde",
-]
-
-[[package]]
-name = "powdr-pil-analyzer"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "itertools 0.13.0",
- "lazy_static",
- "num-traits",
- "powdr-ast",
- "powdr-number",
- "powdr-parser",
- "powdr-parser-util",
-]
-
-[[package]]
-name = "powdr-pilopt"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "itertools 0.13.0",
- "log",
- "powdr-ast",
- "powdr-number",
- "pretty_assertions",
-]
-
-[[package]]
-name = "powdr-pipeline"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "itertools 0.13.0",
- "log",
- "mktemp",
- "num-traits",
- "powdr-airgen",
- "powdr-analysis",
- "powdr-asm-to-pil",
- "powdr-asmopt",
- "powdr-ast",
- "powdr-backend",
- "powdr-executor",
- "powdr-importer",
- "powdr-linker",
- "powdr-number",
- "powdr-parser",
- "powdr-parser-util",
- "powdr-pil-analyzer",
- "powdr-pilopt",
- "powdr-schemas",
- "serde",
- "serde_cbor",
- "walkdir",
-]
-
-[[package]]
-name = "powdr-plonky3"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "indexmap 1.9.3",
- "itertools 0.13.0",
- "lazy_static",
- "p3-air",
- "p3-baby-bear",
- "p3-challenger",
- "p3-circle",
- "p3-commit",
- "p3-dft",
- "p3-field",
- "p3-fri",
- "p3-goldilocks",
- "p3-koala-bear",
- "p3-matrix",
- "p3-maybe-rayon",
- "p3-mds",
- "p3-merkle-tree",
- "p3-mersenne-31",
- "p3-monty-31",
- "p3-poseidon",
- "p3-poseidon2",
- "p3-symmetric",
- "p3-uni-stark",
- "p3-util",
- "powdr-ast",
- "powdr-executor-utils",
- "powdr-number",
- "powdr-riscv-runtime",
- "rand 0.8.5",
- "rand_chacha 0.3.1",
- "serde",
- "tracing",
-]
-
-[[package]]
-name = "powdr-riscv"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "gimli",
- "goblin",
- "itertools 0.13.0",
- "lalrpop",
- "lazy_static",
- "log",
- "powdr-ast",
- "powdr-executor",
- "powdr-isa-utils",
- "powdr-linker",
- "powdr-number",
- "powdr-parser",
- "powdr-parser-util",
- "powdr-pipeline",
- "powdr-riscv-executor",
- "powdr-riscv-syscalls",
- "raki",
- "serde_json",
- "static_assertions",
- "thiserror 1.0.69",
-]
-
-[[package]]
-name = "powdr-riscv-executor"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "inferno",
- "itertools 0.13.0",
- "k256",
- "log",
- "num-bigint",
- "num-derive",
- "num-traits",
- "p3-field",
- "p3-goldilocks",
- "p3-symmetric",
- "powdr-ast",
- "powdr-executor",
- "powdr-number",
- "powdr-parser",
- "powdr-plonky3",
- "rayon",
- "rustc-demangle",
-]
-
-[[package]]
-name = "powdr-riscv-runtime"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "getrandom 0.2.16",
- "powdr-riscv-syscalls",
- "serde",
- "serde_cbor",
-]
-
-[[package]]
-name = "powdr-riscv-syscalls"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-
-[[package]]
-name = "powdr-schemas"
-version = "0.1.3"
-source = "git+https://github.com/powdr-labs/powdr?tag=v0.1.3#340858edd11b67de2b35f84bed6e2bed6decff5d"
-dependencies = [
- "powdr-ast",
- "powdr-number",
- "schemars 0.8.22",
- "serde",
- "serde_cbor",
-]
-
-[[package]]
 name = "powerfmt"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6263,22 +4981,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85eae3c4ed2f50dcfe72643da4befc30deadb458a9b590d720cde2f2b1e97da9"
 dependencies = [
  "zerocopy",
-]
-
-[[package]]
-name = "precomputed-hash"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "925383efa346730478fb4838dbe9137d2a47675ad789c546d150a6e1dd4ab31c"
-
-[[package]]
-name = "pretty_assertions"
-version = "1.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ae130e2f271fbc2ac3a40fb1d07180839cdbbe443c7a27e1e3c13c5cac0116d"
-dependencies = [
- "diff",
- "yansi",
 ]
 
 [[package]]
@@ -6302,7 +5004,7 @@ dependencies = [
  "is-terminal",
  "lazy_static",
  "term",
- "unicode-width 0.1.14",
+ "unicode-width",
 ]
 
 [[package]]
@@ -6405,8 +5107,8 @@ version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6fcdab19deb5195a31cf7726a210015ff1496ba1464fd42cb4f537b8b01b471f"
 dependencies = [
- "bit-set 0.8.0",
- "bit-vec 0.8.0",
+ "bit-set",
+ "bit-vec",
  "bitflags 2.9.3",
  "lazy_static",
  "num-traits",
@@ -6499,15 +5201,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
-name = "quick-xml"
-version = "0.26.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f50b1c63b38611e7d4d7f68b82d3ad0cc71a2ad2e7f61fc10f1328d917c93cd"
-dependencies = [
- "memchr",
-]
-
-[[package]]
 name = "quote"
 version = "1.0.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6527,12 +5220,6 @@ name = "radium"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09"
-
-[[package]]
-name = "raki"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0279959070dedfe40cbbf4e42d06168f2722841d366a6d29c029e2b2dcc989fb"
 
 [[package]]
 name = "rand"
@@ -6780,57 +5467,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "revm"
-version = "3.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68f4ca8ae0345104523b4af1a8a7ea97cfa1865cdb7a7c25d23c1a18d9b48598"
-dependencies = [
- "auto_impl",
- "revm-interpreter",
- "revm-precompile",
-]
-
-[[package]]
-name = "revm-interpreter"
-version = "1.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f959cafdf64a7f89b014fa73dc2325001cf654b3d9400260b212d19a2ebe3da0"
-dependencies = [
- "revm-primitives",
-]
-
-[[package]]
-name = "revm-precompile"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d360a88223d85709d2e95d4609eb1e19c649c47e28954bfabae5e92bb37e83e"
-dependencies = [
- "k256",
- "num",
- "once_cell",
- "revm-primitives",
- "ripemd",
- "sha2",
- "substrate-bn",
-]
-
-[[package]]
-name = "revm-primitives"
-version = "1.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51187b852d9e458816a2e19c81f1dd6c924077e1a8fccd16e4f044f865f299d7"
-dependencies = [
- "alloy-primitives",
- "alloy-rlp",
- "auto_impl",
- "bitflags 2.9.3",
- "bitvec",
- "enumn",
- "hashbrown 0.14.5",
- "hex",
-]
-
-[[package]]
 name = "rfc6979"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6838,15 +5474,6 @@ checksum = "f8dd2a808d456c4a54e300a23e9f5a67e122c3024119acbfd73e3bf664491cb2"
 dependencies = [
  "hmac",
  "subtle",
-]
-
-[[package]]
-name = "rgb"
-version = "0.8.52"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c6a884d2998352bb4daf0183589aec883f16a6da1f4dde84d8e2e9a5409a1ce"
-dependencies = [
- "bytemuck",
 ]
 
 [[package]]
@@ -7245,19 +5872,6 @@ dependencies = [
 
 [[package]]
 name = "schemars"
-version = "0.8.22"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fbf2ae1b8bc8e02df939598064d22402220cd5bbcca1c76f7d6a310974d5615"
-dependencies = [
- "dyn-clone",
- "indexmap 1.9.3",
- "schemars_derive",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "schemars"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4cd191f9397d57d581cddd31014772520aa448f65ef991055d7f61582c65165f"
@@ -7281,18 +5895,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "schemars_derive"
-version = "0.8.22"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32e265784ad618884abaea0600a9adf15393368d840e0222d101a072f3f7534d"
-dependencies = [
- "proc-macro2",
- "quote",
- "serde_derive_internals",
- "syn 2.0.106",
-]
-
-[[package]]
 name = "scoped-tls"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7303,26 +5905,6 @@ name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
-
-[[package]]
-name = "scroll"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ab8598aa408498679922eff7fa985c25d58a90771bd6be794434c5277eab1a6"
-dependencies = [
- "scroll_derive",
-]
-
-[[package]]
-name = "scroll_derive"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1783eabc414609e28a5ba76aee5ddd52199f7107a0b24c2e9746a1ecc34a683d"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.106",
-]
 
 [[package]]
 name = "scrypt"
@@ -7472,31 +6054,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_cbor"
-version = "0.11.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2bef2ebfde456fb76bbcf9f59315333decc4fda0b2b44b420243c11e0f5ec1f5"
-dependencies = [
- "half 1.8.3",
- "serde",
-]
-
-[[package]]
 name = "serde_derive"
 version = "1.0.219"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b0276cf7f2c73365f7157c8123c21cd9a50fbbd844757af28ca1f5925fc2a00"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.106",
-]
-
-[[package]]
-name = "serde_derive_internals"
-version = "0.29.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "18d26a20a969b9e3fdf2fc2d9f21eda6c40e2de84c9408bb5d3b05d499aae711"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -7584,7 +6145,7 @@ version = "0.1.0"
 source = "git+https://github.com/PolyhedraZK/Expander?branch=main#be01620e672429a2414cb37dfdbede2a263a4e99"
 dependencies = [
  "ethnum",
- "halo2curves 0.6.1 (git+https://github.com/PolyhedraZK/halo2curves)",
+ "halo2curves",
  "serdes_derive",
  "thiserror 1.0.69",
 ]
@@ -7597,22 +6158,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.106",
-]
-
-[[package]]
-name = "sha"
-version = "0.1.0"
-dependencies = [
- "clap",
- "criterion",
- "env_logger 0.10.2",
- "log",
- "powdr",
- "rand 0.8.5",
- "serde",
- "serde_cbor",
- "sha2",
- "utils 0.1.0",
 ]
 
 [[package]]
@@ -7671,18 +6216,6 @@ dependencies = [
  "sha2",
  "transcript",
  "utils 0.1.0",
-]
-
-[[package]]
-name = "sha3"
-version = "0.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f81199417d4e5de3f04b1e871023acea7389672c4135918f05aa9cbf2f2fa809"
-dependencies = [
- "block-buffer 0.9.0",
- "digest 0.9.0",
- "keccak",
- "opaque-debug",
 ]
 
 [[package]]
@@ -7749,12 +6282,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "siphasher"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56199f7ddabf13fe5074ce809e7d3f42b42ae711800501b5b16ea82ad029c39d"
-
-[[package]]
 name = "sized-chunks"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7769,7 +6296,7 @@ name = "skyscraper"
 version = "0.1.0"
 source = "git+https://github.com/worldfnd/ProveKit?branch=main#6f0e6e4987f1520fd5b31786674f87c1bd567aa1"
 dependencies = [
- "ark-bn254 0.5.0",
+ "ark-bn254",
  "ark-ff 0.5.0",
  "block-multiplier",
  "fp-rounding",
@@ -7811,26 +6338,6 @@ checksum = "9676b89cd56310a87b93dec47b11af744f34d5fc9f367b829474eec0a891350d"
 dependencies = [
  "borsh",
  "serde",
-]
-
-[[package]]
-name = "snark-verifier"
-version = "0.1.1"
-source = "git+https://github.com/powdr-labs/snark-verifier.git?rev=55012261fd4b0b8d21b581a9782d05258afe4104#55012261fd4b0b8d21b581a9782d05258afe4104"
-dependencies = [
- "ecc",
- "halo2_proofs",
- "halo2curves 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "hex",
- "itertools 0.10.5",
- "lazy_static",
- "num-bigint",
- "num-integer",
- "num-traits",
- "poseidon",
- "rand 0.8.5",
- "revm",
- "sha3 0.10.8",
 ]
 
 [[package]]
@@ -7890,7 +6397,7 @@ dependencies = [
  "hex",
  "keccak",
  "rand 0.8.5",
- "sha3 0.10.8",
+ "sha3",
  "thiserror 2.0.16",
  "zerocopy",
  "zeroize",
@@ -7922,28 +6429,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
-name = "str_stack"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9091b6114800a5f2141aee1d1b9d6ca3592ac062dc5decb3764ec5895a47b4eb"
-
-[[package]]
 name = "strength_reduce"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fe895eb47f22e2ddd4dabc02bce419d2e643c8e3b585c78158b349195bc24d82"
-
-[[package]]
-name = "string_cache"
-version = "0.8.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf776ba3fa74f83bf4b63c3dcbbf82173db2632ed8452cb2d891d33f459de70f"
-dependencies = [
- "new_debug_unreachable",
- "parking_lot",
- "phf_shared",
- "precomputed-hash",
-]
 
 [[package]]
 name = "strsim"
@@ -7956,9 +6445,6 @@ name = "strum"
 version = "0.24.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "063e6045c0e62079840579a7e47a355ae92f60eb74daaf156fb1e84ba164e63f"
-dependencies = [
- "strum_macros",
-]
 
 [[package]]
 name = "strum_macros"
@@ -7971,19 +6457,6 @@ dependencies = [
  "quote",
  "rustversion",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "substrate-bn"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72b5bbfa79abbae15dd642ea8176a21a635ff3c00059961d1ea27ad04e5b441c"
-dependencies = [
- "byteorder",
- "crunchy",
- "lazy_static",
- "rand 0.8.5",
- "rustc-hex",
 ]
 
 [[package]]
@@ -8097,7 +6570,7 @@ checksum = "4c998b0c8b921495196a48aabaf1901ff28be0760136e31604f7967b0792050e"
 dependencies = [
  "papergrid",
  "tabled_derive",
- "unicode-width 0.1.14",
+ "unicode-width",
 ]
 
 [[package]]
@@ -8670,12 +7143,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7dd6e30e90baa6f72411720665d41d89b9a3d039dc45b8faea1ddd07f617f6af"
 
 [[package]]
-name = "unicode-width"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a1a07cc7db3810833284e8d372ccdc6da29741639ecc70c9ec107df0fa6154c"
-
-[[package]]
 name = "unicode-xid"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8800,15 +7267,6 @@ dependencies = [
 name = "utils"
 version = "0.1.0"
 source = "git+https://github.com/PolyhedraZK/Expander?branch=main#be01620e672429a2414cb37dfdbede2a263a4e99"
-
-[[package]]
-name = "uuid"
-version = "1.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79daa5ed5740825c40b389c5e50312b9c86df53fccd33f281df655642b43869d"
-dependencies = [
- "getrandom 0.2.16",
-]
 
 [[package]]
 name = "valuable"
@@ -9069,7 +7527,7 @@ dependencies = [
  "rayon",
  "serde",
  "serde_json",
- "sha3 0.10.8",
+ "sha3",
  "spongefish",
  "spongefish-pow",
  "thiserror 2.0.16",
@@ -9557,12 +8015,6 @@ checksum = "05f360fc0b24296329c78fda852a1e9ae82de9cf7b27dae4b7f62f118f77b9ed"
 dependencies = [
  "tap",
 ]
-
-[[package]]
-name = "yansi"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfe53a6657fd280eaa890a3bc59152892ffa3e30101319d168b781ed6529b049"
 
 [[package]]
 name = "yoke"

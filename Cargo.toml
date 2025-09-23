@@ -3,12 +3,12 @@ resolver = "3"
 members = [
     "binius64",
     "plonky2",
-    "plonky3-powdr",
+    #"plonky3-powdr",
     "provekit",
     "polyhedra-expander",
     "utils",
 ]
-exclude = ["zkvm"]
+exclude = ["zkvm", "plonky3-powdr"]
 
 [workspace.dependencies]
 anyhow = "1.0.81"
