@@ -65,7 +65,7 @@ pub fn prove(
     witness_bytes: &[u8],
     mpi_config: MPIConfig<'_>,
 ) -> (M31Ext3, Proof) {
-    // Taken from circuit.prover_load_witness_file
+    // Taken from circuit.prover_load_circuit
     let circuit_opt = if mpi_config.is_root() {
         let rc: RecursiveCircuit<M31x1Config> =
             RecursiveCircuit::deserialize_from(Cursor::new(circuit_bytes)).unwrap();
