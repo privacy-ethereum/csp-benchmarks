@@ -1,103 +1,39 @@
-use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use plonky2_sha256::bench::{prove, sha256_prepare, verify};
 
 use plonky2::{plonk::config::PoseidonGoldilocksConfig, util::serialization::Write};
 use plonky2_u32::gates::arithmetic_u32::{U32GateSerializer, U32GeneratorSerializer};
-use utils::{
-    bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics},
-    metadata::SHA2_INPUTS,
-};
+use utils::harness::{BenchHarnessConfig, ProvingSystem};
 
 const D: usize = 2;
 type C = PoseidonGoldilocksConfig;
 
-fn sha256_no_lookup(c: &mut Criterion) {
-    for input_size in SHA2_INPUTS {
-        // Measure the metrics
-        let metrics = sha256_plonky2_no_lookup_metrics(input_size);
-
-        let json_file = format!("sha256_{input_size}_plonky2_no_lookup_metrics.json");
-        write_json_metrics(&json_file, &metrics);
-
-        // RAM measurement
-        let sha256_binary_name = "sha256_no_lookup_mem";
-        compile_binary(sha256_binary_name);
-
-        let sha256_binary_path = format!("../target/release/{}", sha256_binary_name);
-        let json_file = format!("sha256_{}_plonky2_no_lookup_mem_report.json", input_size);
-        run_measure_mem_script(&json_file, &sha256_binary_path, input_size);
-
-        // Run the (criterion) benchmarks
-        let mut group = c.benchmark_group(format!("sha256_{input_size}_plonky2_no_lookup"));
-        group.sample_size(10);
-
-        group.bench_function(
-            format!("sha256_{input_size}_plonky2_no_lookup_prove"),
-            |bench| {
-                bench.iter_batched(
-                    || sha256_prepare(input_size),
-                    |(data, pw)| {
-                        prove(&data.prover_data(), pw);
-                    },
-                    BatchSize::SmallInput,
-                );
-            },
-        );
-
-        group.bench_function(
-            format!("sha256_{input_size}_plonky2_no_lookup_verify"),
-            |bench| {
-                bench.iter_batched(
-                    || {
-                        let (data, pw) = sha256_prepare(input_size);
-                        let verifier_data = data.verifier_data();
-                        (prove(&data.prover_data(), pw), verifier_data)
-                    },
-                    |(proof, data)| {
-                        verify(&data, proof);
-                    },
-                    BatchSize::SmallInput,
-                );
-            },
-        );
-        group.finish();
+utils::define_benchmark_harness!(
+    sha256,
+    BenchHarnessConfig::sha256(ProvingSystem::Plonky2, None, Some("sha256_no_lookup_mem")),
+    |input_size| { sha256_prepare(input_size) },
+    |(circuit_data, pw)| { prove(&circuit_data, pw.clone()) },
+    |(circuit_data, _pw), proof| {
+        let verifier_data = circuit_data.verifier_data();
+        verify(&verifier_data, proof.clone());
+    },
+    |(circuit_data, _pw)| {
+        let gate_serializer = U32GateSerializer;
+        let common_data_size = circuit_data
+            .common
+            .to_bytes(&gate_serializer)
+            .unwrap()
+            .len();
+        let generator_serializer = U32GeneratorSerializer::<C, D>::default();
+        let prover_data_size = circuit_data
+            .prover_only
+            .to_bytes(&generator_serializer, &circuit_data.common)
+            .unwrap()
+            .len();
+        prover_data_size + common_data_size
+    },
+    |proof| {
+        let mut buffer = Vec::new();
+        buffer.write_proof(&proof.proof).unwrap();
+        buffer.len()
     }
-}
-
-criterion_main!(sha256);
-criterion_group!(sha256, sha256_no_lookup);
-
-fn sha256_plonky2_no_lookup_metrics(input_size: usize) -> Metrics {
-    let mut metrics = Metrics::new(
-        "plonky2".to_string(),
-        "no_lookup".to_string(),
-        false,
-        "sha256".to_string(),
-        input_size,
-    );
-
-    let (data, pw) = sha256_prepare(input_size);
-
-    let gate_serializer = U32GateSerializer;
-    let common_data_size = data.common.to_bytes(&gate_serializer).unwrap().len();
-    let generator_serializer = U32GeneratorSerializer::<C, D>::default();
-    let prover_data_size = data
-        .prover_only
-        .to_bytes(&generator_serializer, &data.common)
-        .unwrap()
-        .len();
-
-    println!(
-        "Common data size: {}B, Prover data size: {}B",
-        common_data_size, prover_data_size
-    );
-    metrics.preprocessing_size = prover_data_size + common_data_size;
-
-    let proof = prove(&data.prover_data(), pw);
-
-    let mut buffer = Vec::new();
-    buffer.write_proof(&proof.proof).unwrap();
-    metrics.proof_size = buffer.len();
-
-    metrics
-}
+);

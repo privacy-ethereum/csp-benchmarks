@@ -145,7 +145,7 @@ pub fn run_benchmarks_fn<
     PrepareFn: FnMut(usize) -> PreparedContext + Copy,
     ProveFn: FnMut(&PreparedContext) -> Proof + Copy,
     VerifyFn: FnMut(&PreparedContext, &Proof),
-    PrepSizeFn: FnMut(&PreparedContext) -> usize,
+    PrepSizeFn: FnMut(PreparedContext) -> usize,
     ProofSizeFn: FnMut(&Proof) -> usize,
 {
     let target_str = cfg.target.as_str();
@@ -169,8 +169,9 @@ pub fn run_benchmarks_fn<
             target_str.to_string(),
             size,
         );
-        metrics.preprocessing_size = preprocessing_size(&prepared_context);
+        metrics.preprocessing_size = preprocessing_size(prepared_context);
 
+        let prepared_context = prepare(size);
         let proof = prove(&prepared_context);
         metrics.proof_size = proof_size(&proof);
 

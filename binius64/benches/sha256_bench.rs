@@ -1,5 +1,3 @@
-// Copyright 2024-2025 Irreducible Inc.
-
 use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_utils::serialization::SerializeBytes;
 use binius_verifier::hash::{StdCompression, StdDigest};
@@ -12,16 +10,14 @@ utils::define_benchmark_harness!(
     |input_size| {
         prepare(input_size).expect("Failed to prepare sha256 circuit for prove/verify")
     },
-    |prepared_context| {
-        let (_verifier, prover, witness, _cs) = prepared_context;
+    |(_verifier, prover, witness, _cs)| {
         binius64::prove::<StdDigest, StdCompression, ParallelCompressionAdaptor<StdCompression>>(
-            prover,
+            &prover,
             witness.clone(),
         )
         .expect("Failed to prove sha256 circuit")
     },
-    |prepared_context, proof| {
-        let (verifier, _prover, witness, _cs) = prepared_context;
+    |(verifier, _prover, witness, _cs), proof| {
         binius64::verify::<StdDigest, StdCompression, ParallelCompressionAdaptor<StdCompression>>(
             verifier,
             witness.clone(),
@@ -29,8 +25,7 @@ utils::define_benchmark_harness!(
         )
         .expect("Failed to verify sha256 circuit")
     },
-    |prepared_context| {
-        let (_verifier, _prover, _witness, cs) = prepared_context;
+    |(_verifier, _prover, _witness, cs)| {
         let mut buf: Vec<u8> = Vec::new();
         cs.serialize(&mut buf)
             .expect("Failed to serialize constraint system into byte array");

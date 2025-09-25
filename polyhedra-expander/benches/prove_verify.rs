@@ -13,8 +13,7 @@ utils::define_benchmark_harness!(
     },
     BenchHarnessConfig::sha256(ProvingSystem::Expander, None, Some("sha256_mem")),
     |size, _| prepare(size),
-    |prepared_context, (universe, world)| {
-        let (circuit_file, witness_file) = prepared_context;
+    |(circuit_file, witness_file), (universe, world)| {
         let (_claimed, proof) = prove(
             circuit_file,
             witness_file,
@@ -22,8 +21,7 @@ utils::define_benchmark_harness!(
         );
         proof
     },
-    |prepared_context, proof, (universe, world)| {
-        let (circuit_file, witness_file) = prepared_context;
+    |(circuit_file, witness_file), proof, (universe, world)| {
         let (claimed, _) = prove(
             circuit_file,
             witness_file,
@@ -37,8 +35,7 @@ utils::define_benchmark_harness!(
             MPIConfig::prover_new(Some(&universe), Some(&world)),
         );
     },
-    |prepared_context, _shared| {
-        let (circuit_file, _witness_file) = prepared_context;
+    |(circuit_file, _witness_file), _shared| {
         std::fs::metadata(circuit_file).unwrap().len() as usize
     },
     |proof, _shared| proof.bytes.len()
