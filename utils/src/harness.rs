@@ -128,35 +128,25 @@ fn input_sizes_for(target: BenchTarget, _fixed: Option<usize>) -> Vec<usize> {
 pub fn run_benchmarks_fn<
     PreparedContext,
     Proof,
-    PrepareFactory,
-    Prepare,
-    ProveFactory,
-    Prove,
-    VerifyFactory,
-    Verify,
-    PrepSizeFactory,
-    PrepSize,
-    ProofSizeFactory,
-    ProofSize,
+    PrepareFn,
+    ProveFn,
+    VerifyFn,
+    PrepSizeFn,
+    ProofSizeFn,
 >(
     c: &mut Criterion,
     cfg: BenchHarnessConfig<'_>,
-    prepare_factory: PrepareFactory,
-    prove_factory: ProveFactory,
-    verify_factory: VerifyFactory,
-    preprocessing_size_factory: PrepSizeFactory,
-    proof_size_factory: ProofSizeFactory,
+    mut prepare: PrepareFn,
+    mut prove: ProveFn,
+    mut verify: VerifyFn,
+    mut preprocessing_size: PrepSizeFn,
+    mut proof_size: ProofSizeFn,
 ) where
-    PrepareFactory: Fn() -> Prepare + Copy,
-    Prepare: FnMut(usize) -> PreparedContext,
-    ProveFactory: Fn() -> Prove + Copy,
-    Prove: FnMut(&PreparedContext) -> Proof,
-    VerifyFactory: Fn() -> Verify + Copy,
-    Verify: FnMut(&PreparedContext, &Proof),
-    PrepSizeFactory: Fn() -> PrepSize + Copy,
-    PrepSize: FnMut(&PreparedContext) -> usize,
-    ProofSizeFactory: Fn() -> ProofSize + Copy,
-    ProofSize: FnMut(&Proof) -> usize,
+    PrepareFn: FnMut(usize) -> PreparedContext + Copy,
+    ProveFn: FnMut(&PreparedContext) -> Proof + Copy,
+    VerifyFn: FnMut(&PreparedContext, &Proof),
+    PrepSizeFn: FnMut(&PreparedContext) -> usize,
+    ProofSizeFn: FnMut(&Proof) -> usize,
 {
     let target_str = cfg.target.as_str();
     let system_str = cfg.system.as_str();
@@ -170,7 +160,6 @@ pub fn run_benchmarks_fn<
     };
 
     for size in input_sizes_for(cfg.target, cfg.fixed_input_size) {
-        let mut prepare = prepare_factory();
         let prepared_context = prepare(size);
 
         let mut metrics = Metrics::new(
@@ -180,13 +169,10 @@ pub fn run_benchmarks_fn<
             target_str.to_string(),
             size,
         );
-        let mut pre_sz = preprocessing_size_factory();
-        metrics.preprocessing_size = pre_sz(&prepared_context);
+        metrics.preprocessing_size = preprocessing_size(&prepared_context);
 
-        let mut do_prove = prove_factory();
-        let proof = do_prove(&prepared_context);
-        let mut pf_sz = proof_size_factory();
-        metrics.proof_size = pf_sz(&proof);
+        let proof = prove(&prepared_context);
+        metrics.proof_size = proof_size(&proof);
 
         let metrics_file = metrics_filename(target_str, size, system_str, cfg.feature);
         write_json_metrics(&metrics_file, &metrics);
@@ -198,36 +184,26 @@ pub fn run_benchmarks_fn<
         group.sample_size(SAMPLE_SIZE);
 
         let prove_id = bench_id(target_str, size, system_str, cfg.feature, "prove");
-        let prepare_factory_p = prepare_factory;
-        let prove_factory_p = prove_factory;
         group.bench_function(prove_id, move |bench| {
-            let mut prepare = prepare_factory_p();
-            let mut do_prove = prove_factory_p();
             bench.iter_batched(
-                move || prepare(size),
-                move |prepared| {
-                    let _ = (do_prove)(&prepared);
+                || prepare(size),
+                |prepared| {
+                    let _ = (prove)(&prepared);
                 },
                 BatchSize::SmallInput,
             );
         });
 
         let verify_id = bench_id(target_str, size, system_str, cfg.feature, "verify");
-        let prepare_factory_v = prepare_factory;
-        let prove_factory_v = prove_factory;
-        let verify_factory_v = verify_factory;
-        group.bench_function(verify_id, move |bench| {
-            let mut prepare = prepare_factory_v();
-            let mut do_prove = prove_factory_v();
-            let mut do_verify = verify_factory_v();
+        group.bench_function(verify_id, |bench| {
             bench.iter_batched(
-                move || {
+                || {
                     let prepared = prepare(size);
-                    let proof_local = (do_prove)(&prepared);
+                    let proof_local = (prove)(&prepared);
                     (prepared, proof_local)
                 },
-                move |(prepared, proof_local)| {
-                    (do_verify)(&prepared, &proof_local);
+                |(prepared, proof_local)| {
+                    (verify)(&prepared, &proof_local);
                 },
                 BatchSize::SmallInput,
             );
