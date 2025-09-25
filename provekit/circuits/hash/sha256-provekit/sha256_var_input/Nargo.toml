@@ -1,5 +1,5 @@
 [package]
-name = "sha256_bench_2048"
+name = "sha256_var_input"
 type = "bin"
 
 [dependencies]

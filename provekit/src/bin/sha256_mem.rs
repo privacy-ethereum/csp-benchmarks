@@ -1,5 +1,5 @@
 use clap::Parser;
-use provekit::ProvekitSha256Benchmark;
+use provekit::{prepare_sha256, prove};
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -11,6 +11,6 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let bench_harness = ProvekitSha256Benchmark::new(args.input_size);
-    let _proof = bench_harness.run_prove();
+    let (scheme, toml_path, _pre_size) = prepare_sha256(args.input_size);
+    let _proof = prove(&scheme, &toml_path);
 }

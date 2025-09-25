@@ -23,8 +23,10 @@ impl BenchTarget {
 #[derive(Clone, Copy, Debug)]
 pub enum ProvingSystem {
     Binius64,
-    Plonky2,
     Expander,
+    Plonky2,
+    Powdr,
+    Provekit,
     // Extend as needed
 }
 
@@ -32,8 +34,10 @@ impl ProvingSystem {
     pub fn as_str(&self) -> &'static str {
         match self {
             ProvingSystem::Binius64 => "binius64",
-            ProvingSystem::Plonky2 => "plonky2",
             ProvingSystem::Expander => "expander",
+            ProvingSystem::Plonky2 => "plonky2",
+            ProvingSystem::Powdr => "powdr",
+            ProvingSystem::Provekit => "provekit",
         }
     }
 }
