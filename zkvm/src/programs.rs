@@ -9,6 +9,28 @@ use zkvm_interface::{Compiler, ProverResourceType, zkVMError};
 
 pub mod sha256;
 
+/// Supported programs
+pub enum SupportedPrograms {
+    Sha256,
+}
+
+impl From<&str> for SupportedPrograms {
+    fn from(s: &str) -> Self {
+        match s {
+            "sha256" => SupportedPrograms::Sha256,
+            _ => panic!("Unknown program: {}", s),
+        }
+    }
+}
+
+impl ToString for SupportedPrograms {
+    fn to_string(&self) -> String {
+        match self {
+            SupportedPrograms::Sha256 => "sha256".to_string(),
+        }
+    }
+}
+
 /// Loads a program into an EreRisc0 zkVM instance
 pub struct Risc0Builder;
 impl ZkVMBuilder<RV32_IM_RISC0_ZKVM_ELF, EreRisc0> for Risc0Builder {

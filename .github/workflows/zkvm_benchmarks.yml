@@ -71,5 +71,8 @@ jobs:
       - name: Run clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
 
+      - name: Test
+        run: cargo test -- --no-fail-fast --no-capture
+
       - name: Run benchmarks
-        run: cargo bench
+        run: make bench
