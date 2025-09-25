@@ -40,7 +40,7 @@ impl Storage<Input> for Input {
                             let mut erased = <dyn erased_serde::Serializer>::erase(&mut ser);
 
                             obj.erased_serialize(&mut erased)
-                                .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+                                .map_err(io::Error::other)?;
                         }
                         Ok(StoredInputItem::ObjectBincode(buf))
                     }
@@ -55,8 +55,7 @@ impl Storage<Input> for Input {
         let dir = path.parent().unwrap_or_else(|| Path::new("."));
         let mut tmp = NamedTempFile::new_in(dir)?;
 
-        serialize_into(&mut tmp, &disk_items)
-            .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+        serialize_into(&mut tmp, &disk_items).map_err(io::Error::other)?;
 
         tmp.as_file_mut().sync_all()?;
         tmp.persist(path).map(|_| ()).map_err(|e| e.error)

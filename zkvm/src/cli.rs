@@ -170,7 +170,7 @@ pub fn prove(vm: &str, program: &str, config: &str) {
         SupportedPrograms::Sha256 => Sha256Cfg::try_from(config).expect("invalid Sha256 config"),
     };
 
-    let input = <Input as Storage<Input>>::load(&input_path(
+    let input = <Input as Storage<Input>>::load(input_path(
         &root,
         &vm_enum.to_string(),
         &prog_enum.to_string(),

@@ -9,6 +9,7 @@ use ere_miden::EreMiden;
 use ere_risc0::EreRisc0;
 use ere_sp1::EreSP1;
 use rand::{RngCore, SeedableRng, rngs::StdRng};
+use std::fmt;
 use zkvm_interface::Input;
 
 /// RNG seed for SHA256 input generation.
@@ -31,10 +32,10 @@ impl TryFrom<&str> for SupportedConfigs {
     }
 }
 
-impl ToString for SupportedConfigs {
-    fn to_string(&self) -> String {
+impl fmt::Display for SupportedConfigs {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            SupportedConfigs::Size2048 => "2048".to_string(),
+            SupportedConfigs::Size2048 => write!(f, "2048"),
         }
     }
 }

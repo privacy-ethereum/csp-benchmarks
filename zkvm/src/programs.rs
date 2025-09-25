@@ -5,6 +5,7 @@ use ere_jolt::{EreJolt, JOLT_TARGET};
 use ere_miden::{EreMiden, MIDEN_TARGET, error::MidenError};
 use ere_risc0::{EreRisc0, RV32_IM_RISC0_ZKVM_ELF};
 use ere_sp1::{EreSP1, RV32_IM_SUCCINCT_ZKVM_ELF};
+use std::fmt;
 use zkvm_interface::{Compiler, ProverResourceType, zkVMError};
 
 pub mod sha256;
@@ -23,10 +24,10 @@ impl From<&str> for SupportedPrograms {
     }
 }
 
-impl ToString for SupportedPrograms {
-    fn to_string(&self) -> String {
+impl fmt::Display for SupportedPrograms {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            SupportedPrograms::Sha256 => "sha256".to_string(),
+            SupportedPrograms::Sha256 => write!(f, "sha256"),
         }
     }
 }

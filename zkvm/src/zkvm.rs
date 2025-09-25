@@ -2,8 +2,8 @@
 
 use crate::traits::ZkVMBuilder;
 use criterion::Criterion;
-use std::marker::PhantomData;
 use std::path::PathBuf;
+use std::{fmt, marker::PhantomData};
 use zkvm_interface::{
     Compiler, Input, ProgramExecutionReport, ProgramProvingReport, PublicValues, zkVM, zkVMError,
 };
@@ -28,13 +28,13 @@ impl From<&str> for SupportedVms {
     }
 }
 
-impl ToString for SupportedVms {
-    fn to_string(&self) -> String {
+impl fmt::Display for SupportedVms {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            SupportedVms::Risc0 => "risc0".to_string(),
-            SupportedVms::Sp1 => "sp1".to_string(),
-            SupportedVms::Jolt => "jolt".to_string(),
-            SupportedVms::Miden => "miden".to_string(),
+            SupportedVms::Risc0 => write!(f, "risc0"),
+            SupportedVms::Sp1 => write!(f, "sp1"),
+            SupportedVms::Jolt => write!(f, "jolt"),
+            SupportedVms::Miden => write!(f, "miden"),
         }
     }
 }
@@ -124,7 +124,7 @@ where
         &self,
         input: &Input,
     ) -> Result<(PublicValues, ProgramExecutionReport), zkVMError> {
-        self.vm.execute(&input)
+        self.vm.execute(input)
     }
 
     /// Proves the program with the given input.
@@ -132,6 +132,6 @@ where
         &self,
         input: &Input,
     ) -> Result<(Vec<u8>, Vec<u8>, ProgramProvingReport), zkVMError> {
-        self.vm.prove(&input)
+        self.vm.prove(input)
     }
 }
