@@ -60,12 +60,6 @@ TAU_FILE="${TAU_DIR}/powersOfTau28_hez_final_${TAU_RANK}.ptau"
 export NODE_OPTIONS=--max_old_space_size=327680
 # sysctl -w vm.max_map_count=655300
 
-PREPROCESSING_SIZE=0
-PROOF_SIZE=0
-PROVE_MEM=0
-PROVE_TIME=0
-VERIFY_TIME=0
-
 function renderCircom() {
   cd "$CIRCUIT_DIR"
   echo sed -i '' "s/Main([0-9]*)/Main($INPUT_SIZE)/" sha256_test.circom
@@ -116,7 +110,7 @@ avg_time() {
           /maximum resident set size/ { mem += $1; nm++ }
           /^[ \t]*[0-9.]+ real/ { time += $1; nt++ }
           END {
-              if (nm > 0) printf("%f %f\n", mem/nm, time/nt);
+              if (nm > 0) printf("%d %f\n", int(mem/nm), time/nt);
           }'
     )
     LAST_MEM=$(echo "$result" | awk '{print $1}')
@@ -131,7 +125,7 @@ function normalProve() {
   echo "Prove memory: $(bytes_to_human $LAST_MEM)"
   proof_size=$(ls -lh proof.json | awk '{print $5}')
   echo "Proof size: $proof_size"
-  preprocessing_size = $(du -ck sha256_test_0001.zkey witness.wtns proof.json public.json | grep total | awk '{print $1}')
+  preprocessing_size=$(du -ck sha256_test_0001.zkey witness.wtns proof.json public.json | grep total | awk '{print $1}')
   echo "Preprocessing size: $preprocessing_size"
   cd ..
 }
