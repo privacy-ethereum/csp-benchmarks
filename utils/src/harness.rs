@@ -76,13 +76,6 @@ fn bench_id(target: &str, size: usize, system: &str, feat: Option<&str>, which: 
     )
 }
 
-fn metrics_filename(target: &str, size: usize, system: &str, feat: Option<&str>) -> String {
-    match feat {
-        Some(f) if !f.is_empty() => format!("{}_{}_{}_{}_metrics.json", target, size, system, f),
-        _ => format!("{}_{}_{}_metrics.json", target, size, system),
-    }
-}
-
 fn mem_report_filename(target: &str, size: usize, system: &str, feat: Option<&str>) -> String {
     match feat {
         Some(f) if !f.is_empty() => format!("{}_{}_{}_{}_mem_report.json", target, size, system, f),
@@ -127,27 +120,18 @@ pub fn run_benchmarks_fn<
     for size in input_sizes_for(cfg.target, cfg.fixed_input_size) {
         let prepared_context = prepare(size);
 
-        let mut metrics = Metrics::new(
-            system_str.to_string(),
-            cfg.feature.unwrap_or("").to_string(),
-            cfg.is_zkvm,
-            target_str.to_string(),
-            size,
-        );
+        let mut metrics = init_metrics(&cfg, target_str, system_str, size);
         metrics.preprocessing_size = preprocessing_size(prepared_context);
 
         let prepared_context = prepare(size);
         let proof = prove(&prepared_context);
         metrics.proof_size = proof_size(&proof);
 
-        let metrics_file = metrics_filename(target_str, size, system_str, cfg.feature);
-        write_json_metrics(&metrics_file, &metrics);
+        write_json_metrics(target_str, size, system_str, cfg.feature, &metrics);
 
         measure_ram(&cfg, target_str, system_str, cfg.mem_binary_name, size);
 
-        let gid = group_id(target_str, size, system_str, cfg.feature);
-        let mut group = c.benchmark_group(gid);
-        group.sample_size(SAMPLE_SIZE);
+        let mut group = init_bench_group(c, &cfg, target_str, system_str, size);
 
         let prove_id = bench_id(target_str, size, system_str, cfg.feature, "prove");
         group.bench_function(prove_id, move |bench| {
@@ -211,26 +195,17 @@ pub fn run_benchmarks_with_state_fn<
     for size in input_sizes_for(cfg.target, cfg.fixed_input_size) {
         let prepared_context = prepare(size, &shared);
 
-        let mut metrics = Metrics::new(
-            system_str.to_string(),
-            cfg.feature.unwrap_or("").to_string(),
-            cfg.is_zkvm,
-            target_str.to_string(),
-            size,
-        );
+        let mut metrics = init_metrics(&cfg, target_str, system_str, size);
         metrics.preprocessing_size = preprocessing_size(&prepared_context, &shared);
 
         let proof = prove(&prepared_context, &shared);
         metrics.proof_size = proof_size(&proof, &shared);
 
-        let metrics_file = metrics_filename(target_str, size, system_str, cfg.feature);
-        write_json_metrics(&metrics_file, &metrics);
+        write_json_metrics(target_str, size, system_str, cfg.feature, &metrics);
 
         measure_ram(&cfg, target_str, system_str, cfg.mem_binary_name, size);
 
-        let gid = group_id(target_str, size, system_str, cfg.feature);
-        let mut group = c.benchmark_group(gid);
-        group.sample_size(SAMPLE_SIZE);
+        let mut group = init_bench_group(c, &cfg, target_str, system_str, size);
 
         let prove_id = bench_id(target_str, size, system_str, cfg.feature, "prove");
         group.bench_function(prove_id, move |bench| {
@@ -244,7 +219,6 @@ pub fn run_benchmarks_with_state_fn<
         });
 
         let verify_id = bench_id(target_str, size, system_str, cfg.feature, "verify");
-
         group.bench_function(verify_id, |bench| {
             bench.iter_batched(
                 || {
@@ -261,6 +235,34 @@ pub fn run_benchmarks_with_state_fn<
 
         group.finish();
     }
+}
+
+fn init_bench_group<'a>(
+    c: &'a mut Criterion,
+    cfg: &BenchHarnessConfig<'a>,
+    target_str: &'static str,
+    system_str: &'static str,
+    size: usize,
+) -> criterion::BenchmarkGroup<'a, criterion::measurement::WallTime> {
+    let gid = group_id(target_str, size, system_str, cfg.feature);
+    let mut group = c.benchmark_group(gid);
+    group.sample_size(SAMPLE_SIZE);
+    group
+}
+
+fn init_metrics(
+    cfg: &BenchHarnessConfig<'_>,
+    target_str: &'static str,
+    system_str: &'static str,
+    size: usize,
+) -> Metrics {
+    Metrics::new(
+        system_str.to_string(),
+        cfg.feature.unwrap_or("").to_string(),
+        cfg.is_zkvm,
+        target_str.to_string(),
+        size,
+    )
 }
 
 fn measure_ram(
