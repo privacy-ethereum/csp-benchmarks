@@ -36,8 +36,8 @@ fn criterion_benchmarks(c: &mut Criterion) {
         group.bench_function(format!("sha256_{input_size}_expander_prove"), |bench| {
             bench.iter_batched(
                 || prepare(input_size),
-                |(circuit_file, witness_file)| {
-                    prove(&circuit_file, &witness_file, mpi_config.clone());
+                |(circuit_bytes, witness_bytes)| {
+                    prove(&circuit_bytes, &witness_bytes, mpi_config.clone());
                 },
                 BatchSize::SmallInput,
             );
@@ -48,23 +48,23 @@ fn criterion_benchmarks(c: &mut Criterion) {
             bench.iter_batched(
                 || {
                     // Prepare & prove to obtain proof for verification
-                    let (circuit_file, witness_file) = prepare(input_size);
+                    let (circuit_bytes, witness_bytes) = prepare(input_size);
 
                     let (claimed_v, proof) =
-                        prove(&circuit_file, &witness_file, mpi_config.clone());
+                        prove(&circuit_bytes, &witness_bytes, mpi_config.clone());
 
                     (
-                        circuit_file,
-                        witness_file,
+                        circuit_bytes,
+                        witness_bytes,
                         claimed_v,
                         proof,
                         mpi_config.clone(),
                     )
                 },
-                |(circuit_file, witness_file, claimed, proof, mpi_config)| {
+                |(circuit_bytes, witness_bytes, claimed, proof, mpi_config)| {
                     // Set up verifier
 
-                    verify(&circuit_file, &witness_file, &proof, &claimed, mpi_config);
+                    verify(&circuit_bytes, &witness_bytes, &proof, &claimed, mpi_config);
                 },
                 BatchSize::SmallInput,
             );
@@ -83,11 +83,11 @@ fn sha256_expander_metrics(input_size: usize, mpi_config: MPIConfig<'_>) -> Metr
         input_size,
     );
 
-    let (circuit_file, witness_file) = prepare(input_size);
+    let (circuit_bytes, witness_bytes) = prepare(input_size);
 
-    metrics.preprocessing_size = std::fs::metadata(&circuit_file).unwrap().len() as usize;
+    metrics.preprocessing_size = circuit_bytes.len();
 
-    let (_, proof) = prove(&circuit_file, &witness_file, mpi_config.clone());
+    let (_, proof) = prove(&circuit_bytes, &witness_bytes, mpi_config.clone());
     metrics.proof_size = proof.bytes.len();
 
     metrics

@@ -16,9 +16,9 @@ fn main() {
 }
 
 fn sha256_no_lookup_mem(input_size: usize) {
-    let (circuit_file, witness_file) = prepare(input_size);
+    let (circuit_bytes, witness_bytes) = prepare(input_size);
     let universe = MPIConfig::init().expect("Failed to initialize MPI");
     let world = universe.world();
     let mpi_config = MPIConfig::prover_new(Some(&universe), Some(&world));
-    let _proof = prove(&circuit_file, &witness_file, mpi_config);
+    let _proof = prove(&circuit_bytes, &witness_bytes, mpi_config);
 }
