@@ -126,7 +126,7 @@ function normalProve() {
   proof_size=$(ls -lh proof.json | awk '{print $5}')
   echo "Proof size: $proof_size"
   preprocessing_size=$(du -ck sha256_test_0001.zkey witness.wtns proof.json public.json | grep total | awk '{print $1}')
-  echo "Preprocessing size: $preprocessing_size"
+  echo "Preprocessing size: $(bytes_to_human $preprocessing_size)"
   cd ..
 }
 
