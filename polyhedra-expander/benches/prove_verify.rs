@@ -16,30 +16,28 @@ utils::define_benchmark_harness!(
         (universe, world)
     },
     |size, _| prepare(size),
-    |(circuit_file, witness_file), (universe, world)| {
-        let (_claimed, proof) = prove(
-            circuit_file,
-            witness_file,
+    |(circuit_bytes, witness_bytes), (universe, world)| {
+        let (_, proof) = prove(
+            circuit_bytes,
+            witness_bytes,
             MPIConfig::prover_new(Some(&universe), Some(&world)),
         );
         proof
     },
-    |(circuit_file, witness_file), proof, (universe, world)| {
+    |(circuit_bytes, witness_bytes), proof, (universe, world)| {
         let (claimed, _) = prove(
-            circuit_file,
-            witness_file,
+            circuit_bytes,
+            witness_bytes,
             MPIConfig::prover_new(Some(&universe), Some(&world)),
         );
         verify(
-            circuit_file,
-            witness_file,
+            circuit_bytes,
+            witness_bytes,
             proof,
             &claimed,
             MPIConfig::prover_new(Some(&universe), Some(&world)),
         );
     },
-    |(circuit_file, _witness_file), _shared| {
-        std::fs::metadata(circuit_file).unwrap().len() as usize
-    },
+    |(circuit_bytes, _), _| { circuit_bytes.len() },
     |proof, _shared| proof.bytes.len()
 );
