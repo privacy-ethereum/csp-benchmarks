@@ -1,97 +1,81 @@
 # How to Contribute
 
-Howdy! Usual good software engineering practices apply. Write comments. Follow standard Rust coding practices where possible. Use `cargo fmt` and `cargo clippy` to tidy up formatting.
+Howdy! Usual good software engineering practices apply. Write comments. If your codebase is written in Rust, follow standard Rust coding practices where possible, and use `cargo fmt` and `cargo clippy` to tidy up formatting.
 
 ## What's Expected in the Contribution/PR
 
-We depend on 3 JSON files for collecting benchmarks of the proving systems:
+Depending on whether your codebase is written in Rust or not, you should follow the corresponding instructions below.
 
-- Metrics
-- Criterion report
-- Memory report
+### Rust Benchmarks
 
-When you add a new benchmark for a certain proving system, you should add a benchmarking code directory that are able to generate these JSON files. The directory should be included in the workspace(root-level `Cargo.toml`).
+When you add a new benchmark for a certain proving system, you should add a benchmarking code directory at the top level and include it into the workspace(root-level `Cargo.toml`).
 
-### Rules for JSON Files
+Use the shared benchmark harness in the `utils` crate to register Criterion benchmarks with consistent outputs.
 
-#### Naming
+#### What you write:
 
-- Metrics file: `[target]_[size]_[proving_system]_[(optional)feat]_metrics.json`
-- Memory report: `[target]_[size]_[proving_system]_[(optional)feat]_mem_report.json`
-- Criterion report: `[target]_[size]_[proving_system]_[(optional)feat]_prove` and `[target]_[size]_[proving_system]_[(optional)feat]_verify`
+- A one‑line set of settings passed to a macro: the target (e.g., `BenchTarget::Sha256`), the proving system (e.g., `ProvingSystem::Plonky2`), an optional feature tag (`None` or `Some("feature")`), and the memory‑measurement binary name (e.g., `"sha256_mem"`).
+- Five small closures that perform the corresponding operations with your proving system: `prepare`, `prove`, `verify`, `preprocessing_size`, `proof_size`.
 
-NOTE: Criterion report files are generated under the `target/criterion` directory of workspace. Hence, you should apply above naming to criterion benchmark function IDs.
+#### Input sizes:
 
-Example:
+- Variable-size targets (e.g., `sha256` or `keccak`) will use pre-defined input sizes from `utils::metadata`.
+- Fixed‑size targets (e.g., ECDSA) will use a single input size value.
 
-- When you want to add a benchmark for plonky2 with no-lookup for target function `sha256` with input size `2048`:
-  - Metrics: `sha256_2048_plonky2_no_lookup_metrics.json`
-  - Memory report: `sha256_2048_plonky2_no_lookup_mem_report.json`
-  - Criterion IDs: `sha256_2048_plonky2_no_lookup_prove` and `sha256_2048_plonky2_no_lookup_verify`
+#### RAM usage measurement:
 
-You can reference the existing benchmarks for naming. (e.g. [./plonky2/benches/prove_verify.rs](https://github.com/privacy-ethereum/csp-benchmarks/blob/CSP-Q3-2025/plonky2/benches/prove_verify.rs#L14-L68))
+- Ensure that your crate provides a binary that will be measured for RAM usage by the harness. Pass the binary name via `mem_binary_name` (e.g., `sha256_mem`). This binary is expected to perform only the circuit preprocessing and proving (including witness generation).
 
-#### Contents
+#### Quickstart (no shared state)
 
-- Metrics file: should be deserialized into the following struct:
+Provide closures for the five operations; the harness handles looping, timing, and file outputs. Pass the benchmark settings directly as macro arguments.
 
 ```rust
-#[serde_as]
-#[derive(Serialize, Deserialize, Tabled, Clone)]
-pub struct Metrics {
-    pub name: String,
-    pub feat: String,
-    pub is_zkvm: bool,
-    pub target: String,
-    #[tabled(display_with = "display_bytes")]
-    pub input_size: usize,
-    #[serde_as(as = "DurationNanoSeconds")]
-    #[tabled(display_with = "display_duration")]
-    pub proof_duration: Duration,
-    #[serde_as(as = "DurationNanoSeconds")]
-    #[tabled(display_with = "display_duration")]
-    pub verify_duration: Duration,
-    #[tabled(display_with = "display_cycles")]
-    pub cycles: u64,
-    #[tabled(display_with = "display_bytes")]
-    pub proof_size: usize,
-    #[tabled(display_with = "display_bytes")]
-    pub preprocessing_size: usize,
-    #[tabled(display_with = "display_bytes")]
-    pub peak_memory: usize,
-}
+use utils::harness::{BenchTarget, ProvingSystem};
+
+utils::define_benchmark_harness!(
+    BenchTarget::Sha256,            // target
+    ProvingSystem::Binius64,        // proving system
+    None,                           // optional feature tag
+    "sha256_mem",                  // memory-measurement binary name
+    |input_size| { /* return prepared context for input_size */ },
+    |prepared| { /* build and return proof */ },
+    |prepared, proof| { /* verify */ },
+    |prepared| { /* compute preprocessing size in bytes */ 0 },
+    |proof| { /* compute proof size in bytes */ 0 }
+);
 ```
 
-Example:
+#### Shared state
 
-```json
-{
-  "name": "plonky2",
-  "feat": "no_lookup",
-  "is_zkvm": false,
-  "target": "sha256",
-  "input_size": 2048,
-  "proof_duration": 10644587248,
-  "verify_duration": 4647043282,
-  "cycles": 0,
-  "proof_size": 475590,
-  "preprocessing_size": 329524,
-  "peak_memory": 0
-}
+For systems that need some state that is shared among all closures, use the macro’s shared‑state form. The initializer runs once; closures receive a reference to the shared state. For exmaple, in Polyhedra Expander:
+
+```rust
+use utils::harness::{BenchTarget, ProvingSystem};
+
+utils::define_benchmark_harness!(
+    BenchTarget::Sha256,        // target
+    ProvingSystem::Expander,    // proving system
+    None,                       // optional feature tag
+    "sha256_mem",              // memory-measurement binary name
+    // Initialize shared state once (e.g., MPI universe/world)
+    {
+        let mpi_config = MPIConfig::init().expect("Failed to initialize MPI");
+        let universe = mpi_config.universe();
+        let world = mpi_config.world();
+        (universe, world)
+    },
+    |size, _shared| { /* prepare */ },
+    |prepared, shared| { /* prove using shared */ },
+    |prepared, proof, shared| { /* verify using shared */ },
+    |prepared, _shared| { /* preprocessing_size */ 0 },
+    |proof, _shared| { /* proof_size */ 0 }
+);
 ```
 
-You can reference how to create JSON files of metrics in the existing benchmarks.(e.g. [./plonky2/benches/prove_verify.rs](https://github.com/privacy-ethereum/csp-benchmarks/blob/CSP-Q3-2025/plonky2/benches/prove_verify.rs#L16-L20))
+#### Outputs
 
-```json
-{
-  "peak_memory": 44869222
-}
-```
-
-We provide the shell script to make this JSON file - `./measure_mem_avg.sh`.  
-You can reference how we do the memory measurement in the existing benchmarks.(e.g. [./plonky2/benches/prove_verify.rs](https://github.com/privacy-ethereum/csp-benchmarks/blob/CSP-Q3-2025/plonky2/benches/prove_verify.rs#L22-L28))
-
-For more details, please check the existing benchmarks like `binius64` and `plonky2`.
+The harness writes out Metrics JSON, Criterion reports, and a memory report with standardized names. No manual naming is needed.
 
 ## Contributing a Non-Rust Benchmark
 

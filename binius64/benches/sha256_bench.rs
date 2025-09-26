@@ -2,11 +2,14 @@ use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_utils::serialization::SerializeBytes;
 use binius_verifier::hash::{StdCompression, StdDigest};
 use binius64::prepare;
-use utils::harness::{BenchHarnessConfig, ProvingSystem};
+use utils::harness::BenchTarget;
+use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
-    sha256,
-    BenchHarnessConfig::sha256(ProvingSystem::Binius64, None, Some("sha256_mem")),
+    BenchTarget::Sha256,
+    ProvingSystem::Binius64,
+    None,
+    "sha256_mem",
     |input_size| {
         prepare(input_size).expect("Failed to prepare sha256 circuit for prove/verify")
     },

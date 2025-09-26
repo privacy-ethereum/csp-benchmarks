@@ -1,9 +1,11 @@
 use sha::bench::{prepare_pipeline, prove, verify};
-use utils::harness::{BenchHarnessConfig, ProvingSystem};
+use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
     sha256,
-    BenchHarnessConfig::sha256(ProvingSystem::Powdr, None, Some("sha256_mem")),
+    ProvingSystem::Powdr,
+    None,
+    Some("sha256_mem"),
     |input_size| { prepare_pipeline(input_size) },
     |pipeline: &mut sha::bench::Pipeline| { prove(pipeline) },
     |pipeline: &mut sha::bench::Pipeline, _| { verify(pipeline) },

@@ -8,6 +8,7 @@ const SAMPLE_SIZE: usize = 10;
 pub enum BenchTarget {
     Sha256,
     Ecdsa,
+    Keccak,
     // Add more targets here
 }
 
@@ -16,6 +17,7 @@ impl BenchTarget {
         match self {
             BenchTarget::Sha256 => "sha256",
             BenchTarget::Ecdsa => "ecdsa",
+            BenchTarget::Keccak => "keccak",
         }
     }
 }
@@ -49,37 +51,7 @@ pub struct BenchHarnessConfig<'a> {
     pub feature: Option<&'a str>,
     pub is_zkvm: bool,
     pub fixed_input_size: Option<usize>,
-    pub mem_binary_name: Option<&'a str>,
-}
-
-impl<'a> BenchHarnessConfig<'a> {
-    pub fn sha256(
-        system: ProvingSystem,
-        feature: Option<&'a str>,
-        mem_binary_name: Option<&'a str>,
-    ) -> Self {
-        BenchHarnessConfig {
-            target: BenchTarget::Sha256,
-            system,
-            feature,
-            is_zkvm: false,
-            fixed_input_size: None,
-            mem_binary_name,
-        }
-    }
-}
-
-impl<'a> BenchHarnessConfig<'a> {
-    pub fn new(target: BenchTarget, system: ProvingSystem) -> Self {
-        BenchHarnessConfig {
-            target,
-            system,
-            feature: None,
-            is_zkvm: false,
-            fixed_input_size: None,
-            mem_binary_name: None,
-        }
-    }
+    pub mem_binary_name: &'a str,
 }
 
 fn feat_suffix(feat: Option<&str>) -> String {
@@ -118,14 +90,11 @@ fn mem_report_filename(target: &str, size: usize, system: &str, feat: Option<&st
     }
 }
 
-fn default_mem_binary_name(target: &str) -> String {
-    format!("{}_mem", target)
-}
-
 fn input_sizes_for(target: BenchTarget, _fixed: Option<usize>) -> Vec<usize> {
     match target {
         BenchTarget::Sha256 => SHA2_INPUTS.to_vec(),
         BenchTarget::Ecdsa => vec![32],
+        BenchTarget::Keccak => SHA2_INPUTS.to_vec(),
     }
 }
 
@@ -155,14 +124,6 @@ pub fn run_benchmarks_fn<
     let target_str = cfg.target.as_str();
     let system_str = cfg.system.as_str();
 
-    let mem_bin_name_ref: &str = match cfg.mem_binary_name {
-        Some(name) => name,
-        None => {
-            let s = default_mem_binary_name(target_str);
-            Box::leak(s.into_boxed_str())
-        }
-    };
-
     for size in input_sizes_for(cfg.target, cfg.fixed_input_size) {
         let prepared_context = prepare(size);
 
@@ -182,7 +143,7 @@ pub fn run_benchmarks_fn<
         let metrics_file = metrics_filename(target_str, size, system_str, cfg.feature);
         write_json_metrics(&metrics_file, &metrics);
 
-        measure_ram(&cfg, target_str, system_str, mem_bin_name_ref, size);
+        measure_ram(&cfg, target_str, system_str, cfg.mem_binary_name, size);
 
         let gid = group_id(target_str, size, system_str, cfg.feature);
         let mut group = c.benchmark_group(gid);
@@ -247,14 +208,6 @@ pub fn run_benchmarks_with_state_fn<
     let target_str = cfg.target.as_str();
     let system_str = cfg.system.as_str();
 
-    let mem_bin_name_ref: &str = match cfg.mem_binary_name {
-        Some(name) => name,
-        None => {
-            let s = default_mem_binary_name(target_str);
-            Box::leak(s.into_boxed_str())
-        }
-    };
-
     for size in input_sizes_for(cfg.target, cfg.fixed_input_size) {
         let prepared_context = prepare(size, &shared);
 
@@ -273,7 +226,7 @@ pub fn run_benchmarks_with_state_fn<
         let metrics_file = metrics_filename(target_str, size, system_str, cfg.feature);
         write_json_metrics(&metrics_file, &metrics);
 
-        measure_ram(&cfg, target_str, system_str, mem_bin_name_ref, size);
+        measure_ram(&cfg, target_str, system_str, cfg.mem_binary_name, size);
 
         let gid = group_id(target_str, size, system_str, cfg.feature);
         let mut group = c.benchmark_group(gid);
@@ -324,13 +277,20 @@ fn measure_ram(
 }
 
 #[macro_export]
-macro_rules! define_benchmark_harness {
+macro_rules! __define_benchmark_harness {
     // No shared state
-    ($public_group_ident:ident, $cfg:expr,
+    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr,
         $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
-            let cfg = $cfg;
+            let cfg = ::utils::harness::BenchHarnessConfig {
+                target: $target,
+                system: $system,
+                feature: $feature,
+                mem_binary_name: $mem_binary_name,
+                fixed_input_size: None,
+                is_zkvm: false,
+            };
             ::utils::harness::run_benchmarks_fn(
                 c,
                 cfg,
@@ -345,11 +305,18 @@ macro_rules! define_benchmark_harness {
         ::criterion::criterion_main!($public_group_ident);
     };
     // With shared state (e.g., MPI config in Polyhedra Expander)
-    ($public_group_ident:ident, $shared_init:block, $cfg:expr,
+    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $shared_init:expr,
         $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
-            let cfg = $cfg;
+            let cfg = ::utils::harness::BenchHarnessConfig {
+                target: $target,
+                system: $system,
+                feature: $feature,
+                mem_binary_name: $mem_binary_name,
+                fixed_input_size: None,
+                is_zkvm: false,
+            };
             ::utils::harness::run_benchmarks_with_state_fn(
                 c,
                 cfg,
@@ -364,4 +331,17 @@ macro_rules! define_benchmark_harness {
         ::criterion::criterion_group!($public_group_ident, criterion_benchmarks);
         ::criterion::criterion_main!($public_group_ident);
     };
+}
+
+#[macro_export]
+macro_rules! define_benchmark_harness {
+      (BenchTarget::Sha256, $($rest:tt)*) => {
+        use $crate::__define_benchmark_harness;
+        __define_benchmark_harness!(sha256,BenchTarget::Sha256, $($rest)*); };
+    (BenchTarget::Ecdsa, $($rest:tt)*) => {
+        use $crate::__define_benchmark_harness;
+        __define_benchmark_harness!(ecdsa,BenchTarget::Ecdsa, $($rest)*); };
+    (BenchTarget::Keccak, $($rest:tt)*) => {
+        use $crate::__define_benchmark_harness;
+        __define_benchmark_harness!(keccak,BenchTarget::Keccak, $($rest)*); };
 }

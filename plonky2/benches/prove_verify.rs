@@ -2,14 +2,17 @@ use plonky2_sha256::bench::{prove, sha256_prepare, verify};
 
 use plonky2::{plonk::config::PoseidonGoldilocksConfig, util::serialization::Write};
 use plonky2_u32::gates::arithmetic_u32::{U32GateSerializer, U32GeneratorSerializer};
-use utils::harness::{BenchHarnessConfig, ProvingSystem};
+use utils::harness::BenchTarget;
+use utils::harness::ProvingSystem;
 
 const D: usize = 2;
 type C = PoseidonGoldilocksConfig;
 
 utils::define_benchmark_harness!(
-    sha256,
-    BenchHarnessConfig::sha256(ProvingSystem::Plonky2, None, Some("sha256_no_lookup_mem")),
+    BenchTarget::Sha256,
+    ProvingSystem::Plonky2,
+    None,
+    "sha256_no_lookup_mem",
     |input_size| { sha256_prepare(input_size) },
     |(circuit_data, pw)| { prove(&circuit_data, pw.clone()) },
     |(circuit_data, _pw), proof| {

@@ -1,9 +1,12 @@
 use provekit::{prepare_sha256, preprocessing_size, prove, verify};
-use utils::harness::{BenchHarnessConfig, ProvingSystem};
+use utils::harness::BenchTarget;
+use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
-    benches,
-    BenchHarnessConfig::sha256(ProvingSystem::Provekit, None, Some("sha256_mem")),
+    BenchTarget::Sha256,
+    ProvingSystem::Provekit,
+    None,
+    "sha256_mem",
     |input_size| { prepare_sha256(input_size) },
     |(proof_scheme, toml_path, _)| { prove(proof_scheme, toml_path) },
     |(proof_scheme, _, _), proof| {
