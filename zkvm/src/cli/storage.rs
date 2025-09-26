@@ -127,17 +127,17 @@ mod tests {
         let items1: Vec<_> = loaded1.iter().collect();
         assert_eq!(items1.len(), 3);
 
-        let &InputItem::Bytes(ref bytes_0) = items1[0] else {
+        let InputItem::Bytes(bytes_0) = items1[0] else {
             panic!()
         };
         assert_eq!(bytes_0, &expected_string_bincode);
 
-        let &InputItem::Bytes(ref bytes_1) = items1[1] else {
+        let InputItem::Bytes(bytes_1) = items1[1] else {
             panic!()
         };
         assert_eq!(bytes_1, &test_bytes);
 
-        let &InputItem::Bytes(ref bytes_2) = items1[2] else {
+        let InputItem::Bytes(bytes_2) = items1[2] else {
             panic!()
         };
         assert_eq!(bytes_2, &expected_obj_bincode);
