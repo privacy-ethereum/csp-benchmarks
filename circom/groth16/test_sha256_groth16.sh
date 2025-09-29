@@ -89,6 +89,10 @@ function setup() {
 
 function generateWtns() {
   cd "$CIRCUIT_DIR"
+  
+  preprocessing_size=$(du -ck sha256_test_0001.zkey sha256_test_js/generate_witness.js sha256_test_js/sha256_test.wasm | grep total | awk '{print $1}')
+  echo "Preprocessing size: $(bytes_to_human $preprocessing_size)"
+  
   echo node sha256_test_js/generate_witness.js sha256_test_js/sha256_test.wasm input_${INPUT_SIZE}.json witness.wtns
   run_with_time node sha256_test_js/generate_witness.js sha256_test_js/sha256_test.wasm input_${INPUT_SIZE}.json witness.wtns
   echo "Generate witness time: $LAST_TIME seconds"
@@ -125,8 +129,6 @@ function normalProve() {
   echo "Prove memory: $(bytes_to_human $LAST_MEM)"
   proof_size=$(ls -lh proof.json | awk '{print $5}')
   echo "Proof size: $proof_size"
-  preprocessing_size=$(du -ck sha256_test_0001.zkey witness.wtns proof.json public.json | grep total | awk '{print $1}')
-  echo "Preprocessing size: $(bytes_to_human $preprocessing_size)"
   cd ..
 }
 
