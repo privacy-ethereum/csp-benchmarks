@@ -20,7 +20,7 @@ utils::define_benchmark_harness!(
         //       needed for witness generation("[circuit].cpp", "[circuit].dat" files).
         sum_file_sizes_in_the_dir(zkey_path).expect("Unable to compute preprocessing size")
     },
-    |_proof: &CircomProof| 0
+    |_proof: &CircomProof| 807 // NOTE: Assume that protocol is "rapidsnark" and curve is "bn128"
 );
 
 fn sum_file_sizes_in_the_dir(file_path: String) -> std::io::Result<usize> {
