@@ -114,7 +114,7 @@ fn main() -> std::io::Result<()> {
         let out_file = system_dir.join(format!(
             "{target}_{input_size}_{proving_system}_metrics.json"
         ));
-        utils::bench::write_json_metrics(out_file.to_str().unwrap(), &metrics);
+        utils::bench::write_json_metrics_file(out_file.to_str().unwrap(), &metrics);
 
         // Cleanup originals
         let _ = fs::remove_file(&prover_path);

@@ -57,7 +57,7 @@ jobs:
 
           RUN_ALL="${{ github.event.inputs.run_all }}"
 
-          EXCLUDE_REGEX='^(utils|mobile|zkvm|powdr)(/|$)'
+          EXCLUDE_REGEX='^(utils|mobile|zkvm|plonky3-powdr)(/|$)'
 
           # ─── 1. discover Cargo.toml files ────────────────────────────────
           dirs=$(find . -mindepth 2 -maxdepth 4 -type f -name Cargo.toml \

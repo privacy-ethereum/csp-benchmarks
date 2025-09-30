@@ -1,79 +1,20 @@
-use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use sha::bench::{prepare_pipeline, prove, verify};
-use utils::{
-    bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics},
-    metadata::SHA2_INPUTS,
-};
+use utils::harness::ProvingSystem;
 
-fn sha256_bench(c: &mut Criterion) {
-    for input_size in SHA2_INPUTS {
-        // Measure the SubMetrics
-        let metrics = sha256_powdr_metrics(input_size);
-
-        let json_file = format!("sha256_{input_size}_powdr_metrics.json");
-        write_json_metrics(&json_file, &metrics);
-
-        // RAM measurement
-        let sha256_binary_name = "sha256_mem";
-        compile_binary(sha256_binary_name);
-
-        let sha256_binary_path = format!("../target/release/{}", sha256_binary_name);
-        let json_file = format!("sha256_{}_powdr_mem_report.json", input_size);
-        run_measure_mem_script(&json_file, &sha256_binary_path, input_size);
-
-        // Run the (criterion) benchmarks
-        let mut group = c.benchmark_group(format!("sha256_{input_size}_powdr"));
-        group.sample_size(10);
-
-        group.bench_function(format!("sha256_{input_size}_powdr_prove"), |bench| {
-            bench.iter_batched(
-                || prepare_pipeline(input_size),
-                |mut pipeline| {
-                    prove(&mut pipeline);
-                },
-                BatchSize::SmallInput,
-            );
-        });
-
-        group.bench_function(format!("sha256_{input_size}_powdr_verify"), |bench| {
-            bench.iter_batched(
-                || {
-                    let mut pipeline = prepare_pipeline(input_size);
-                    prove(&mut pipeline);
-                    pipeline
-                },
-                |pipeline| {
-                    verify(pipeline);
-                },
-                BatchSize::SmallInput,
-            );
-        });
-        group.finish();
-    }
-}
-
-criterion_main!(sha256);
-criterion_group!(sha256, sha256_bench);
-
-fn sha256_powdr_metrics(input_size: usize) -> Metrics {
-    let mut metrics = Metrics::new(
-        "powdr".to_string(),
-        "".to_string(),
-        false,
-        "sha256".to_string(),
-        input_size,
-    );
-
-    let mut pipeline = prepare_pipeline(input_size);
-
-    // Load the proving key and constants from the files.
-    let pk_bytes = std::fs::read("powdr-target/pkey.bin").expect("Unable to read file");
-    let constants_bytes = std::fs::read("powdr-target/constants.bin").expect("Unable to read file");
-    let pil_bytes = std::fs::read("powdr-target/guest.pil").expect("Unable to read file");
-    metrics.preprocessing_size = pk_bytes.len() + constants_bytes.len() + pil_bytes.len();
-
-    let _ = prove(&mut pipeline);
-    metrics.proof_size = pipeline.proof().unwrap().len();
-
-    metrics
-}
+utils::define_benchmark_harness!(
+    sha256,
+    ProvingSystem::Powdr,
+    None,
+    Some("sha256_mem"),
+    |input_size| { prepare_pipeline(input_size) },
+    |pipeline: &mut sha::bench::Pipeline| { prove(pipeline) },
+    |pipeline: &mut sha::bench::Pipeline, _| { verify(pipeline) },
+    |pipeline: sha::bench::Pipeline| {
+        let pk_bytes = std::fs::read("powdr-target/pkey.bin").expect("Unable to read file");
+        let constants_bytes =
+            std::fs::read("powdr-target/constants.bin").expect("Unable to read file");
+        let pil_bytes = std::fs::read("powdr-target/guest.pil").expect("Unable to read file");
+        pk_bytes.len() + constants_bytes.len() + pil_bytes.len()
+    },
+    |proof: &Vec<u8>| { proof.len() }
+);

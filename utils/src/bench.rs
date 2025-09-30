@@ -148,7 +148,26 @@ pub fn write_csv(out_path: &str, results: &[Metrics]) {
     println!("{table}");
 }
 
-pub fn write_json_metrics(output_path: &str, metrics: &Metrics) {
+fn metrics_filename(target: &str, size: usize, system: &str, feat: Option<&str>) -> String {
+    match feat {
+        Some(f) if !f.is_empty() => format!("{}_{}_{}_{}_metrics.json", target, size, system, f),
+        _ => format!("{}_{}_{}_metrics.json", target, size, system),
+    }
+}
+
+pub fn write_json_metrics(
+    target_str: &'static str,
+    size: usize,
+    system_str: &'static str,
+    feature: Option<&str>,
+    metrics: &Metrics,
+) {
+    let metrics_file = metrics_filename(target_str, size, system_str, feature);
+
+    write_json_metrics_file(&metrics_file, metrics);
+}
+
+pub fn write_json_metrics_file(output_path: &str, metrics: &Metrics) {
     let json = serde_json::to_string_pretty(metrics).unwrap();
     std::fs::write(output_path, json).unwrap();
 }
