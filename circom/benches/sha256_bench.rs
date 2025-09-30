@@ -12,7 +12,9 @@ utils::define_benchmark_harness!(
     |(witness_fn, input_str, zkey_path)| {
         circom::prove(witness_fn.clone(), input_str.clone(), zkey_path.clone())
     },
-    |(_witness_fn, _input_str, zkey_path), proof| { circom::verify(proof.clone(), zkey_path.clone(),) },
+    |(_witness_fn, _input_str, zkey_path), proof| {
+        circom::verify(proof.clone(), zkey_path.clone())
+    },
     |(_witness_fn, _input_str, _zkey_path)| { 0 },
     |_proof: &CircomProof| 0
 );

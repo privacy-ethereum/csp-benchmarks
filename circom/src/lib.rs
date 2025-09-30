@@ -18,12 +18,22 @@ pub fn prepare(input_size: usize) -> (WitnessFn, String, String) {
 
     // Prepare inputs
     let (input, digest) = generate_sha256_input(input_size);
-    let merged_input: Vec<String> = input
-        .into_iter()
-        .chain(digest.into_iter())
-        .map(|n| n.to_string())
-        .collect();
-    let inputs = HashMap::from([("in".to_string(), merged_input)]);
+    let inputs = HashMap::from([
+        (
+            "in".to_string(),
+            input
+                .into_iter()
+                .map(|n| n.to_string())
+                .collect::<Vec<String>>(),
+        ),
+        (
+            "hash".to_string(),
+            digest
+                .into_iter()
+                .map(|n| n.to_string())
+                .collect::<Vec<String>>(),
+        ),
+    ]);
     let input_str = serde_json::to_string(&inputs).unwrap();
 
     // Prepare zkey path
