@@ -29,6 +29,7 @@ pub enum ProvingSystem {
     Plonky2,
     Powdr,
     Provekit,
+    Circom,
     // Extend as needed
 }
 
@@ -40,6 +41,7 @@ impl ProvingSystem {
             ProvingSystem::Plonky2 => "plonky2",
             ProvingSystem::Powdr => "powdr",
             ProvingSystem::Provekit => "provekit",
+            ProvingSystem::Circom => "circom",
         }
     }
 }
