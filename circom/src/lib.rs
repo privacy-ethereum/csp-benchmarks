@@ -44,15 +44,13 @@ pub fn prepare(input_size: usize) -> (WitnessFn, String, String) {
 
 pub fn prove(witness_fn: WitnessFn, input_str: String, zkey_path: String) -> CircomProof {
     // Generate proof
-    let result = CircomProver::prove(
+    CircomProver::prove(
         ProofLib::Rapidsnark, // The rapidsnark prover
         witness_fn,
         input_str,
         zkey_path,
     )
-    .unwrap();
-
-    result
+    .unwrap()
 }
 
 pub fn verify(proof: CircomProof, zkey_path: String) {
