@@ -3,7 +3,7 @@ use plonky2::{
     iop::witness::{PartialWitness, WitnessWrite},
     plonk::{
         circuit_builder::CircuitBuilder,
-        circuit_data::{CircuitConfig, CircuitData, ProverCircuitData, VerifierCircuitData},
+        circuit_data::{CircuitConfig, CircuitData, VerifierCircuitData},
         config::{GenericConfig, PoseidonGoldilocksConfig},
         proof::ProofWithPublicInputs,
     },
@@ -20,7 +20,7 @@ pub fn verify(data: &VerifierCircuitData<F, C, D>, proof: ProofWithPublicInputs<
 }
 
 pub fn prove(
-    data: &ProverCircuitData<F, C, D>,
+    data: &CircuitData<GoldilocksField, PoseidonGoldilocksConfig, 2>,
     pw: PartialWitness<F>,
 ) -> ProofWithPublicInputs<GoldilocksField, C, D> {
     data.prove(pw).unwrap()

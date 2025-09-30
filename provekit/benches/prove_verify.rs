@@ -1,65 +1,17 @@
-use criterion::{BatchSize, Criterion, black_box, criterion_group, criterion_main};
-use provekit::ProvekitSha256Benchmark;
-use utils::{
-    bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics},
-    metadata::SHA2_INPUTS,
-};
+use provekit::{prepare_sha256, preprocessing_size, prove, verify};
+use utils::harness::BenchTarget;
+use utils::harness::ProvingSystem;
 
-fn sha256_benchmarks(c: &mut Criterion) {
-    for &input_size in SHA2_INPUTS.iter() {
-        let bench_harness = ProvekitSha256Benchmark::new(input_size);
-
-        // Measure the Metrics
-        let metrics = sha256_provekit_metrics(&bench_harness, input_size);
-        let json_file = format!("sha256_{input_size}_provekit_metrics.json");
-        write_json_metrics(&json_file, &metrics);
-
-        // RAM measurement
-        let sha256_binary_name = "sha256_mem";
-        compile_binary(sha256_binary_name);
-
-        let sha256_binary_path = format!("../target/release/{}", sha256_binary_name);
-        let json_file = format!("sha256_{}_provekit_mem_report.json", input_size);
-        run_measure_mem_script(&json_file, &sha256_binary_path, input_size);
-
-        // Run the (criterion) benchmarks
-        let mut group = c.benchmark_group(format!("sha256_{input_size}_provekit"));
-        group.sample_size(10);
-
-        group.bench_function(format!("sha256_{input_size}_provekit_prove"), |bench| {
-            bench.iter(|| {
-                let proof = bench_harness.run_prove();
-                black_box(proof);
-            });
-        });
-
-        group.bench_function(format!("sha256_{input_size}_provekit_verify"), |bench| {
-            bench.iter_batched(
-                || bench_harness.prepare_verify(),
-                |(proof, proof_scheme)| bench_harness.run_verify(&proof, proof_scheme).unwrap(),
-                BatchSize::SmallInput,
-            );
-        });
-        group.finish();
-    }
-}
-
-criterion_group!(benches, sha256_benchmarks);
-criterion_main!(benches);
-
-fn sha256_provekit_metrics(bench_harness: &ProvekitSha256Benchmark, input_size: usize) -> Metrics {
-    let mut metrics = Metrics::new(
-        "provekit".to_string(),
-        "".to_string(),
-        false,
-        "sha256".to_string(),
-        input_size,
-    );
-
-    metrics.preprocessing_size = bench_harness.preprocessing_size();
-
-    let proof = bench_harness.run_prove();
-    metrics.proof_size = proof.whir_r1cs_proof.transcript.len();
-
-    metrics
-}
+utils::define_benchmark_harness!(
+    BenchTarget::Sha256,
+    ProvingSystem::Provekit,
+    None,
+    "sha256_mem",
+    |input_size| { prepare_sha256(input_size) },
+    |(proof_scheme, toml_path, _)| { prove(proof_scheme, toml_path) },
+    |(proof_scheme, _, _), proof| {
+        verify(&proof, proof_scheme).unwrap();
+    },
+    |(_, _, circuit_path)| { preprocessing_size(&circuit_path) },
+    |proof| { proof.whir_r1cs_proof.transcript.len() }
+);

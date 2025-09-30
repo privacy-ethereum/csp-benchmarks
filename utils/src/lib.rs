@@ -6,7 +6,10 @@ use std::io::Write;
 use std::path::Path;
 
 pub mod bench;
+pub mod harness;
 pub mod metadata;
+
+pub use harness::{BenchHarnessConfig, BenchTarget, ProvingSystem};
 
 pub fn write_json<T: Serialize>(data: &T, output_path: &str) {
     let json_data = serde_json::to_string_pretty(&data).expect("Failed to serialize to JSON");
