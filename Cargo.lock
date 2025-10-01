@@ -273,6 +273,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "ark-bls12-381"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3df4dcc01ff89867cd86b0da835f23c3f02738353aaee7dde7495af71363b8d5"
+dependencies = [
+ "ark-ec 0.5.0",
+ "ark-ff 0.5.0",
+ "ark-serialize 0.5.0",
+ "ark-std 0.5.0",
+]
+
+[[package]]
 name = "ark-bn254"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -482,6 +494,22 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.106",
+]
+
+[[package]]
+name = "ark-groth16"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "88f1d0f3a534bb54188b8dcc104307db6c56cdae574ddc3212aec0625740fc7e"
+dependencies = [
+ "ark-crypto-primitives",
+ "ark-ec 0.5.0",
+ "ark-ff 0.5.0",
+ "ark-poly 0.5.0",
+ "ark-relations",
+ "ark-serialize 0.5.0",
+ "ark-std 0.5.0",
+ "rayon",
 ]
 
 [[package]]
@@ -890,7 +918,7 @@ dependencies = [
  "bitflags 2.9.3",
  "cexpr",
  "clang-sys",
- "itertools 0.11.0",
+ "itertools 0.13.0",
  "proc-macro2",
  "quote",
  "regex",
@@ -907,7 +935,7 @@ dependencies = [
  "binius-core",
  "binius-frontend",
  "cranelift-entity",
- "hex-literal",
+ "hex-literal 1.0.0",
  "num-bigint",
  "num-integer",
  "petgraph 0.8.2",
@@ -987,7 +1015,7 @@ source = "git+https://github.com/IrreducibleOSS/binius64#f539683c8a6593d5d8df365
 dependencies = [
  "binius-core",
  "cranelift-entity",
- "hex-literal",
+ "hex-literal 1.0.0",
  "num-bigint",
  "num-integer",
  "petgraph 0.8.2",
@@ -1442,6 +1470,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
 
 [[package]]
+name = "chkstk_stub"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "047f6ab2f3b9bcaf23b593d1580898e4244d27eadf1a1fae99212ee5735d3d1c"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "chrono"
 version = "0.4.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1494,6 +1531,48 @@ dependencies = [
 ]
 
 [[package]]
+name = "circom"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "circom-prover",
+ "clap",
+ "criterion",
+ "serde_json",
+ "utils 0.1.0",
+ "witnesscalc-adapter",
+]
+
+[[package]]
+name = "circom-prover"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62ce8067ecdda38ff17e577c43e326b5c40a29581b4f900340ef755127446201"
+dependencies = [
+ "anyhow",
+ "ark-bls12-381 0.5.0",
+ "ark-bn254",
+ "ark-ec 0.5.0",
+ "ark-ff 0.5.0",
+ "ark-groth16",
+ "ark-poly 0.5.0",
+ "ark-relations",
+ "ark-serialize 0.5.0",
+ "ark-std 0.5.0",
+ "byteorder",
+ "hex-literal 0.4.1",
+ "num",
+ "num-bigint",
+ "num-traits",
+ "rand 0.8.5",
+ "rayon",
+ "rust-rapidsnark",
+ "serde_json",
+ "uuid",
+ "witnesscalc-adapter",
+]
+
+[[package]]
 name = "circuit"
 version = "0.1.0"
 source = "git+https://github.com/PolyhedraZK/Expander?branch=main#be01620e672429a2414cb37dfdbede2a263a4e99"
@@ -1518,7 +1597,7 @@ version = "0.1.0"
 source = "git+https://github.com/PolyhedraZK/ExpanderCompilerCollection#306b51501a1db565a32e9d89e3bc61d62fbd22d2"
 dependencies = [
  "arith",
- "ark-bls12-381",
+ "ark-bls12-381 0.4.0",
  "ark-ec 0.4.2",
  "ark-ff 0.4.2",
  "ark-std 0.4.0",
@@ -2946,6 +3025,12 @@ checksum = "5313b072ce3c597065a808dbf612c4c8e8590bdbf8b579508bf7a762c5eae6cd"
 dependencies = [
  "arrayvec",
 ]
+
+[[package]]
+name = "hex-literal"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
 
 [[package]]
 name = "hex-literal"
@@ -5137,8 +5222,8 @@ version = "0.13.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be769465445e8c1474e9c5dac2018218498557af32d9ed057325ec9a41ae81bf"
 dependencies = [
- "heck 0.4.1",
- "itertools 0.10.5",
+ "heck 0.5.0",
+ "itertools 0.14.0",
  "log",
  "multimap",
  "once_cell",
@@ -5158,7 +5243,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a56d757972c98b346a9b766e3f02746cde6dd1cd1d1d563472929fdd74bec4d"
 dependencies = [
  "anyhow",
- "itertools 0.10.5",
+ "itertools 0.14.0",
  "proc-macro2",
  "quote",
  "syn 2.0.106",
@@ -5624,6 +5709,19 @@ name = "rust-fuzzy-search"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a157657054ffe556d8858504af8a672a054a6e0bd9e8ee531059100c0fa11bb2"
+
+[[package]]
+name = "rust-rapidsnark"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "17fc46ed31873e6fbc16e2ca37f1b26458ef3f2e72fef8ddf6f166af889a5baa"
+dependencies = [
+ "anyhow",
+ "cc",
+ "chkstk_stub",
+ "num-bigint",
+ "num-traits",
+]
 
 [[package]]
 name = "rustc-demangle"
@@ -7270,6 +7368,17 @@ version = "0.1.0"
 source = "git+https://github.com/PolyhedraZK/Expander?branch=main#be01620e672429a2414cb37dfdbede2a263a4e99"
 
 [[package]]
+name = "uuid"
+version = "1.18.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f87b8aa10b915a06587d0dec516c282ff295b475d94abf425d62b57710070a2"
+dependencies = [
+ "getrandom 0.3.3",
+ "js-sys",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "valuable"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8000,6 +8109,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6f42320e61fe2cfd34354ecb597f86f413484a798ba44a8ca1165c58d42da6c1"
 dependencies = [
  "bitflags 2.9.3",
+]
+
+[[package]]
+name = "witnesscalc-adapter"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3536d0e525d058a790368b7c0a4f6fe96aec69493f6b72a6f6916866de498327"
+dependencies = [
+ "anyhow",
+ "num-bigint",
+ "num-traits",
+ "paste",
+ "serde_json",
 ]
 
 [[package]]

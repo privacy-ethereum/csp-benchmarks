@@ -22,3 +22,8 @@ tmp/
 *.json
 // Ligetron proof files
 *.data
+// Circom files
+*.r1cs
+*.sym
+*.wtns
+*.ptau

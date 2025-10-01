@@ -1,0 +1,29 @@
+[package]
+name = "circom"
+version = "0.1.0"
+edition = "2024"
+build = "build.rs"
+
+[dependencies]
+circom-prover = { version = "0.1", default-features = false, features = ["witnesscalc", "rapidsnark"] }
+witnesscalc-adapter = "0.1"
+
+anyhow = { workspace = true }
+clap = { workspace = true }
+serde_json = { workspace = true }
+utils = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[build-dependencies]
+circom-prover = { version = "0.1", default-features = false, features = ["witnesscalc", "rapidsnark"] }
+witnesscalc-adapter = "0.1"
+
+[[bench]]
+name = "sha256_bench"
+harness = false
+
+[[bin]]
+name = "sha256_mem"
+path = "src/bin/sha256_mem.rs"
