@@ -58,9 +58,8 @@ jobs:
             all_done=true
             any_failed=false
             summary=""
-            # build array of workflow names from JSON env
-            mapfile -t WORKFLOWS < <(jq -r '.[]' <<<"$REQUIRED_WORKFLOWS_JSON")
-            for wf in "${WORKFLOWS[@]}"; do
+          # Iterate workflows from JSON (compatible with macOS bash 3.2)
+          while IFS= read -r wf; do
               # List recent runs for this workflow, pick the one matching head SHA
               run_json=$(gh run list --workflow "$wf" --limit 50 \
                 --json databaseId,headSha,conclusion,status,displayTitle,workflowName \
@@ -79,7 +78,7 @@ jobs:
               elif [[ "$conclusion" != "success" ]]; then
                 any_failed=true
               fi
-            done
+          done < <(jq -r '.[]' <<<"$REQUIRED_WORKFLOWS_JSON")
             echo -e "$summary"
             if $all_done; then
               if $any_failed; then
@@ -102,14 +101,13 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p inbox
-          mapfile -t WORKFLOWS < <(jq -r '.[]' <<<"$REQUIRED_WORKFLOWS_JSON")
-          for wf in "${WORKFLOWS[@]}"; do
+          while IFS= read -r wf; do
             RUN_ID=$(gh run list --workflow "$wf" --limit 50 \
               --json databaseId,headSha \
               --jq "map(select(.headSha==\"$SHA\"))[0].databaseId")
             [[ -z "$RUN_ID" || "$RUN_ID" == "null" ]] && { echo "No run for $wf (skipping)"; continue; }
             gh run download "$RUN_ID" --dir "inbox/$wf" || echo "No artifacts to download for $wf (run_id=$RUN_ID). Continuing."
-          done
+          done < <(jq -r '.[]' <<<"$REQUIRED_WORKFLOWS_JSON")
 
       - name: Stage downloaded artifacts into workspace
         shell: bash
