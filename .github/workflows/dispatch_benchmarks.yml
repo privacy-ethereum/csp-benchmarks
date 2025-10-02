@@ -1,0 +1,61 @@
+name: Dispatch All Benchmarks (manual)
+
+"on":
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref (branch, tag, or SHA) to run on"
+        required: false
+        default: "${{ github.ref }}"
+      run_all:
+        description: "Force running all benches regardless of changes"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: macos-latest
+    steps:
+      - name: Install gh
+        run: brew install gh
+
+      - name: Determine ref
+        id: ref
+        shell: bash
+        run: |
+          set -euo pipefail
+          REF_INPUT="${{ github.event.inputs.ref }}"
+          if [[ -n "$REF_INPUT" ]]; then
+            echo "ref=$REF_INPUT" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Dispatch Rust Benchmarks (parallel)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          REF='${{ steps.ref.outputs.ref }}'
+          RUN_ALL='${{ github.event.inputs.run_all }}'
+          gh workflow run "Rust Benchmarks (parallel)" \
+            --ref "$REF" \
+            -f run_all="$RUN_ALL"
+
+      - name: Dispatch Non-Rust Benchmarks (parallel)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          REF='${{ steps.ref.outputs.ref }}'
+          RUN_ALL='${{ github.event.inputs.run_all }}'
+          gh workflow run "Non-Rust Benchmarks (parallel)" \
+            --ref "$REF" \
+            -f run_all="$RUN_ALL"
