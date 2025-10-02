@@ -3,12 +3,7 @@ name: Collect & Parse Artifacts (fan-in)
 # Will be triggered by the completion of any of the following workflows:
 on:
   workflow_run:
-    workflows:
-      [
-        "Rust Benchmarks (parallel)",
-        "Rust Benchmarks (serial)",
-        "Non-Rust Benchmarks (parallel)",
-      ]
+    workflows: ["Rust Benchmarks (parallel)", "Non-Rust Benchmarks (parallel)"]
     types: [completed]
 
 # collapse multiple triggers for the same commit into one survivor
@@ -26,7 +21,7 @@ jobs:
     env:
       SHA: ${{ github.event.workflow_run.head_sha }}
       # keep in sync with on.workflow_run.workflows
-      REQUIRED_WORKFLOWS_JSON: '["Rust Benchmarks (parallel)", "Rust Benchmarks (serial)", "Non-Rust Benchmarks (parallel)"]'
+      REQUIRED_WORKFLOWS_JSON: '["Rust Benchmarks (parallel)", "Non-Rust Benchmarks (parallel)"]'
       WAIT_SECONDS: "30"
       MAX_TRIES: "80" # 30 × 80 = ~40 min max wait
     steps:
