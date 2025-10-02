@@ -7,6 +7,7 @@ members = [
     "provekit",
     "polyhedra-expander",
     "circom",
+    "noir",
     "utils",
 ]
 exclude = ["zkvm", "plonky3-powdr"]
