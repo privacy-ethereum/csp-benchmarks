@@ -28,6 +28,7 @@ jobs:
     runs-on: macos-latest
     env:
       SHA: ${{ inputs.sha || github.event.workflow_run.head_sha || github.sha }}
+      GH_TOKEN: ${{ github.token }}
       # keep in sync with on.workflow_run.workflows
       REQUIRED_WORKFLOWS_JSON: ${{ inputs.required_workflows_json || '["Rust Benchmarks (parallel)", "Non-Rust Benchmarks (parallel)"]' }}
       WAIT_SECONDS: "30"
