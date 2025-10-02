@@ -1,12 +1,11 @@
 name: Dispatch All Benchmarks (manual)
 
-"on":
+on:
   workflow_dispatch:
     inputs:
       ref:
         description: "Git ref (branch, tag, or SHA) to run on"
         required: false
-        default: "${{ github.ref }}"
       run_all:
         description: "Force running all benches regardless of changes"
         required: false

@@ -5,10 +5,18 @@ on:
   workflow_run:
     workflows: ["Rust Benchmarks (parallel)", "Non-Rust Benchmarks (parallel)"]
     types: [completed]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit SHA to collect from"
+        required: false
+      required_workflows_json:
+        description: "JSON array of workflow names"
+        required: false
 
 # collapse multiple triggers for the same commit into one survivor
 concurrency:
-  group: fanin-${{ github.event.workflow_run.head_sha }}
+  group: fanin-${{ inputs.sha || github.event.workflow_run.head_sha || github.sha }}
   cancel-in-progress: true
 
 permissions:
@@ -19,9 +27,9 @@ jobs:
   collect:
     runs-on: macos-latest
     env:
-      SHA: ${{ github.event.workflow_run.head_sha }}
+      SHA: ${{ inputs.sha || github.event.workflow_run.head_sha || github.sha }}
       # keep in sync with on.workflow_run.workflows
-      REQUIRED_WORKFLOWS_JSON: '["Rust Benchmarks (parallel)", "Non-Rust Benchmarks (parallel)"]'
+      REQUIRED_WORKFLOWS_JSON: ${{ inputs.required_workflows_json || '["Rust Benchmarks (parallel)", "Non-Rust Benchmarks (parallel)"]' }}
       WAIT_SECONDS: "30"
       MAX_TRIES: "80" # 30 × 80 = ~40 min max wait
     steps:
