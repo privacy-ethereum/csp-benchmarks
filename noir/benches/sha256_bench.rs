@@ -5,7 +5,7 @@ use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
-    ProvingSystem::Provekit,
+    ProvingSystem::Noir,
     None,
     "sha256_mem",
     |input_size| { prepare_sha256(input_size) },

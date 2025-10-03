@@ -30,6 +30,7 @@ pub enum ProvingSystem {
     Powdr,
     Provekit,
     Circom,
+    Noir,
     // Extend as needed
 }
 
@@ -42,6 +43,7 @@ impl ProvingSystem {
             ProvingSystem::Powdr => "powdr",
             ProvingSystem::Provekit => "provekit",
             ProvingSystem::Circom => "circom",
+            ProvingSystem::Noir => "noir",
         }
     }
 }
