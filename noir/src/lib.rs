@@ -1,7 +1,8 @@
 use noir_rs::{
     barretenberg::{
-        prove::prove_ultra_honk, srs::setup_srs_from_bytecode, utils::get_honk_verification_key,
-        verify::verify_ultra_honk,
+        prove::prove_ultra_honk,
+        srs::setup_srs_from_bytecode,
+        verify::{get_ultra_honk_verification_key, verify_ultra_honk},
     },
     witness::deserialize_witness,
 };
@@ -93,7 +94,10 @@ pub fn prove(toml_path: &Path, circuit_path: &Path) -> Vec<u8> {
     let initial_witness =
         deserialize_witness(witness).expect("Failed to deserialize initial witness");
 
-    let proof = prove_ultra_honk(&bytecode, initial_witness, false).unwrap();
+    // Get the verification key
+    let vk = get_ultra_honk_verification_key(&bytecode, true).unwrap();
+
+    let proof = prove_ultra_honk(&bytecode, initial_witness, vk, true).unwrap();
     proof
 }
 
@@ -104,7 +108,7 @@ pub fn verify(proof: &Vec<u8>, circuit_path: &Path) -> Result<(), &'static str> 
         .expect("Cannot read bytecode from circuit json");
 
     // Get the verification key
-    let vk = get_honk_verification_key(&bytecode, false).unwrap();
+    let vk = get_ultra_honk_verification_key(&bytecode, true).unwrap();
 
     // Verify the proof
     let verdict = verify_ultra_honk(proof, vk).unwrap();
