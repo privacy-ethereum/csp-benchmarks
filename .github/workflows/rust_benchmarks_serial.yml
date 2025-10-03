@@ -86,6 +86,9 @@ jobs:
       - name: Install Nargo
         uses: ./.github/actions/install-nargo
 
+      - name: Install Barretenberg
+        uses: ./.github/actions/install-bb
+
       - name: Install OpenMPI
         uses: ./.github/actions/install-ompi
 

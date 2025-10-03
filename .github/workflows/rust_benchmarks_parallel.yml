@@ -184,6 +184,9 @@ jobs:
       - name: Install Nargo
         if: ${{ contains(matrix.crate, 'provekit') }}
         uses: ./.github/actions/install-nargo
+      
+      - name: Install Barretenberg
+        uses: ./.github/actions/install-bb
 
       - name: Install OpenMPI for polyhedra-expander
         if: ${{ contains(matrix.crate, 'polyhedra-expander') }}
