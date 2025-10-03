@@ -81,6 +81,7 @@ pub fn prove(input_size: usize, toml_path: &Path, circuit_path: &Path) -> (PathB
     }
 
     let witness_path = workspace_root.join("target").join(witness_file_name);
+    let output_path = workspace_root.join("target");
     let output = Command::new("bb")
         .args([
             "prove",
@@ -90,7 +91,7 @@ pub fn prove(input_size: usize, toml_path: &Path, circuit_path: &Path) -> (PathB
             witness_path.to_str().unwrap(),
             "--write_vk",
             "-o",
-            "./target",
+            output_path.to_str().unwrap(),
         ])
         .current_dir(&workspace_root)
         .output()
