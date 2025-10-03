@@ -1,3 +1,4 @@
+use noir::proof_size;
 use noir::{prepare_sha256, preprocessing_size, prove, verify};
 use utils::harness::BenchTarget;
 use utils::harness::ProvingSystem;
@@ -8,10 +9,10 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem",
     |input_size| { prepare_sha256(input_size) },
-    |(proof_scheme, toml_path, _)| { prove(proof_scheme, toml_path) },
-    |(proof_scheme, _, _), proof| {
-        verify(&proof, proof_scheme).unwrap();
+    |(input_size, toml_path, circuit_path)| { prove(*input_size, toml_path, circuit_path) },
+    |(_, _, _), (proof_path, vk_path)| {
+        verify(&proof_path, &vk_path).unwrap();
     },
     |(_, _, circuit_path)| { preprocessing_size(&circuit_path) },
-    |proof| { proof.whir_r1cs_proof.transcript.len() }
+    |(proof_path, _vk_path)| { proof_size(proof_path) }
 );

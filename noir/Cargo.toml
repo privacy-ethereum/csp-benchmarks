@@ -4,8 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-noir_rs = { git = "https://github.com/zkpassport/noir_rs.git", tag = "v1.0.0-beta.8-3", features = ["barretenberg"] }
-
 anyhow = { workspace = true }
 bincode = { workspace = true }
 clap = { workspace = true }

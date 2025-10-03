@@ -1,12 +1,3 @@
-use noir_rs::{
-    barretenberg::{
-        prove::prove_ultra_honk,
-        srs::setup_srs_from_bytecode,
-        verify::{get_ultra_honk_verification_key, verify_ultra_honk},
-    },
-    witness::deserialize_witness,
-};
-use serde_json::Value;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -36,34 +27,13 @@ fn compile_workspace() -> PathBuf {
     workspace_root
 }
 
-fn read_file_as_string(path: &Path) -> std::io::Result<String> {
-    let mut file = fs::File::open(path)?;
-    let mut buf = String::new();
-    file.read_to_string(&mut buf)?;
-    Ok(buf)
-}
-
-fn read_bytecode_from_circuit_json(circuit_path: &Path) -> std::io::Result<String> {
-    let buf = read_file_as_string(circuit_path)?;
-    let v: Value =
-        serde_json::from_str(&buf).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-
-    v.get("bytecode").map(|val| val.to_string())
-}
-
-pub fn prepare_sha256(input_size: usize) -> (PathBuf, PathBuf) {
+pub fn prepare_sha256(input_size: usize) -> (usize, PathBuf, PathBuf) {
     let workspace_root = compile_workspace();
 
     let package_name = "sha256_var_input";
     let circuit_path = workspace_root
         .join("target")
         .join(format!("{package_name}.json"));
-
-    let bytecode = read_bytecode_from_circuit_json(circuit_path)
-        .expect("Cannot read bytecode from circuit json");
-
-    // Setup the SRS
-    setup_srs_from_bytecode(&bytecode, None, false).unwrap();
 
     let dir_name = "sha256_var_input";
     let circuit_member_dir = workspace_root.join(CIRCUIT_SUB_PATH).join(dir_name);
@@ -79,41 +49,86 @@ pub fn prepare_sha256(input_size: usize) -> (PathBuf, PathBuf) {
             .join(", "),
     );
 
-    let toml_path = circuit_member_dir.join("Prover.toml");
+    let toml_path = circuit_member_dir.join(format!("Prover_{input_size}.toml"));
     fs::write(&toml_path, toml_content).expect("Failed to write Prover.toml");
 
-    (toml_path, circuit_path)
+    (input_size, toml_path, circuit_path)
 }
 
-pub fn prove(toml_path: &Path, circuit_path: &Path) -> Vec<u8> {
-    let bytecode = read_bytecode_from_circuit_json(circuit_path)
-        .expect("Cannot read bytecode from circuit json");
+pub fn prove(input_size: usize, toml_path: &Path, circuit_path: &Path) -> (PathBuf, PathBuf) {
+    let current_dir = std::env::current_dir().expect("Failed to get current directory");
+    let workspace_root = current_dir.join(WORKSPACE_ROOT);
 
-    let buf = read_file_as_string(toml_path).unwrap();
-    let witness = bincode::serialize(&buf).unwrap();
-    let initial_witness =
-        deserialize_witness(witness).expect("Failed to deserialize initial witness");
+    let package_name = "sha256_var_input";
+    let witness_file_name = format!("{package_name}_{input_size}.gz");
+    let output = Command::new("nargo")
+        .args([
+            "execute",
+            "--prover-name",
+            toml_path.file_name().unwrap().to_str().unwrap(),
+            "--package",
+            package_name,
+            &witness_file_name,
+        ])
+        .current_dir(&workspace_root)
+        .output()
+        .expect("Failed to run nargo compile");
+    if !output.status.success() {
+        panic!(
+            "Witness generation failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
 
-    // Get the verification key
-    let vk = get_ultra_honk_verification_key(&bytecode, true).unwrap();
+    let witness_path = workspace_root.join("target").join(witness_file_name);
+    let output = Command::new("bb")
+        .args([
+            "prove",
+            "-b",
+            circuit_path.to_str().unwrap(),
+            "-w",
+            witness_path.to_str().unwrap(),
+            "--write_vk",
+            "-o",
+            "./target",
+        ])
+        .current_dir(&workspace_root)
+        .output()
+        .expect("Failed to run bb prove");
+    if !output.status.success() {
+        panic!(
+            "Barretenberg prove failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
 
-    let proof = prove_ultra_honk(&bytecode, initial_witness, vk, true).unwrap();
-    proof
+    let proof_path = workspace_root.join("target").join("proof");
+    let vk_path = workspace_root.join("target").join("vk");
+    (proof_path, vk_path)
 }
 
-/// Verify a proof with the given scheme
-pub fn verify(proof: &Vec<u8>, circuit_path: &Path) -> Result<(), &'static str> {
-    // Read the bytecode from the circuit json
-    let bytecode = read_bytecode_from_circuit_json(circuit_path)
-        .expect("Cannot read bytecode from circuit json");
+/// Verify a proof
+pub fn verify(proof_path: &Path, vk_path: &Path) -> Result<(), &'static str> {
+    let current_dir = std::env::current_dir().expect("Failed to get current directory");
+    let workspace_root = current_dir.join(WORKSPACE_ROOT);
 
-    // Get the verification key
-    let vk = get_ultra_honk_verification_key(&bytecode, true).unwrap();
-
-    // Verify the proof
-    let verdict = verify_ultra_honk(proof, vk).unwrap();
-
-    assert!(verdict, "Verification failed");
+    let output = Command::new("bb")
+        .args([
+            "verify",
+            "-p",
+            proof_path.to_str().unwrap(),
+            "-k",
+            vk_path.to_str().unwrap(),
+        ])
+        .current_dir(&workspace_root)
+        .output()
+        .expect("Failed to run bb verify");
+    if !output.status.success() {
+        panic!(
+            "Barretenberg verify failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
 
     Ok(())
 }
@@ -122,4 +137,8 @@ pub fn preprocessing_size(circuit_path: &Path) -> usize {
     std::fs::metadata(circuit_path)
         .map(|m| m.len())
         .unwrap_or(0) as usize
+}
+
+pub fn proof_size(proof_path: &Path) -> usize {
+    std::fs::metadata(proof_path).map(|m| m.len()).unwrap_or(0) as usize
 }

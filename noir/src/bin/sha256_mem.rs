@@ -11,6 +11,10 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let (toml_path, circuit_path) = prepare_sha256(args.input_size);
-    let _proof = prove(&toml_path, &circuit_path);
+    sha256_mem(args.input_size);
+}
+
+fn sha256_mem(input_size: usize) {
+    let (input_size, toml_path, circuit_path) = prepare_sha256(input_size);
+    let _ = prove(input_size, &toml_path, &circuit_path);
 }
