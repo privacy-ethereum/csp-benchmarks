@@ -207,6 +207,6 @@ jobs:
         if: always()
         with:
           name: "metrics-${{ matrix.crate }}"
-          path: ${{ matrix.crate }}/*_metrics.json
+          path: ${{ matrix.crate }}/**/*_metrics.json
           if-no-files-found: warn
           retention-days: 30

@@ -102,18 +102,24 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p inbox
+          echo "Downloading artifacts for workflows listed in REQUIRED_WORKFLOWS_JSON: $REQUIRED_WORKFLOWS_JSON"
           while IFS= read -r wf; do
             RUN_ID=$(gh run list --workflow "$wf" --limit 50 \
               --json databaseId,headSha \
               --jq "map(select(.headSha==\"$SHA\"))[0].databaseId")
             [[ -z "$RUN_ID" || "$RUN_ID" == "null" ]] && { echo "No run for $wf (skipping)"; continue; }
+            echo "Downloading artifacts for $wf (run_id=$RUN_ID) into inbox/$wf"
             gh run download "$RUN_ID" --dir "inbox/$wf" || echo "No artifacts to download for $wf (run_id=$RUN_ID). Continuing."
           done < <(jq -r '.[]' <<<"$REQUIRED_WORKFLOWS_JSON")
+
+          echo "Artifact directory structure (depth 3):"
+          find inbox -maxdepth 3 -print | sed 's/^/  /'
 
       - name: Stage downloaded artifacts into workspace
         shell: bash
         run: |
           set -euo pipefail
+          set -x
           shopt -s nullglob
 
           # 1) Merge all criterion trees into ./target/criterion so the collector finds them
@@ -122,15 +128,35 @@ jobs:
             rsync -a "$critdir"/ target/criterion/
           done < <(find inbox -type d -path '*/target/criterion' -print0)
 
-          # 2) Restore non-Rust metrics into workspace, preserving relative paths
+          # 2) Restore non-Rust metrics into their system folders (e.g., ./ligetron/*.json)
           while IFS= read -r -d '' outdir; do
-            rsync -a "$outdir"/ ./
+            sys="$(basename "$outdir")"
+            sys="${sys#benchmark-outputs-}"
+            mkdir -p "$sys"
+            if [[ -d "$outdir/$sys" ]]; then
+              cp -a "$outdir/$sys/"*_metrics.json "$sys"/ || true
+            else
+              cp -a "$outdir/"*_metrics.json "$sys"/ || true
+            fi
           done < <(find inbox -type d -name 'benchmark-outputs-*' -print0)
 
-          # 3) Restore Rust metrics into workspace, preserving relative paths
+          # 3) Restore Rust metrics into their crate folders
           while IFS= read -r -d '' mdir; do
-            rsync -a "$mdir"/ ./
+            crate="$(basename "$mdir")"
+            crate="${crate#metrics-}"
+            mkdir -p "$crate"
+            if [[ -d "$mdir/$crate" ]]; then
+              cp -a "$mdir/$crate/"*_metrics.json "$crate"/ || true
+            else
+              cp -a "$mdir/"*_metrics.json "$crate"/ || true
+            fi
           done < <(find inbox -type d -name 'metrics-*' -print0)
+
+          set +x
+          echo "Workspace metrics discovered (depth 2):"
+          find . -maxdepth 2 -name "*_metrics.json" -print | sed 's/^/  /'
+          echo "Criterion entries present:"
+          find target/criterion -maxdepth 2 -type d -print 2>/dev/null | sed 's/^/  /' || true
 
       - name: Install Rust toolchain (stable)
         uses: actions-rs/toolchain@v1
