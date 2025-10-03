@@ -18,8 +18,17 @@ fn main() -> io::Result<()> {
             let metrics_file_paths = find_metrics_files(&path);
             for metrics_file_path in metrics_file_paths {
                 println!("Extracting metrics from {}", metrics_file_path.display());
-                let metrics = extract_metrics(&path, &metrics_file_path)?;
-                benchmarks.push(metrics);
+                match extract_metrics(&path, &metrics_file_path) {
+                    Ok(metrics) => benchmarks.push(metrics),
+                    Err(e) => {
+                        eprintln!(
+                            "\n===== WARNING: failed to parse metrics file =====\n  file: {}\n  error: {}\n===============================================\n",
+                            metrics_file_path.display(),
+                            e
+                        );
+                        continue;
+                    }
+                }
             }
         }
     }
@@ -61,11 +70,35 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> 
                 "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_prove/new/estimates.json"
             ))
         };
-        println!("Reading proof duration from {}", crit_path_p.display());
-
-        let proof_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_p)?)?;
-        if let Some(est) = proof_crit.get("mean").and_then(|m| m.get("point_estimate")) {
-            metrics.proof_duration = Duration::from_nanos(est.as_f64().unwrap().round() as u64);
+        if crit_path_p.exists() {
+            println!("Reading proof duration from {}", crit_path_p.display());
+            match fs::read_to_string(&crit_path_p) {
+                Ok(contents) => match serde_json::from_str::<Value>(&contents) {
+                    Ok(proof_crit) => {
+                        if let Some(est) =
+                            proof_crit.get("mean").and_then(|m| m.get("point_estimate"))
+                            && let Some(f) = est.as_f64()
+                        {
+                            metrics.proof_duration = Duration::from_nanos(f.round() as u64);
+                        }
+                    }
+                    Err(e) => eprintln!(
+                        "\n===== WARNING: failed to parse proof estimates =====\n  file: {}\n  error: {}\n===================================================\n",
+                        crit_path_p.display(),
+                        e
+                    ),
+                },
+                Err(e) => eprintln!(
+                    "\n===== WARNING: failed to read proof estimates =====\n  file: {}\n  error: {}\n==================================================\n",
+                    crit_path_p.display(),
+                    e
+                ),
+            }
+        } else {
+            eprintln!(
+                "\n===== WARNING: proof estimates.json not found =====\n  file: {}\n==================================================\n",
+                crit_path_p.display()
+            );
         }
     }
 
@@ -79,13 +112,36 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> 
                 "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_verify/new/estimates.json"
             ))
         };
-        println!("Reading verify duration from {}", crit_path_v.display());
-        let verify_crit: Value = serde_json::from_str(&fs::read_to_string(&crit_path_v)?)?;
-        if let Some(est) = verify_crit
-            .get("mean")
-            .and_then(|m| m.get("point_estimate"))
-        {
-            metrics.verify_duration = Duration::from_nanos(est.as_f64().unwrap().round() as u64);
+        if crit_path_v.exists() {
+            println!("Reading verify duration from {}", crit_path_v.display());
+            match fs::read_to_string(&crit_path_v) {
+                Ok(contents) => match serde_json::from_str::<Value>(&contents) {
+                    Ok(verify_crit) => {
+                        if let Some(est) = verify_crit
+                            .get("mean")
+                            .and_then(|m| m.get("point_estimate"))
+                            && let Some(f) = est.as_f64()
+                        {
+                            metrics.verify_duration = Duration::from_nanos(f.round() as u64);
+                        }
+                    }
+                    Err(e) => eprintln!(
+                        "\n===== WARNING: failed to parse verify estimates =====\n  file: {}\n  error: {}\n====================================================\n",
+                        crit_path_v.display(),
+                        e
+                    ),
+                },
+                Err(e) => eprintln!(
+                    "\n===== WARNING: failed to read verify estimates =====\n  file: {}\n  error: {}\n===================================================\n",
+                    crit_path_v.display(),
+                    e
+                ),
+            }
+        } else {
+            eprintln!(
+                "\n===== WARNING: verify estimates.json not found =====\n  file: {}\n===================================================\n",
+                crit_path_v.display()
+            );
         }
     }
 
@@ -99,10 +155,32 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> 
                 "{target}_{input_size}_{proving_system}_{feat}_mem_report.json"
             ))
         };
-        println!("Reading peak memory from {}", mem_path.display());
-        let mem: Value = serde_json::from_str(&fs::read_to_string(&mem_path)?)?;
-        if let Some(m) = mem.get("peak_memory") {
-            metrics.peak_memory = m.as_u64().unwrap() as usize;
+        if mem_path.exists() {
+            println!("Reading peak memory from {}", mem_path.display());
+            match fs::read_to_string(&mem_path) {
+                Ok(contents) => match serde_json::from_str::<Value>(&contents) {
+                    Ok(mem) => {
+                        if let Some(m) = mem.get("peak_memory") {
+                            metrics.peak_memory = m.as_u64().unwrap_or(0) as usize;
+                        }
+                    }
+                    Err(e) => eprintln!(
+                        "\n===== WARNING: failed to parse memory report =====\n  file: {}\n  error: {}\n==================================================\n",
+                        mem_path.display(),
+                        e
+                    ),
+                },
+                Err(e) => eprintln!(
+                    "\n===== WARNING: failed to read memory report =====\n  file: {}\n  error: {}\n=================================================\n",
+                    mem_path.display(),
+                    e
+                ),
+            }
+        } else {
+            eprintln!(
+                "\n===== WARNING: memory report not found =====\n  file: {}\n===========================================\n",
+                mem_path.display()
+            );
         }
     }
 
