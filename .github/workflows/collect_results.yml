@@ -122,11 +122,12 @@ jobs:
           set -x
           shopt -s nullglob
 
-          # 1) Merge all criterion trees into ./target/criterion so the collector finds them
+          # 1) Merge all Criterion artifact trees (named criterion-<crate>, see rust_benchmarks_parallel.yml) into ./target/criterion
           mkdir -p target/criterion
-          while IFS= read -r -d '' critdir; do
-            rsync -a "$critdir"/ target/criterion/
-          done < <(find inbox -type d -path '*/target/criterion' -print0)
+          while IFS= read -r -d '' critroot; do
+            echo "Merging Criterion artifact: $critroot -> target/criterion"
+            rsync -a "$critroot"/ target/criterion/
+          done < <(find inbox -type d -maxdepth 3 -name 'criterion-*' -print0)
 
           # 2) Restore non-Rust metrics into their system folders (e.g., ./ligetron/*.json)
           while IFS= read -r -d '' outdir; do
