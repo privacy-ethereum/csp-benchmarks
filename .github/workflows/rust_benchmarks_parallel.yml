@@ -182,7 +182,7 @@ jobs:
       #  run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
       - name: Install Nargo
-        if: ${{ contains(matrix.crate, 'provekit') }}
+        if: ${{ contains(matrix.crate, 'provekit') || contains(matrix.crate, 'noir') }}
         uses: ./.github/actions/install-nargo
       
       - name: Install Barretenberg
