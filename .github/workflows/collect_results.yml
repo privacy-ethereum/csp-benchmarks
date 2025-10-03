@@ -153,6 +153,18 @@ jobs:
             fi
           done < <(find inbox -type d -name 'metrics-*' -print0)
 
+          # 4) Restore Rust mem reports into their crate folders
+          while IFS= read -r -d '' mdir; do
+            crate="$(basename "$mdir")"
+            crate="${crate#mem-}"
+            mkdir -p "$crate"
+            if [[ -d "$mdir/$crate" ]]; then
+              cp -a "$mdir/$crate/"*_mem_report.json "$crate"/ || true
+            else
+              cp -a "$mdir/"*_mem_report.json "$crate"/ || true
+            fi
+          done < <(find inbox -type d -name 'mem-*' -print0)
+
           set +x
           echo "Workspace metrics discovered (depth 2):"
           find . -maxdepth 2 -name "*_metrics.json" -print | sed 's/^/  /'
