@@ -81,7 +81,7 @@ pub fn prove(input_size: usize, toml_path: &Path, circuit_path: &Path) -> (PathB
     }
 
     let witness_path = workspace_root.join("target").join(witness_file_name);
-    let output_path = workspace_root.join("target/");
+    // let output_path = workspace_root.join("target/");
     let output = Command::new("bb")
         .args([
             "prove",
@@ -90,8 +90,8 @@ pub fn prove(input_size: usize, toml_path: &Path, circuit_path: &Path) -> (PathB
             "-w",
             witness_path.to_str().unwrap(),
             "--write_vk",
-            "-o",
-            output_path.to_str().unwrap(),
+            // "-o",
+            // output_path.to_str().unwrap(),
         ])
         .current_dir(&workspace_root)
         .output()
@@ -103,8 +103,8 @@ pub fn prove(input_size: usize, toml_path: &Path, circuit_path: &Path) -> (PathB
         );
     }
 
-    let proof_path = workspace_root.join("target").join("proof");
-    let vk_path = workspace_root.join("target").join("vk");
+    let proof_path = workspace_root.join("out").join("proof");
+    let vk_path = workspace_root.join("out").join("vk");
     (proof_path, vk_path)
 }
 
