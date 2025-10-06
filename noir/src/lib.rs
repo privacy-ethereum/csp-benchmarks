@@ -72,7 +72,7 @@ pub fn prove(input_size: usize, toml_path: &Path, circuit_path: &Path) -> (PathB
         ])
         .current_dir(&workspace_root)
         .output()
-        .expect("Failed to run nargo compile");
+        .expect("Failed to run nargo execute");
     if !output.status.success() {
         panic!(
             "Witness generation failed: {}",
@@ -81,7 +81,7 @@ pub fn prove(input_size: usize, toml_path: &Path, circuit_path: &Path) -> (PathB
     }
 
     let witness_path = workspace_root.join("target").join(witness_file_name);
-    let output_path = workspace_root.join("target");
+    let output_path = workspace_root.join("target/");
     let output = Command::new("bb")
         .args([
             "prove",
