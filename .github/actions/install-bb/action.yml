@@ -9,4 +9,4 @@ runs:
         curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/next/barretenberg/bbup/install | bash
         source ~/.bashrc
         bbup
-        bb --version
+        echo "$HOME/.bb" >> $GITHUB_PATH
