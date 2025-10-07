@@ -106,6 +106,12 @@ jobs:
         with:
           ligero_path: ./ligetron/ligero-prover
           install_prefix: ${{ github.workspace }}/.deps/install
+      
+      - name: Setup & build Noir (only when folder is noir)
+        if: ${{ matrix.folder == 'noir' }}
+        run: |
+          ./.github/actions/install-nargo
+          ./.github/actions/install-bb
 
       - name: Ensure jq present
         run: |
