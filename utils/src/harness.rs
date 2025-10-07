@@ -30,6 +30,10 @@ pub enum ProvingSystem {
     Powdr,
     Provekit,
     Circom,
+    Risc0,
+    Sp1,
+    Jolt,
+    Miden,
     // Extend as needed
 }
 
@@ -42,7 +46,18 @@ impl ProvingSystem {
             ProvingSystem::Powdr => "powdr",
             ProvingSystem::Provekit => "provekit",
             ProvingSystem::Circom => "circom",
+            ProvingSystem::Risc0 => "risc0",
+            ProvingSystem::Sp1 => "sp1",
+            ProvingSystem::Jolt => "jolt",
+            ProvingSystem::Miden => "miden",
         }
+    }
+
+    pub fn is_zkvm(&self) -> bool {
+        matches!(
+            self,
+            ProvingSystem::Risc0 | ProvingSystem::Sp1 | ProvingSystem::Jolt | ProvingSystem::Miden
+        )
     }
 }
 
@@ -101,6 +116,7 @@ pub fn run_benchmarks_fn<
     VerifyFn,
     PrepSizeFn,
     ProofSizeFn,
+    ExecutionCyclesFn: Fn(&PreparedContext) -> u64,
 >(
     c: &mut Criterion,
     cfg: BenchHarnessConfig<'_>,
@@ -109,11 +125,12 @@ pub fn run_benchmarks_fn<
     mut verify: VerifyFn,
     mut preprocessing_size: PrepSizeFn,
     mut proof_size: ProofSizeFn,
+    execution_cycles: Option<ExecutionCyclesFn>,
 ) where
     PrepareFn: FnMut(usize) -> PreparedContext + Copy,
     ProveFn: FnMut(&PreparedContext) -> Proof + Copy,
     VerifyFn: FnMut(&PreparedContext, &Proof),
-    PrepSizeFn: FnMut(PreparedContext) -> usize,
+    PrepSizeFn: FnMut(&PreparedContext) -> usize,
     ProofSizeFn: FnMut(&Proof) -> usize,
 {
     let target_str = cfg.target.as_str();
@@ -123,11 +140,13 @@ pub fn run_benchmarks_fn<
         let prepared_context = prepare(size);
 
         let mut metrics = init_metrics(&cfg, target_str, system_str, size);
-        metrics.preprocessing_size = preprocessing_size(prepared_context);
-
-        let prepared_context = prepare(size);
+        metrics.preprocessing_size = preprocessing_size(&prepared_context);
         let proof = prove(&prepared_context);
         metrics.proof_size = proof_size(&proof);
+
+        if let Some(ref cycles_fn) = execution_cycles {
+            metrics.cycles = cycles_fn(&prepared_context);
+        }
 
         write_json_metrics(target_str, size, system_str, cfg.feature, &metrics);
 
@@ -175,6 +194,7 @@ pub fn run_benchmarks_with_state_fn<
     VerifyFn,
     PrepSizeFn,
     ProofSizeFn,
+    ExecutionCyclesFn: Fn(&PreparedContext) -> u64,
 >(
     c: &mut Criterion,
     cfg: BenchHarnessConfig<'_>,
@@ -184,6 +204,7 @@ pub fn run_benchmarks_with_state_fn<
     mut verify: VerifyFn,
     mut preprocessing_size: PrepSizeFn,
     mut proof_size: ProofSizeFn,
+    execution_cycles: Option<ExecutionCyclesFn>,
 ) where
     PrepareFn: FnMut(usize, &SharedState) -> PreparedContext + Copy,
     ProveFn: FnMut(&PreparedContext, &SharedState) -> Proof + Copy,
@@ -202,6 +223,10 @@ pub fn run_benchmarks_with_state_fn<
 
         let proof = prove(&prepared_context, &shared);
         metrics.proof_size = proof_size(&proof, &shared);
+
+        if let Some(ref cycles_fn) = execution_cycles {
+            metrics.cycles = cycles_fn(&prepared_context);
+        }
 
         write_json_metrics(target_str, size, system_str, cfg.feature, &metrics);
 
@@ -282,18 +307,48 @@ fn measure_ram(
 
 #[macro_export]
 macro_rules! __define_benchmark_harness {
-    // No shared state
-    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr,
+    // With shared state
+    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, { $($shared_init:tt)* },
         $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
+            let system = $system;
             let cfg = ::utils::harness::BenchHarnessConfig {
                 target: $target,
-                system: $system,
+                system,
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
                 fixed_input_size: None,
-                is_zkvm: false,
+                is_zkvm: system.is_zkvm(),
+            };
+            ::utils::harness::run_benchmarks_with_state_fn(
+                c,
+                cfg,
+                &{ $($shared_init)* },
+                $prepare,
+                $prove,
+                $verify,
+                $prep_size,
+                $proof_size,
+                None::<fn(&_) -> u64>,
+            );
+        }
+        ::criterion::criterion_group!($public_group_ident, criterion_benchmarks);
+        ::criterion::criterion_main!($public_group_ident);
+    };
+    // With execution_cycles
+    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr,
+        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $execution_cycles:expr
+    ) => {
+        fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
+            let system = $system;
+            let cfg = ::utils::harness::BenchHarnessConfig {
+                target: $target,
+                system,
+                feature: $feature,
+                mem_binary_name: $mem_binary_name,
+                fixed_input_size: None,
+                is_zkvm: system.is_zkvm(),
             };
             ::utils::harness::run_benchmarks_fn(
                 c,
@@ -303,23 +358,25 @@ macro_rules! __define_benchmark_harness {
                 $verify,
                 $prep_size,
                 $proof_size,
+                Some($execution_cycles),
             );
         }
         ::criterion::criterion_group!($public_group_ident, criterion_benchmarks);
         ::criterion::criterion_main!($public_group_ident);
     };
-    // With shared state (e.g., MPI config in Polyhedra Expander)
+    // With shared state - old syntax fallback (6 params)
     ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $shared_init:expr,
         $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
+            let system = $system;
             let cfg = ::utils::harness::BenchHarnessConfig {
                 target: $target,
-                system: $system,
+                system,
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
                 fixed_input_size: None,
-                is_zkvm: false,
+                is_zkvm: system.is_zkvm(),
             };
             ::utils::harness::run_benchmarks_with_state_fn(
                 c,
@@ -330,6 +387,35 @@ macro_rules! __define_benchmark_harness {
                 $verify,
                 $prep_size,
                 $proof_size,
+                None::<fn(&_) -> u64>,
+            );
+        }
+        ::criterion::criterion_group!($public_group_ident, criterion_benchmarks);
+        ::criterion::criterion_main!($public_group_ident);
+    };
+    // Without execution_cycles
+    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr,
+        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
+    ) => {
+        fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
+            let system = $system;
+            let cfg = ::utils::harness::BenchHarnessConfig {
+                target: $target,
+                system,
+                feature: $feature,
+                mem_binary_name: $mem_binary_name,
+                fixed_input_size: None,
+                is_zkvm: system.is_zkvm(),
+            };
+            ::utils::harness::run_benchmarks_fn(
+                c,
+                cfg,
+                $prepare,
+                $prove,
+                $verify,
+                $prep_size,
+                $proof_size,
+                None::<fn(&_) -> u64>,
             );
         }
         ::criterion::criterion_group!($public_group_ident, criterion_benchmarks);
@@ -339,13 +425,13 @@ macro_rules! __define_benchmark_harness {
 
 #[macro_export]
 macro_rules! define_benchmark_harness {
-      (BenchTarget::Sha256, $($rest:tt)*) => {
-        use $crate::__define_benchmark_harness;
-        __define_benchmark_harness!(sha256,BenchTarget::Sha256, $($rest)*); };
+    (BenchTarget::Sha256, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(sha256, $crate::harness::BenchTarget::Sha256, $($rest)*);
+    };
     (BenchTarget::Ecdsa, $($rest:tt)*) => {
-        use $crate::__define_benchmark_harness;
-        __define_benchmark_harness!(ecdsa,BenchTarget::Ecdsa, $($rest)*); };
+        $crate::__define_benchmark_harness!(ecdsa, $crate::harness::BenchTarget::Ecdsa, $($rest)*);
+    };
     (BenchTarget::Keccak, $($rest:tt)*) => {
-        use $crate::__define_benchmark_harness;
-        __define_benchmark_harness!(keccak,BenchTarget::Keccak, $($rest)*); };
+        $crate::__define_benchmark_harness!(keccak, $crate::harness::BenchTarget::Keccak, $($rest)*);
+    };
 }

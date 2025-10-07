@@ -8,6 +8,7 @@ use std::path::Path;
 pub mod bench;
 pub mod harness;
 pub mod metadata;
+pub mod zkvm;
 
 pub use harness::{BenchHarnessConfig, BenchTarget, ProvingSystem};
 

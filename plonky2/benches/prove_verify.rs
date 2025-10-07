@@ -2,7 +2,6 @@ use plonky2_sha256::bench::{prove, sha256_prepare, verify};
 
 use plonky2::{plonk::config::PoseidonGoldilocksConfig, util::serialization::Write};
 use plonky2_u32::gates::arithmetic_u32::{U32GateSerializer, U32GeneratorSerializer};
-use utils::harness::BenchTarget;
 use utils::harness::ProvingSystem;
 
 const D: usize = 2;
@@ -13,8 +12,8 @@ utils::define_benchmark_harness!(
     ProvingSystem::Plonky2,
     None,
     "sha256_no_lookup_mem",
-    |input_size| { sha256_prepare(input_size) },
-    |(circuit_data, pw)| { prove(&circuit_data, pw.clone()) },
+    sha256_prepare,
+    |(circuit_data, pw)| { prove(circuit_data, pw.clone()) },
     |(circuit_data, _pw), proof| {
         let verifier_data = circuit_data.verifier_data();
         verify(&verifier_data, proof.clone());

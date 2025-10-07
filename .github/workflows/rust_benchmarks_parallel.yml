@@ -136,6 +136,12 @@ jobs:
       - name: Install OpenMPI for polyhedra-expander
         uses: ./.github/actions/install-ompi
 
+      - name: Install RISC0 toolchain
+        uses: ./.github/actions/install-risc0
+
+      - name: Install SP1 toolchain
+        uses: ./.github/actions/install-sp1
+
       - name: Build full workspace (release)
         run: cargo build --release --workspace
 
@@ -188,6 +194,14 @@ jobs:
       - name: Install OpenMPI for polyhedra-expander
         if: ${{ contains(matrix.crate, 'polyhedra-expander') }}
         uses: ./.github/actions/install-ompi
+
+      - name: Install RISC0 toolchain
+        if: ${{ contains(matrix.crate, 'risc0') }}
+        uses: ./.github/actions/install-risc0
+
+      - name: Install SP1 toolchain
+        if: ${{ contains(matrix.crate, 'sp1') }}
+        uses: ./.github/actions/install-sp1
 
       - name: Run benches in ${{ matrix.crate }}
         run: |

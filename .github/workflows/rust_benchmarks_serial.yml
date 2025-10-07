@@ -47,6 +47,12 @@ jobs:
       - name: Install OpenMPI for polyhedra-expander
         uses: ./.github/actions/install-ompi
 
+      - name: Install RISC0 toolchain
+        uses: ./.github/actions/install-risc0
+
+      - name: Install SP1 toolchain
+        uses: ./.github/actions/install-sp1
+
       - name: Build full workspace (release)
         run: cargo build --release --workspace
 
@@ -88,6 +94,12 @@ jobs:
 
       - name: Install OpenMPI
         uses: ./.github/actions/install-ompi
+
+      - name: Install RISC0 toolchain
+        uses: ./.github/actions/install-risc0
+
+      - name: Install SP1 toolchain
+        uses: ./.github/actions/install-sp1
 
       - name: Run workspace benchmarks
         run: cargo bench

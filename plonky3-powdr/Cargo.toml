@@ -35,7 +35,7 @@ name = "prove_verify"
 harness = false
 
 [[bin]]
-name = "sha256_mem"
+name = "sha256_mem_powdr"
 path = "src/bin/sha256_mem.rs"
 
 [[bin]]

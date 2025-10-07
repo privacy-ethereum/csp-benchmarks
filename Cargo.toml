@@ -7,9 +7,13 @@ members = [
     "provekit",
     "polyhedra-expander",
     "circom",
+    "jolt",
+    "miden",
+    "risc0",
+    "sp1",
     "utils",
 ]
-exclude = ["zkvm", "plonky3-powdr"]
+exclude = ["plonky3-powdr"]
 
 [workspace.dependencies]
 anyhow = "1.0.81"
@@ -25,6 +29,12 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
 sha2 = "0.10"
 tracing = "0.1.40"
+zkvm-interface = { git = "https://github.com/eth-act/ere", tag = "v0.0.12" }
 
-# Workspace
+# Local
 utils = { path = "utils" }
+
+[patch.crates-io]
+ark-ff = { git = "https://github.com/a16z/arkworks-algebra", branch = "v0.5.0-optimize-mul-u64" }
+ark-ec = { git = "https://github.com/a16z/arkworks-algebra", branch = "v0.5.0-optimize-mul-u64" }
+ark-serialize = { git = "https://github.com/a16z/arkworks-algebra", branch = "v0.5.0-optimize-mul-u64" }
