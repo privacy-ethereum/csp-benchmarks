@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -u
 
 # ================================
 # Noir macOS end-to-end setup
@@ -20,22 +20,23 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Detect the shell
-current_shell=$(basename "$SHELL")
-
 # -----------------------
 # Install Nargo
 # -----------------------
 
 curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash
-if [ "$current_shell" = "zsh" ]; then
-    [ -f ~/.zshrc ] && source ~/.zshrc
-elif [ "$current_shell" = "bash" ]; then
-    # On macOS, interactive bash sessions might use .bash_profile or .bashrc
-    [ -f ~/.bashrc ] && source ~/.bashrc
-    [ -f ~/.bash_profile ] && source ~/.bash_profile
+# Safe check for ZSH_VERSION or BASH_VERSION
+if [ -n "${ZSH_VERSION-}" ]; then
+    # We are in zsh
+    [ -f "${HOME}/.zshrc" ] && source "${HOME}/.zshrc"
+elif [ -n "${BASH_VERSION-}" ]; then
+    # We are in bash
+    # On macOS, .bash_profile is often used first, .bashrc sometimes sourced from it
+    [ -f "${HOME}/.bashrc" ] && source "${HOME}/.bashrc"
+    [ -f "${HOME}/.bash_profile" ] && source "${HOME}/.bash_profile"
 else
-    echo "Unsupported shell: $current_shell" >&2
+    # Unknown shell: you can fallback or warn
+    echo "Warning: Unknown shell, cannot source rc file automatically" >&2
 fi
 noirup --version 1.0.0-beta.9
 
@@ -44,14 +45,18 @@ noirup --version 1.0.0-beta.9
 # -----------------------
 
 curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/next/barretenberg/bbup/install | bash
-if [ "$current_shell" = "zsh" ]; then
-    [ -f ~/.zshrc ] && source ~/.zshrc
-elif [ "$current_shell" = "bash" ]; then
-    # On macOS, interactive bash sessions might use .bash_profile or .bashrc
-    [ -f ~/.bashrc ] && source ~/.bashrc
-    [ -f ~/.bash_profile ] && source ~/.bash_profile
+# Safe check for ZSH_VERSION or BASH_VERSION
+if [ -n "${ZSH_VERSION-}" ]; then
+    # We are in zsh
+    [ -f "${HOME}/.zshrc" ] && source "${HOME}/.zshrc"
+elif [ -n "${BASH_VERSION-}" ]; then
+    # We are in bash
+    # On macOS, .bash_profile is often used first, .bashrc sometimes sourced from it
+    [ -f "${HOME}/.bashrc" ] && source "${HOME}/.bashrc"
+    [ -f "${HOME}/.bash_profile" ] && source "${HOME}/.bash_profile"
 else
-    echo "Unsupported shell: $current_shell" >&2
+    # Unknown shell: you can fallback or warn
+    echo "Warning: Unknown shell, cannot source rc file automatically" >&2
 fi
 bbup
 
