@@ -73,13 +73,13 @@ for target in "${TARGETS[@]}"; do
     hyperfine --runs "$RUNS" \
       --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
       "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
-      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json"
+      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json" --show-output
 
     step "[$TARGET] Verifier (size ${INPUT_SIZE}):"
     hyperfine --runs "$RUNS" \
       --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
       "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
-      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
+      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json" --show-output
 
     step "[$TARGET] RAM measurement (size ${INPUT_SIZE})"
     MEM_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_mem_report.json"
