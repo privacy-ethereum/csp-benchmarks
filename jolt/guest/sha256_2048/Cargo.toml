@@ -5,10 +5,6 @@ edition = "2021"
 
 [features]
 guest = []
-size_128 = []
-size_256 = []
-size_512 = []
-size_1024 = []
 
 [dependencies]
 jolt = { package = "jolt-sdk", git = "https://github.com/a16z/jolt", rev = "55b9830a3944dde55d33a55c42522b81dd49f87a", features = [
