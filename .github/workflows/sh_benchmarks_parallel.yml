@@ -100,6 +100,11 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Install bash 5.0 under macOS for mapfile
+        run: |
+          brew install bash
+          sudo mv /usr/local/bin/bash /bin/bash
+
       - name: Setup & build Ligetron (only when folder is ligetron)
         if: ${{ matrix.folder == 'ligetron' }}
         uses: ./.github/actions/install-ligero
