@@ -4132,18 +4132,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "noir"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bincode",
- "clap",
- "criterion",
- "serde_json",
- "utils 0.1.0",
-]
-
-[[package]]
 name = "noir-r1cs"
 version = "0.1.0"
 source = "git+https://github.com/worldfnd/ProveKit?branch=main#6f0e6e4987f1520fd5b31786674f87c1bd567aa1"

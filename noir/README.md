@@ -2,9 +2,21 @@
 
 This benchmark code is from: https://github.com/worldfnd/provekit/tree/main/noir-examples/noir-native-sha256
 
-## Run SHA256 benches
+## Installation & Test Run
+
+### On OSX
+
+From the root directory:
 
 ```bash
-chmod +x ../measure_mem_avg.sh
-cargo bench
+cd noir
+./osx_local_setup.sh
+```
+
+## Benchmarking
+
+```bash
+cd ../
+cargo build --release -p utils
+./benchmark.sh
 ```
