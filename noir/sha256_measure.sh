@@ -27,7 +27,7 @@ proof_size_bytes=$(stat -f %z "$proof_path" 2>/dev/null || stat -c %s "$proof_pa
 
 # Preprocessing artifacts: circuit.json file
 CIRCUIT_PATH=$(jq -r '."circuit-path"' "$STATE_JSON")
-circuit_size=$(stat -f %z "$WASM_PATH" 2>/dev/null || stat -c %s "$WASM_PATH")
+circuit_size=$(stat -f %z "$CIRCUIT_PATH" 2>/dev/null || stat -c %s "$CIRCUIT_PATH")
 preprocessing_size_bytes=$(( circuit_size ))
 
 json_output=$(jq -n \
