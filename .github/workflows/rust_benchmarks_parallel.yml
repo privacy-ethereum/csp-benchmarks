@@ -182,11 +182,8 @@ jobs:
       #  run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
       - name: Install Nargo
-        if: ${{ contains(matrix.crate, 'provekit') || contains(matrix.crate, 'noir') }}
+        if: ${{ contains(matrix.crate, 'provekit') }}
         uses: ./.github/actions/install-nargo
-      
-      - name: Install Barretenberg
-        uses: ./.github/actions/install-bb
 
       - name: Install OpenMPI for polyhedra-expander
         if: ${{ contains(matrix.crate, 'polyhedra-expander') }}
