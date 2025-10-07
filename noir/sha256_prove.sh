@@ -22,3 +22,5 @@ nargo execute --prover-name $TOML_PATH --package "sha256_var_input" $WITNESS_FIL
 
 #### Step 2: bb prove ####
 bb prove -b "$CIRCUIT_PATH" -w "$WORKSPACE_ROOT_PATH/target/$WITNESS_FILE" --write_vk -o "$WORKSPACE_ROOT_PATH/target/"
+
+cd ..
