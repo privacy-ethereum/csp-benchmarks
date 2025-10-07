@@ -115,7 +115,7 @@ jobs:
         if: ${{ matrix.folder == 'noir' }}
         uses: ./.github/actions/install-nargo
 
-      - name: Setup Bb (only when folder is noir)
+      - name: Setup Barretenberg (only when folder is noir)
         if: ${{ matrix.folder == 'noir' }}
         uses: ./.github/actions/install-bb
 
