@@ -18,4 +18,4 @@ PROOF_PATH="${WORKSPACE_ROOT_PATH}/target/proof"
 VK_PATH="${WORKSPACE_ROOT_PATH}/target/vk"
 bb verify -p "$PROOF_PATH" -vk "$VK_PATH"
 
-cd ..
+cd ../..

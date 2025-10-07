@@ -16,7 +16,7 @@ WORKSPACE_ROOT_PATH="${SCRIPT_DIR}/circuits"
 
 cd "$WORKSPACE_ROOT_PATH"
 nargo compile --workspace --silence-warnings --skip-brillig-constraints-check
-cd ..
+cd ../..
 
 CIRCUIT_PATH="${WORKSPACE_ROOT_PATH}/target/sha256_var_input.json"
 
