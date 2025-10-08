@@ -17,8 +17,8 @@ INPUT_SIZE=$(jq -r '."input-size"' "$STATE_JSON")
 cd "$WORKSPACE_ROOT_PATH"
 
 #### Step 1: Witness generation ####
-WITNESS_FILE="sha256_var_input_${INPUT_SIZE}.gz"
-nargo execute --prover-name $TOML_PATH --package "sha256_var_input" $WITNESS_FILE
+WITNESS_FILE="sha256_${INPUT_SIZE}.gz"
+nargo execute --prover-name $TOML_PATH --package "sha256" $WITNESS_FILE
 
 #### Step 2: bb prove ####
 bb prove -b "$CIRCUIT_PATH" -w "$WORKSPACE_ROOT_PATH/target/$WITNESS_FILE" --write_vk -o "$WORKSPACE_ROOT_PATH/target/"

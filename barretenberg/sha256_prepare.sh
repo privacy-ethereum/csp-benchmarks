@@ -18,7 +18,7 @@ cd "$WORKSPACE_ROOT_PATH"
 nargo compile --workspace --silence-warnings --skip-brillig-constraints-check
 cd ../..
 
-CIRCUIT_PATH="${WORKSPACE_ROOT_PATH}/target/sha256_var_input.json"
+CIRCUIT_PATH="${WORKSPACE_ROOT_PATH}/target/sha256.json"
 
 ####   Generate input(Prover.toml)   ####
 GEN="$("$UTILS_BIN" sha256 -n 2048)"
@@ -76,7 +76,7 @@ fi
 # Build TOML: input array and input_len
 
 # Determine path
-CIRCUIT_MEMBER_DIR="${WORKSPACE_ROOT_PATH}/hash/sha256/sha256_var_input"
+CIRCUIT_MEMBER_DIR="${WORKSPACE_ROOT_PATH}/hash/sha256"
 TOML_PATH="${CIRCUIT_MEMBER_DIR}/Prover_${INPUT_SIZE}.toml"
 
 {

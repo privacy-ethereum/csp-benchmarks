@@ -1,6 +1,6 @@
-# Noir SHA256 benchmarks
+# Noir + Barretenberg SHA256 benchmarks
 
-This benchmark code is from: https://github.com/worldfnd/provekit/tree/main/noir-examples/noir-native-sha256
+This benchmark code is from: https://github.com/noir-lang/sha256/tree/main
 
 ## Installation & Test Run
 
@@ -9,7 +9,7 @@ This benchmark code is from: https://github.com/worldfnd/provekit/tree/main/noir
 From the root directory:
 
 ```bash
-cd noir
+cd barretenberg
 ./osx_local_setup.sh
 ```
 
