@@ -21,6 +21,6 @@ WITNESS_FILE="sha256_${INPUT_SIZE}.gz"
 nargo execute --prover-name $TOML_PATH --package "sha256" $WITNESS_FILE
 
 #### Step 2: bb prove ####
-bb prove -b "$CIRCUIT_PATH" -w "$WORKSPACE_ROOT_PATH/target/$WITNESS_FILE" -o "$WORKSPACE_ROOT_PATH/target/"
+bb prove -b "$CIRCUIT_PATH" -w "$WORKSPACE_ROOT_PATH/target/$WITNESS_FILE" --write_vk -o "$WORKSPACE_ROOT_PATH/target/"
 
 cd ../..
