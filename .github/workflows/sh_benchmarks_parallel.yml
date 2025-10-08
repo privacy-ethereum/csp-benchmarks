@@ -60,7 +60,7 @@ jobs:
           # ─── 1. list of top‑level folders to watch ────────────
           FOLDERS=(
             ligetron,
-            noir
+            barretenberg
           )
 
           # ─── 2. filter by diff (or include all when run_all=true) ───────
@@ -111,12 +111,12 @@ jobs:
           ligero_path: ./ligetron/ligero-prover
           install_prefix: ${{ github.workspace }}/.deps/install
       
-      - name: Setup Nargo (only when folder is noir)
-        if: ${{ matrix.folder == 'noir' }}
+      - name: Setup Nargo (only when folder is barretenberg)
+        if: ${{ matrix.folder == 'barretenberg' }}
         uses: ./.github/actions/install-nargo
 
-      - name: Setup Barretenberg (only when folder is noir)
-        if: ${{ matrix.folder == 'noir' }}
+      - name: Setup Barretenberg (only when folder is barretenberg)
+        if: ${{ matrix.folder == 'barretenberg' }}
         uses: ./.github/actions/install-bb
 
       - name: Ensure jq present
