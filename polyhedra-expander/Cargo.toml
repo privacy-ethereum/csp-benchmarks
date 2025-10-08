@@ -31,11 +31,5 @@ name = "prove_verify"
 harness = false
 
 [[bin]]
-name = "sha256_mem"
+name = "sha256_mem_expander"
 path = "src/bin/sha256_mem.rs"
-
-[profile.release]
-opt-level = 3
-
-[profile.bench]
-opt-level = 3

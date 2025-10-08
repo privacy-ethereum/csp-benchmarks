@@ -1,0 +1,23 @@
+name: "Install RISC0 toolchain"
+description: "Installs the RISC0 toolchain components required for benchmarks"
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        set -Eeuo pipefail
+
+        if [[ ! -x "$HOME/.risc0/bin/rzup" ]]; then
+          curl -fsSL --retry 5 --proto '=https' --tlsv1.2 https://risczero.com/install | bash
+        fi
+
+        export PATH="$HOME/.risc0/bin:$PATH"
+        echo "$HOME/.risc0/bin" >> "$GITHUB_PATH"
+
+        rzup install rust 1.88.0
+        rzup install cpp 2024.1.5
+        rzup install r0vm 3.0.3
+        rzup install cargo-risczero 3.0.3
+
+        rzup --version

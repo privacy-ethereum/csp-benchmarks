@@ -1,0 +1,22 @@
+[package]
+name = "jolt"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ere-jolt = { git = "https://github.com/eth-act/ere", tag = "v0.0.12" }
+
+# Workspace
+bincode = { workspace = true }
+criterion = { workspace = true }
+clap = { workspace = true }
+utils = { workspace = true }
+zkvm-interface = { workspace = true }
+
+[[bench]]
+name = "sha256"
+harness = false
+
+[[bin]]
+name = "sha256_mem_jolt"
+path = "src/bin/sha256_mem.rs"

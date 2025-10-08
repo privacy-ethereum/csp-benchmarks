@@ -14,7 +14,7 @@ Use the shared benchmark harness in the `utils` crate to register Criterion benc
 
 #### What you write:
 
-- A one‑line set of settings passed to a macro: the target (e.g., `BenchTarget::Sha256`), the proving system (e.g., `ProvingSystem::Plonky2`), an optional feature tag (`None` or `Some("feature")`), and the memory‑measurement binary name (e.g., `"sha256_mem"`).
+- A one‑line set of settings passed to a macro: the target (e.g., `BenchTarget::Sha256`), the proving system (e.g., `ProvingSystem::Plonky2`), an optional feature tag (`None` or `Some("feature")`), and a unique memory‑measurement binary name (e.g., `"sha256_mem_plonky2"`).
 - Five small closures that perform the corresponding operations with your proving system: `prepare`, `prove`, `verify`, `preprocessing_size`, `proof_size`.
 
 #### Input sizes:
@@ -24,7 +24,7 @@ Use the shared benchmark harness in the `utils` crate to register Criterion benc
 
 #### RAM usage measurement:
 
-- Ensure that your crate provides a binary that will be measured for RAM usage by the harness. Pass the binary name via `mem_binary_name` (e.g., `sha256_mem`). This binary is expected to perform only the circuit preprocessing and proving (including witness generation).
+- Ensure that your crate provides a binary that will be measured for RAM usage by the harness. Pass the binary name via `mem_binary_name` (e.g., `sha256_mem_plonky2`). This binary is expected to perform only the circuit preprocessing and proving (including witness generation).
 
 #### Quickstart (no shared state)
 
@@ -37,7 +37,7 @@ utils::define_benchmark_harness!(
     BenchTarget::Sha256,            // target
     ProvingSystem::Binius64,        // proving system
     None,                           // optional feature tag
-    "sha256_mem",                  // memory-measurement binary name
+    "sha256_mem_binius64",         // memory-measurement binary name
     |input_size| { /* return prepared context for input_size */ },
     |prepared| { /* build and return proof */ },
     |prepared, proof| { /* verify */ },
@@ -57,7 +57,7 @@ utils::define_benchmark_harness!(
     BenchTarget::Sha256,        // target
     ProvingSystem::Expander,    // proving system
     None,                       // optional feature tag
-    "sha256_mem",              // memory-measurement binary name
+    "sha256_mem_expander",     // memory-measurement binary name
     // Initialize shared state once (e.g., MPI universe/world)
     {
         let mpi_config = MPIConfig::init().expect("Failed to initialize MPI");

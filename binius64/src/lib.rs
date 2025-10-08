@@ -47,11 +47,11 @@ pub fn prepare(input_size: usize) -> Result<(StdVerifier, StdProver, ValueVec, C
 
     // Parse Params and Instance from matches
     let params = Params {
-        max_len_bytes: input_size,
+        max_len_bytes: Some(input_size),
         exact_len: true,
     };
     let instance = Instance {
-        message_len: None,
+        message_len: Some(input_size),
         message_string: None,
     };
 

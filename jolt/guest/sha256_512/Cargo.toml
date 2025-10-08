@@ -1,0 +1,15 @@
+[package]
+name = "jolt-sha256"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+guest = []
+
+[dependencies]
+jolt = { package = "jolt-sdk", git = "https://github.com/a16z/jolt", rev = "55b9830a3944dde55d33a55c42522b81dd49f87a", features = [
+    "guest-std",
+] }
+sha2 = { version = "0.10", default-features = false }
+
+[workspace]

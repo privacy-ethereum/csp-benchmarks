@@ -1,0 +1,21 @@
+[package]
+name = "risc0"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ere-risc0 = { git = "https://github.com/eth-act/ere", tag = "v0.0.12" }
+
+# Workspace
+criterion = { workspace = true }
+clap = { workspace = true }
+utils = { workspace = true }
+zkvm-interface = { workspace = true }
+
+[[bench]]
+name = "sha256"
+harness = false
+
+[[bin]]
+name = "sha256_mem_risc0"
+path = "src/bin/sha256_mem.rs"

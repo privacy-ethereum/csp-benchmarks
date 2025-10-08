@@ -25,5 +25,5 @@ name = "sha256_bench"
 harness = false
 
 [[bin]]
-name = "sha256_mem"
+name = "sha256_mem_circom"
 path = "src/bin/sha256_mem.rs"

@@ -8,10 +8,10 @@ rand = { workspace = true }
 utils = { workspace = true }
 criterion = { workspace = true }
 clap = { workspace = true }
-noir-r1cs = { git = "https://github.com/worldfnd/ProveKit", branch = "main" }
+noir-r1cs = { git = "https://github.com/worldfnd/ProveKit", rev = "6f0e6e4987f1520fd5b31786674f87c1bd567aa1"}
 
 [[bin]]
-name = "sha256_mem"
+name = "sha256_mem_provekit"
 path = "src/bin/sha256_mem.rs"
 
 [[bench]]

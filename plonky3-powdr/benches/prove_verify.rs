@@ -5,7 +5,7 @@ utils::define_benchmark_harness!(
     sha256,
     ProvingSystem::Powdr,
     None,
-    Some("sha256_mem"),
+    Some("sha256_mem_powdr"),
     |input_size| { prepare_pipeline(input_size) },
     |pipeline: &mut sha::bench::Pipeline| { prove(pipeline) },
     |pipeline: &mut sha::bench::Pipeline, _| { verify(pipeline) },

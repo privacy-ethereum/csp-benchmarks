@@ -1,0 +1,12 @@
+#![cfg_attr(feature = "guest", no_std)]
+
+use sha2::{Digest, Sha256};
+
+#[jolt::provable]
+fn sha2(_input: &[u8]) -> [u8; 32] {
+    let mut hasher = Sha256::new();
+    let input = [0xAA; 512];
+    hasher.update(input);
+    let result = hasher.finalize();
+    Into::<[u8; 32]>::into(result)
+}

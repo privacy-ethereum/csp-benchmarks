@@ -1,16 +1,15 @@
 use circom::prepare;
 use circom_prover::prover::CircomProof;
-use utils::harness::BenchTarget;
 use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
     ProvingSystem::Circom,
     None,
-    "sha256_mem",
+    "sha256_mem_circom",
     |input_size| { prepare(input_size) },
     |(witness_fn, input_str, zkey_path)| {
-        circom::prove(witness_fn.clone(), input_str.clone(), zkey_path.clone())
+        circom::prove(*witness_fn, input_str.clone(), zkey_path.clone())
     },
     |(_witness_fn, _input_str, zkey_path), proof| {
         circom::verify(proof.clone(), zkey_path.clone())
@@ -23,9 +22,9 @@ utils::define_benchmark_harness!(
     |_proof: &CircomProof| 807 // NOTE: Assume that protocol is "rapidsnark" and curve is "bn128"
 );
 
-fn sum_file_sizes_in_the_dir(file_path: String) -> std::io::Result<usize> {
+fn sum_file_sizes_in_the_dir(file_path: &str) -> std::io::Result<usize> {
     // Get the parent directory
-    let dir = std::path::Path::new(&file_path)
+    let dir = std::path::Path::new(file_path)
         .parent()
         .expect("File should have a parent directory");
 

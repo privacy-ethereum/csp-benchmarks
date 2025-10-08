@@ -2,14 +2,13 @@ use gkr_engine::MPIConfig;
 use sha256_expander_benchmark::bench::prepare;
 use sha256_expander_benchmark::bench::prove;
 use sha256_expander_benchmark::bench::verify;
-use utils::harness::BenchTarget;
 use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
     ProvingSystem::Expander,
     None,
-    "sha256_mem",
+    "sha256_mem_expander",
     {
         let universe = MPIConfig::init().expect("Failed to initialize MPI");
         let world = universe.world();
@@ -20,7 +19,7 @@ utils::define_benchmark_harness!(
         let (_, proof) = prove(
             circuit_bytes,
             witness_bytes,
-            MPIConfig::prover_new(Some(&universe), Some(&world)),
+            MPIConfig::prover_new(Some(universe), Some(world)),
         );
         proof
     },
@@ -28,14 +27,14 @@ utils::define_benchmark_harness!(
         let (claimed, _) = prove(
             circuit_bytes,
             witness_bytes,
-            MPIConfig::prover_new(Some(&universe), Some(&world)),
+            MPIConfig::prover_new(Some(universe), Some(world)),
         );
         verify(
             circuit_bytes,
             witness_bytes,
             proof,
             &claimed,
-            MPIConfig::prover_new(Some(&universe), Some(&world)),
+            MPIConfig::prover_new(Some(universe), Some(world)),
         );
     },
     |(circuit_bytes, _), _| { circuit_bytes.len() },
