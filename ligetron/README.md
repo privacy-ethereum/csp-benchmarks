@@ -15,8 +15,9 @@ cd ligetron
 
 ## Benchmarking
 
+From the root directory:
+
 ```bash
-cd ../
 cargo build --release -p utils
 ./benchmark.sh
 ```
