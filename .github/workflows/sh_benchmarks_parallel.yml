@@ -114,6 +114,8 @@ jobs:
       - name: Setup Nargo (only when folder is barretenberg)
         if: ${{ matrix.folder == 'barretenberg' }}
         uses: ./.github/actions/install-nargo
+        with:
+          version: "1.0.0-beta.10"
 
       - name: Setup Barretenberg (only when folder is barretenberg)
         if: ${{ matrix.folder == 'barretenberg' }}
