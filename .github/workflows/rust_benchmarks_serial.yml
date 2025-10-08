@@ -98,17 +98,23 @@ jobs:
         with:
           name: criterion-reports
           path: ./target/criterion
+          if-no-files-found: warn
           retention-days: 30
 
-      - name: Collect benchmarks
-        run: |
-          cd utils
-          cargo run --release --bin collect_benchmarks
-
-      - name: Upload collected reports
+      - name: Upload Rust metrics
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: collected-benchmarks
-          path: ./collected_benchmarks.json
+          name: metrics-rust
+          path: "**/*_metrics.json"
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload Rust mem reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mem-rust
+          path: "**/*_mem_report.json"
+          if-no-files-found: warn
           retention-days: 30
