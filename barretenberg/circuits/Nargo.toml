@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "hash/sha256/noir-native-sha256",
+    "hash/sha256/sha256_var_input",
+]

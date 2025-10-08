@@ -1,0 +1,6 @@
+[package]
+name = "sha256_var_input"
+type = "bin"
+
+[dependencies]
+noir_native_sha256 = { path = "../noir-native-sha256" }
