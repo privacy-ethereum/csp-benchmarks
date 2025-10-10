@@ -1,4 +1,7 @@
-use noir_r1cs::{NoirProof, NoirProofScheme};
+use provekit_common::{NoirProof, NoirProofScheme};
+use provekit_prover::NoirProofSchemeProver;
+use provekit_r1cs_compiler::NoirProofSchemeBuilder;
+use provekit_verifier::NoirProofSchemeVerifier;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
