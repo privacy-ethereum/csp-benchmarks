@@ -1933,7 +1933,7 @@ dependencies = [
 [[package]]
 name = "binius-circuits"
 version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64#c035a1cfba04b6f3926b81e491ae603d83909308"
+source = "git+https://github.com/IrreducibleOSS/binius64?rev=d8bfbd6#d8bfbd67e13b087315755f11593a33631350f294"
 dependencies = [
  "binius-core",
  "binius-frontend",
@@ -1948,7 +1948,7 @@ dependencies = [
 [[package]]
 name = "binius-core"
 version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64#c035a1cfba04b6f3926b81e491ae603d83909308"
+source = "git+https://github.com/IrreducibleOSS/binius64?rev=d8bfbd6#d8bfbd67e13b087315755f11593a33631350f294"
 dependencies = [
  "binius-utils",
  "bytemuck",
@@ -1959,7 +1959,7 @@ dependencies = [
 [[package]]
 name = "binius-examples"
 version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64#c035a1cfba04b6f3926b81e491ae603d83909308"
+source = "git+https://github.com/IrreducibleOSS/binius64?rev=d8bfbd6#d8bfbd67e13b087315755f11593a33631350f294"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -1991,7 +1991,7 @@ dependencies = [
 [[package]]
 name = "binius-field"
 version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64#c035a1cfba04b6f3926b81e491ae603d83909308"
+source = "git+https://github.com/IrreducibleOSS/binius64?rev=d8bfbd6#d8bfbd67e13b087315755f11593a33631350f294"
 dependencies = [
  "binius-utils",
  "bytemuck",
@@ -2005,7 +2005,7 @@ dependencies = [
 [[package]]
 name = "binius-frontend"
 version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64#c035a1cfba04b6f3926b81e491ae603d83909308"
+source = "git+https://github.com/IrreducibleOSS/binius64?rev=d8bfbd6#d8bfbd67e13b087315755f11593a33631350f294"
 dependencies = [
  "binius-core",
  "cranelift-entity",
@@ -2022,7 +2022,7 @@ dependencies = [
 [[package]]
 name = "binius-math"
 version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64#c035a1cfba04b6f3926b81e491ae603d83909308"
+source = "git+https://github.com/IrreducibleOSS/binius64?rev=d8bfbd6#d8bfbd67e13b087315755f11593a33631350f294"
 dependencies = [
  "binius-field",
  "binius-utils",
@@ -2038,7 +2038,7 @@ dependencies = [
 [[package]]
 name = "binius-prover"
 version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64#c035a1cfba04b6f3926b81e491ae603d83909308"
+source = "git+https://github.com/IrreducibleOSS/binius64?rev=d8bfbd6#d8bfbd67e13b087315755f11593a33631350f294"
 dependencies = [
  "binius-core",
  "binius-field",
@@ -2061,7 +2061,7 @@ dependencies = [
 [[package]]
 name = "binius-transcript"
 version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64#c035a1cfba04b6f3926b81e491ae603d83909308"
+source = "git+https://github.com/IrreducibleOSS/binius64?rev=d8bfbd6#d8bfbd67e13b087315755f11593a33631350f294"
 dependencies = [
  "auto_impl",
  "binius-field",
@@ -2075,7 +2075,7 @@ dependencies = [
 [[package]]
 name = "binius-utils"
 version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64#c035a1cfba04b6f3926b81e491ae603d83909308"
+source = "git+https://github.com/IrreducibleOSS/binius64?rev=d8bfbd6#d8bfbd67e13b087315755f11593a33631350f294"
 dependencies = [
  "bytemuck",
  "bytes",
@@ -2091,7 +2091,7 @@ dependencies = [
 [[package]]
 name = "binius-verifier"
 version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64#c035a1cfba04b6f3926b81e491ae603d83909308"
+source = "git+https://github.com/IrreducibleOSS/binius64?rev=d8bfbd6#d8bfbd67e13b087315755f11593a33631350f294"
 dependencies = [
  "binius-core",
  "binius-field",

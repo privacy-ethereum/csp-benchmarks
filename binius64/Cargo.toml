@@ -15,13 +15,13 @@ utils = { workspace = true }
 sha2 = { workspace = true }
 
 tracing-profile = "0.10.3"
-binius-frontend = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
-binius-circuits = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
-binius-examples = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
-binius-prover = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
-binius-verifier = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
-binius-core = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
-binius-utils = { git = "https://github.com/IrreducibleOSS/binius64", version = "0.1.0" }
+binius-frontend = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
+binius-circuits = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
+binius-examples = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
+binius-prover = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
+binius-verifier = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
+binius-core = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
+binius-utils = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
 
 [[bench]]
 name = "sha256_bench"
