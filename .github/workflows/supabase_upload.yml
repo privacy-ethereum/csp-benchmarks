@@ -1,0 +1,61 @@
+name: Upload Results to Supabase
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Workflow run ID containing the collected-benchmarks artifact"
+        required: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  upload-benchmarks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (optional if artifact only)
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Download collected-benchmarks artifact from specified run
+        uses: actions/download-artifact@v5
+        with:
+          name: collected-benchmarks
+          path: ./artifacts
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ secrets.GH_PAT }}
+
+      - name: Show files
+        run: ls -al ./artifacts
+
+      - name: Validate JSON
+        run: |
+          set -euo pipefail
+          BENCH_JSON=$(find ./artifacts -type f -name 'collected_benchmarks.json' | head -n1)
+          if [ -z "${BENCH_JSON}" ]; then
+            echo "collected_benchmarks.json not found in ./artifacts" >&2
+            exit 1
+          fi
+          jq . < "${BENCH_JSON}" > /dev/null
+
+      - name: Upload Payload
+        env:
+          API_KEY: ${{ secrets.ETHPROOFS_API_KEY }}
+        run: |
+          set -euo pipefail
+          BENCH_JSON=$(find ./artifacts -type f -name 'collected_benchmarks.json' | head -n1)
+          if [ -z "${BENCH_JSON}" ]; then
+            echo "collected_benchmarks.json not found in ./artifacts" >&2
+            exit 1
+          fi
+          DATA=$(cat "${BENCH_JSON}")
+          curl -X POST https://ethproofs.org/api/v0/csp-benchmarks/upload \
+             -H "Authorization: Bearer ${API_KEY}" \
+             -F "file=@${BENCH_JSON}" \
+             -F "filename=collected-benchmarks-${{ inputs.run_id }}.json"
