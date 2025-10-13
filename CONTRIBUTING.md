@@ -166,6 +166,7 @@ jq -nc \
 ```7:11:ligetron/sha256_prove.sh
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 exec "$SCRIPT_DIR/ligero-prover/build/webgpu_prover" "$(cat "$STATE_JSON")"
+```
 
 #### API: `[target]_prove_for_verify.sh`
 
