@@ -6,6 +6,9 @@ on:
       run_id:
         description: "Workflow run ID containing the collected-benchmarks artifact"
         required: true
+  workflow_run:
+    workflows: ["Collect & Parse Artifacts (fan-in)"]
+    types: [completed]
 
 permissions:
   actions: read
@@ -28,7 +31,7 @@ jobs:
         with:
           name: collected-benchmarks
           path: ./artifacts
-          run-id: ${{ inputs.run_id }}
+          run-id: ${{ inputs.run_id || github.event.workflow_run.id }}
           github-token: ${{ secrets.GH_PAT }}
 
       - name: Show files
@@ -59,7 +62,8 @@ jobs:
             exit 1
           fi
           DATA=$(cat "${BENCH_JSON}")
+          RUN_ID="${{ inputs.run_id || github.event.workflow_run.id }}"
           curl -sS --fail-with-body -X POST https://ethproofs.org/api/v0/csp-benchmarks/upload \
              -H "Authorization: Bearer ${API_KEY}" \
              -F "file=@${BENCH_JSON}" \
-             -F "filename=collected-benchmarks-${{ inputs.run_id }}"
+             -F "filename=collected-benchmarks-${RUN_ID}"
