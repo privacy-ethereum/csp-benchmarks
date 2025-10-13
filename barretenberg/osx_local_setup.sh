@@ -38,7 +38,7 @@ else
     # Unknown shell: you can fallback or warn
     echo "Warning: Unknown shell, cannot source rc file automatically" >&2
 fi
-noirup --version 1.0.0-beta.10
+noirup --version 1.0.0-beta.13
 
 # -----------------------
 # Install Barretenberg(bbup)
@@ -58,7 +58,7 @@ else
     # Unknown shell: you can fallback or warn
     echo "Warning: Unknown shell, cannot source rc file automatically" >&2
 fi
-bbup -v 0.87.0
+bbup -v 1.2.0
 
 # -----------------------
 # Run demo prover & verifier
