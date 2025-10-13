@@ -62,4 +62,4 @@ jobs:
           curl -X POST https://ethproofs.org/api/v0/csp-benchmarks/upload \
              -H "Authorization: Bearer ${API_KEY}" \
              -F "file=@${BENCH_JSON}" \
-             -F "filename=collected-benchmarks-${{ inputs.run_id }}.json"
+             -F "filename=collected-benchmarks-${{ inputs.run_id }}"
