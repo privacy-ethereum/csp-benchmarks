@@ -60,7 +60,8 @@ jobs:
           # ─── 1. list of top‑level folders to watch ────────────
           FOLDERS=(
             ligetron,
-            barretenberg
+            barretenberg,
+            # stwo
           )
 
           # ─── 2. filter by diff (or include all when run_all=true) ───────

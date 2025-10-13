@@ -13,7 +13,7 @@ members = [
     "sp1",
     "utils",
 ]
-exclude = ["plonky3-powdr"]
+exclude = ["plonky3-powdr", "stwo/stwo-cairo/cairo-prove"]
 
 [workspace.dependencies]
 anyhow = "1.0.81"
