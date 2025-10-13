@@ -120,6 +120,8 @@ jobs:
       - name: Setup Barretenberg (only when folder is barretenberg)
         if: ${{ matrix.folder == 'barretenberg' }}
         uses: ./.github/actions/install-bb
+        with:
+          version: "1.2.0"
 
       - name: Ensure jq present
         run: |

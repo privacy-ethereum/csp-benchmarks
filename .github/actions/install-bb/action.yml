@@ -1,6 +1,12 @@
 name: "Install Barretenberg(bbup)"
 description: "Installs the Barretenberg proving backend for noir-lang benchmarking"
 
+inputs:
+  version:
+    description: Version of "bb" cli.
+    required: false
+    default: "1.2.0"
+
 runs:
   using: "composite"
   steps:
@@ -8,5 +14,5 @@ runs:
       run: |
         curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/next/barretenberg/bbup/install | bash
         source ~/.bashrc
-        bbup -v 0.87.0
+        bbup -v ${{ inputs.version }}
         echo "$HOME/.bb" >> $GITHUB_PATH
