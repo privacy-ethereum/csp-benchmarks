@@ -11,12 +11,13 @@ OUT_JSON="${SIZES_JSON:-}"
 : "${STATE_JSON:?STATE_JSON is required}"
 : "${SIZES_JSON:?SIZES_JSON is required}"
 
+TARGET_DIR=$(jq -r '."target-dir"' "$STATE_JSON")
+
 # Run one proving cycle to generate artifacts for measurement
 "$SCRIPT_DIR/sha256_prove.sh" >/dev/null 2>&1 || true
 
-# In Noir + Barretenberg(bb), the prover writes a proof file named proof in the "target" directory.
-WORKSPACE_ROOT_PATH=$(jq -r '."workspace-root-path"' "$STATE_JSON")
-proof_path="${WORKSPACE_ROOT_PATH}/target/proof"
+# In STWO, the prover writes a proof file named "proof.json" in the target directory.
+proof_path="${TARGET_DIR}/proof.json"
 
 if [[ ! -f "$proof_path" ]]; then
   echo "proof not found for Noir size measurement" >&2
@@ -25,8 +26,8 @@ fi
 
 proof_size_bytes=$(stat -f %z "$proof_path" 2>/dev/null || stat -c %s "$proof_path")
 
-# Preprocessing artifacts: circuit.json file
-CIRCUIT_PATH=$(jq -r '."circuit-path"' "$STATE_JSON")
+# Preprocessing artifacts: compiled circuit file
+CIRCUIT_PATH=$(jq -r '."compiled-circuit-path"' "$STATE_JSON")
 circuit_size=$(stat -f %z "$CIRCUIT_PATH" 2>/dev/null || stat -c %s "$CIRCUIT_PATH")
 preprocessing_size_bytes=$(( circuit_size ))
 

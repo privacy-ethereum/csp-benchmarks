@@ -15,7 +15,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 SHA256_CAIRO_CIRCUIT_PATH="${SCRIPT_DIR}/src/main.cairo"
 TARGET_DIR="${SCRIPT_DIR}/target"
-COMPILED_CIRCUIT_PATH="${TARGET_DIR}/main_compiled.json"
+COMPILED_CIRCUIT_PATH="${TARGET_DIR}/sha256_compiled.json"
 
 cd "$SCRIPT_DIR"
 
@@ -56,6 +56,7 @@ STWO_DIR="${SCRIPT_DIR}/stwo-cairo"
 if [ ! -d "$STWO_DIR" ]; then
   echo "Cloning stwo-cairo repository..."
   git clone $STWO_REPO
+  git checkout 0cbda4a
 fi
 
 PROVER_DIR="${STWO_DIR}/stwo_cairo_prover"
@@ -63,7 +64,7 @@ ADAPTED_STWO_BIN="${PROVER_DIR}/target/release/adapted_stwo"
 if [ ! -f "$ADAPTED_STWO_BIN" ]; then
   echo "Building stwo-cairo ..."
   cd "$PROVER_DIR"
-  RUSTFLAGS="-C target-cpu=native -C opt-level=3" cargo build --release
+  RUSTFLAGS="-C target-cpu=native -C opt-level=3" cargo build --release --features="std"
   cd -
 else
   echo "adapted_stwo binary already exists. Skipping build."
