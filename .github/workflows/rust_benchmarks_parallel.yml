@@ -191,7 +191,7 @@ jobs:
         if: ${{ contains(matrix.crate, 'provekit') }}
         uses: ./.github/actions/install-nargo
         with:
-          version: "1.0.0-beta.9"
+          version: "1.0.0-beta.11"
 
       - name: Install OpenMPI for polyhedra-expander
         if: ${{ contains(matrix.crate, 'polyhedra-expander') }}
