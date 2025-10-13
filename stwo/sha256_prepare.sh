@@ -33,7 +33,7 @@ echo "Compiling sha256 circuit..."
 cairo-compile $SHA256_CAIRO_CIRCUIT_PATH --output $COMPILED_CIRCUIT_PATH --proof_mode
 
 # Step 2: Generate input(input.json)
-GEN="$("$UTILS_BIN" sha256 -n 2048)"
+GEN="$("$UTILS_BIN" sha256 -n $INPUT_SIZE)"
 MSG="$(printf "%s\n" "$GEN" | sed -n '1p')"
 HEX_NO_PREFIX="$(printf "%s\n" "$GEN" | sed -n '2p')"
 
