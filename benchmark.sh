@@ -74,19 +74,19 @@ for target in "${TARGETS[@]}"; do
     hyperfine --runs "$RUNS" \
       --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
       "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
-      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json"
+      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json" --show-output
 
     step "[$TARGET] Verifier (size ${INPUT_SIZE}):"
     if [[ -x "$PROVE_FOR_VERIY_SH" ]]; then
       hyperfine --runs "$RUNS" \
         --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_FOR_VERIY_SH > /dev/null 2>&1" \
         "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
-        --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
+        --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json" --show-output
     else
       hyperfine --runs "$RUNS" \
         --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
         "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
-        --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
+        --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json" --show-output
     fi
 
     step "[$TARGET] RAM measurement (size ${INPUT_SIZE})"
