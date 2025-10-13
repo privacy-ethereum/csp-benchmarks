@@ -49,6 +49,10 @@ jobs:
           API_KEY: ${{ secrets.ETHPROOFS_API_KEY }}
         run: |
           set -euo pipefail
+          if [ -z "${API_KEY:-}" ]; then
+            echo "ETHPROOFS_API_KEY secret is not set; aborting." >&2
+            exit 1
+          fi
           BENCH_JSON=$(find ./artifacts -type f -name 'collected_benchmarks.json' | head -n1)
           if [ -z "${BENCH_JSON}" ]; then
             echo "collected_benchmarks.json not found in ./artifacts" >&2
