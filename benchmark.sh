@@ -74,7 +74,7 @@ for target in "${TARGETS[@]}"; do
     hyperfine --runs "$RUNS" \
       --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
       "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
-      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json" --show-output
+      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json"
 
     step "[$TARGET] Verifier (size ${INPUT_SIZE}):"
     if [[ -x "$PROVE_FOR_VERIY_SH" ]]; then
