@@ -5,7 +5,7 @@ inputs:
   version:
     description: Version of Nargo/Noir binaries.
     required: false
-    default: ""
+    default: "1.0.0-beta.13"
 
 runs:
   using: "composite"
