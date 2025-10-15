@@ -1,6 +1,12 @@
 name: "Install Nargo"
 description: "Installs the noir-lang toolchain"
 
+inputs:
+  version:
+    description: Version of Nargo/Noir binaries.
+    required: false
+    default: "1.0.0-beta.13"
+
 runs:
   using: "composite"
   steps:
@@ -8,5 +14,5 @@ runs:
       run: |
         curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash
         source ~/.bashrc
-        ~/.nargo/bin/noirup --version 1.0.0-beta.11
+        ~/.nargo/bin/noirup --version ${{ inputs.version }}
         echo "$HOME/.nargo/bin" >> $GITHUB_PATH

@@ -91,6 +91,8 @@ jobs:
 
       - name: Install Nargo
         uses: ./.github/actions/install-nargo
+        with:
+          version: "1.0.0-beta.11"
 
       - name: Install OpenMPI
         uses: ./.github/actions/install-ompi

@@ -99,12 +99,13 @@ FOLDERS=(
           )
 ```
 
-### 3) Implement four shell scripts per target
+### 3) Implement 4 or 5 shell scripts per target
 
-The orchestrator expects four scripts in your folder for each target name (e.g. `sha256`). The scripts must be executable and named:
+The orchestrator expects 4 or 5 scripts in your folder for each target name (e.g. `sha256`). The scripts must be executable and named:
 
 - `[target]_prepare.sh` - prepare the input state for your prover/verifier
 - `[target]_prove.sh` - prove the input state
+- `[target]_prove_for_verify.sh` - prove the input state and prepare proof for verify (optional)
 - `[target]_verify.sh` - verify the proof
 - `[target]_measure.sh` - measure the proof and preprocessing sizes. By preprocessing we mean any circuit-specific state that a real application would need to persist between prover runs, e.g., proving key.
 
@@ -114,6 +115,10 @@ For `ligetron` with the `sha256` target, these are:
 - `ligetron/sha256_prove.sh`
 - `ligetron/sha256_verify.sh`
 - `ligetron/sha256_measure.sh`
+
+For `barretenberg` with the `sha256` target, there is extra script:
+
+- `barretenberg/sha256_prove_for_verify.sh`
 
 The root `./benchmark.sh` will invoke them in a fixed way via `hyperfine` and our helper scripts. Your scripts should follow the APIs below.
 
@@ -161,6 +166,26 @@ jq -nc \
 ```7:11:ligetron/sha256_prove.sh
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 exec "$SCRIPT_DIR/ligero-prover/build/webgpu_prover" "$(cat "$STATE_JSON")"
+```
+
+#### API: `[target]_prove_for_verify.sh`
+
+- Required environment variables:
+  - `STATE_JSON`: path to the JSON produced by prepare
+- Behavior:
+  - Run the prover for the state described by `$STATE_JSON`.
+  - Should produce a proof artifact in a predictable location for size measurement (see measure API).
+  - Should produce an additional files for verification, if there is a need (e.g. verification key).
+  - Exit non-zero on error.
+- Example (Barretenberg):
+
+```19:24:barretenberg/sha256_prove_for_verify.sh
+#### Step 1: Witness generation ####
+WITNESS_FILE="sha256_${INPUT_SIZE}.gz"
+nargo execute --prover-name $TOML_PATH --package "sha256" $WITNESS_FILE
+
+#### Step 2: bb prove ####
+bb prove -b "$CIRCUIT_PATH" -w "$WORKSPACE_ROOT_PATH/target/$WITNESS_FILE" --write_vk -o "$WORKSPACE_ROOT_PATH/target/"
 ```
 
 #### API: `[target]_verify.sh`
@@ -223,4 +248,4 @@ jq -n --argjson proof_size "$proof_size_bytes" --argjson preprocessing_size "$pr
 - Memory report (created by our wrapper): `[target]_[size]_[proving_system]_mem_report.json`
 - Sizes (produced by your `[target]_measure.sh`): contains `proof_size` and `preprocessing_size` as shown above
 
-Use `ligetron` as a reference implementation.
+Use `ligetron` and `barretenberg` as a reference implementation.

@@ -59,7 +59,8 @@ jobs:
 
           # ─── 1. list of top‑level folders to watch ────────────
           FOLDERS=(
-            ligetron
+            ligetron,
+            barretenberg
           )
 
           # ─── 2. filter by diff (or include all when run_all=true) ───────
@@ -99,12 +100,28 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Update bash under macOS for mapfile
+        run: |
+          brew install bash
+
       - name: Setup & build Ligetron (only when folder is ligetron)
         if: ${{ matrix.folder == 'ligetron' }}
         uses: ./.github/actions/install-ligero
         with:
           ligero_path: ./ligetron/ligero-prover
           install_prefix: ${{ github.workspace }}/.deps/install
+      
+      - name: Setup Nargo (only when folder is barretenberg)
+        if: ${{ matrix.folder == 'barretenberg' }}
+        uses: ./.github/actions/install-nargo
+        with:
+          version: "1.0.0-beta.13"
+
+      - name: Setup Barretenberg (only when folder is barretenberg)
+        if: ${{ matrix.folder == 'barretenberg' }}
+        uses: ./.github/actions/install-bb
+        with:
+          version: "0.87.0"
 
       - name: Ensure jq present
         run: |
