@@ -57,7 +57,11 @@ impl ProvingSystem {
     pub fn is_zkvm(&self) -> bool {
         matches!(
             self,
-            ProvingSystem::Risc0 | ProvingSystem::Sp1 | ProvingSystem::Jolt | ProvingSystem::Miden | ProvingSystem::CairoM
+            ProvingSystem::Risc0
+                | ProvingSystem::Sp1
+                | ProvingSystem::Jolt
+                | ProvingSystem::Miden
+                | ProvingSystem::CairoM
         )
     }
 }

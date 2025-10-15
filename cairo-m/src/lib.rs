@@ -5,8 +5,11 @@ use cairo_m_prover::{
     prover_config::REGULAR_96_BITS, verifier::verify_cairo_m,
 };
 use cairo_m_runner::{RunnerOutput, run_cairo_program};
-use stwo_prover::core::{fields::m31::M31, vcs::blake2_merkle::{Blake2sMerkleChannel, Blake2sMerkleHasher}};
 use std::fs;
+use stwo_prover::core::{
+    fields::m31::M31,
+    vcs::blake2_merkle::{Blake2sMerkleChannel, Blake2sMerkleHasher},
+};
 use utils::generate_sha256_input;
 
 /// Prepares a message for the Cairo-M SHA256 function by padding it and
