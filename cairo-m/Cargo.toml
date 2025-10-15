@@ -1,0 +1,35 @@
+[package]
+name = "cairo-m"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# cairo-m-common = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha" }
+# cairo-m-runner = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha" }
+# cairo-m-prover = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha" }
+# cairo-m-compiler = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha" }
+
+cairo-m-common = { git = "https://github.com/kkrt-labs/cairo-m", rev = "1577f99" }
+cairo-m-runner = { git = "https://github.com/kkrt-labs/cairo-m", rev = "1577f99" }
+cairo-m-prover = { git = "https://github.com/kkrt-labs/cairo-m", rev = "1577f99" }
+cairo-m-compiler = { git = "https://github.com/kkrt-labs/cairo-m", rev = "1577f99" }
+
+stwo-prover = { git = "https://github.com/starkware-libs/stwo", features = ["parallel"], rev = "ab57a1c" }
+
+clap = { workspace = true }
+serde_json = { workspace = true }
+utils = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[patch."https://github.com/HorizenLabs/poseidon2.git"]
+zkhash = { git = "https://github.com/AntoineFONDEUR/poseidon2.git", branch = "poseidon2-M31" }
+
+[[bench]]
+name = "sha256_bench"
+harness = false
+
+[[bin]]
+name = "sha256_mem_cairo_m"
+path = "src/bin/sha256_mem.rs"

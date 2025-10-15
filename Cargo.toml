@@ -11,6 +11,7 @@ members = [
     "miden",
     "risc0",
     "sp1",
+    "cairo-m", # kakarot zkVM
     "utils",
 ]
 exclude = ["plonky3-powdr"]
