@@ -1,4 +1,4 @@
-use cairo_m_common::InputValue;
+use cairo_m_common::{InputValue, Program};
 use cairo_m_compiler::{CompilerOptions, compile_cairo};
 use cairo_m_prover::{
     Proof, adapter::import_from_runner_output, prover::prove_cairo_m,
@@ -32,7 +32,7 @@ fn prepare_sha256_input(msg: &[u8]) -> Vec<u32> {
         .collect()
 }
 
-pub fn prepare(input_size: usize) -> RunnerOutput {
+pub fn prepare(input_size: usize) -> (RunnerOutput, Program) {
     // Compile the program
     let source_path = "programs/sha256.cm".to_string();
     let source_text = fs::read_to_string(&source_path).expect("Failed to read sha256.cm");
@@ -78,7 +78,7 @@ pub fn prepare(input_size: usize) -> RunnerOutput {
     )
     .expect("failed to run cairo program");
 
-    runner_output
+    (runner_output, compiled_program)
 }
 
 pub fn prove(runner_output: &RunnerOutput) -> Proof<Blake2sMerkleHasher> {
