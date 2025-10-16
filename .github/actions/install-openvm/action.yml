@@ -19,7 +19,21 @@ runs:
       run: |
         set -Eeuo pipefail
 
-        cargo +1.86 install --locked --git https://github.com/openvm-org/openvm.git --tag ${{ inputs.openvm-version }} cargo-openvm
+        OPENVM_TAG="${{ inputs.openvm-version }}"
+        OPENVM_VERSION="${OPENVM_TAG#v}"
+
+        # Install cargo-openvm only if not present or wrong version
+        if command -v cargo-openvm >/dev/null 2>&1; then
+          if cargo openvm --version | grep -q "$OPENVM_VERSION"; then
+            echo "cargo-openvm $OPENVM_VERSION already installed; skipping install."
+          else
+            echo "Different cargo-openvm version detected; reinstalling..."
+            cargo +1.86 install --force --locked --git https://github.com/openvm-org/openvm.git --tag "$OPENVM_TAG" cargo-openvm
+          fi
+        else
+          cargo +1.86 install --locked --git https://github.com/openvm-org/openvm.git --tag "$OPENVM_TAG" cargo-openvm
+        fi
+
         cargo openvm --version
         if [ ! -f "$HOME/.openvm/agg_stark.pk" ]; then
           echo "OpenVM keys not found; running setup..."
