@@ -1,5 +1,5 @@
 use clap::Parser;
-use ere_openvm::{OPENVM_TARGET, OpenVMProgram};
+use ere_openvm::OPENVM_TARGET;
 use openvm::{prepare_sha256, prove_sha256};
 use utils::zkvm::SHA256_BENCH;
 use utils::zkvm::helpers::load_compiled_program;

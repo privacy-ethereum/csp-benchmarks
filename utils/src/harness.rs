@@ -108,6 +108,7 @@ fn input_sizes_for(target: BenchTarget, _fixed: Option<usize>) -> Vec<usize> {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn run_benchmarks_fn<
     PreparedContext,
     Proof,

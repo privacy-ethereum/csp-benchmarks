@@ -1,5 +1,7 @@
 use clap::Parser;
+use ere_jolt::JOLT_TARGET;
 use jolt::{prepare_sha256, prove_sha256};
+use utils::zkvm::helpers::load_compiled_program;
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -11,6 +13,8 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let prepared = prepare_sha256(args.input_size);
-    prove_sha256(&prepared);
+    let bench_name = format!("sha256_{}", args.input_size);
+    let program = load_compiled_program::<JOLT_TARGET>(&bench_name);
+    let prepared = prepare_sha256(args.input_size, &program);
+    prove_sha256(&prepared, &());
 }
