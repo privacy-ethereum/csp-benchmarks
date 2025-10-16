@@ -6,10 +6,7 @@ use cairo_m_prover::{
 };
 use cairo_m_runner::{RunnerOutput, run_cairo_program};
 use std::fs;
-use stwo_prover::core::{
-    fields::m31::M31,
-    vcs::blake2_merkle::{Blake2sMerkleChannel, Blake2sMerkleHasher},
-};
+use stwo_prover::core::vcs::blake2_merkle::{Blake2sMerkleChannel, Blake2sMerkleHasher};
 use utils::generate_sha256_input;
 
 /// Prepares a message for the Cairo-M SHA256 function by padding it and
@@ -86,20 +83,28 @@ pub fn prepare(input_size: usize) -> RunnerOutput {
 
 pub fn prove(runner_output: &RunnerOutput) -> Proof<Blake2sMerkleHasher> {
     // Proof Generation
-    let segment = runner_output.vm.segments.into_iter().next().unwrap();
+    let segment = runner_output
+        .vm
+        .segments
+        .clone()
+        .into_iter()
+        .next()
+        .unwrap();
 
-    let mut prover_input = import_from_runner_output(segment, runner_output.public_address_ranges)
-        .expect("Failed to import runner output for proof generation");
+    let mut prover_input =
+        import_from_runner_output(segment, runner_output.public_address_ranges.clone())
+            .expect("Failed to import runner output for proof generation");
 
     let pcs_config = REGULAR_96_BITS;
 
-    let start = Instant::now();
     let proof = prove_cairo_m::<Blake2sMerkleChannel>(&mut prover_input, Some(pcs_config))
         .expect("failed to generate proof");
     proof
 }
 
 pub fn verify(proof: &Proof<Blake2sMerkleHasher>) {
-    verify_cairo_m::<Blake2sMerkleChannel>(proof, Some(pcs_config))
+    let pcs_config = REGULAR_96_BITS;
+
+    verify_cairo_m::<Blake2sMerkleChannel>(*proof, Some(pcs_config))
         .expect("failed to verify proof");
 }

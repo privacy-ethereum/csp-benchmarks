@@ -94,10 +94,13 @@ where
             return Err(zkVMError::other("public values mismatch"));
         }
 
-        if let Some(expected) = &self.expected_digest
-            && &public_values != expected
-        {
-            return Err(zkVMError::other("digest mismatch"));
+        match &self.expected_digest {
+            None => {}
+            Some(expected) => {
+                if public_values != *expected {
+                    return Err(zkVMError::other("digest mismatch"));
+                }
+            }
         }
 
         Ok(())
