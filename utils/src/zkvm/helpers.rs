@@ -40,7 +40,8 @@ pub fn proof_size<SharedState>(proof: &ProofArtifacts, _: &SharedState) -> usize
 
 /// Get the guest program directory path for a benchmark.
 pub fn guest_dir(benchmark_name: &str) -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set");
+    PathBuf::from(manifest_dir)
         .join("guest")
         .join(benchmark_name)
 }
@@ -73,24 +74,14 @@ pub fn load_or_compile_program<C: Compiler>(
 ) -> CompiledProgram<C> {
     let compiled_path = compiled_program_path(benchmark_name);
     if compiled_path.exists() {
-        let program_bin = fs::read(&compiled_path).expect("failed to read compiled guest program");
-        let program: C::Program = bincode::options()
-            .deserialize(&program_bin)
-            .expect("failed to deserialize compiled guest program");
-        let byte_size = program_bin.len();
-        return CompiledProgram { program, byte_size };
+        load_compiled_program(benchmark_name)
+    } else {
+        let program = compile_guest_program(compiler, &guest_dir(benchmark_name))
+            .expect("failed to compile guest program");
+        let bytes = bincode::options()
+            .serialize(&program.program)
+            .expect("failed to serialize compiled program");
+        fs::write(&compiled_path, bytes).expect("failed to write compiled program file");
+        program
     }
-
-    let guest_path = guest_dir(benchmark_name);
-    let compiled =
-        compile_guest_program(compiler, &guest_path).expect("failed to compile guest program");
-    // Persist compiled program bytes for future runs
-    let bytes = bincode::options()
-        .serialize(&compiled.program)
-        .expect("failed to serialize compiled program");
-    if let Some(parent) = compiled_path.parent() {
-        std::fs::create_dir_all(parent).ok();
-    }
-    std::fs::write(&compiled_path, bytes).expect("failed to write compiled program file");
-    compiled
 }
