@@ -205,11 +205,28 @@ jobs:
         if: ${{ contains(matrix.crate, 'sp1') }}
         uses: ./.github/actions/install-sp1
 
+      - name: Install llvm and lld for cairo-m
+        if: ${{ contains(matrix.crate, 'cairo-m') }}
+        run: |
+          brew install llvm
+          brew install lld
+
+          echo 'export CC=/usr/runner/opt/llvm/bin/clang' >> ~/.bashrc
+          echo 'export CXX=/usr/runner/opt/llvm/bin/clang++' >> ~/.bashrc
+          echo 'export AR=/usr/runner/opt/llvm/bin/llvm-ar' >> ~/.bashrc
+          echo 'export RANLIB=/usr/runner/opt/llvm/bin/llvm-ranlib' >> ~/.bashrc
+
+          source ~/.bashrc
+
       - name: Run benches in ${{ matrix.crate }}
         run: |
           cd ${{ matrix.crate }}
-          cargo bench
-
+          if [ "${{ matrix.crate }}" = "cairo-m" ]; then
+            RUSTFLAGS="-C link-arg=-fuse-ld=/usr/runner/bin/ld64.lld -C target-cpu=native" cargo bench
+          else
+            cargo bench
+          fi
+        
       - name: Upload reports for ${{ matrix.crate }}
         uses: actions/upload-artifact@v4
         if: always()
