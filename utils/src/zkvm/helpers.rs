@@ -1,14 +1,25 @@
+use crate::zkvm::instance::{CompiledProgram, compile_guest_program};
 use crate::zkvm::{PreparedSha256, ProofArtifacts};
+use bincode::Options;
+use std::fs;
 use std::path::PathBuf;
+use zkvm_interface::Compiler;
 use zkvm_interface::zkVM;
 
 /// Prove a SHA-256 benchmark using the prepared zkVM instance.
-pub fn prove_sha256<V: zkVM>(prepared: &PreparedSha256<V>) -> ProofArtifacts {
+pub fn prove_sha256<V: zkVM, SharedState>(
+    prepared: &PreparedSha256<V>,
+    _: &SharedState,
+) -> ProofArtifacts {
     prepared.prove().expect("prove failed")
 }
 
 /// Verify a SHA-256 proof with digest checking.
-pub fn verify_sha256<V: zkVM>(prepared: &PreparedSha256<V>, proof: &ProofArtifacts) {
+pub fn verify_sha256<V: zkVM, SharedState>(
+    prepared: &PreparedSha256<V>,
+    proof: &ProofArtifacts,
+    _: &SharedState,
+) {
     prepared.verify_with_digest(proof).expect("verify failed");
 }
 
@@ -18,12 +29,12 @@ pub fn execution_cycles<V: zkVM>(prepared: &PreparedSha256<V>) -> u64 {
 }
 
 /// Get the preprocessing (compiled program) size.
-pub fn preprocessing_size<V>(prepared: &PreparedSha256<V>) -> usize {
+pub fn preprocessing_size<V, SharedState>(prepared: &PreparedSha256<V>, _: &SharedState) -> usize {
     prepared.compiled_size()
 }
 
 /// Get the proof size from proof artifacts.
-pub fn proof_size(proof: &ProofArtifacts) -> usize {
+pub fn proof_size<SharedState>(proof: &ProofArtifacts, _: &SharedState) -> usize {
     proof.proof_size()
 }
 
@@ -32,4 +43,41 @@ pub fn guest_dir(benchmark_name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("guest")
         .join(benchmark_name)
+}
+
+/// Compute the standard compiled program path for a benchmark.
+/// By convention we store at guest/<bench>/target/<bench>.bin
+pub fn compiled_program_path(benchmark_name: &str) -> PathBuf {
+    guest_dir(benchmark_name)
+        .join("target")
+        .join(format!("{}.bin", benchmark_name))
+}
+
+/// Load a compiled program if present, otherwise compile and persist it.
+pub fn load_or_compile_program<C: Compiler>(
+    compiler: &C,
+    benchmark_name: &str,
+) -> CompiledProgram<C> {
+    let compiled_path = compiled_program_path(benchmark_name);
+    if compiled_path.exists() {
+        let program_bin = fs::read(&compiled_path).expect("failed to read compiled guest program");
+        let program: C::Program = bincode::options()
+            .deserialize(&program_bin)
+            .expect("failed to deserialize compiled guest program");
+        let byte_size = program_bin.len();
+        return CompiledProgram { program, byte_size };
+    }
+
+    let guest_path = guest_dir(benchmark_name);
+    let compiled =
+        compile_guest_program(compiler, &guest_path).expect("failed to compile guest program");
+    // Persist compiled program bytes for future runs
+    let bytes = bincode::options()
+        .serialize(&compiled.program)
+        .expect("failed to serialize compiled program");
+    if let Some(parent) = compiled_path.parent() {
+        std::fs::create_dir_all(parent).ok();
+    }
+    std::fs::write(&compiled_path, bytes).expect("failed to write compiled program file");
+    compiled
 }

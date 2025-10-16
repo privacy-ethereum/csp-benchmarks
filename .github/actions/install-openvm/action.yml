@@ -1,0 +1,29 @@
+name: "Install OpenVM toolchain"
+description: "Installs the OpenVM toolchain components required for benchmarks"
+
+inputs:
+  openvm-version:
+    description: "OpenVM toolchain version"
+    required: false
+    default: "v1.4.0"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Restore OpenVM cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.openvm
+        key: ${{ runner.os }}-openvm-${{ inputs.openvm-version }}-v1
+    - shell: bash
+      run: |
+        set -Eeuo pipefail
+
+        cargo +1.86 install --locked --git https://github.com/openvm-org/openvm.git --tag ${{ inputs.openvm-version }} cargo-openvm
+        cargo openvm --version
+        if [ ! -f "$HOME/.openvm/agg_stark.pk" ]; then
+          echo "OpenVM keys not found; running setup..."
+          cargo openvm setup
+        else
+          echo "OpenVM keys already present; skipping setup."
+        fi

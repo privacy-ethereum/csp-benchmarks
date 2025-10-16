@@ -1,31 +1,29 @@
-use ere_miden::{EreMiden, MIDEN_TARGET};
+use ere_miden::EreMiden;
 use std::convert::TryInto;
-use std::path::PathBuf;
-use utils::zkvm::{
-    CompiledProgram, PreparedSha256, ProofArtifacts, SHA256_BENCH, compile_guest_program,
-};
+use utils::zkvm::{CompiledProgram, PreparedSha256, ProofArtifacts};
 use zkvm_interface::{Input, ProverResourceType};
 
 pub use utils::zkvm::{execution_cycles, preprocessing_size, proof_size, prove_sha256};
 
-pub fn prepare_sha256(input_size: usize) -> PreparedSha256<EreMiden> {
-    let guest_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("guest")
-        .join(SHA256_BENCH);
-    let CompiledProgram { program, byte_size } = compile_guest_program(&MIDEN_TARGET, &guest_path)
-        .expect("failed to compile miden guest program");
-
-    let vm = EreMiden::new(program, ProverResourceType::Cpu)
+pub fn prepare_sha256(
+    input_size: usize,
+    program: &CompiledProgram<ere_miden::MIDEN_TARGET>,
+) -> PreparedSha256<EreMiden> {
+    let vm = EreMiden::new(program.program.clone(), ProverResourceType::Cpu)
         .expect("failed to build miden prover instance");
 
     let (message_bytes, digest) = utils::generate_sha256_input(input_size);
     let input = build_input(message_bytes);
 
-    PreparedSha256::with_expected_digest(vm, input, byte_size, digest)
+    PreparedSha256::with_expected_digest(vm, input, program.byte_size, digest)
 }
 
 // Miden has custom verification logic due to special public value decoding
-pub fn verify_sha256(prepared: &PreparedSha256<EreMiden>, proof: &ProofArtifacts) {
+pub fn verify_sha256(
+    prepared: &PreparedSha256<EreMiden>,
+    proof: &ProofArtifacts,
+    _: &&CompiledProgram<ere_miden::MIDEN_TARGET>,
+) {
     let public_values = prepared.verify(&proof.proof).expect("miden verify failed");
 
     assert_eq!(public_values, proof.public_values, "public values mismatch");
@@ -82,7 +80,13 @@ mod tests {
 
     #[test]
     fn miden_sha256_matches_reference_digest() {
-        let prepared = prepare_sha256(2048);
+        // Build a program for tests
+        use ere_miden::MIDEN_TARGET;
+        use utils::zkvm::{SHA256_BENCH, compile_guest_program, guest_dir};
+        let guest_path = guest_dir(SHA256_BENCH);
+        let program = compile_guest_program(&MIDEN_TARGET, &guest_path)
+            .expect("compile guest program for tests");
+        let prepared = prepare_sha256(2048, &program);
 
         // Execute the guest to obtain the committed digest bytes
         let (public_values, _) = prepared
@@ -96,7 +100,7 @@ mod tests {
         assert_eq!(digest_bytes, expected_digest);
 
         // Ensure prove/verify plumbing also succeeds
-        let proof = prove_sha256(&prepared);
-        verify_sha256(&prepared, &proof);
+        let proof = prove_sha256(&prepared, &program);
+        verify_sha256(&prepared, &proof, &(&program));
     }
 }
