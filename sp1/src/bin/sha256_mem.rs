@@ -1,11 +1,8 @@
-use std::{fs, path::PathBuf};
-
-use bincode::Options;
 use clap::Parser;
 use ere_sp1::RV32_IM_SUCCINCT_ZKVM_ELF;
 use sp1::{prepare_sha256, prove_sha256};
-use utils::zkvm::{CompiledProgram, SHA256_BENCH};
-use zkvm_interface::Compiler;
+use utils::zkvm::SHA256_BENCH;
+use utils::zkvm::helpers::load_compiled_program;
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -17,17 +14,7 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let compiled_program_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("guest")
-        .join(SHA256_BENCH)
-        .join("target")
-        .join("sha256.bin");
-    let program_bin = fs::read(&compiled_program_path)
-        .expect("missing compiled guest; the harness should have compiled it already");
-    let program: <RV32_IM_SUCCINCT_ZKVM_ELF as Compiler>::Program =
-        bincode::options().deserialize(&program_bin).unwrap();
-    let byte_size = program_bin.len();
-    let program = CompiledProgram { program, byte_size };
+    let program = load_compiled_program::<RV32_IM_SUCCINCT_ZKVM_ELF>(SHA256_BENCH);
 
     let prepared = prepare_sha256(args.input_size, &program);
     prove_sha256(&prepared, &());

@@ -53,6 +53,19 @@ pub fn compiled_program_path(benchmark_name: &str) -> PathBuf {
         .join(format!("{}.bin", benchmark_name))
 }
 
+/// Load a compiled program, panicking if it is missing.
+/// Used by RAM measurement binaries which must never trigger compilation.
+pub fn load_compiled_program<C: Compiler>(benchmark_name: &str) -> CompiledProgram<C> {
+    let compiled_path = compiled_program_path(benchmark_name);
+    let program_bin = fs::read(&compiled_path)
+        .expect("missing compiled guest; the harness should have compiled it already");
+    let program: C::Program = bincode::options()
+        .deserialize(&program_bin)
+        .expect("failed to deserialize compiled guest program");
+    let byte_size = program_bin.len();
+    CompiledProgram { program, byte_size }
+}
+
 /// Load a compiled program if present, otherwise compile and persist it.
 pub fn load_or_compile_program<C: Compiler>(
     compiler: &C,
