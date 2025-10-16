@@ -81,6 +81,7 @@ pub fn load_or_compile_program<C: Compiler>(
         let bytes = bincode::options()
             .serialize(&program.program)
             .expect("failed to serialize compiled program");
+        fs::create_dir_all(compiled_path.parent().unwrap()).expect("failed to create directory");
         fs::write(&compiled_path, bytes).expect("failed to write compiled program file");
         program
     }
