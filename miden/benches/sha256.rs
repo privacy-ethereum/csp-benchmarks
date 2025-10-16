@@ -11,9 +11,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::Miden,
     None,
     "sha256_mem_miden",
-    {
-        load_or_compile_program(&MIDEN_TARGET, SHA256_BENCH)
-    },
+    { load_or_compile_program(&MIDEN_TARGET, SHA256_BENCH) },
     prepare_sha256,
     prove_sha256,
     verify_sha256,
