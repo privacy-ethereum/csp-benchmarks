@@ -1,7 +1,8 @@
+use std::collections::HashMap;
+
 use clap::Parser;
-use ere_jolt::JOLT_TARGET;
 use jolt::{prepare_sha256, prove_sha256};
-use utils::zkvm::helpers::load_compiled_program;
+use utils::zkvm::{SHA256_BENCH, helpers::load_compiled_program};
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -12,9 +13,12 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
+    let mut programs = HashMap::new();
+    programs.insert(
+        args.input_size,
+        load_compiled_program(&format!("{}_{}", SHA256_BENCH, args.input_size)),
+    );
 
-    let bench_name = format!("sha256_{}", args.input_size);
-    let program = load_compiled_program::<JOLT_TARGET>(&bench_name);
-    let prepared = prepare_sha256(args.input_size, &program);
+    let prepared = prepare_sha256(args.input_size, &programs);
     prove_sha256(&prepared, &());
 }
