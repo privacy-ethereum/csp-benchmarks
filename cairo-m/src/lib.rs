@@ -105,6 +105,6 @@ pub fn prove(runner_output: &RunnerOutput) -> Proof<Blake2sMerkleHasher> {
 pub fn verify(proof: &Proof<Blake2sMerkleHasher>) {
     let pcs_config = REGULAR_96_BITS;
 
-    verify_cairo_m::<Blake2sMerkleChannel>(*proof, Some(pcs_config))
+    verify_cairo_m::<Blake2sMerkleChannel>(proof.clone(), Some(pcs_config))
         .expect("failed to verify proof");
 }

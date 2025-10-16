@@ -2543,7 +2543,7 @@ dependencies = [
 [[package]]
 name = "cairo-m-common"
 version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha#11238b46d358bcd34c4f1f3ee575055f533e0b18"
+source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
 dependencies = [
  "anyhow",
  "num-traits",
@@ -2558,7 +2558,7 @@ dependencies = [
 [[package]]
 name = "cairo-m-compiler"
 version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha#11238b46d358bcd34c4f1f3ee575055f533e0b18"
+source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
 dependencies = [
  "anyhow",
  "ariadne",
@@ -2585,7 +2585,7 @@ dependencies = [
 [[package]]
 name = "cairo-m-compiler-codegen"
 version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha#11238b46d358bcd34c4f1f3ee575055f533e0b18"
+source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
 dependencies = [
  "cairo-m-common",
  "cairo-m-compiler-diagnostics",
@@ -2610,7 +2610,7 @@ dependencies = [
 [[package]]
 name = "cairo-m-compiler-diagnostics"
 version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha#11238b46d358bcd34c4f1f3ee575055f533e0b18"
+source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
 dependencies = [
  "ariadne",
  "chumsky",
@@ -2619,7 +2619,7 @@ dependencies = [
 [[package]]
 name = "cairo-m-compiler-mir"
 version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha#11238b46d358bcd34c4f1f3ee575055f533e0b18"
+source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
 dependencies = [
  "cairo-m-compiler-diagnostics",
  "cairo-m-compiler-parser",
@@ -2636,7 +2636,7 @@ dependencies = [
 [[package]]
 name = "cairo-m-compiler-parser"
 version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha#11238b46d358bcd34c4f1f3ee575055f533e0b18"
+source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
 dependencies = [
  "ariadne",
  "cairo-m-compiler-diagnostics",
@@ -2655,7 +2655,7 @@ dependencies = [
 [[package]]
 name = "cairo-m-compiler-semantic"
 version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha#11238b46d358bcd34c4f1f3ee575055f533e0b18"
+source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
 dependencies = [
  "anyhow",
  "ariadne",
@@ -2681,7 +2681,7 @@ dependencies = [
 [[package]]
 name = "cairo-m-project"
 version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha#11238b46d358bcd34c4f1f3ee575055f533e0b18"
+source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
 dependencies = [
  "anyhow",
  "ignore",
@@ -2695,7 +2695,7 @@ dependencies = [
 [[package]]
 name = "cairo-m-prover"
 version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha#11238b46d358bcd34c4f1f3ee575055f533e0b18"
+source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
 dependencies = [
  "anyhow",
  "bytemuck",
@@ -2724,7 +2724,7 @@ dependencies = [
 [[package]]
 name = "cairo-m-runner"
 version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha#11238b46d358bcd34c4f1f3ee575055f533e0b18"
+source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
 dependencies = [
  "anyhow",
  "cairo-m-common",
@@ -2746,7 +2746,7 @@ dependencies = [
 [[package]]
 name = "cairo-m-test-utils"
 version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha#11238b46d358bcd34c4f1f3ee575055f533e0b18"
+source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
 dependencies = [
  "once_cell",
  "pulldown-cmark",

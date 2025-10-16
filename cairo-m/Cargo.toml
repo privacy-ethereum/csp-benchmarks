@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-cairo-m-common = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha" }
-cairo-m-runner = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha" }
-cairo-m-prover = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha" }
-cairo-m-compiler = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha" }
+cairo-m-common = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha.1" }
+cairo-m-runner = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha.1" }
+cairo-m-prover = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha.1" }
+cairo-m-compiler = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha.1" }
 
 stwo-prover = { git = "https://github.com/starkware-libs/stwo", features = ["parallel"], rev = "ab57a1c" }
 
