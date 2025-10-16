@@ -21,6 +21,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Install gh
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+          HOMEBREW_NO_ENV_HINTS: "1"
         run: brew install gh
 
       - name: Determine ref

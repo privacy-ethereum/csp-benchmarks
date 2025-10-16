@@ -40,6 +40,9 @@ runs:
 
     - name: Brew deps (conditionally)
       shell: bash
+      env:
+        HOMEBREW_NO_AUTO_UPDATE: "1"
+        HOMEBREW_NO_ENV_HINTS: "1"
       run: |
         set -euo pipefail
         NEEDS=()
