@@ -3,7 +3,7 @@ resolver = "3"
 members = [
     "binius64",
     "plonky2",
-    #"plonky3-powdr",
+    "openvm",
     "provekit",
     "polyhedra-expander",
     "circom",
@@ -14,7 +14,6 @@ members = [
     "cairo-m", # kakarot zkVM
     "utils",
 ]
-exclude = ["plonky3-powdr"]
 
 [workspace.dependencies]
 anyhow = "1.0.81"

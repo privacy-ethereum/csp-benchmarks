@@ -13,6 +13,7 @@ pub fn compile_guest_program<C: Compiler>(
     compiler: &C,
     guest_dir: &Path,
 ) -> Result<CompiledProgram<C>, C::Error> {
+    println!("Compiling guest program at {:?}", guest_dir);
     let program = compiler.compile(guest_dir)?;
     let cfg = bincode::options();
     let byte_size = cfg

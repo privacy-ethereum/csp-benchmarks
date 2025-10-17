@@ -1,5 +1,9 @@
 name: Lints
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 on:
   pull_request:
     branches:
@@ -39,12 +43,6 @@ jobs:
           profile: default
           default: true
           components: rustfmt, clippy
-
-      - name: Install Powdr
-        uses: ./.github/actions/install-powdr
-
-      - name: Install nightly-2024-08-01 with rust-src for Powdr
-        run: rustup toolchain install nightly-2024-08-01 --component rust-src
 
       - name: Install OpenMPI
         uses: ./.github/actions/install-ompi

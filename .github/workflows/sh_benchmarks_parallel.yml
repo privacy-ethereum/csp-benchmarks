@@ -23,6 +23,8 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_ENV_HINTS: "1"
 
 jobs:
   detect-folders:
@@ -110,7 +112,7 @@ jobs:
         with:
           ligero_path: ./ligetron/ligero-prover
           install_prefix: ${{ github.workspace }}/.deps/install
-      
+
       - name: Setup Nargo (only when folder is barretenberg)
         if: ${{ matrix.folder == 'barretenberg' }}
         uses: ./.github/actions/install-nargo
