@@ -7947,7 +7947,7 @@ dependencies = [
  "serde",
  "strum 0.26.3",
  "strum_macros 0.26.4",
- "zkhash 0.2.0 (git+https://github.com/AntoineFONDEUR/poseidon2.git?branch=poseidon2-M31)",
+ "zkhash 0.2.0 (git+https://github.com/HorizenLabs/poseidon2.git?rev=bb476b9)",
 ]
 
 [[package]]
@@ -8081,7 +8081,7 @@ dependencies = [
  "p3-poseidon2-air",
  "p3-symmetric 0.1.0",
  "rand 0.8.5",
- "zkhash 0.2.0 (git+https://github.com/AntoineFONDEUR/poseidon2.git?branch=poseidon2-M31)",
+ "zkhash 0.2.0 (git+https://github.com/HorizenLabs/poseidon2.git?rev=bb476b9)",
 ]
 
 [[package]]
@@ -8320,7 +8320,7 @@ dependencies = [
  "tracing",
  "tracing-forest",
  "tracing-subscriber 0.3.20",
- "zkhash 0.2.0 (git+https://github.com/AntoineFONDEUR/poseidon2.git?branch=poseidon2-M31)",
+ "zkhash 0.2.0 (git+https://github.com/HorizenLabs/poseidon2.git?rev=bb476b9)",
 ]
 
 [[package]]
@@ -14802,7 +14802,7 @@ dependencies = [
 [[package]]
 name = "zkhash"
 version = "0.2.0"
-source = "git+https://github.com/AntoineFONDEUR/poseidon2.git?branch=poseidon2-M31#5f715d0c9b34f427f8b6b05ddbafc82379e73b20"
+source = "git+https://github.com/HorizenLabs/poseidon2.git?rev=bb476b9#bb476b9ca38198cf5092487283c8b8c5d4317c4e"
 dependencies = [
  "ark-ff 0.4.2",
  "ark-std 0.4.0",

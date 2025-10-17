@@ -8,15 +8,22 @@ cairo-m-common = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-a
 cairo-m-runner = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha.1" }
 cairo-m-prover = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha.1" }
 cairo-m-compiler = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha.1" }
-
 stwo-prover = { git = "https://github.com/starkware-libs/stwo", features = ["parallel"], rev = "ab57a1c" }
 
-clap = { workspace = true }
-serde_json = { workspace = true }
-utils = { workspace = true }
+# clap = { workspace = true }
+# serde_json = { workspace = true }
+# utils = { workspace = true }
+clap = { version = "4.5.20", features = ["derive", "env"] }
+serde_json = { version = "1.0" }
+utils = { path = "../utils" }
 
 [dev-dependencies]
-criterion = { workspace = true }
+# criterion = { workspace = true }
+criterion = "0.5.1"
+
+# patch for "cairo-m" 
+[patch."https://github.com/HorizenLabs/poseidon2.git"]
+zkhash = { git = "https://github.com/AntoineFONDEUR/poseidon2.git", branch = "poseidon2-M31" }
 
 [[bench]]
 name = "sha256_bench"
