@@ -11,9 +11,11 @@ members = [
     "miden",
     "risc0",
     "sp1",
-    "cairo-m", # kakarot zkVM
+    # "cairo-m", # kakarot zkVM
     "utils",
 ]
+
+exclude = [ "cairo-m" ]
 
 [workspace.dependencies]
 anyhow = "1.0.81"
