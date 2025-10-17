@@ -8386,7 +8386,7 @@ dependencies = [
  "serde",
  "strum 0.26.3",
  "strum_macros 0.26.4",
- "zkhash 0.2.0 (git+https://github.com/HorizenLabs/poseidon2.git?rev=bb476b9)",
+ "zkhash 0.2.0 (git+https://github.com/AntoineFONDEUR/poseidon2.git?branch=poseidon2-M31)",
 ]
 
 [[package]]
@@ -8520,7 +8520,7 @@ dependencies = [
  "p3-poseidon2-air",
  "p3-symmetric 0.1.0",
  "rand 0.8.5",
- "zkhash 0.2.0 (git+https://github.com/HorizenLabs/poseidon2.git?rev=bb476b9)",
+ "zkhash 0.2.0 (git+https://github.com/AntoineFONDEUR/poseidon2.git?branch=poseidon2-M31)",
 ]
 
 [[package]]
@@ -8759,7 +8759,7 @@ dependencies = [
  "tracing",
  "tracing-forest",
  "tracing-subscriber 0.3.20",
- "zkhash 0.2.0 (git+https://github.com/HorizenLabs/poseidon2.git?rev=bb476b9)",
+ "zkhash 0.2.0 (git+https://github.com/AntoineFONDEUR/poseidon2.git?branch=poseidon2-M31)",
 ]
 
 [[package]]
@@ -10403,15 +10403,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09"
 
 [[package]]
-name = "rancor"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a063ea72381527c2a0561da9c80000ef822bdd7c3241b1cc1b12100e3df081ee"
-dependencies = [
- "ptr_meta",
-]
-
-[[package]]
 name = "radix_trie"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10419,6 +10410,15 @@ checksum = "c069c179fcdc6a2fe24d8d18305cf085fdbd4f922c041943e203685d6a1c58fd"
 dependencies = [
  "endian-type",
  "nibble_vec",
+]
+
+[[package]]
+name = "rancor"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a063ea72381527c2a0561da9c80000ef822bdd7c3241b1cc1b12100e3df081ee"
+dependencies = [
+ "ptr_meta",
 ]
 
 [[package]]
