@@ -197,27 +197,10 @@ jobs:
         if: ${{ contains(matrix.crate, 'sp1') }}
         uses: ./.github/actions/install-sp1
 
-      - name: Install llvm and lld for cairo-m
-        if: ${{ contains(matrix.crate, 'cairo-m') }}
-        run: |
-          brew install llvm
-          brew install lld
-
-          echo 'export CC=/usr/runner/opt/llvm/bin/clang' >> ~/.bashrc
-          echo 'export CXX=/usr/runner/opt/llvm/bin/clang++' >> ~/.bashrc
-          echo 'export AR=/usr/runner/opt/llvm/bin/llvm-ar' >> ~/.bashrc
-          echo 'export RANLIB=/usr/runner/opt/llvm/bin/llvm-ranlib' >> ~/.bashrc
-
-          source ~/.bashrc
-
       - name: Run benches in ${{ matrix.crate }}
         run: |
           cd ${{ matrix.crate }}
-          if [ "${{ matrix.crate }}" = "cairo-m" ]; then
-            RUSTFLAGS="-C link-arg=-fuse-ld=/usr/runner/bin/ld64.lld -C target-cpu=native" cargo bench
-          else
-            cargo bench
-          fi
+          cargo bench
         
       - name: Upload reports for ${{ matrix.crate }}
         uses: actions/upload-artifact@v4
@@ -244,5 +227,70 @@ jobs:
           name: "mem-${{ matrix.crate }}"
           path: |
             ${{ matrix.crate }}/*_mem_report.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  bench_cairo_m:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth:
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2025-04-06-aarch64-apple-darwin
+          override: true
+          profile: default
+          default: true
+
+      - name: Install llvm and lld for "cairo-m"
+        if: ${{ contains(matrix.crate, 'cairo-m') }}
+        run: |
+          brew install llvm
+          brew install lld
+
+          echo 'export CC=/usr/runner/opt/llvm/bin/clang' >> ~/.bashrc
+          echo 'export CXX=/usr/runner/opt/llvm/bin/clang++' >> ~/.bashrc
+          echo 'export AR=/usr/runner/opt/llvm/bin/llvm-ar' >> ~/.bashrc
+          echo 'export RANLIB=/usr/runner/opt/llvm/bin/llvm-ranlib' >> ~/.bashrc
+
+          source ~/.bashrc
+
+      - name: Run benches in "cairo-m"
+        run: |
+          cd cairo-m
+          RUSTFLAGS="-C link-arg=-fuse-ld=/usr/runner/bin/ld64.lld -C target-cpu=native" cargo bench
+          
+        
+      - name: Upload reports for "cairo-m"
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "criterion-cairo-m"
+          path: ./target/criterion
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload metrics for "cairo-m"
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "metrics-cairo-m"
+          path: cairo-m/**/*_metrics.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload mem reports for cairo-m
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "mem-cairo-m"
+          path: |
+            cairo-m/*_mem_report.json
           if-no-files-found: warn
           retention-days: 30
