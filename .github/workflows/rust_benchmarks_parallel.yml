@@ -264,14 +264,13 @@ jobs:
         run: |
           cd cairo-m
           RUSTFLAGS="-C link-arg=-fuse-ld=/opt/homebrew/bin/ld64.lld -C target-cpu=native" cargo bench
-          
         
       - name: Upload reports for "cairo-m"
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: "criterion-cairo-m"
-          path: ./target/criterion
+          path: ./cairo-m/target/criterion
           if-no-files-found: warn
           retention-days: 30
 
@@ -280,7 +279,7 @@ jobs:
         if: always()
         with:
           name: "metrics-cairo-m"
-          path: cairo-m/**/*_metrics.json
+          path: ./cairo-m/**/*_metrics.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -290,6 +289,6 @@ jobs:
         with:
           name: "mem-cairo-m"
           path: |
-            cairo-m/*_mem_report.json
+            ./cairo-m/*_mem_report.json
           if-no-files-found: warn
           retention-days: 30
