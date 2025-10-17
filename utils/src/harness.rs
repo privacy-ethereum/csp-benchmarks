@@ -27,7 +27,7 @@ pub enum ProvingSystem {
     Binius64,
     Expander,
     Plonky2,
-    Powdr,
+    OpenVM,
     Provekit,
     Circom,
     Risc0,
@@ -43,7 +43,7 @@ impl ProvingSystem {
             ProvingSystem::Binius64 => "binius64",
             ProvingSystem::Expander => "expander",
             ProvingSystem::Plonky2 => "plonky2",
-            ProvingSystem::Powdr => "powdr",
+            ProvingSystem::OpenVM => "openvm",
             ProvingSystem::Provekit => "provekit",
             ProvingSystem::Circom => "circom",
             ProvingSystem::Risc0 => "risc0",
@@ -108,6 +108,7 @@ fn input_sizes_for(target: BenchTarget, _fixed: Option<usize>) -> Vec<usize> {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn run_benchmarks_fn<
     PreparedContext,
     Proof,
@@ -206,7 +207,7 @@ pub fn run_benchmarks_with_state_fn<
     mut proof_size: ProofSizeFn,
     execution_cycles: Option<ExecutionCyclesFn>,
 ) where
-    PrepareFn: FnMut(usize, &SharedState) -> PreparedContext + Copy,
+    PrepareFn: FnMut(usize, SharedState) -> PreparedContext + Copy,
     ProveFn: FnMut(&PreparedContext, &SharedState) -> Proof + Copy,
     VerifyFn: FnMut(&PreparedContext, &Proof, &SharedState),
     PrepSizeFn: FnMut(&PreparedContext, &SharedState) -> usize,
@@ -216,7 +217,7 @@ pub fn run_benchmarks_with_state_fn<
     let system_str = cfg.system.as_str();
 
     for size in input_sizes_for(cfg.target, cfg.fixed_input_size) {
-        let prepared_context = prepare(size, &shared);
+        let prepared_context = prepare(size, shared);
 
         let mut metrics = init_metrics(&cfg, target_str, system_str, size);
         metrics.preprocessing_size = preprocessing_size(&prepared_context, &shared);
@@ -237,7 +238,7 @@ pub fn run_benchmarks_with_state_fn<
         let prove_id = bench_id(target_str, size, system_str, cfg.feature, "prove");
         group.bench_function(prove_id, move |bench| {
             bench.iter_batched(
-                move || prepare(size, &shared),
+                move || prepare(size, shared),
                 move |prepared| {
                     let _ = (prove)(&prepared, &shared);
                 },
@@ -249,7 +250,7 @@ pub fn run_benchmarks_with_state_fn<
         group.bench_function(verify_id, |bench| {
             bench.iter_batched(
                 || {
-                    let prepared = prepare(size, &shared);
+                    let prepared = prepare(size, shared);
                     let proof_local = (prove)(&prepared, &shared);
                     (prepared, proof_local)
                 },
@@ -364,8 +365,36 @@ macro_rules! __define_benchmark_harness {
         ::criterion::criterion_group!($public_group_ident, criterion_benchmarks);
         ::criterion::criterion_main!($public_group_ident);
     };
+    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, { $($shared_init:tt)* },
+        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $execution_cycles:expr
+    ) => {
+        fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
+            let system = $system;
+            let cfg = ::utils::harness::BenchHarnessConfig {
+                target: $target,
+                system,
+                feature: $feature,
+                mem_binary_name: $mem_binary_name,
+                fixed_input_size: None,
+                is_zkvm: system.is_zkvm(),
+            };
+            ::utils::harness::run_benchmarks_with_state_fn(
+                c,
+                cfg,
+                &{ $($shared_init)* },
+                $prepare,
+                $prove,
+                $verify,
+                $prep_size,
+                $proof_size,
+                Some($execution_cycles),
+            );
+        }
+        ::criterion::criterion_group!($public_group_ident, criterion_benchmarks);
+        ::criterion::criterion_main!($public_group_ident);
+    };
     // With shared state - old syntax fallback (6 params)
-    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $shared_init:expr,
+    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, { $($shared_init:tt)* },
         $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
@@ -381,7 +410,7 @@ macro_rules! __define_benchmark_harness {
             ::utils::harness::run_benchmarks_with_state_fn(
                 c,
                 cfg,
-                &$shared_init,
+                &{ $($shared_init)* },
                 $prepare,
                 $prove,
                 $verify,

@@ -1,5 +1,8 @@
 use clap::Parser;
+use ere_risc0::RV32_IM_RISC0_ZKVM_ELF;
 use risc0::{prepare_sha256, prove_sha256};
+use utils::zkvm::SHA256_BENCH;
+use utils::zkvm::helpers::load_compiled_program;
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -11,6 +14,8 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let prepared = prepare_sha256(args.input_size);
-    prove_sha256(&prepared);
+    let program = load_compiled_program::<RV32_IM_RISC0_ZKVM_ELF>(SHA256_BENCH);
+
+    let prepared = prepare_sha256(args.input_size, &program);
+    prove_sha256(&prepared, &());
 }

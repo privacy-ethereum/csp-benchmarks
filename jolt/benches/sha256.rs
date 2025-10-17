@@ -1,13 +1,30 @@
+use std::collections::HashMap;
+
+use ere_jolt::JOLT_TARGET;
 use jolt::{
     execution_cycles, prepare_sha256, preprocessing_size, proof_size, prove_sha256, verify_sha256,
 };
-use utils::harness::ProvingSystem;
+use utils::{
+    harness::ProvingSystem,
+    metadata::SHA2_INPUTS,
+    zkvm::{SHA256_BENCH, helpers::load_or_compile_program},
+};
 
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
     ProvingSystem::Jolt,
     None,
     "sha256_mem_jolt",
+    {
+        let mut programs = HashMap::new();
+        for input_size in SHA2_INPUTS {
+            programs.insert(
+                input_size,
+                load_or_compile_program(&JOLT_TARGET, &format!("{}_{}", SHA256_BENCH, input_size)),
+            );
+        }
+        programs
+    },
     prepare_sha256,
     prove_sha256,
     verify_sha256,

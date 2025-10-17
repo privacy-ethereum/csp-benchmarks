@@ -27,6 +27,8 @@ jobs:
   collect:
     runs-on: macos-latest
     env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_ENV_HINTS: "1"
       SHA: ${{ inputs.sha || github.event.workflow_run.head_sha || github.sha }}
       GH_TOKEN: ${{ github.token }}
       # keep in sync with on.workflow_run.workflows
