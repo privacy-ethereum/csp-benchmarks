@@ -66,15 +66,13 @@ jobs:
 
           # ─── 1. list of top‑level folders to watch ────────────
           FOLDERS=(
-            ligetron,
+            ligetron
             barretenberg
           )
 
           # ─── 2. filter by diff (or include all when run_all=true) ───────
           changed=()
           for d in "${FOLDERS[@]}"; do
-            # skip if directory does not exist in the workspace
-            [[ -d "$d" ]] || continue
 
             if [[ "$RUN_ALL" == "true" ]]; then
               changed+=("$d")
