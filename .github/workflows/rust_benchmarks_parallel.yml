@@ -263,14 +263,14 @@ jobs:
       - name: Build "cairo-m" for memory report (temporary workaround)
         run: |
           cd cairo-m
-          RUSTFLAGS="-C link-arg=-fuse-ld=/opt/homebrew/bin/ld64.lld -C target-cpu=native" cargo build --release
+          RUSTFLAGS="-C link-arg=-fuse-ld=lld -C target-cpu=native" cargo build --release
           mkdir -p ../target/release
           cp ./target/release/sha256_mem_cairo_m ../target/release/
 
       - name: Run benches in "cairo-m"
         run: |
           cd cairo-m
-          RUSTFLAGS="-C link-arg=-fuse-ld=/opt/homebrew/bin/ld64.lld -C target-cpu=native" cargo bench
+          RUSTFLAGS="-C link-arg=-fuse-ld=lld -C target-cpu=native" cargo bench
         
       - name: Upload reports for "cairo-m"
         uses: actions/upload-artifact@v4

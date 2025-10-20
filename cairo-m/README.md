@@ -11,5 +11,5 @@ https://github.com/kkrt-labs/cairo-m?tab=readme-ov-file#note-for-macos-users
 
 ```bash
 chmod +x ../measure_mem_avg.sh
-RUSTFLAGS="-C link-arg=-fuse-ld=/usr/local/bin/ld64.lld -C target-cpu=native" cargo bench 
+RUSTFLAGS="-C link-arg=-fuse-ld=lld -C target-cpu=native" cargo bench 
 ```
