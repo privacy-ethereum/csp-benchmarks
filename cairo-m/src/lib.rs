@@ -45,29 +45,20 @@ pub fn prepare(input_size: usize) -> (RunnerOutput, Program) {
     let compiled_program = (*output.program).clone();
 
     // Generate input using sha2_input
-    let (input_bytes, _digest) = generate_sha256_input(input_size);
+    let (input_bytes, _digest) = generate_sha256_input(2048);
 
     // Prepare the input with proper SHA-256 padding
     let padded_words = prepare_sha256_input(&input_bytes);
 
-    // Select appropriate entry point based on input size
-    let (entrypoint_name, runner_inputs) = match input_size {
-        128 => {
-            // Use sha256_128 entry point
-            let input_values: Vec<InputValue> = padded_words[..48]
-                .iter()
-                .map(|&word| InputValue::Number(word as i64))
-                .collect();
-            ("sha256_128", vec![InputValue::List(input_values)])
-        }
-        _ => {
-            eprintln!(
-                "Error: Unsupported input size {}. Supported sizes are: 128",
-                input_size
-            );
-            panic!("Unsupported SHA-256 input size");
-        }
-    };
+    // Prepare the entry point and input params based on input_size
+    let entrypoint_name = "sha256_hash";
+    let input_values: Vec<InputValue> = padded_words
+        .iter()
+        .map(|&word| InputValue::Number(word as i64))
+        .collect();
+    // padding adds extra 64 bytes to the input message bytes
+    let num_chunks = input_size / 64_usize + 1;
+    let runner_inputs = vec![InputValue::List(input_values), InputValue::Number(num_chunks as i64)];
 
     // Run/Execute the program
     let runner_output = run_cairo_program(
