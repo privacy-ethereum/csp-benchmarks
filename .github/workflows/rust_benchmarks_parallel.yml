@@ -56,6 +56,11 @@ jobs:
           BASE_REF="${{ steps.base.outputs.BASE_REF }}"
 
           RUN_ALL="${{ github.event.inputs.run_all }}"
+          # ─── Run all benches when we're merging a PR ─────────────────────
+          EVENT_NAME='${{ github.event_name }}'
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            RUN_ALL="true"
+          fi
 
           EXCLUDE_REGEX='^(utils|mobile|zkvm)(/|$)'
 
