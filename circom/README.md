@@ -4,7 +4,7 @@ This benchmark code is from: https://github.com/brevis-network/zk-benchmark/tree
 
 ## Run SHA256 benches
 
-```bash
+```shell
 chmod +x ../measure_mem_avg.sh
 cargo bench
 ```

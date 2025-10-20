@@ -129,6 +129,7 @@ jobs:
 
       - name: Install OpenVM
         uses: ./.github/actions/install-openvm
+
       - name: Install OpenMPI for polyhedra-expander
         uses: ./.github/actions/install-ompi
 
@@ -137,6 +138,9 @@ jobs:
 
       - name: Install SP1 toolchain
         uses: ./.github/actions/install-sp1
+
+      - name: Install WitnessCalc prerequisites
+        uses: ./.github/actions/install-witnesscalc-deps
 
       - name: Build full workspace (release)
         run: cargo build --release --workspace
@@ -196,6 +200,10 @@ jobs:
       - name: Install SP1 toolchain
         if: ${{ contains(matrix.crate, 'sp1') }}
         uses: ./.github/actions/install-sp1
+
+      - name: Install WitnessCalc prerequisites
+        if: ${{ contains(matrix.crate, 'circom') }}
+        uses: ./.github/actions/install-witnesscalc-deps
 
       - name: Run benches in ${{ matrix.crate }}
         run: |

@@ -58,7 +58,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::Expander,    // proving system
     None,                       // optional feature tag
     "sha256_mem_expander",     // memory-measurement binary name
-    // Initialize shared state once (e.g., MPI universe/world)
+    // Initialize shared state once (e.g., MPI universe/world or zkVM guest program compilation)
     {
         let mpi_config = MPIConfig::init().expect("Failed to initialize MPI");
         let universe = mpi_config.universe();

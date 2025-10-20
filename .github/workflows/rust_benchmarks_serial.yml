@@ -96,6 +96,9 @@ jobs:
       - name: Install SP1 toolchain
         uses: ./.github/actions/install-sp1
 
+      - name: Install WitnessCalc prerequisites
+        uses: ./.github/actions/install-witnesscalc-deps
+
       - name: Run workspace benchmarks
         run: cargo bench
 

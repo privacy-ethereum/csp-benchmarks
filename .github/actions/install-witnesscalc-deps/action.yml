@@ -1,0 +1,34 @@
+name: WitnessCalc prerequisites (macOS)
+description: Install prerequisites for WitnessCalc.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache Homebrew downloads
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/Library/Caches/Homebrew
+        # Key off OS + any Brewfile you might keep (optional). If you don't use a Brewfile, just key off OS.
+        key: ${{ runner.os }}-brew-cache-${{ hashFiles('Brewfile', '.github/**/Brewfile') }}
+        restore-keys: |
+          ${{ runner.os }}-brew-cache-
+
+    - name: Brew deps (conditionally)
+      shell: bash
+      env:
+        HOMEBREW_NO_AUTO_UPDATE: "1"
+        HOMEBREW_NO_INSTALL_CLEANUP: "1"
+        HOMEBREW_NO_ENV_HINTS: "1"
+      run: |
+        set -euo pipefail
+        NEEDS=()
+        for pkg in cmake m4 gmp; do
+          brew list --versions "$pkg" >/dev/null 2>&1 || NEEDS+=("$pkg")
+        done
+        if [[ ${#NEEDS[@]} -gt 0 ]]; then
+          # With NO_AUTO_UPDATE this won't waste time updating taps
+          brew install "${NEEDS[@]}"
+        else
+          echo "All brew deps present; skipping brew install."
+        fi
