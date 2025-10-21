@@ -263,7 +263,7 @@ jobs:
       - name: Build "cairo-m" for memory report (temporary workaround)
         run: |
           cd cairo-m
-          cargo build --release
+          cargo build --release -bin sha256_mem_cairo_m
           mkdir -p ../target/release
           cp ./target/release/sha256_mem_cairo_m ../target/release/
 
