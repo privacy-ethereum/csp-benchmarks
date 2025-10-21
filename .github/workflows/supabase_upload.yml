@@ -3,6 +3,14 @@ name: Upload Results to Supabase
 on:
   workflow_dispatch:
     inputs:
+      environment:
+        description: "Environment to upload to"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - prod
       run_id:
         description: "Workflow run ID containing the collected-benchmarks artifact"
         required: true
@@ -46,9 +54,17 @@ jobs:
 
       - name: Upload Payload
         env:
-          API_KEY: ${{ secrets.ETHPROOFS_DEV_KEY }}
+          DEV_API_KEY: ${{ secrets.ETHPROOFS_DEV_KEY }}
+          PROD_API_KEY: ${{ secrets.ETHPROOFS_API_KEY }}
         run: |
           set -euo pipefail
+          if [ "${{ inputs.environment }}" = "dev" ]; then
+            API_KEY="${DEV_API_KEY}"
+            API_URL="https://deploy-preview-524--ethproofs.netlify.app/api/v0/csp-benchmarks/upload"
+          else
+            API_KEY="${PROD_API_KEY}"
+            API_URL="https://ethproofs.net/api/v0/csp-benchmarks/upload"
+          fi
           if [ -z "${API_KEY:-}" ]; then
             echo "ETHPROOFS_DEV_KEY secret is not set; aborting." >&2
             exit 1
@@ -60,7 +76,7 @@ jobs:
           fi
           DATA=$(cat "${BENCH_JSON}")
           RUN_ID="${{ inputs.run_id }}"
-          curl -sS --fail-with-body -X POST https://deploy-preview-524--ethproofs.netlify.app/api/v0/csp-benchmarks/upload \
+          curl -sS --fail-with-body -X POST ${API_URL} \
              -H "Authorization: Bearer ${API_KEY}" \
              -F "file=@${BENCH_JSON}" \
              -F "filename=collected-benchmarks-${RUN_ID}"
