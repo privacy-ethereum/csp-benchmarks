@@ -21,7 +21,9 @@ utils::define_benchmark_harness!(
     },
     |proof: &CircomProof| {
         // Serialize the proof to JSON and measure its byte size
-        serde_json::to_vec(proof).expect("Failed to serialize proof").len()
+        serde_json::to_vec(proof)
+            .expect("Failed to serialize proof")
+            .len()
     }
 );
 
