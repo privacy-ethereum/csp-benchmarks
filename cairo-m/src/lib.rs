@@ -32,6 +32,9 @@ fn prepare_sha256_input(msg: &[u8]) -> Vec<u32> {
         .collect()
 }
 
+// TODO: Separate the program compilation, like in other benchmarks.
+// The blocker is that `compiled_program` doesn't implement proper serde, cannot be serialized to a file and deserialized from it.
+// Once this is fixed, the program compilation can be separated from the `prepare`.
 pub fn prepare(input_size: usize) -> (RunnerOutput, Program) {
     // Compile the program
     let source_path = "programs/sha256.cm".to_string();
@@ -58,7 +61,10 @@ pub fn prepare(input_size: usize) -> (RunnerOutput, Program) {
         .collect();
     // padding adds extra 64 bytes to the input message bytes
     let num_chunks = input_size / 64_usize + 1;
-    let runner_inputs = vec![InputValue::List(input_values), InputValue::Number(num_chunks as i64)];
+    let runner_inputs = vec![
+        InputValue::List(input_values),
+        InputValue::Number(num_chunks as i64),
+    ];
 
     // Run/Execute the program
     let runner_output = run_cairo_program(
