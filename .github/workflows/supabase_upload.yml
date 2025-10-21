@@ -6,9 +6,6 @@ on:
       run_id:
         description: "Workflow run ID containing the collected-benchmarks artifact"
         required: true
-  workflow_run:
-    workflows: ["Collect & Parse Artifacts (fan-in)"]
-    types: [completed]
 
 permissions:
   actions: read
@@ -16,7 +13,6 @@ permissions:
 
 jobs:
   upload-benchmarks:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'CSP-Q3-2025') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (optional if artifact only)
@@ -27,12 +23,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq
 
-      - name: Download collected-benchmarks artifact from specified run
+      - name: Download collected-benchmarks artifact
         uses: actions/download-artifact@v5
         with:
           name: collected-benchmarks
           path: ./artifacts
-          run-id: ${{ inputs.run_id || github.event.workflow_run.id }}
+          run-id: ${{ inputs.run_id }}
           github-token: ${{ secrets.GH_PAT }}
 
       - name: Show files
@@ -63,7 +59,7 @@ jobs:
             exit 1
           fi
           DATA=$(cat "${BENCH_JSON}")
-          RUN_ID="${{ inputs.run_id || github.event.workflow_run.id }}"
+          RUN_ID="${{ inputs.run_id }}"
           curl -sS --fail-with-body -X POST https://deploy-preview-524--ethproofs.netlify.app/api/v0/csp-benchmarks/upload \
              -H "Authorization: Bearer ${API_KEY}" \
              -F "file=@${BENCH_JSON}" \
