@@ -4,7 +4,7 @@ use cairo_m_prover::{
     Proof, adapter::import_from_runner_output, prover::prove_cairo_m,
     prover_config::REGULAR_96_BITS, verifier::verify_cairo_m,
 };
-use cairo_m_runner::{RunnerOutput, run_cairo_program};
+use cairo_m_runner::run_cairo_program;
 use std::fs;
 use stwo_prover::core::vcs::blake2_merkle::{Blake2sMerkleChannel, Blake2sMerkleHasher};
 use utils::generate_sha256_input;
@@ -35,7 +35,7 @@ fn prepare_sha256_input(msg: &[u8]) -> Vec<u32> {
 // TODO: Separate the program compilation, like in other benchmarks.
 // The blocker is that `compiled_program` doesn't implement proper serde, cannot be serialized to a file and deserialized from it.
 // Once this is fixed, the program compilation can be separated from the `prepare`.
-pub fn prepare(input_size: usize) -> (RunnerOutput, Program) {
+pub fn prepare(input_size: usize) -> (Program, usize) {
     // Compile the program
     let source_path = "programs/sha256.cm".to_string();
     let source_text = fs::read_to_string(&source_path).expect("Failed to read sha256.cm");
@@ -47,6 +47,10 @@ pub fn prepare(input_size: usize) -> (RunnerOutput, Program) {
         compile_cairo(source_text, source_path, options).expect("Failed to compile sha256.cm");
     let compiled_program = (*output.program).clone();
 
+    (compiled_program, input_size)
+}
+
+pub fn prove(compiled_program: &Program, input_size: usize) -> Proof<Blake2sMerkleHasher> {
     // Generate input using sha2_input
     let (input_bytes, _digest) = generate_sha256_input(2048);
 
@@ -68,17 +72,13 @@ pub fn prepare(input_size: usize) -> (RunnerOutput, Program) {
 
     // Run/Execute the program
     let runner_output = run_cairo_program(
-        &compiled_program,
+        compiled_program,
         entrypoint_name,
         &runner_inputs,
         Default::default(),
     )
     .expect("failed to run cairo program");
 
-    (runner_output, compiled_program)
-}
-
-pub fn prove(runner_output: &RunnerOutput) -> Proof<Blake2sMerkleHasher> {
     // Proof Generation
     let segment = runner_output
         .vm
