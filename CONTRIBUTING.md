@@ -93,7 +93,7 @@ Add your folder name to the `FOLDERS` array in the non-Rust workflow so CI will 
 - Edit `.github/workflows/sh_benchmarks_parallel.yml`
 - Add your folder to the list (example shows `ligetron`):
 
-[`.github/workflows/sh_benchmarks_parallel.yml` (lines 63-65)](https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/.github/workflows/sh_benchmarks_parallel.yml#L63-L65)
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/.github/workflows/sh_benchmarks_parallel.yml#L63-L65
 
 ### 3) Implement 4 or 5 shell scripts per target
 
@@ -129,7 +129,7 @@ The root `./benchmark.sh` will invoke them in a fixed way via `hyperfine` and ou
   - Exit non-zero on error.
 - Example (Ligetron): builds a JSON containing the WASM program path, shader path, and args:
 
-[`ligetron/sha256_prepare.sh` (lines 13-34)](https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_prepare.sh#L13-L34)
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_prepare.sh#L13-L34
 
 #### API: `[target]_prove.sh`
 
@@ -141,7 +141,7 @@ The root `./benchmark.sh` will invoke them in a fixed way via `hyperfine` and ou
   - Exit non-zero on error.
 - Example (Ligetron):
 
-[`ligetron/sha256_prove.sh` (lines 9-10)](https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_prove.sh#L9-L10)
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_prove.sh#L9-L10
 
 #### API: `[target]_prove_for_verify.sh`
 
@@ -154,7 +154,7 @@ The root `./benchmark.sh` will invoke them in a fixed way via `hyperfine` and ou
   - Exit non-zero on error.
 - Example (Barretenberg):
 
-[`barretenberg/sha256_prove_for_verify.sh` (lines 19-24)](https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/barretenberg/sha256_prove_for_verify.sh#L19-L24)
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/barretenberg/sha256_prove_for_verify.sh#L19-L24
 
 #### API: `[target]_verify.sh`
 
@@ -165,7 +165,7 @@ The root `./benchmark.sh` will invoke them in a fixed way via `hyperfine` and ou
   - Exit non-zero on error.
 - Example (Ligetron):
 
-[`ligetron/sha256_verify.sh` (lines 9-10)](https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_verify.sh#L9-L10)
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_verify.sh#L9-L10
 
 #### API: `[target]_measure.sh`
 
@@ -183,7 +183,7 @@ The root `./benchmark.sh` will invoke them in a fixed way via `hyperfine` and ou
 
 - Example (Ligetron): finds `proof.data` and measures the WASM size as preprocessing:
 
-[`ligetron/sha256_measure.sh` (lines 14-39)](https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_measure.sh#L14-L39)
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_measure.sh#L14-L39
 
 ### 4) What the orchestrator and CI do for you
 
