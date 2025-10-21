@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   upload-benchmarks:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'CSP-Q3-2025') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (optional if artifact only)
@@ -64,7 +64,7 @@ jobs:
           fi
           DATA=$(cat "${BENCH_JSON}")
           RUN_ID="${{ inputs.run_id || github.event.workflow_run.id }}"
-          curl -sS --fail-with-body -X POST https://ethproofs.org/api/v0/csp-benchmarks/upload \
+          curl -sS --fail-with-body -X POST https://deploy-preview-524--ethproofs.netlify.app/api/v0/csp-benchmarks/upload \
              -H "Authorization: Bearer ${API_KEY}" \
              -F "file=@${BENCH_JSON}" \
              -F "filename=collected-benchmarks-${RUN_ID}"
