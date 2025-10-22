@@ -5,18 +5,10 @@ on:
   workflow_run:
     workflows: ["Rust Benchmarks (parallel)", "Non-Rust Benchmarks (parallel)"]
     types: [completed]
-  workflow_dispatch:
-    inputs:
-      sha:
-        description: "Commit SHA to collect from"
-        required: false
-      required_workflows_json:
-        description: "JSON array of workflow names"
-        required: false
 
 # collapse multiple triggers for the same commit into one survivor
 concurrency:
-  group: fanin-${{ inputs.sha || github.event.workflow_run.head_sha || github.sha }}
+  group: fanin-${{ github.event.workflow_run.head_sha || github.sha }}
   cancel-in-progress: true
 
 permissions:
@@ -29,12 +21,10 @@ jobs:
     env:
       HOMEBREW_NO_AUTO_UPDATE: "1"
       HOMEBREW_NO_ENV_HINTS: "1"
-      SHA: ${{ inputs.sha || github.event.workflow_run.head_sha || github.sha }}
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
       GH_TOKEN: ${{ github.token }}
       # keep in sync with on.workflow_run.workflows
-      REQUIRED_WORKFLOWS_JSON: ${{ inputs.required_workflows_json || '["Rust Benchmarks (parallel)", "Non-Rust Benchmarks (parallel)"]' }}
-      WAIT_SECONDS: "30"
-      MAX_TRIES: "80" # 30 × 80 = ~40 min max wait
+      REQUIRED_WORKFLOWS_JSON: '["Rust Benchmarks (parallel)", "Non-Rust Benchmarks (parallel)"]'
     steps:
       - uses: actions/checkout@v4
 
@@ -50,56 +40,47 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Wait until all parent workflows are completed for this commit
-        id: wait
+      - name: "Gate - proceed only when all parent workflows completed for this commit"
+        id: gate
         shell: bash
         run: |
           set -euo pipefail
           echo "Target SHA: $SHA"
-          tries=0
-          while (( tries < MAX_TRIES )); do
-            all_done=true
-            any_failed=false
-            summary=""
-          # Iterate workflows from JSON (compatible with macOS bash 3.2)
+          all_done=true
+          any_failed=false
+          summary=""
           while IFS= read -r wf; do
-              # List recent runs for this workflow, pick the one matching head SHA
-              run_json=$(gh run list --workflow "$wf" --limit 50 \
-                --json databaseId,headSha,conclusion,status,displayTitle,workflowName \
-                --jq "map(select(.headSha==\"$SHA\"))[0]")
-              if [[ "$run_json" == "null" || -z "$run_json" ]]; then
-                all_done=false
-                summary+="$wf: pending (not started)\n"
-                continue
-              fi
-              status=$(jq -r '.status' <<<"$run_json")
-              conclusion=$(jq -r '.conclusion' <<<"$run_json")
-              run_id=$(jq -r '.databaseId' <<<"$run_json")
-              summary+="$wf: status=$status conclusion=$conclusion run_id=$run_id\n"
-              if [[ "$status" != "completed" ]]; then
-                all_done=false
-              elif [[ "$conclusion" != "success" ]]; then
-                any_failed=true
-              fi
-          done < <(jq -r '.[]' <<<"$REQUIRED_WORKFLOWS_JSON")
-            echo -e "$summary"
-            if $all_done; then
-              if $any_failed; then
-                echo "One or more parents failed. Proceeding to collect what is available."
-              else
-                echo "All parents completed successfully."
-              fi
-              break
+            run_json=$(gh run list --workflow "$wf" --limit 50 \
+              --json databaseId,headSha,conclusion,status,displayTitle,workflowName \
+              --jq "map(select(.headSha==\"$SHA\"))[0]")
+            if [[ "$run_json" == "null" || -z "$run_json" ]]; then
+              all_done=false
+              summary+="$wf: pending (not started)\n"
+              continue
             fi
-            tries=$((tries+1))
-            sleep "$WAIT_SECONDS"
-          done
-          if (( tries >= MAX_TRIES )); then
-            echo "Timeout waiting for parent workflows." >&2
-            exit 1
+            status=$(jq -r '.status' <<<"$run_json")
+            conclusion=$(jq -r '.conclusion' <<<"$run_json")
+            run_id=$(jq -r '.databaseId' <<<"$run_json")
+            summary+="$wf: status=$status conclusion=$conclusion run_id=$run_id\n"
+            if [[ "$status" != "completed" ]]; then
+              all_done=false
+            elif [[ "$conclusion" != "success" ]]; then
+              any_failed=true
+            fi
+          done < <(jq -r '.[]' <<<"$REQUIRED_WORKFLOWS_JSON")
+          echo -e "$summary"
+          if ! $all_done; then
+            echo "Some parent workflows are still running or not started. Exiting early; will be triggered again."
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          if $any_failed; then
+            echo "One or more parents failed. Proceeding to collect what is available."
+          fi
+          echo "proceed=true" >> "$GITHUB_OUTPUT"
 
       - name: Download artifacts from each parent run
+        if: ${{ steps.gate.outputs.proceed == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -118,6 +99,7 @@ jobs:
           find inbox -maxdepth 3 -print | sed 's/^/  /'
 
       - name: Stage downloaded artifacts into workspace
+        if: ${{ steps.gate.outputs.proceed == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -174,6 +156,7 @@ jobs:
           find target/criterion -maxdepth 2 -type d -print 2>/dev/null | sed 's/^/  /' || true
 
       - name: Install Rust toolchain (stable)
+        if: ${{ steps.gate.outputs.proceed == 'true' }}
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -181,16 +164,19 @@ jobs:
           profile: minimal
 
       - name: Build utils
+        if: ${{ steps.gate.outputs.proceed == 'true' }}
         run: cargo build --release -p utils
 
       - name: Collect benchmarks
+        if: ${{ steps.gate.outputs.proceed == 'true' }}
         run: |
+          set -euo pipefail
           cd utils
           cargo run --release --bin collect_benchmarks
 
       - name: Upload collected reports
         uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ always() && steps.gate.outputs.proceed == 'true' }}
         with:
           name: "collected-benchmarks"
           path: ./collected_benchmarks.json

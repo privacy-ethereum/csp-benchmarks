@@ -13,7 +13,7 @@ cd ligetron
 ./osx_local_setup.sh
 ```
 
-## Benchmarking
+## Running the Benchmark
 
 From the root directory:
 
