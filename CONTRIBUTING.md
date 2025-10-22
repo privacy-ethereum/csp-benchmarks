@@ -48,7 +48,7 @@ utils::define_benchmark_harness!(
 
 #### Shared state
 
-For systems that need some state that is shared among all closures, use the macro’s shared‑state form. The initializer runs once; closures receive a reference to the shared state. For exmaple, in Polyhedra Expander:
+For systems that need some state that is shared among all closures, use the macro’s shared‑state form. The initializer runs once; closures receive a reference to the shared state. For example, in Polyhedra Expander:
 
 ```rust
 use utils::harness::{BenchTarget, ProvingSystem};
@@ -93,11 +93,7 @@ Add your folder name to the `FOLDERS` array in the non-Rust workflow so CI will 
 - Edit `.github/workflows/sh_benchmarks_parallel.yml`
 - Add your folder to the list (example shows `ligetron`):
 
-```61:63:.github/workflows/sh_benchmarks_parallel.yml
-FOLDERS=(
-            ligetron
-          )
-```
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/.github/workflows/sh_benchmarks_parallel.yml#L63-L65
 
 ### 3) Implement 4 or 5 shell scripts per target
 
@@ -116,7 +112,7 @@ For `ligetron` with the `sha256` target, these are:
 - `ligetron/sha256_verify.sh`
 - `ligetron/sha256_measure.sh`
 
-For `barretenberg` with the `sha256` target, there is extra script:
+For `barretenberg` with the `sha256` target, there is an extra script:
 
 - `barretenberg/sha256_prove_for_verify.sh`
 
@@ -133,25 +129,7 @@ The root `./benchmark.sh` will invoke them in a fixed way via `hyperfine` and ou
   - Exit non-zero on error.
 - Example (Ligetron): builds a JSON containing the WASM program path, shader path, and args:
 
-```10:35:ligetron/sha256_prepare.sh
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROGRAM_PATH="${SCRIPT_DIR}/ligero-prover/sdk/build/examples/sha256.wasm"
-SHADER_PATH="${SCRIPT_DIR}/ligero-prover/shader"
-
-GEN="$("$UTILS_BIN" sha256 -n "$INPUT_SIZE")"
-MSG="$(printf "%s\n" "$GEN" | sed -n '1p')"
-HEX_NO_PREFIX="$(printf "%s\n" "$GEN" | sed -n '2p')"
-
-JQ_PROG='{program:$prog, "shader-path":$shader, packing:8192, "private-indices":[1], args:[{hex:$msg},{i64:$len},{hex:$dig}]}'
-
-jq -nc \
-  --arg prog "$PROGRAM_PATH" \
-  --arg shader "$SHADER_PATH" \
-  --arg msg "$MSG" \
-  --arg dig "0x$HEX_NO_PREFIX" \
-  --argjson len "$INPUT_SIZE" \
-  "$JQ_PROG" > "$STATE_JSON"
-```
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_prepare.sh#L13-L34
 
 #### API: `[target]_prove.sh`
 
@@ -163,10 +141,7 @@ jq -nc \
   - Exit non-zero on error.
 - Example (Ligetron):
 
-```7:11:ligetron/sha256_prove.sh
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec "$SCRIPT_DIR/ligero-prover/build/webgpu_prover" "$(cat "$STATE_JSON")"
-```
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_prove.sh#L9-L10
 
 #### API: `[target]_prove_for_verify.sh`
 
@@ -175,18 +150,11 @@ exec "$SCRIPT_DIR/ligero-prover/build/webgpu_prover" "$(cat "$STATE_JSON")"
 - Behavior:
   - Run the prover for the state described by `$STATE_JSON`.
   - Should produce a proof artifact in a predictable location for size measurement (see measure API).
-  - Should produce an additional files for verification, if there is a need (e.g. verification key).
+  - Should produce additional files for verification, if there is a need (e.g., verification key).
   - Exit non-zero on error.
 - Example (Barretenberg):
 
-```19:24:barretenberg/sha256_prove_for_verify.sh
-#### Step 1: Witness generation ####
-WITNESS_FILE="sha256_${INPUT_SIZE}.gz"
-nargo execute --prover-name $TOML_PATH --package "sha256" $WITNESS_FILE
-
-#### Step 2: bb prove ####
-bb prove -b "$CIRCUIT_PATH" -w "$WORKSPACE_ROOT_PATH/target/$WITNESS_FILE" --write_vk -o "$WORKSPACE_ROOT_PATH/target/"
-```
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/barretenberg/sha256_prove_for_verify.sh#L19-L24
 
 #### API: `[target]_verify.sh`
 
@@ -197,10 +165,7 @@ bb prove -b "$CIRCUIT_PATH" -w "$WORKSPACE_ROOT_PATH/target/$WITNESS_FILE" --wri
   - Exit non-zero on error.
 - Example (Ligetron):
 
-```7:11:ligetron/sha256_verify.sh
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec "$SCRIPT_DIR/ligero-prover/build/webgpu_verifier" "$(cat "$STATE_JSON")"
-```
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_verify.sh#L9-L10
 
 #### API: `[target]_measure.sh`
 
@@ -218,19 +183,7 @@ exec "$SCRIPT_DIR/ligero-prover/build/webgpu_verifier" "$(cat "$STATE_JSON")"
 
 - Example (Ligetron): finds `proof.data` and measures the WASM size as preprocessing:
 
-```14:47:ligetron/sha256_measure.sh
-"$SCRIPT_DIR/sha256_prove.sh" >/dev/null 2>&1 || true
-
-proof_path="${PWD}/proof.data"
-proof_size_bytes=$(stat -f %z "$proof_path" 2>/dev/null || stat -c %s "$proof_path")
-
-WASM_PATH="${SCRIPT_DIR}/ligero-prover/sdk/build/examples/sha256.wasm"
-PROVER_BIN_PATH="${SCRIPT_DIR}/ligero-prover/build/webgpu_prover"
-wasm_size=$(stat -f %z "$WASM_PATH" 2>/dev/null || stat -c %s "$WASM_PATH")
-preprocessing_size_bytes=$(( wasm_size ))
-
-jq -n --argjson proof_size "$proof_size_bytes" --argjson preprocessing_size "$preprocessing_size_bytes" '{proof_size:$proof_size, preprocessing_size:$preprocessing_size}'
-```
+https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd813697576db1901649f8/ligetron/sha256_measure.sh#L14-L39
 
 ### 4) What the orchestrator and CI do for you
 

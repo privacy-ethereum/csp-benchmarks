@@ -34,7 +34,7 @@ pub enum ProvingSystem {
     Sp1,
     Jolt,
     Miden,
-    // Extend as needed
+    CairoM, // Extend as needed
 }
 
 impl ProvingSystem {
@@ -50,13 +50,18 @@ impl ProvingSystem {
             ProvingSystem::Sp1 => "sp1",
             ProvingSystem::Jolt => "jolt",
             ProvingSystem::Miden => "miden",
+            ProvingSystem::CairoM => "cairo-m",
         }
     }
 
     pub fn is_zkvm(&self) -> bool {
         matches!(
             self,
-            ProvingSystem::Risc0 | ProvingSystem::Sp1 | ProvingSystem::Jolt | ProvingSystem::Miden
+            ProvingSystem::Risc0
+                | ProvingSystem::Sp1
+                | ProvingSystem::Jolt
+                | ProvingSystem::Miden
+                | ProvingSystem::CairoM
         )
     }
 }
