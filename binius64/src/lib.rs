@@ -70,7 +70,14 @@ pub fn prepare(
     // Using SHA256 compression for Merkle tree
     let (verifier, prover) = setup_sha256(cs.clone(), log_inv_rate as usize, None)?;
 
-    Ok((verifier, prover, cs, sha256_circuit, compiled_circuit, input_size))
+    Ok((
+        verifier,
+        prover,
+        cs,
+        sha256_circuit,
+        compiled_circuit,
+        input_size,
+    ))
 }
 
 pub fn prove<D, C, PC>(
