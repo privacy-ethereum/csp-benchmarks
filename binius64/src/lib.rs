@@ -61,22 +61,22 @@ pub fn prepare(
 
     // Build the circuit
     let mut builder = CircuitBuilder::new();
-    let example = Sha256Example::build(params, &mut builder)?;
-    let circuit = builder.build();
+    let sha256_circuit = Sha256Example::build(params, &mut builder)?;
+    let compiled_circuit = builder.build();
 
     // Set up prover and verifier
-    let cs = circuit.constraint_system().clone();
+    let cs = compiled_circuit.constraint_system().clone();
 
     // Using SHA256 compression for Merkle tree
     let (verifier, prover) = setup_sha256(cs.clone(), log_inv_rate as usize, None)?;
 
-    Ok((verifier, prover, cs, example, circuit, input_size))
+    Ok((verifier, prover, cs, sha256_circuit, compiled_circuit, input_size))
 }
 
 pub fn prove<D, C, PC>(
     prover: &Prover<OptimalPackedB128, PC, D>,
-    circuit: &Circuit,
-    example: &Sha256Example,
+    compiled_circuit: &Circuit,
+    sha256_circuit: &Sha256Example,
     input_size: usize,
 ) -> Result<(Vec<u8>, Vec<Word>)>
 where
@@ -90,9 +90,9 @@ where
         message_len: Some(input_size),
         message_string: None,
     };
-    let mut filler = circuit.new_witness_filler();
-    example.populate_witness(instance, &mut filler)?; // input population
-    circuit.populate_wire_witness(&mut filler)?; // circuit evaluation
+    let mut filler = compiled_circuit.new_witness_filler();
+    sha256_circuit.populate_witness(instance, &mut filler)?; // input population
+    compiled_circuit.populate_wire_witness(&mut filler)?; // circuit evaluation
     let witness = filler.into_value_vec();
 
     let pub_witness = witness.public().to_vec();
