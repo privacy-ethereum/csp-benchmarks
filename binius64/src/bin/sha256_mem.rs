@@ -18,9 +18,13 @@ fn main() {
 }
 
 fn sha256_mem(input_size: usize) -> Result<()> {
-    let (_, prover, witness, _) = prepare(input_size)?;
+    let (_verifier, prover, _cs, sha256_circuit, compiled_circuit, input_size) =
+        prepare(input_size)?;
     let _ = prove::<StdDigest, StdCompression, ParallelCompressionAdaptor<StdCompression>>(
-        &prover, witness,
+        &prover,
+        &compiled_circuit,
+        &sha256_circuit,
+        input_size,
     )?;
     Ok(())
 }

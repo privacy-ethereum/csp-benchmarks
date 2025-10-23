@@ -1,6 +1,6 @@
 use anyhow::Result;
-use binius_core::constraint_system::{ConstraintSystem, ValueVec};
-use binius_frontend::CircuitBuilder;
+use binius_core::{Word, constraint_system::ConstraintSystem};
+use binius_frontend::{Circuit, CircuitBuilder};
 use binius_prover::{
     KeyCollection, OptimalPackedB128, Prover,
     hash::{
@@ -40,62 +40,81 @@ fn setup_sha256(
 }
 
 // Use the default configs/params
-pub fn prepare(input_size: usize) -> Result<(StdVerifier, StdProver, ValueVec, ConstraintSystem)> {
+pub fn prepare(
+    input_size: usize,
+) -> Result<(
+    StdVerifier,
+    StdProver,
+    ConstraintSystem,
+    Sha256Example,
+    Circuit,
+    usize,
+)> {
     // Extract common arguments
     let log_inv_rate = 1;
-    // let compression = CompressionType::Sha256;
 
-    // Parse Params and Instance from matches
+    // Prepare Params
     let params = Params {
         max_len_bytes: Some(input_size),
         exact_len: true,
     };
-    let instance = Instance {
-        message_len: Some(input_size),
-        message_string: None,
-    };
 
     // Build the circuit
     let mut builder = CircuitBuilder::new();
-    let example = Sha256Example::build(params, &mut builder)?;
-    let circuit = builder.build();
+    let sha256_circuit = Sha256Example::build(params, &mut builder)?;
+    let compiled_circuit = builder.build();
 
     // Set up prover and verifier
-    let cs = circuit.constraint_system().clone();
-
-    // Population of the input to the witness and then evaluating the circuit.
-    let mut filler = circuit.new_witness_filler();
-    example.populate_witness(instance, &mut filler)?; // input population
-    circuit.populate_wire_witness(&mut filler)?; // circuit evaluation
-    let witness = filler.into_value_vec();
+    let cs = compiled_circuit.constraint_system().clone();
 
     // Using SHA256 compression for Merkle tree
     let (verifier, prover) = setup_sha256(cs.clone(), log_inv_rate as usize, None)?;
 
-    Ok((verifier, prover, witness, cs))
+    Ok((
+        verifier,
+        prover,
+        cs,
+        sha256_circuit,
+        compiled_circuit,
+        input_size,
+    ))
 }
 
 pub fn prove<D, C, PC>(
     prover: &Prover<OptimalPackedB128, PC, D>,
-    witness: ValueVec,
-) -> Result<Vec<u8>>
+    compiled_circuit: &Circuit,
+    sha256_circuit: &Sha256Example,
+    input_size: usize,
+) -> Result<(Vec<u8>, Vec<Word>)>
 where
     D: ParallelDigest + Digest + BlockSizeUser,
     D::Digest: BlockSizeUser + FixedOutputReset,
     C: PseudoCompressionFunction<Output<D>, 2>,
     PC: ParallelPseudoCompression<Output<D::Digest>, 2>,
 {
-    let challenger = StdChallenger::default();
+    // Population of the input to the witness and then evaluating the circuit.
+    let instance = Instance {
+        message_len: Some(input_size),
+        message_string: None,
+    };
+    let mut filler = compiled_circuit.new_witness_filler();
+    sha256_circuit.populate_witness(instance, &mut filler)?; // input population
+    compiled_circuit.populate_wire_witness(&mut filler)?; // circuit evaluation
+    let witness = filler.into_value_vec();
 
+    let pub_witness = witness.public().to_vec();
+
+    // Prove
+    let challenger = StdChallenger::default();
     let mut prover_transcript = ProverTranscript::new(challenger);
-    prover.prove(witness.clone(), &mut prover_transcript)?;
+    prover.prove(witness, &mut prover_transcript)?;
 
     let proof = prover_transcript.finalize();
 
-    Ok(proof)
+    Ok((proof, pub_witness))
 }
 
-pub fn verify<D, C, PC>(verifier: &Verifier<D, C>, witness: ValueVec, proof: &[u8]) -> Result<()>
+pub fn verify<D, C, PC>(verifier: &Verifier<D, C>, pub_witness: &[Word], proof: &[u8]) -> Result<()>
 where
     D: ParallelDigest + Digest + BlockSizeUser,
     D::Digest: BlockSizeUser + FixedOutputReset,
@@ -104,7 +123,7 @@ where
 {
     let challenger = StdChallenger::default();
     let mut verifier_transcript = VerifierTranscript::new(challenger, proof.to_vec());
-    verifier.verify(witness.public(), &mut verifier_transcript)?;
+    verifier.verify(pub_witness, &mut verifier_transcript)?;
     verifier_transcript.finalize()?;
 
     Ok(())
