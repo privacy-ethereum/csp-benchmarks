@@ -1,7 +1,6 @@
-use ere_openvm::EreOpenVM;
-use ere_openvm::OPENVM_TARGET;
+use ere_openvm::{EreOpenVM, compiler::RustRv32imaCustomized};
+use ere_zkvm_interface::ProverResourceType;
 use utils::zkvm::{CompiledProgram, PreparedSha256, build_input};
-use zkvm_interface::ProverResourceType;
 
 pub use utils::zkvm::{
     execution_cycles, preprocessing_size, proof_size, prove_sha256, verify_sha256,
@@ -9,7 +8,7 @@ pub use utils::zkvm::{
 
 pub fn prepare_sha256(
     input_size: usize,
-    program: &CompiledProgram<OPENVM_TARGET>,
+    program: &CompiledProgram<RustRv32imaCustomized>,
 ) -> PreparedSha256<EreOpenVM> {
     let vm = EreOpenVM::new(program.program.clone(), ProverResourceType::Cpu)
         .expect("failed to build OpenVM prover instance");

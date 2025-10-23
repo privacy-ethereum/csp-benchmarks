@@ -1,17 +1,17 @@
-use ere_openvm::OPENVM_TARGET;
+use ere_openvm::compiler::RustRv32imaCustomized;
 use openvm::{
     execution_cycles, prepare_sha256, preprocessing_size, proof_size, prove_sha256, verify_sha256,
 };
+use utils::harness::ProvingSystem;
+use utils::zkvm::SHA256_BENCH;
 use utils::zkvm::helpers::load_or_compile_program;
-use utils::{harness::ProvingSystem, zkvm::SHA256_BENCH};
 
-utils::__define_benchmark_harness!(
-    sha256,
-    utils::harness::BenchTarget::Sha256,
+utils::define_benchmark_harness!(
+    BenchTarget::Sha256,
     ProvingSystem::OpenVM,
     None,
     "sha256_mem_openvm",
-    { load_or_compile_program(&OPENVM_TARGET, SHA256_BENCH) },
+    { load_or_compile_program(&RustRv32imaCustomized, SHA256_BENCH) },
     prepare_sha256,
     prove_sha256,
     verify_sha256,

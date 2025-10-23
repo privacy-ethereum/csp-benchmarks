@@ -62,7 +62,7 @@ jobs:
             RUN_ALL="true"
           fi
 
-          EXCLUDE_REGEX='^(utils|mobile|zkvm|cairo-m)(/|$)'
+          EXCLUDE_REGEX='^(utils|mobile|zkvm)(/|$)'
 
           # ─── 1. discover Cargo.toml files ────────────────────────────────
           dirs=$(find . -mindepth 2 -maxdepth 4 -type f -name Cargo.toml \
@@ -119,6 +119,8 @@ jobs:
             ~/.cargo/git/db
             ~/.rustup
             target
+            nexus/target
+            cairo-m/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
@@ -132,6 +134,13 @@ jobs:
           default: true
           components: llvm-tools, rustc-dev, rustfmt, clippy
 
+      - name: Install excluded crates toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2025-04-06
+          profile: minimal
+          components: llvm-tools, rustc-dev, rust-src, rustfmt, clippy
+
       - name: Install OpenVM
         uses: ./.github/actions/install-openvm
       - name: Install OpenMPI for polyhedra-expander
@@ -143,8 +152,16 @@ jobs:
       - name: Install SP1 toolchain
         uses: ./.github/actions/install-sp1
 
+      - name: Install LLVM and LLD for cairo-m
+        uses: ./.github/actions/install-llvm
+
       - name: Build full workspace (release)
         run: cargo build --release --workspace
+
+      - name: Build nexus and cairo-m separately
+        run: |
+          cd nexus && cargo build --release && cd ..
+          cd cairo-m && cargo build --release && cd ..
 
   bench:
     if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
@@ -167,6 +184,8 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
+            nexus/target
+            cairo-m/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
@@ -179,6 +198,14 @@ jobs:
           profile: default
           default: true
           components: llvm-tools, rustc-dev
+
+      - name: Install excluded crates toolchain
+        if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2025-04-06
+          profile: minimal
+          components: llvm-tools, rustc-dev, rust-src, rustfmt, clippy
 
       - name: Install OpenVM
         if: ${{ contains(matrix.crate, 'openvm') }}
@@ -202,17 +229,31 @@ jobs:
         if: ${{ contains(matrix.crate, 'sp1') }}
         uses: ./.github/actions/install-sp1
 
+      - name: Install LLVM and LLD for cairo-m
+        if: ${{ contains(matrix.crate, 'cairo-m') }}
+        uses: ./.github/actions/install-llvm
+
       - name: Run benches in ${{ matrix.crate }}
         run: |
           cd ${{ matrix.crate }}
           cargo bench
+
+      - name: Copy memory benchmark binaries to workspace target
+        if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') }}
+        run: |
+          mkdir -p target/release
+          if [ -d "${{ matrix.crate }}/target/release" ]; then
+            find "${{ matrix.crate }}/target/release" -maxdepth 1 -type f -perm +111 -exec cp {} target/release/ \;
+          fi
 
       - name: Upload reports for ${{ matrix.crate }}
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: "criterion-${{ matrix.crate }}"
-          path: ./target/criterion
+          path: |
+            target/criterion
+            ${{ matrix.crate }}/target/criterion
           if-no-files-found: warn
           retention-days: 30
 
@@ -232,75 +273,5 @@ jobs:
           name: "mem-${{ matrix.crate }}"
           path: |
             ${{ matrix.crate }}/*_mem_report.json
-          if-no-files-found: warn
-          retention-days: 30
-
-  bench_cairo_m:
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth:
-
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2025-04-06-aarch64-apple-darwin
-          override: true
-          profile: default
-          default: true
-
-      - name: Install llvm and lld for "cairo-m"
-        run: |
-          brew install llvm
-          brew install lld
-
-          echo 'export CC=/opt/homebrew/opt/llvm/bin/clang' >> ~/.bashrc
-          echo 'export CXX=/opt/homebrew/opt/llvm/bin/clang++' >> ~/.bashrc
-          echo 'export AR=/opt/homebrew/opt/llvm/bin/llvm-ar' >> ~/.bashrc
-          echo 'export RANLIB=/opt/homebrew/opt/llvm/bin/llvm-ranlib' >> ~/.bashrc
-
-          source ~/.bashrc
-
-      - name: Build "cairo-m" for memory report (temporary workaround)
-        run: |
-          cd cairo-m
-          cargo build --release --bin sha256_mem_cairo_m
-          mkdir -p ../target/release
-          cp ./target/release/sha256_mem_cairo_m ../target/release/
-
-      - name: Run benches in "cairo-m"
-        run: |
-          cd cairo-m
-          cargo bench
-        
-      - name: Upload reports for "cairo-m"
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: "criterion-cairo-m"
-          path: ./cairo-m/target/criterion
-          if-no-files-found: warn
-          retention-days: 30
-
-      - name: Upload metrics for "cairo-m"
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: "metrics-cairo-m"
-          path: ./cairo-m/**/*_metrics.json
-          if-no-files-found: warn
-          retention-days: 30
-
-      - name: Upload mem reports for cairo-m
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: "mem-cairo-m"
-          path: |
-            ./cairo-m/*_mem_report.json
           if-no-files-found: warn
           retention-days: 30

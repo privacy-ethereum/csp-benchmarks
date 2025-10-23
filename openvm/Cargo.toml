@@ -5,13 +5,13 @@ edition = "2024"
 
 [dependencies]
 # disable CUDA 
-ere-openvm = { git = "https://github.com/eth-act/ere", rev = "215a326995578a564871100d1b7b335f400c4fd1", default-features = false }
+ere-openvm = { git = "https://github.com/eth-act/ere", tag = "v0.0.13", default-features = false }
 
 # Workspace
 criterion = { workspace = true }
 clap = { workspace = true }
 utils = { workspace = true }
-zkvm-interface = { workspace = true }
+ere-zkvm-interface = { workspace = true }
 bincode = { workspace = true }
 toml = "0.9.8"
 

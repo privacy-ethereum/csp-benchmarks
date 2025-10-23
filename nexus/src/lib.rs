@@ -1,4 +1,4 @@
-use ere_risc0::{EreRisc0, compiler::RustRv32imaCustomized};
+use ere_nexus::{EreNexus, compiler::RustRv32i};
 use ere_zkvm_interface::ProverResourceType;
 use utils::zkvm::{CompiledProgram, PreparedSha256, build_input};
 
@@ -8,10 +8,9 @@ pub use utils::zkvm::{
 
 pub fn prepare_sha256(
     input_size: usize,
-    program: &CompiledProgram<RustRv32imaCustomized>,
-) -> PreparedSha256<EreRisc0> {
-    let vm = EreRisc0::new(program.program.clone(), ProverResourceType::Cpu)
-        .expect("failed to build risc0 prover instance");
+    program: &CompiledProgram<RustRv32i>,
+) -> PreparedSha256<EreNexus> {
+    let vm = EreNexus::new(program.program.clone(), ProverResourceType::Cpu);
 
     let (message_bytes, digest) = utils::generate_sha256_input(input_size);
     let input = build_input(message_bytes);

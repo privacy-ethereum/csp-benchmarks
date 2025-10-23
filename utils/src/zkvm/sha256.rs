@@ -1,4 +1,6 @@
-use zkvm_interface::{Input, ProgramProvingReport, PublicValues, zkVM, zkVMError};
+use ere_zkvm_interface::{
+    Input, ProgramProvingReport, Proof, ProofKind, PublicValues, zkVM, zkVMError,
+};
 
 /// Benchmark name for SHA256 programs.
 pub const SHA256_BENCH: &str = "sha256";
@@ -7,12 +9,12 @@ pub const SHA256_BENCH: &str = "sha256";
 #[derive(Clone)]
 pub struct ProofArtifacts {
     pub public_values: PublicValues,
-    pub proof: Vec<u8>,
+    pub proof: Proof,
     pub report: ProgramProvingReport,
 }
 
 impl ProofArtifacts {
-    pub fn new(public_values: PublicValues, proof: Vec<u8>, report: ProgramProvingReport) -> Self {
+    pub fn new(public_values: PublicValues, proof: Proof, report: ProgramProvingReport) -> Self {
         Self {
             public_values,
             proof,
@@ -21,7 +23,7 @@ impl ProofArtifacts {
     }
 
     pub fn proof_size(&self) -> usize {
-        self.proof.len()
+        self.proof.as_bytes().len()
     }
 }
 
@@ -79,11 +81,11 @@ where
     V: zkVM,
 {
     pub fn prove(&self) -> Result<ProofArtifacts, zkVMError> {
-        let (public_values, proof, report) = self.vm.prove(&self.input)?;
+        let (public_values, proof, report) = self.vm.prove(&self.input, ProofKind::default())?;
         Ok(ProofArtifacts::new(public_values, proof, report))
     }
 
-    pub fn verify(&self, proof: &[u8]) -> Result<PublicValues, zkVMError> {
+    pub fn verify(&self, proof: &Proof) -> Result<PublicValues, zkVMError> {
         self.vm.verify(proof)
     }
 

@@ -1,0 +1,19 @@
+[package]
+name = "nexus"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ere-nexus = { git = "https://github.com/eth-act/ere", tag = "v0.0.13" }
+ere-zkvm-interface = { git = "https://github.com/eth-act/ere", tag = "v0.0.13" }
+criterion = "0.5.1"
+clap = { version = "4.5.20", features = ["derive", "env"] }
+utils = { path = "../utils" }
+
+[[bench]]
+name = "sha256"
+harness = false
+
+[[bin]]
+name = "sha256_mem_nexus"
+path = "src/bin/sha256_mem.rs"

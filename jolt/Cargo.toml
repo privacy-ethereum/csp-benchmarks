@@ -4,14 +4,14 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-ere-jolt = { git = "https://github.com/eth-act/ere", rev = "215a326995578a564871100d1b7b335f400c4fd1" }
+ere-jolt = { git = "https://github.com/eth-act/ere", tag = "v0.0.13" }
 
 # Workspace
 bincode = { workspace = true }
 criterion = { workspace = true }
 clap = { workspace = true }
 utils = { workspace = true }
-zkvm-interface = { workspace = true }
+ere-zkvm-interface = { workspace = true }
 
 [[bench]]
 name = "sha256"

@@ -1,6 +1,6 @@
-use ere_sp1::EreSP1;
+use ere_sp1::{EreSP1, compiler::RustRv32imaCustomized};
+use ere_zkvm_interface::ProverResourceType;
 use utils::zkvm::{CompiledProgram, PreparedSha256, build_input};
-use zkvm_interface::ProverResourceType;
 
 pub use utils::zkvm::{
     execution_cycles, preprocessing_size, proof_size, prove_sha256, verify_sha256,
@@ -8,7 +8,7 @@ pub use utils::zkvm::{
 
 pub fn prepare_sha256(
     input_size: usize,
-    program: &CompiledProgram<ere_sp1::RV32_IM_SUCCINCT_ZKVM_ELF>,
+    program: &CompiledProgram<RustRv32imaCustomized>,
 ) -> PreparedSha256<EreSP1> {
     let vm = EreSP1::new(program.program.clone(), ProverResourceType::Cpu);
 
