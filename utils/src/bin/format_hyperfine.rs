@@ -19,6 +19,10 @@ struct Cli {
     #[arg(long)]
     name: Option<String>,
 
+    /// Optional feature name (default empty)
+    #[arg(long, default_value = "")]
+    feature: Option<String>,
+
     /// Mark as zkVM system (default: false)
     #[arg(long, default_value_t = false)]
     is_zkvm: bool,
@@ -86,10 +90,15 @@ fn main() -> std::io::Result<()> {
         let verifier_mean_sec = read_hyperfine_mean_seconds(&verifier_path)?;
         println!("Reading verifier time from {}", verifier_path.display());
 
+        let feat = match cli.feature.as_deref() {
+            Some(f) if !f.is_empty() => Some(f.to_string()),
+            _ => None,
+        };
+
         let mut metrics = Metrics::new(
             proving_system.clone(),
-            String::new(),
-            cli.is_zkvm,
+            feat,
+            Some(cli.is_zkvm),
             target.clone(),
             input_size,
         );

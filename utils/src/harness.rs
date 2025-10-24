@@ -75,9 +75,13 @@ pub struct BenchHarnessConfig<'a> {
     pub target: BenchTarget,
     pub system: ProvingSystem,
     pub feature: Option<&'a str>,
-    pub is_zkvm: bool,
     pub fixed_input_size: Option<usize>,
     pub mem_binary_name: &'a str,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct BenchProperties {
+    pub is_zkvm: bool,
 }
 
 fn feat_suffix(feat: Option<&str>) -> String {
@@ -150,12 +154,17 @@ pub fn run_benchmarks_fn<
         let prepared_context = prepare(size);
 
         let mut metrics = init_metrics(&cfg, target_str, system_str, size);
+        let properties = BenchProperties {
+            is_zkvm: execution_cycles.is_some(),
+        };
+        metrics.is_zkvm = Some(properties.is_zkvm);
         metrics.preprocessing_size = preprocessing_size(&prepared_context);
         let proof = prove(&prepared_context);
         metrics.proof_size = proof_size(&proof);
 
         if let Some(ref cycles_fn) = execution_cycles {
-            metrics.cycles = cycles_fn(&prepared_context);
+            let c = cycles_fn(&prepared_context);
+            metrics.cycles = if c == 0 { None } else { Some(c) };
         }
 
         write_json_metrics(target_str, size, system_str, cfg.feature, &metrics);
@@ -229,13 +238,18 @@ pub fn run_benchmarks_with_state_fn<
         let prepared_context = prepare(size, shared);
 
         let mut metrics = init_metrics(&cfg, target_str, system_str, size);
+        let properties = BenchProperties {
+            is_zkvm: execution_cycles.is_some(),
+        };
+        metrics.is_zkvm = Some(properties.is_zkvm);
         metrics.preprocessing_size = preprocessing_size(&prepared_context, &shared);
 
         let proof = prove(&prepared_context, &shared);
         metrics.proof_size = proof_size(&proof, &shared);
 
         if let Some(ref cycles_fn) = execution_cycles {
-            metrics.cycles = cycles_fn(&prepared_context);
+            let c = cycles_fn(&prepared_context);
+            metrics.cycles = if c == 0 { None } else { Some(c) };
         }
 
         write_json_metrics(target_str, size, system_str, cfg.feature, &metrics);
@@ -295,8 +309,11 @@ fn init_metrics(
 ) -> Metrics {
     Metrics::new(
         system_str.to_string(),
-        cfg.feature.unwrap_or("").to_string(),
-        cfg.is_zkvm,
+        match cfg.feature {
+            Some(f) if !f.is_empty() => Some(f.to_string()),
+            _ => None,
+        },
+        None,
         target_str.to_string(),
         size,
     )
@@ -329,7 +346,6 @@ macro_rules! __define_benchmark_harness {
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
                 fixed_input_size: None,
-                is_zkvm: system.is_zkvm(),
             };
             ::utils::harness::run_benchmarks_with_state_fn(
                 c,
@@ -358,7 +374,6 @@ macro_rules! __define_benchmark_harness {
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
                 fixed_input_size: None,
-                is_zkvm: system.is_zkvm(),
             };
             ::utils::harness::run_benchmarks_fn(
                 c,
@@ -385,7 +400,6 @@ macro_rules! __define_benchmark_harness {
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
                 fixed_input_size: None,
-                is_zkvm: system.is_zkvm(),
             };
             ::utils::harness::run_benchmarks_with_state_fn(
                 c,
@@ -414,7 +428,6 @@ macro_rules! __define_benchmark_harness {
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
                 fixed_input_size: None,
-                is_zkvm: system.is_zkvm(),
             };
             ::utils::harness::run_benchmarks_with_state_fn(
                 c,
@@ -443,7 +456,6 @@ macro_rules! __define_benchmark_harness {
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
                 fixed_input_size: None,
-                is_zkvm: system.is_zkvm(),
             };
             ::utils::harness::run_benchmarks_fn(
                 c,

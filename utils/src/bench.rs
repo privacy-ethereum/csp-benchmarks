@@ -65,8 +65,12 @@ pub fn measure_peak_memory<R, F: FnOnce() -> R>(func: F) -> (R, usize) {
 #[derive(Serialize, Deserialize, Tabled, Clone)]
 pub struct Metrics {
     pub name: String,
-    pub feat: String,
-    pub is_zkvm: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[tabled(display_with = "display_string")]
+    pub feat: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[tabled(display_with = "display_bool")]
+    pub is_zkvm: Option<bool>,
     pub target: String,
     #[tabled(display_with = "display_bytes")]
     pub input_size: usize,
@@ -76,8 +80,9 @@ pub struct Metrics {
     #[serde_as(as = "DurationNanoSeconds")]
     #[tabled(display_with = "display_duration")]
     pub verify_duration: Duration,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[tabled(display_with = "display_cycles")]
-    pub cycles: u64,
+    pub cycles: Option<u64>,
     #[tabled(display_with = "display_bytes")]
     pub proof_size: usize,
     #[tabled(display_with = "display_bytes")]
@@ -90,16 +95,18 @@ fn display_bytes(bytes: &usize) -> String {
     bytes.human_count_bytes().to_string()
 }
 
-fn display_cycles(cycles: &u64) -> String {
-    cycles.human_count_bare().to_string()
-}
-
 fn display_duration(duration: &Duration) -> String {
     duration.human_duration().to_string()
 }
 
 impl Metrics {
-    pub fn new(name: String, feat: String, is_zkvm: bool, target: String, size: usize) -> Self {
+    pub fn new(
+        name: String,
+        feat: Option<String>,
+        is_zkvm: Option<bool>,
+        target: String,
+        size: usize,
+    ) -> Self {
         Metrics {
             name,
             feat,
@@ -108,11 +115,32 @@ impl Metrics {
             input_size: size,
             proof_duration: Duration::default(),
             verify_duration: Duration::default(),
-            cycles: 0,
+            cycles: None,
             proof_size: 0,
             preprocessing_size: 0,
             peak_memory: 0,
         }
+    }
+}
+
+fn display_string(s: &Option<String>) -> String {
+    match s {
+        Some(v) if !v.is_empty() => v.clone(),
+        _ => "-".to_string(),
+    }
+}
+
+fn display_bool(b: &Option<bool>) -> String {
+    match b {
+        Some(v) => v.to_string(),
+        None => "-".to_string(),
+    }
+}
+
+fn display_cycles(cycles: &Option<u64>) -> String {
+    match cycles {
+        Some(v) => v.human_count_bare().to_string(),
+        None => "-".to_string(),
     }
 }
 
