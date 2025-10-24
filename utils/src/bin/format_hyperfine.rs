@@ -9,6 +9,56 @@ use std::time::Duration;
 use utils::bench::Metrics;
 use utils::harness::BenchProperties;
 
+#[derive(clap::Args, Debug, Clone, Default)]
+struct BenchPropsArgs {
+    #[arg(long)]
+    proving_system: Option<String>,
+    #[arg(long)]
+    field_curve: Option<String>,
+    #[arg(long)]
+    iop: Option<String>,
+    #[arg(long)]
+    pcs: Option<String>,
+    #[arg(long)]
+    arithm: Option<String>,
+    #[arg(long)]
+    security_bits: Option<u64>,
+    #[arg(long)]
+    is_pq: Option<bool>,
+    #[arg(long)]
+    is_maintained: Option<bool>,
+    #[arg(long)]
+    is_zk: Option<bool>,
+    #[arg(long)]
+    is_audited: Option<bool>,
+    #[arg(long)]
+    n_constraints: Option<u64>,
+    #[arg(long)]
+    cycles: Option<u64>,
+    #[arg(long)]
+    isa: Option<String>,
+}
+
+impl From<BenchPropsArgs> for BenchProperties {
+    fn from(a: BenchPropsArgs) -> Self {
+        BenchProperties {
+            proving_system: a.proving_system,
+            field_curve: a.field_curve,
+            iop: a.iop,
+            pcs: a.pcs,
+            arithm: a.arithm,
+            security_bits: a.security_bits,
+            is_pq: a.is_pq,
+            is_maintained: a.is_maintained,
+            is_zk: a.is_zk,
+            is_audited: a.is_audited,
+            n_constraints: a.n_constraints,
+            cycles: a.cycles,
+            isa: a.isa,
+        }
+    }
+}
+
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Format hyperfine + RAM outputs into Metrics JSON and clean up", long_about = None)]
 struct Cli {
@@ -27,6 +77,14 @@ struct Cli {
     /// Mark as zkVM system (default: false)
     #[arg(long, default_value_t = false)]
     is_zkvm: bool,
+
+    /// Optional path to properties file (JSON) to populate BenchProperties
+    #[arg(long)]
+    properties: Option<PathBuf>,
+
+    /// CLI overrides for BenchProperties (fields not provided remain unchanged)
+    #[command(flatten)]
+    props: BenchPropsArgs,
 }
 
 #[derive(Deserialize)]
@@ -96,13 +154,20 @@ fn main() -> std::io::Result<()> {
             _ => None,
         };
 
+        let file_props = match &cli.properties {
+            Some(p) => load_properties_json(p)?,
+            None => BenchProperties::default(),
+        };
+        let override_props: BenchProperties = cli.props.clone().into();
+        let bench_properties = merge_props(file_props, override_props);
+
         let mut metrics = Metrics::new(
             proving_system.clone(),
             feat,
             cli.is_zkvm,
             target.clone(),
             input_size,
-            BenchProperties::default(),
+            bench_properties,
         );
         metrics.proof_duration = to_duration_ns(prover_mean_sec);
         metrics.verify_duration = to_duration_ns(verifier_mean_sec);
@@ -135,6 +200,35 @@ fn main() -> std::io::Result<()> {
     }
 
     Ok(())
+}
+
+fn load_properties_json(path: &Path) -> std::io::Result<BenchProperties> {
+    let s = fs::read_to_string(path)?;
+    serde_json::from_str::<BenchProperties>(&s).map_err(|e| io_err(&e.to_string()))
+}
+
+fn merge_props(mut base: BenchProperties, override_: BenchProperties) -> BenchProperties {
+    macro_rules! take {
+        ($f:ident) => {
+            if override_.$f.is_some() {
+                base.$f = override_.$f;
+            }
+        };
+    }
+    take!(proving_system);
+    take!(field_curve);
+    take!(iop);
+    take!(pcs);
+    take!(arithm);
+    take!(security_bits);
+    take!(is_pq);
+    take!(is_maintained);
+    take!(is_zk);
+    take!(is_audited);
+    take!(n_constraints);
+    take!(cycles);
+    take!(isa);
+    base
 }
 
 fn read_hyperfine_mean_seconds(path: &Path) -> std::io::Result<f64> {

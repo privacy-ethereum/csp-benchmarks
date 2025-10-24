@@ -84,6 +84,7 @@ use serde_with::skip_serializing_none;
 
 #[skip_serializing_none]
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct BenchProperties {
     // Classification
     pub proving_system: Option<String>,
