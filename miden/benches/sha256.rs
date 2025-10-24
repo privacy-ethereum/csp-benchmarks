@@ -11,6 +11,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::Miden,
     None,
     "sha256_mem_miden",
+    utils::harness::BenchProperties::default(),
     { load_or_compile_program(&MidenAsm, SHA256_BENCH) },
     prepare_sha256,
     prove_sha256,

@@ -9,6 +9,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::Binius64,
     None,
     "sha256_mem_binius64",
+    utils::harness::BenchProperties::default(),
     |input_size| {
         prepare(input_size).expect("Failed to prepare sha256 circuit for prove/verify")
     },

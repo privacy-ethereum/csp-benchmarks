@@ -6,6 +6,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::CairoM,
     None,
     "sha256_mem_cairo_m",
+    utils::harness::BenchProperties::default(),
     |input_size| { prepare(input_size) },
     |(program, (entrypoint_name, runner_inputs))| {
         prove(program, (entrypoint_name, runner_inputs))

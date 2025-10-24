@@ -1,5 +1,7 @@
+use crate::harness::BenchProperties;
 use human_repr::{HumanCount, HumanDuration};
 use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 use serde_with::{DurationNanoSeconds, serde_as};
 use std::{
     fmt::Display,
@@ -62,15 +64,13 @@ pub fn measure_peak_memory<R, F: FnOnce() -> R>(func: F) -> (R, usize) {
 }
 
 #[serde_as]
+#[skip_serializing_none]
 #[derive(Serialize, Deserialize, Tabled, Clone)]
 pub struct Metrics {
     pub name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[tabled(display_with = "display_string")]
     pub feat: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[tabled(display_with = "display_bool")]
-    pub is_zkvm: Option<bool>,
+    pub is_zkvm: bool,
     pub target: String,
     #[tabled(display_with = "display_bytes")]
     pub input_size: usize,
@@ -80,7 +80,6 @@ pub struct Metrics {
     #[serde_as(as = "DurationNanoSeconds")]
     #[tabled(display_with = "display_duration")]
     pub verify_duration: Duration,
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[tabled(display_with = "display_cycles")]
     pub cycles: Option<u64>,
     #[tabled(display_with = "display_bytes")]
@@ -89,6 +88,9 @@ pub struct Metrics {
     pub preprocessing_size: usize,
     #[tabled(display_with = "display_bytes")]
     pub peak_memory: usize,
+    #[serde(flatten)]
+    #[tabled(skip)]
+    pub bench_properties: BenchProperties,
 }
 
 fn display_bytes(bytes: &usize) -> String {
@@ -103,9 +105,10 @@ impl Metrics {
     pub fn new(
         name: String,
         feat: Option<String>,
-        is_zkvm: Option<bool>,
+        is_zkvm: bool,
         target: String,
         size: usize,
+        bench_properties: BenchProperties,
     ) -> Self {
         Metrics {
             name,
@@ -119,6 +122,7 @@ impl Metrics {
             proof_size: 0,
             preprocessing_size: 0,
             peak_memory: 0,
+            bench_properties,
         }
     }
 }
@@ -127,13 +131,6 @@ fn display_string(s: &Option<String>) -> String {
     match s {
         Some(v) if !v.is_empty() => v.clone(),
         _ => "-".to_string(),
-    }
-}
-
-fn display_bool(b: &Option<bool>) -> String {
-    match b {
-        Some(v) => v.to_string(),
-        None => "-".to_string(),
     }
 }
 

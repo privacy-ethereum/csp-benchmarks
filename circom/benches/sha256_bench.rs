@@ -7,6 +7,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::Circom,
     None,
     "sha256_mem_circom",
+    utils::harness::BenchProperties::default(),
     |input_size| { prepare(input_size) },
     |(witness_fn, input_str, zkey_path)| {
         circom::prove(*witness_fn, input_str.clone(), zkey_path.clone())

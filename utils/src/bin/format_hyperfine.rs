@@ -7,6 +7,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use utils::bench::Metrics;
+use utils::harness::BenchProperties;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Format hyperfine + RAM outputs into Metrics JSON and clean up", long_about = None)]
@@ -98,9 +99,10 @@ fn main() -> std::io::Result<()> {
         let mut metrics = Metrics::new(
             proving_system.clone(),
             feat,
-            Some(cli.is_zkvm),
+            cli.is_zkvm,
             target.clone(),
             input_size,
+            BenchProperties::default(),
         );
         metrics.proof_duration = to_duration_ns(prover_mean_sec);
         metrics.verify_duration = to_duration_ns(verifier_mean_sec);

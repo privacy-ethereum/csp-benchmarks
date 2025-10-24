@@ -11,6 +11,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::Nexus,
     None,
     "sha256_mem_nexus",
+    utils::harness::BenchProperties::default(),
     { load_or_compile_program(&RustRv32i, SHA256_BENCH) },
     prepare_sha256,
     prove_sha256,

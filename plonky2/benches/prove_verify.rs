@@ -12,6 +12,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::Plonky2,
     None,
     "sha256_no_lookup_mem",
+    utils::harness::BenchProperties::default(),
     sha256_prepare,
     |(circuit_data, pw)| { prove(circuit_data, pw.clone()) },
     |(circuit_data, _pw), proof| {

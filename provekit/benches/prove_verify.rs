@@ -6,6 +6,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::Provekit,
     None,
     "sha256_mem_provekit",
+    utils::harness::BenchProperties::default(),
     prepare_sha256,
     |(proof_scheme, toml_path, _)| { prove(proof_scheme, toml_path) },
     |(proof_scheme, _, _), proof| {
