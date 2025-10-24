@@ -1,6 +1,6 @@
 use bincode::Options;
+use ere_zkvm_interface::Compiler;
 use std::path::Path;
-use zkvm_interface::Compiler;
 
 /// Holds a compiled program together with its serialized size.
 pub struct CompiledProgram<C: Compiler> {

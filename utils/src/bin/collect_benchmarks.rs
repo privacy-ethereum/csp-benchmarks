@@ -10,7 +10,7 @@ use utils::bench::Metrics;
 /// at `../collected_benchmarks.json`.
 fn main() -> io::Result<()> {
     let mut benchmarks: Vec<Metrics> = Vec::new();
-
+    let mut had_errors = false;
     let root_dir = workspace_dir();
     for entry in fs::read_dir(root_dir)? {
         let path = entry?.path();
@@ -19,7 +19,10 @@ fn main() -> io::Result<()> {
             for metrics_file_path in metrics_file_paths {
                 println!("Extracting metrics from {}", metrics_file_path.display());
                 match extract_metrics(&path, &metrics_file_path) {
-                    Ok(metrics) => benchmarks.push(metrics),
+                    Ok((metrics, errors)) => {
+                        benchmarks.push(metrics);
+                        had_errors |= errors;
+                    }
                     Err(e) => {
                         eprintln!(
                             "\n===== WARNING: failed to parse metrics file =====\n  file: {}\n  error: {}\n===============================================\n",
@@ -36,7 +39,13 @@ fn main() -> io::Result<()> {
     let output = serde_json::to_string_pretty(&benchmarks)?;
     std::fs::write("../collected_benchmarks.json", output)?;
 
-    Ok(())
+    if had_errors {
+        Err(io::Error::other(
+            "Metrics extraction had errors, see the logs for details",
+        ))
+    } else {
+        Ok(())
+    }
 }
 
 /// Extract `Metrics` from JSON file `metrics_file_path` and fill in any missing
@@ -50,7 +59,8 @@ fn main() -> io::Result<()> {
 /// file.
 ///
 /// Returns `Metrics` if successful.
-fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> {
+fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<(Metrics, bool)> {
+    let mut had_errors = false;
     let metrics_json: Value = serde_json::from_str(&fs::read_to_string(metrics_file_path)?)?;
 
     let mut metrics: Metrics = serde_json::from_value(metrics_json)?;
@@ -82,23 +92,30 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> 
                             metrics.proof_duration = Duration::from_nanos(f.round() as u64);
                         }
                     }
-                    Err(e) => eprintln!(
-                        "\n===== WARNING: failed to parse proof estimates =====\n  file: {}\n  error: {}\n===================================================\n",
+                    Err(e) => {
+                        eprintln!(
+                            "\n===== WARNING: failed to parse proof estimates =====\n  file: {}\n  error: {}\n===================================================\n",
+                            crit_path_p.display(),
+                            e
+                        );
+                        had_errors = true;
+                    }
+                },
+                Err(e) => {
+                    eprintln!(
+                        "\n===== WARNING: failed to read proof estimates =====\n  file: {}\n  error: {}\n==================================================\n",
                         crit_path_p.display(),
                         e
-                    ),
-                },
-                Err(e) => eprintln!(
-                    "\n===== WARNING: failed to read proof estimates =====\n  file: {}\n  error: {}\n==================================================\n",
-                    crit_path_p.display(),
-                    e
-                ),
+                    );
+                    had_errors = true;
+                }
             }
         } else {
             eprintln!(
                 "\n===== WARNING: proof estimates.json not found =====\n  file: {}\n==================================================\n",
                 crit_path_p.display()
             );
+            had_errors = true;
         }
     }
 
@@ -125,23 +142,30 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> 
                             metrics.verify_duration = Duration::from_nanos(f.round() as u64);
                         }
                     }
-                    Err(e) => eprintln!(
-                        "\n===== WARNING: failed to parse verify estimates =====\n  file: {}\n  error: {}\n====================================================\n",
+                    Err(e) => {
+                        eprintln!(
+                            "\n===== WARNING: failed to parse verify estimates =====\n  file: {}\n  error: {}\n====================================================\n",
+                            crit_path_v.display(),
+                            e
+                        );
+                        had_errors = true;
+                    }
+                },
+                Err(e) => {
+                    eprintln!(
+                        "\n===== WARNING: failed to read verify estimates =====\n  file: {}\n  error: {}\n===================================================\n",
                         crit_path_v.display(),
                         e
-                    ),
-                },
-                Err(e) => eprintln!(
-                    "\n===== WARNING: failed to read verify estimates =====\n  file: {}\n  error: {}\n===================================================\n",
-                    crit_path_v.display(),
-                    e
-                ),
+                    );
+                    had_errors = true;
+                }
             }
         } else {
             eprintln!(
                 "\n===== WARNING: verify estimates.json not found =====\n  file: {}\n===================================================\n",
                 crit_path_v.display()
             );
+            had_errors = true;
         }
     }
 
@@ -164,27 +188,34 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<Metrics> 
                             metrics.peak_memory = m.as_u64().unwrap_or(0) as usize;
                         }
                     }
-                    Err(e) => eprintln!(
-                        "\n===== WARNING: failed to parse memory report =====\n  file: {}\n  error: {}\n==================================================\n",
+                    Err(e) => {
+                        eprintln!(
+                            "\n===== WARNING: failed to parse memory report =====\n  file: {}\n  error: {}\n==================================================\n",
+                            mem_path.display(),
+                            e
+                        );
+                        had_errors = true;
+                    }
+                },
+                Err(e) => {
+                    eprintln!(
+                        "\n===== WARNING: failed to read memory report =====\n  file: {}\n  error: {}\n=================================================\n",
                         mem_path.display(),
                         e
-                    ),
-                },
-                Err(e) => eprintln!(
-                    "\n===== WARNING: failed to read memory report =====\n  file: {}\n  error: {}\n=================================================\n",
-                    mem_path.display(),
-                    e
-                ),
+                    );
+                    had_errors = true;
+                }
             }
         } else {
             eprintln!(
                 "\n===== WARNING: memory report not found =====\n  file: {}\n===========================================\n",
                 mem_path.display()
             );
+            had_errors = true;
         }
     }
 
-    Ok(metrics)
+    Ok((metrics, had_errors))
 }
 
 /// Returns the root directory of the current workspace, as determined by the

@@ -11,17 +11,19 @@ members = [
     "miden",
     "risc0",
     "sp1",
-    # "cairo-m", # kakarot zkVM
     "utils",
 ]
-
-exclude = [ "cairo-m" ]
+exclude = [
+    "cairo-m",
+    "nexus"
+]
 
 [workspace.dependencies]
 anyhow = "1.0.81"
 bincode = "1.3.3"
 clap = { version = "4.5.20", features = ["derive", "env"] }
 criterion = "0.5.1"
+ere-zkvm-interface = { git = "https://github.com/eth-act/ere", tag = "v0.0.13" }
 env_logger = "0.10.0"
 hex = "0.4.3"
 itertools = "0.13.0"
@@ -31,7 +33,6 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
 sha2 = "0.10"
 tracing = "0.1.40"
-zkvm-interface = { git = "https://github.com/eth-act/ere", rev = "215a326995578a564871100d1b7b335f400c4fd1" }
 
 # Local
 utils = { path = "utils" }
@@ -40,8 +41,3 @@ utils = { path = "utils" }
 ark-ff = { git = "https://github.com/a16z/arkworks-algebra", branch = "v0.5.0-optimize-mul-u64" }
 ark-ec = { git = "https://github.com/a16z/arkworks-algebra", branch = "v0.5.0-optimize-mul-u64" }
 ark-serialize = { git = "https://github.com/a16z/arkworks-algebra", branch = "v0.5.0-optimize-mul-u64" }
-
-# TODO: Enable this when re-add the "cairo-m" as workspace member
-# # patch for "cairo-m" 
-# [patch."https://github.com/HorizenLabs/poseidon2.git"]
-# zkhash = { git = "https://github.com/AntoineFONDEUR/poseidon2.git", branch = "poseidon2-M31" }

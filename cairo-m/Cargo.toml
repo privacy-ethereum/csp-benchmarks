@@ -4,23 +4,18 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+clap = { version = "4.5.20", features = ["derive", "env"] }
+serde_json = { version = "1.0" }
+utils = { path = "../utils" }
+
+# Cairo
 cairo-m-common = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha.1" }
 cairo-m-runner = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha.1" }
 cairo-m-prover = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha.1" }
 cairo-m-compiler = { git = "https://github.com/kkrt-labs/cairo-m", tag = "v0.1.0-alpha.1" }
 stwo-prover = { git = "https://github.com/starkware-libs/stwo", features = ["parallel"], rev = "ab57a1c" }
 
-# TODO: Enable these when re-add the "cairo-m" as workspace member
-# clap = { workspace = true }
-# serde_json = { workspace = true }
-# utils = { workspace = true }
-clap = { version = "4.5.20", features = ["derive", "env"] }
-serde_json = { version = "1.0" }
-utils = { path = "../utils" }
-
 [dev-dependencies]
-# TODO: Enable this when re-add the "cairo-m" as workspace member
-# criterion = { workspace = true }
 criterion = "0.5.1"
 
 # TODO: Remove this patch when re-add the "cairo-m" as workspace member

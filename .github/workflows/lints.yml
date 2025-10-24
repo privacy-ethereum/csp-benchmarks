@@ -12,6 +12,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
+  EXCLUDED_CRATES: "nexus cairo-m"
   GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
 # ────────────────── 1. Warm‑up build ──────────────────
@@ -44,14 +45,36 @@ jobs:
           default: true
           components: rustfmt, clippy
 
+      - name: Install excluded crates toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2025-04-06
+          profile: minimal
+          components: llvm-tools, rustc-dev, rust-src, rustfmt, clippy
+
       - name: Install OpenMPI
         uses: ./.github/actions/install-ompi
 
+      - name: Install LLVM and LLD for cairo-m
+        uses: ./.github/actions/install-llvm
+
       - name: Build full workspace
         run: cargo build --workspace
+
+      - name: Build excluded crates
+        run: |
+          for crate in $EXCLUDED_CRATES; do
+            cd "$crate" && cargo build && cd ..
+          done
 
       - name: Format
         run: cargo fmt --all -- --check
 
       - name: Clippy
         run: cargo clippy --workspace --all-targets --all-features
+
+      - name: Clippy excluded crates
+        run: |
+          for crate in $EXCLUDED_CRATES; do
+            cd "$crate" && cargo clippy --all-targets --all-features && cd ..
+          done

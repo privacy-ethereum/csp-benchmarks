@@ -1,10 +1,10 @@
 use crate::zkvm::instance::{CompiledProgram, compile_guest_program};
 use crate::zkvm::{PreparedSha256, ProofArtifacts};
 use bincode::Options;
+use ere_zkvm_interface::Compiler;
+use ere_zkvm_interface::zkVM;
 use std::fs;
 use std::path::PathBuf;
-use zkvm_interface::Compiler;
-use zkvm_interface::zkVM;
 
 /// Prove a SHA-256 benchmark using the prepared zkVM instance.
 pub fn prove_sha256<V: zkVM, SharedState>(

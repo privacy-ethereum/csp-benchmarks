@@ -28,7 +28,7 @@ pub fn prove_sha256(msg: &[u8]) -> Result<()> {
         pw.set_bool_target(targets.message[i], *msg_bit)?;
     }
 
-    let expected_res = array_to_bits(hash.as_slice());
+    let expected_res = array_to_bits(&hash);
     for (i, expected_res_bit) in expected_res.iter().enumerate() {
         if *expected_res_bit {
             builder.assert_one(targets.digest[i].target);

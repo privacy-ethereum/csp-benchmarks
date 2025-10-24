@@ -1,5 +1,5 @@
 use clap::Parser;
-use ere_sp1::RV32_IM_SUCCINCT_ZKVM_ELF;
+use ere_sp1::compiler::RustRv32imaCustomized;
 use sp1::{prepare_sha256, prove_sha256};
 use utils::zkvm::SHA256_BENCH;
 use utils::zkvm::helpers::load_compiled_program;
@@ -14,7 +14,7 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let program = load_compiled_program::<RV32_IM_SUCCINCT_ZKVM_ELF>(SHA256_BENCH);
+    let program = load_compiled_program::<RustRv32imaCustomized>(SHA256_BENCH);
 
     let prepared = prepare_sha256(args.input_size, &program);
     prove_sha256(&prepared, &());

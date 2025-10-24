@@ -34,7 +34,9 @@ pub enum ProvingSystem {
     Sp1,
     Jolt,
     Miden,
-    CairoM, // Extend as needed
+    CairoM,
+    Nexus,
+    // Extend as needed
 }
 
 impl ProvingSystem {
@@ -51,6 +53,7 @@ impl ProvingSystem {
             ProvingSystem::Jolt => "jolt",
             ProvingSystem::Miden => "miden",
             ProvingSystem::CairoM => "cairo-m",
+            ProvingSystem::Nexus => "nexus",
         }
     }
 
@@ -62,6 +65,7 @@ impl ProvingSystem {
                 | ProvingSystem::Jolt
                 | ProvingSystem::Miden
                 | ProvingSystem::CairoM
+                | ProvingSystem::Nexus
         )
     }
 }

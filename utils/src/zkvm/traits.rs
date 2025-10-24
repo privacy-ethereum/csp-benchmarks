@@ -1,4 +1,4 @@
-use zkvm_interface::{Compiler, Input, zkVM};
+use ere_zkvm_interface::{Compiler, Input, zkVM};
 
 /// Program to be benchmarked.
 pub trait Program {

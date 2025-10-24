@@ -1,9 +1,8 @@
-use std::collections::HashMap;
-
-use ere_jolt::JOLT_TARGET;
+use ere_jolt::compiler::RustRv32imaCustomized;
 use jolt::{
     execution_cycles, prepare_sha256, preprocessing_size, proof_size, prove_sha256, verify_sha256,
 };
+use std::collections::HashMap;
 use utils::{
     harness::ProvingSystem,
     metadata::SHA2_INPUTS,
@@ -20,7 +19,10 @@ utils::define_benchmark_harness!(
         for input_size in SHA2_INPUTS {
             programs.insert(
                 input_size,
-                load_or_compile_program(&JOLT_TARGET, &format!("{}_{}", SHA256_BENCH, input_size)),
+                load_or_compile_program(
+                    &RustRv32imaCustomized,
+                    &format!("{}_{}", SHA256_BENCH, input_size),
+                ),
             );
         }
         programs

@@ -1,13 +1,13 @@
-use ere_miden::EreMiden;
+use ere_miden::{EreMiden, compiler::MidenAsm};
+use ere_zkvm_interface::{Input, ProverResourceType};
 use std::convert::TryInto;
 use utils::zkvm::{CompiledProgram, PreparedSha256, ProofArtifacts};
-use zkvm_interface::{Input, ProverResourceType};
 
 pub use utils::zkvm::{execution_cycles, preprocessing_size, proof_size, prove_sha256};
 
 pub fn prepare_sha256(
     input_size: usize,
-    program: &CompiledProgram<ere_miden::MIDEN_TARGET>,
+    program: &CompiledProgram<MidenAsm>,
 ) -> PreparedSha256<EreMiden> {
     let vm = EreMiden::new(program.program.clone(), ProverResourceType::Cpu)
         .expect("failed to build miden prover instance");
@@ -22,7 +22,7 @@ pub fn prepare_sha256(
 pub fn verify_sha256(
     prepared: &PreparedSha256<EreMiden>,
     proof: &ProofArtifacts,
-    _: &&CompiledProgram<ere_miden::MIDEN_TARGET>,
+    _: &&CompiledProgram<MidenAsm>,
 ) {
     let public_values = prepared.verify(&proof.proof).expect("miden verify failed");
 
@@ -76,16 +76,16 @@ fn decode_public_values(raw: &[u8]) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zkvm_interface::zkVM;
+    use ere_zkvm_interface::zkVM;
 
     #[test]
     fn miden_sha256_matches_reference_digest() {
         // Build a program for tests
-        use ere_miden::MIDEN_TARGET;
+        use ere_miden::compiler::MidenAsm;
         use utils::zkvm::{SHA256_BENCH, compile_guest_program, guest_dir};
         let guest_path = guest_dir(SHA256_BENCH);
-        let program = compile_guest_program(&MIDEN_TARGET, &guest_path)
-            .expect("compile guest program for tests");
+        let program =
+            compile_guest_program(&MidenAsm, &guest_path).expect("compile guest program for tests");
         let prepared = prepare_sha256(2048, &program);
 
         // Execute the guest to obtain the committed digest bytes
