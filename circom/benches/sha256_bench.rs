@@ -7,7 +7,19 @@ utils::define_benchmark_harness!(
     ProvingSystem::Circom,
     None,
     "sha256_mem_circom",
-    utils::harness::BenchProperties::default(),
+    utils::harness::BenchProperties {
+        proving_system: Some("Groth16".to_string()),
+        field_curve: Some("Bn254".to_string()),
+        iop: Some("Groth16".to_string()),
+        pcs: None,
+        arithm: Some("R1CS".to_string()),
+        is_zk: Some(true),
+        security_bits: Some(128),
+        is_pq: Some(false),
+        is_maintained: Some(true),
+        is_audited: Some(AuditStatus::PartiallyAudited),
+        isa: None,
+    },
     |input_size| { prepare(input_size) },
     |(witness_fn, input_str, zkey_path)| {
         circom::prove(*witness_fn, input_str.clone(), zkey_path.clone())

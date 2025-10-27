@@ -82,6 +82,27 @@ pub struct BenchHarnessConfig<'a> {
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum AuditStatus {
+    #[serde(rename = "audited")]
+    Audited,
+    #[serde(rename = "not_audited")]
+    NotAudited,
+    #[serde(rename = "partially_audited")]
+    PartiallyAudited,
+}
+
+impl AuditStatus {
+    pub fn from_str(s: &str) -> Option<AuditStatus> {
+        match s {
+            "audited" => Some(AuditStatus::Audited),
+            "not_audited" => Some(AuditStatus::NotAudited),
+            "partially_audited" => Some(AuditStatus::PartiallyAudited),
+            _ => None,
+        }
+    }
+}
+
 #[skip_serializing_none]
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -100,13 +121,9 @@ pub struct BenchProperties {
 
     // Maintenance / audit / zk
     pub is_maintained: Option<bool>,
-    pub is_audited: Option<bool>,
-
-    // Circuit characteristics
-    pub n_constraints: Option<u64>,
+    pub is_audited: Option<AuditStatus>,
 
     // zkVM specifics
-    pub cycles: Option<u64>,
     pub isa: Option<String>,
 }
 

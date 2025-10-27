@@ -7,7 +7,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use utils::bench::Metrics;
-use utils::harness::BenchProperties;
+use utils::harness::{AuditStatus, BenchProperties};
 
 #[derive(clap::Args, Debug, Clone, Default)]
 struct BenchPropsArgs {
@@ -30,11 +30,7 @@ struct BenchPropsArgs {
     #[arg(long)]
     is_zk: Option<bool>,
     #[arg(long)]
-    is_audited: Option<bool>,
-    #[arg(long)]
-    n_constraints: Option<u64>,
-    #[arg(long)]
-    cycles: Option<u64>,
+    is_audited: Option<String>,
     #[arg(long)]
     isa: Option<String>,
 }
@@ -51,9 +47,7 @@ impl From<BenchPropsArgs> for BenchProperties {
             is_pq: a.is_pq,
             is_maintained: a.is_maintained,
             is_zk: a.is_zk,
-            is_audited: a.is_audited,
-            n_constraints: a.n_constraints,
-            cycles: a.cycles,
+            is_audited: a.is_audited.map(|s| AuditStatus::from_str(&s).unwrap()),
             isa: a.isa,
         }
     }
@@ -225,8 +219,6 @@ fn merge_props(mut base: BenchProperties, override_: BenchProperties) -> BenchPr
     take!(is_maintained);
     take!(is_zk);
     take!(is_audited);
-    take!(n_constraints);
-    take!(cycles);
     take!(isa);
     base
 }
