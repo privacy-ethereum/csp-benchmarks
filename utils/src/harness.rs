@@ -1,5 +1,5 @@
 use crate::bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics};
-use crate::metadata::SHA2_INPUTS;
+use crate::metadata::selected_sha2_inputs;
 use criterion::{BatchSize, Criterion};
 
 const SAMPLE_SIZE: usize = 10;
@@ -111,9 +111,9 @@ fn mem_report_filename(target: &str, size: usize, system: &str, feat: Option<&st
 
 fn input_sizes_for(target: BenchTarget, _fixed: Option<usize>) -> Vec<usize> {
     match target {
-        BenchTarget::Sha256 => SHA2_INPUTS.to_vec(),
+        BenchTarget::Sha256 => selected_sha2_inputs(),
         BenchTarget::Ecdsa => vec![32],
-        BenchTarget::Keccak => SHA2_INPUTS.to_vec(),
+        BenchTarget::Keccak => selected_sha2_inputs(),
     }
 }
 

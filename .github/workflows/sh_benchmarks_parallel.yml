@@ -155,6 +155,12 @@ jobs:
       - name: Run benches in ${{ matrix.folder }}
         run: |
           set -euo pipefail
+          PROFILE="full"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            PROFILE="reduced"
+          fi
+          export BENCH_INPUT_PROFILE="$PROFILE"
+          echo "Using BENCH_INPUT_PROFILE=$BENCH_INPUT_PROFILE for ${{ matrix.folder }}"
           if [[ -f ./benchmark.sh ]]; then
             bash ./benchmark.sh --system-dir "./${{ matrix.folder }}"
           else
