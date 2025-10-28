@@ -102,6 +102,20 @@ fn display_duration(duration: &Duration) -> String {
     duration.human_duration().to_string()
 }
 
+fn display_string(s: &Option<String>) -> String {
+    match s {
+        Some(v) if !v.is_empty() => v.clone(),
+        _ => "-".to_string(),
+    }
+}
+
+fn display_cycles(cycles: &Option<u64>) -> String {
+    match cycles {
+        Some(v) => v.human_count_bare().to_string(),
+        None => "-".to_string(),
+    }
+}
+
 impl Metrics {
     pub fn new(
         name: String,
@@ -126,20 +140,6 @@ impl Metrics {
             peak_memory: 0,
             bench_properties,
         }
-    }
-}
-
-fn display_string(s: &Option<String>) -> String {
-    match s {
-        Some(v) if !v.is_empty() => v.clone(),
-        _ => "-".to_string(),
-    }
-}
-
-fn display_cycles(cycles: &Option<u64>) -> String {
-    match cycles {
-        Some(v) => v.human_count_bare().to_string(),
-        None => "-".to_string(),
     }
 }
 
