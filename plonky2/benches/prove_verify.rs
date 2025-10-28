@@ -38,5 +38,6 @@ utils::define_benchmark_harness!(
         let mut buffer = Vec::new();
         buffer.write_proof(&proof.proof).unwrap();
         buffer.len()
-    }
+    },
+    |(circuit_data, _)| { circuit_data.common.num_gate_constraints }
 );

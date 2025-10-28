@@ -1,4 +1,5 @@
 use gkr_engine::MPIConfig;
+use sha256_expander_benchmark::bench::get_constraints;
 use sha256_expander_benchmark::bench::prepare;
 use sha256_expander_benchmark::bench::prove;
 use sha256_expander_benchmark::bench::verify;
@@ -39,5 +40,10 @@ utils::define_benchmark_harness!(
         );
     },
     |(circuit_bytes, _), _| { circuit_bytes.len() },
-    |proof, _shared| proof.bytes.len()
+    |proof, _shared| proof.bytes.len(),
+    |(circuit_bytes, witness_bytes), (universe, world)| get_constraints(
+        circuit_bytes,
+        witness_bytes,
+        MPIConfig::prover_new(Some(universe), Some(world))
+    )
 );

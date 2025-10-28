@@ -13,5 +13,6 @@ utils::define_benchmark_harness!(
         verify(proof, proof_scheme).unwrap();
     },
     |(_, _, circuit_path)| { preprocessing_size(circuit_path) },
-    |proof| { proof.whir_r1cs_proof.transcript.len() }
+    |proof| { proof.whir_r1cs_proof.transcript.len() },
+    |(proof_scheme, _, _)| { proof_scheme.r1cs.num_constraints() }
 );

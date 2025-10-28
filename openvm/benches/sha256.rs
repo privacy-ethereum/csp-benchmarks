@@ -18,5 +18,6 @@ utils::define_benchmark_harness!(
     verify_sha256,
     preprocessing_size,
     proof_size,
+    |_, _| 0,
     execution_cycles
 );

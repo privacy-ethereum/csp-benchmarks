@@ -1,6 +1,6 @@
 use circom::prepare;
 use circom_prover::prover::CircomProof;
-use utils::harness::ProvingSystem;
+use utils::harness::{AuditStatus, ProvingSystem};
 
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
@@ -37,7 +37,8 @@ utils::define_benchmark_harness!(
         serde_json::to_vec(proof)
             .expect("Failed to serialize proof")
             .len()
-    }
+    },
+    |(_witness_fn, _input_str, _zkey_path)| { 0 } // TODO: implement constraints size computation
 );
 
 fn sum_file_sizes_in_the_dir(file_path: &str) -> std::io::Result<usize> {

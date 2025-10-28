@@ -49,5 +49,6 @@ utils::define_benchmark_harness!(
             .expect("Failed to serialize constraint system into byte array");
         buf.len()
     },
-    |(proof, _pub_witness)| proof.len()
+    |(proof, _pub_witness)| proof.len(),
+    |(_, _, cs, _, _, _)| cs.n_and_constraints() + cs.n_mul_constraints()
 );

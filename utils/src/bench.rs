@@ -86,6 +86,7 @@ pub struct Metrics {
     pub proof_size: usize,
     #[tabled(display_with = "display_bytes")]
     pub preprocessing_size: usize,
+    pub num_constraints: usize,
     #[tabled(display_with = "display_bytes")]
     pub peak_memory: usize,
     #[serde(flatten)]
@@ -121,6 +122,7 @@ impl Metrics {
             cycles: None,
             proof_size: 0,
             preprocessing_size: 0,
+            num_constraints: 0,
             peak_memory: 0,
             bench_properties,
         }

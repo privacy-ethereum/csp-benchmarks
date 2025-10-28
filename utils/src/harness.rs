@@ -169,6 +169,7 @@ pub fn run_benchmarks_fn<
     PreparedContext,
     Proof,
     PrepareFn,
+    NumConstraintsFn,
     ProveFn,
     VerifyFn,
     PrepSizeFn,
@@ -179,6 +180,7 @@ pub fn run_benchmarks_fn<
     cfg: BenchHarnessConfig<'_>,
     properties: BenchProperties,
     mut prepare: PrepareFn,
+    mut num_constraints: NumConstraintsFn,
     mut prove: ProveFn,
     mut verify: VerifyFn,
     mut preprocessing_size: PrepSizeFn,
@@ -187,6 +189,7 @@ pub fn run_benchmarks_fn<
 ) where
     PrepareFn: FnMut(usize) -> PreparedContext + Copy,
     ProveFn: FnMut(&PreparedContext) -> Proof + Copy,
+    NumConstraintsFn: FnMut(&PreparedContext) -> usize,
     VerifyFn: FnMut(&PreparedContext, &Proof),
     PrepSizeFn: FnMut(&PreparedContext) -> usize,
     ProofSizeFn: FnMut(&Proof) -> usize,
@@ -200,6 +203,7 @@ pub fn run_benchmarks_fn<
         let mut metrics = init_metrics(&cfg, target_str, system_str, size, &properties);
         metrics.is_zkvm = execution_cycles.is_some();
         metrics.preprocessing_size = preprocessing_size(&prepared_context);
+        metrics.num_constraints = num_constraints(&prepared_context);
         let proof = prove(&prepared_context);
         metrics.proof_size = proof_size(&proof);
 
@@ -250,6 +254,7 @@ pub fn run_benchmarks_with_state_fn<
     PreparedContext,
     Proof,
     PrepareFn,
+    NumConstraintsFn,
     ProveFn,
     VerifyFn,
     PrepSizeFn,
@@ -261,6 +266,7 @@ pub fn run_benchmarks_with_state_fn<
     properties: BenchProperties,
     shared: SharedState,
     mut prepare: PrepareFn,
+    mut num_constraints: NumConstraintsFn,
     mut prove: ProveFn,
     mut verify: VerifyFn,
     mut preprocessing_size: PrepSizeFn,
@@ -268,6 +274,7 @@ pub fn run_benchmarks_with_state_fn<
     execution_cycles: Option<ExecutionCyclesFn>,
 ) where
     PrepareFn: FnMut(usize, SharedState) -> PreparedContext + Copy,
+    NumConstraintsFn: FnMut(&PreparedContext, &SharedState) -> usize,
     ProveFn: FnMut(&PreparedContext, &SharedState) -> Proof + Copy,
     VerifyFn: FnMut(&PreparedContext, &Proof, &SharedState),
     PrepSizeFn: FnMut(&PreparedContext, &SharedState) -> usize,
@@ -282,7 +289,7 @@ pub fn run_benchmarks_with_state_fn<
         let mut metrics = init_metrics(&cfg, target_str, system_str, size, &properties);
         metrics.is_zkvm = execution_cycles.is_some();
         metrics.preprocessing_size = preprocessing_size(&prepared_context, &shared);
-
+        metrics.num_constraints = num_constraints(&prepared_context, &shared);
         let proof = prove(&prepared_context, &shared);
         metrics.proof_size = proof_size(&proof, &shared);
 
@@ -377,7 +384,7 @@ fn measure_ram(
 macro_rules! __define_benchmark_harness {
     // With shared state
     ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr, { $($shared_init:tt)* },
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
+        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $num_constraints:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;
@@ -394,6 +401,7 @@ macro_rules! __define_benchmark_harness {
                 $properties,
                 &{ $($shared_init)* },
                 $prepare,
+                $num_constraints,
                 $prove,
                 $verify,
                 $prep_size,
@@ -406,7 +414,7 @@ macro_rules! __define_benchmark_harness {
     };
     // No shared state, with execution_cycles
     ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr,
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $execution_cycles:expr
+        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $num_constraints:expr, $execution_cycles:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;
@@ -422,6 +430,7 @@ macro_rules! __define_benchmark_harness {
                 cfg,
                 $properties,
                 $prepare,
+                $num_constraints,
                 $prove,
                 $verify,
                 $prep_size,
@@ -434,7 +443,7 @@ macro_rules! __define_benchmark_harness {
     };
     // With shared state and execution_cycles
     ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr, { $($shared_init:tt)* },
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $execution_cycles:expr
+        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $constraints_size:expr, $execution_cycles:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;
@@ -451,6 +460,7 @@ macro_rules! __define_benchmark_harness {
                 $properties,
                 &{ $($shared_init)* },
                 $prepare,
+                $constraints_size,
                 $prove,
                 $verify,
                 $prep_size,
@@ -463,7 +473,7 @@ macro_rules! __define_benchmark_harness {
     };
     // No shared state, no execution_cycles
     ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr,
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
+        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $num_constraints:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;
@@ -479,6 +489,7 @@ macro_rules! __define_benchmark_harness {
                 cfg,
                 $properties,
                 $prepare,
+                $num_constraints,
                 $prove,
                 $verify,
                 $prep_size,
