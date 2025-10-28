@@ -24,6 +24,13 @@ utils::define_benchmark_harness!(
         isa: None,
     },
     |input_size| { prepare(input_size) },
+    |(_witness_fn, _input_str, zkey_path)| {
+        let (_, constraint_matrices) = ark_circom::read_zkey::<_, Bn254>(&mut BufReader::new(
+            File::open(zkey_path).expect("Unable to open zkey"),
+        ))
+        .expect("Unable to read zkey");
+        constraint_matrices.num_constraints
+    },
     |(witness_fn, input_str, zkey_path)| {
         circom::prove(*witness_fn, input_str.clone(), zkey_path.clone())
     },
@@ -40,13 +47,6 @@ utils::define_benchmark_harness!(
         serde_json::to_vec(proof)
             .expect("Failed to serialize proof")
             .len()
-    },
-    |(_witness_fn, _input_str, zkey_path)| {
-        let (_, constraint_matrices) = ark_circom::read_zkey::<_, Bn254>(&mut BufReader::new(
-            File::open(zkey_path).expect("Unable to open zkey"),
-        ))
-        .expect("Unable to read zkey");
-        constraint_matrices.num_constraints
     }
 );
 

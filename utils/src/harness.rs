@@ -388,7 +388,7 @@ fn measure_ram(
 macro_rules! __define_benchmark_harness {
     // With shared state
     ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr, { $($shared_init:tt)* },
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $num_constraints:expr
+        $prepare:expr, $num_constraints:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;
@@ -418,7 +418,7 @@ macro_rules! __define_benchmark_harness {
     };
     // No shared state, with execution_cycles
     ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr,
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $num_constraints:expr, $execution_cycles:expr
+        $prepare:expr, $num_constraints:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $execution_cycles:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;
@@ -447,7 +447,7 @@ macro_rules! __define_benchmark_harness {
     };
     // With shared state and execution_cycles
     ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr, { $($shared_init:tt)* },
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $constraints_size:expr, $execution_cycles:expr
+        $prepare:expr, $num_constraints:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $execution_cycles:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;
@@ -464,7 +464,7 @@ macro_rules! __define_benchmark_harness {
                 $properties,
                 &{ $($shared_init)* },
                 $prepare,
-                $constraints_size,
+                $num_constraints,
                 $prove,
                 $verify,
                 $prep_size,
@@ -477,7 +477,7 @@ macro_rules! __define_benchmark_harness {
     };
     // No shared state, no execution_cycles
     ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr,
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $num_constraints:expr
+        $prepare:expr, $num_constraints:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;

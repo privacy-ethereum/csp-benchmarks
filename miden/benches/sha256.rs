@@ -14,10 +14,10 @@ utils::define_benchmark_harness!(
     utils::harness::BenchProperties::default(),
     { load_or_compile_program(&MidenAsm, SHA256_BENCH) },
     prepare_sha256,
+    |_, _| 0,
     prove_sha256,
     verify_sha256,
     preprocessing_size,
     proof_size,
-    |_, _| 0,
     execution_cycles
 );

@@ -14,6 +14,7 @@ utils::define_benchmark_harness!(
     "sha256_no_lookup_mem",
     utils::harness::BenchProperties::default(),
     sha256_prepare,
+    |(circuit_data, _)| { circuit_data.common.num_gate_constraints },
     |(circuit_data, pw)| { prove(circuit_data, pw.clone()) },
     |(circuit_data, _pw), proof| {
         let verifier_data = circuit_data.verifier_data();
@@ -38,6 +39,5 @@ utils::define_benchmark_harness!(
         let mut buffer = Vec::new();
         buffer.write_proof(&proof.proof).unwrap();
         buffer.len()
-    },
-    |(circuit_data, _)| { circuit_data.common.num_gate_constraints }
+    }
 );

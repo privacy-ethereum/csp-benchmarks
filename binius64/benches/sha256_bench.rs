@@ -25,6 +25,7 @@ utils::define_benchmark_harness!(
     |input_size| {
         prepare(input_size).expect("Failed to prepare sha256 circuit for prove/verify")
     },
+    |(_, _, cs, _, _, _)| { cs.n_and_constraints() + cs.n_mul_constraints() },
     |(_verifier, prover, _cs, sha256_circuit, compiled_circuit, input_size)| {
         binius64::prove::<StdDigest, StdCompression, ParallelCompressionAdaptor<StdCompression>>(
             prover,
@@ -49,6 +50,5 @@ utils::define_benchmark_harness!(
             .expect("Failed to serialize constraint system into byte array");
         buf.len()
     },
-    |(proof, _pub_witness)| proof.len(),
-    |(_, _, cs, _, _, _)| cs.n_and_constraints() + cs.n_mul_constraints()
+    |(proof, _pub_witness)| proof.len()
 );

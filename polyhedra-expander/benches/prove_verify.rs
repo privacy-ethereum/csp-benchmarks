@@ -17,6 +17,11 @@ utils::define_benchmark_harness!(
         (universe, world)
     },
     |size, _| prepare(size),
+    |(circuit_bytes, witness_bytes), (universe, world)| get_constraints(
+        circuit_bytes,
+        witness_bytes,
+        MPIConfig::prover_new(Some(universe), Some(world))
+    ),
     |(circuit_bytes, witness_bytes), (universe, world)| {
         let (_, proof) = prove(
             circuit_bytes,
@@ -40,10 +45,5 @@ utils::define_benchmark_harness!(
         );
     },
     |(circuit_bytes, _), _| { circuit_bytes.len() },
-    |proof, _shared| proof.bytes.len(),
-    |(circuit_bytes, witness_bytes), (universe, world)| get_constraints(
-        circuit_bytes,
-        witness_bytes,
-        MPIConfig::prover_new(Some(universe), Some(world))
-    )
+    |proof, _shared| proof.bytes.len()
 );
