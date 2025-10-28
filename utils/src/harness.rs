@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics};
 use crate::metadata::SHA2_INPUTS;
 use criterion::{BatchSize, Criterion};
@@ -92,13 +94,15 @@ pub enum AuditStatus {
     PartiallyAudited,
 }
 
-impl AuditStatus {
-    pub fn from_str(s: &str) -> Option<AuditStatus> {
+impl FromStr for AuditStatus {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<AuditStatus, String> {
         match s {
-            "audited" => Some(AuditStatus::Audited),
-            "not_audited" => Some(AuditStatus::NotAudited),
-            "partially_audited" => Some(AuditStatus::PartiallyAudited),
-            _ => None,
+            "audited" => Ok(AuditStatus::Audited),
+            "not_audited" => Ok(AuditStatus::NotAudited),
+            "partially_audited" => Ok(AuditStatus::PartiallyAudited),
+            _ => Err(format!("Invalid audit status: {}", s)),
         }
     }
 }

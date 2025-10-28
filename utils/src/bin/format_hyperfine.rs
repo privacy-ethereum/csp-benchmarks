@@ -5,6 +5,7 @@ use serde::Deserialize;
 use serde_json::Value;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
 use std::time::Duration;
 use utils::bench::Metrics;
 use utils::harness::{AuditStatus, BenchProperties};
