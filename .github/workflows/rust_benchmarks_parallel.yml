@@ -233,17 +233,29 @@ jobs:
         if: ${{ contains(matrix.crate, 'cairo-m') }}
         uses: ./.github/actions/install-llvm
 
+      - name: Build and copy excluded memory benchmark binary to workspace target
+        if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') }}
+        run: |
+          mkdir -p target/release
+          if [ "${{ matrix.crate }}" = "nexus" ]; then
+            cd nexus && cargo build --release --bin sha256_mem_nexus && cd ..
+            cp nexus/target/release/sha256_mem_nexus target/release/
+          elif [ "${{ matrix.crate }}" = "cairo-m" ]; then
+            cd cairo-m && cargo build --release --bin sha256_mem_cairo_m && cd ..
+            cp cairo-m/target/release/sha256_mem_cairo_m target/release/
+          fi
+
       - name: Run benches in ${{ matrix.crate }}
         run: |
           cd ${{ matrix.crate }}
           cargo bench
 
-      - name: Copy memory benchmark binaries to workspace target
+      - name: Copy excluded crates criterion results to workspace target
         if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') }}
         run: |
-          mkdir -p target/release
-          if [ -d "${{ matrix.crate }}/target/release" ]; then
-            find "${{ matrix.crate }}/target/release" -maxdepth 1 -type f -perm +111 -exec cp {} target/release/ \;
+          if [ -d "${{ matrix.crate }}/target/criterion" ]; then
+            mkdir -p target/criterion
+            cp -r ${{ matrix.crate }}/target/criterion/* target/criterion/ 2>/dev/null || true
           fi
 
       - name: Upload reports for ${{ matrix.crate }}
@@ -251,9 +263,7 @@ jobs:
         if: always()
         with:
           name: "criterion-${{ matrix.crate }}"
-          path: |
-            target/criterion
-            ${{ matrix.crate }}/target/criterion
+          path: target/criterion
           if-no-files-found: warn
           retention-days: 30
 
