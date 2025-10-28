@@ -1,5 +1,8 @@
+use std::{fs::File, io::BufReader};
+
+use ark_bn254::Bn254;
 use circom::prepare;
-use circom_prover::prover::CircomProof;
+use circom_prover::prover::{CircomProof, ark_circom};
 use utils::harness::{AuditStatus, ProvingSystem};
 
 utils::define_benchmark_harness!(
@@ -38,7 +41,13 @@ utils::define_benchmark_harness!(
             .expect("Failed to serialize proof")
             .len()
     },
-    |(_witness_fn, _input_str, _zkey_path)| { 0 } // TODO: implement constraints size computation
+    |(_witness_fn, _input_str, zkey_path)| {
+        let (_, constraint_matrices) = ark_circom::read_zkey::<_, Bn254>(&mut BufReader::new(
+            File::open(zkey_path).expect("Unable to open zkey"),
+        ))
+        .expect("Unable to read zkey");
+        constraint_matrices.num_constraints
+    }
 );
 
 fn sum_file_sizes_in_the_dir(file_path: &str) -> std::io::Result<usize> {
