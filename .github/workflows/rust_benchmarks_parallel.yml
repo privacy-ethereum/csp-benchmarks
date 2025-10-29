@@ -253,10 +253,8 @@ jobs:
       - name: Copy excluded crates criterion results to workspace target
         if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') }}
         run: |
-          if [ -d "${{ matrix.crate }}/target/criterion" ]; then
-            mkdir -p target/criterion
-            cp -r ${{ matrix.crate }}/target/criterion/* target/criterion/ 2>/dev/null || true
-          fi
+          mkdir -p target/criterion
+          cp -r ${{ matrix.crate }}/target/criterion/* target/criterion/
 
       - name: Upload reports for ${{ matrix.crate }}
         uses: actions/upload-artifact@v4
