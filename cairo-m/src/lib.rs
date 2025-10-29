@@ -99,9 +99,8 @@ pub fn prove(
 
     let pcs_config = REGULAR_96_BITS;
 
-    let proof = prove_cairo_m::<Blake2sMerkleChannel>(&mut prover_input, Some(pcs_config))
-        .expect("failed to generate proof");
-    proof
+    prove_cairo_m::<Blake2sMerkleChannel>(&mut prover_input, Some(pcs_config))
+        .expect("failed to generate proof")
 }
 
 pub fn verify(proof: &Proof<Blake2sMerkleHasher>) {

@@ -16,9 +16,9 @@ fn main() {
     let utils_metadata = workspace_root.join("polyhedra-expander/src/metadata.rs");
     let contents = fs::read_to_string(&utils_metadata).expect("read src/metadata.rs");
 
-    // Parse pub const SHA2_INPUTS: [usize; N] = [a, b, c];
+    // Always parse the full set of input sizes from const SHA2_INPUTS_FULL: [usize; N] = [a, b, c];
     let mut sizes: Vec<String> = Vec::new();
-    if let Some(id_start) = contents.find("SHA2_INPUTS") {
+    if let Some(id_start) = contents.find("SHA2_INPUTS_FULL") {
         let after_id = &contents[id_start..];
         if let Some(eq_rel) = after_id.find('=') {
             let after_eq = &after_id[eq_rel + 1..];
@@ -96,6 +96,7 @@ fn main() {
     let out_file = out_dir.join("sha256_sizes.rs");
     fs::write(&out_file, final_out).expect("write generated sha256_sizes.rs");
 
+    println!("cargo:rerun-if-env-changed=BENCH_INPUT_PROFILE");
     println!("cargo:rerun-if-changed={}", template_path.display());
     println!("cargo:rerun-if-changed={}", utils_metadata.display());
 }

@@ -90,6 +90,37 @@ pub fn prove(
     proof
 }
 
+pub fn get_constraints(
+    circuit_bytes: &[u8],
+    _witness_bytes: &[u8],
+    mpi_config: MPIConfig<'_>,
+) -> usize {
+    // Taken from Circuit::prover_load_circuit
+    let circuit_opt = if mpi_config.is_root() {
+        let rc: RecursiveCircuit<M31x1Config> =
+            RecursiveCircuit::deserialize_from(Cursor::new(circuit_bytes)).unwrap();
+        let circuit = rc.flatten();
+        Some(circuit)
+    } else {
+        None
+    };
+
+    let (mut circuit, mut window) = mpi_config.consume_obj_and_create_shared(circuit_opt);
+    circuit.pre_process_gkr();
+    // Summing all 4 kinds of constraints across all layers
+    let n_constraints = circuit
+        .layers
+        .iter()
+        .map(|layer| layer.add.len() + layer.mul.len() + layer.const_.len() + layer.uni.len())
+        .sum();
+
+    // Clean up shared memory
+    circuit.discard_control_of_shared_mem();
+    mpi_config.free_shared_mem(&mut window);
+
+    n_constraints
+}
+
 pub fn verify(
     circuit_bytes: &[u8],
     witness_bytes: &[u8],

@@ -11,6 +11,11 @@ on:
         required: false
         default: true
         type: boolean
+      include_optional:
+        description: "Include the mobile-unfriendly systems (openvm, jolt, sp1)"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   actions: write
@@ -46,9 +51,11 @@ jobs:
           set -euo pipefail
           REF='${{ steps.ref.outputs.ref }}'
           RUN_ALL='${{ github.event.inputs.run_all }}'
+          INCLUDE_OPTIONAL='${{ github.event.inputs.include_optional }}'
           gh workflow run "Rust Benchmarks (parallel)" \
             --ref "$REF" \
-            -f run_all="$RUN_ALL"
+            -f run_all="$RUN_ALL" \
+            -f include_optional="$INCLUDE_OPTIONAL"
 
       - name: Dispatch Non-Rust Benchmarks (parallel)
         env:

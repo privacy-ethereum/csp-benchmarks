@@ -5,7 +5,6 @@ use jolt::{
 use std::collections::HashMap;
 use utils::{
     harness::ProvingSystem,
-    metadata::SHA2_INPUTS,
     zkvm::{SHA256_BENCH, helpers::load_or_compile_program},
 };
 
@@ -14,9 +13,10 @@ utils::define_benchmark_harness!(
     ProvingSystem::Jolt,
     None,
     "sha256_mem_jolt",
+    utils::harness::BenchProperties::default(),
     {
         let mut programs = HashMap::new();
-        for input_size in SHA2_INPUTS {
+        for input_size in utils::metadata::selected_sha2_inputs() {
             programs.insert(
                 input_size,
                 load_or_compile_program(
@@ -28,6 +28,7 @@ utils::define_benchmark_harness!(
         programs
     },
     prepare_sha256,
+    |_, _| 0,
     prove_sha256,
     verify_sha256,
     preprocessing_size,

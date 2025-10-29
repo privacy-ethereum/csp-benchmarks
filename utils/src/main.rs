@@ -50,19 +50,19 @@ fn main() {
         Command::Sizes {
             command: SizesCommand::List,
         } => {
-            let json =
-                serde_json::to_string(&utils::metadata::SHA2_INPUTS).expect("serialize sizes");
+            let json = serde_json::to_string(&utils::metadata::selected_sha2_inputs())
+                .expect("serialize sizes");
             println!("{}", json);
         }
         Command::Sizes {
             command: SizesCommand::Len,
         } => {
-            println!("{}", utils::metadata::SHA2_INPUTS.len());
+            println!("{}", utils::metadata::selected_sha2_inputs().len());
         }
         Command::Sizes {
             command: SizesCommand::Get { index },
         } => {
-            let sizes = &utils::metadata::SHA2_INPUTS;
+            let sizes = &utils::metadata::selected_sha2_inputs();
             if let Some(size) = sizes.get(index) {
                 println!("{}", size);
             } else {

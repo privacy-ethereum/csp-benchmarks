@@ -1,5 +1,7 @@
+use crate::harness::BenchProperties;
 use human_repr::{HumanCount, HumanDuration};
 use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 use serde_with::{DurationNanoSeconds, serde_as};
 use std::{
     fmt::Display,
@@ -62,10 +64,12 @@ pub fn measure_peak_memory<R, F: FnOnce() -> R>(func: F) -> (R, usize) {
 }
 
 #[serde_as]
+#[skip_serializing_none]
 #[derive(Serialize, Deserialize, Tabled, Clone)]
 pub struct Metrics {
     pub name: String,
-    pub feat: String,
+    #[tabled(display_with = "display_string")]
+    pub feat: Option<String>,
     pub is_zkvm: bool,
     pub target: String,
     #[tabled(display_with = "display_bytes")]
@@ -77,29 +81,50 @@ pub struct Metrics {
     #[tabled(display_with = "display_duration")]
     pub verify_duration: Duration,
     #[tabled(display_with = "display_cycles")]
-    pub cycles: u64,
+    pub cycles: Option<u64>,
     #[tabled(display_with = "display_bytes")]
     pub proof_size: usize,
     #[tabled(display_with = "display_bytes")]
     pub preprocessing_size: usize,
+    pub num_constraints: usize,
     #[tabled(display_with = "display_bytes")]
     pub peak_memory: usize,
+    #[serde(flatten)]
+    #[tabled(skip)]
+    pub bench_properties: BenchProperties,
 }
 
 fn display_bytes(bytes: &usize) -> String {
     bytes.human_count_bytes().to_string()
 }
 
-fn display_cycles(cycles: &u64) -> String {
-    cycles.human_count_bare().to_string()
-}
-
 fn display_duration(duration: &Duration) -> String {
     duration.human_duration().to_string()
 }
 
+fn display_string(s: &Option<String>) -> String {
+    match s {
+        Some(v) if !v.is_empty() => v.clone(),
+        _ => "-".to_string(),
+    }
+}
+
+fn display_cycles(cycles: &Option<u64>) -> String {
+    match cycles {
+        Some(v) => v.human_count_bare().to_string(),
+        None => "-".to_string(),
+    }
+}
+
 impl Metrics {
-    pub fn new(name: String, feat: String, is_zkvm: bool, target: String, size: usize) -> Self {
+    pub fn new(
+        name: String,
+        feat: Option<String>,
+        is_zkvm: bool,
+        target: String,
+        size: usize,
+        bench_properties: BenchProperties,
+    ) -> Self {
         Metrics {
             name,
             feat,
@@ -108,10 +133,12 @@ impl Metrics {
             input_size: size,
             proof_duration: Duration::default(),
             verify_duration: Duration::default(),
-            cycles: 0,
+            cycles: None,
             proof_size: 0,
             preprocessing_size: 0,
+            num_constraints: 0,
             peak_memory: 0,
+            bench_properties,
         }
     }
 }
