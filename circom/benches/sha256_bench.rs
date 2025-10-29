@@ -1,13 +1,36 @@
+use std::{fs::File, io::BufReader};
+
+use ark_bn254::Bn254;
 use circom::prepare;
-use circom_prover::prover::CircomProof;
-use utils::harness::ProvingSystem;
+use circom_prover::prover::{CircomProof, ark_circom};
+use utils::harness::{AuditStatus, ProvingSystem};
 
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
     ProvingSystem::Circom,
     None,
     "sha256_mem_circom",
+    utils::harness::BenchProperties {
+        proving_system: Some("Groth16".to_string()),
+        field_curve: Some("Bn254".to_string()),
+        iop: Some("Groth16".to_string()),
+        pcs: None,
+        arithm: Some("R1CS".to_string()),
+        is_zk: Some(true),
+        security_bits: Some(128),
+        is_pq: Some(false),
+        is_maintained: Some(true),
+        is_audited: Some(AuditStatus::PartiallyAudited),
+        isa: None,
+    },
     |input_size| { prepare(input_size) },
+    |(_witness_fn, _input_str, zkey_path)| {
+        let (_, constraint_matrices) = ark_circom::read_zkey::<_, Bn254>(&mut BufReader::new(
+            File::open(zkey_path).expect("Unable to open zkey"),
+        ))
+        .expect("Unable to read zkey");
+        constraint_matrices.num_constraints
+    },
     |(witness_fn, input_str, zkey_path)| {
         circom::prove(*witness_fn, input_str.clone(), zkey_path.clone())
     },

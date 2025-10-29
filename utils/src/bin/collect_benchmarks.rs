@@ -68,17 +68,16 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<(Metrics,
     let target = &metrics.target;
     let input_size = metrics.input_size;
     let proving_system = &metrics.name;
-    let feat = &metrics.feat;
+    let feat = metrics.feat.as_deref();
 
     if metrics.proof_duration.is_zero() {
-        let crit_path_p = if feat.is_empty() {
-            dir.parent().unwrap().join(format!(
+        let crit_path_p = match feat {
+            Some(f) if !f.is_empty() => dir.parent().unwrap().join(format!(
+                "target/criterion/{target}_{input_size}_{proving_system}_{f}/{target}_{input_size}_{proving_system}_{f}_prove/new/estimates.json"
+            )),
+            _ => dir.parent().unwrap().join(format!(
                 "target/criterion/{target}_{input_size}_{proving_system}/{target}_{input_size}_{proving_system}_prove/new/estimates.json"
-            ))
-        } else {
-            dir.parent().unwrap().join(format!(
-                "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_prove/new/estimates.json"
-            ))
+            )),
         };
         if crit_path_p.exists() {
             println!("Reading proof duration from {}", crit_path_p.display());
@@ -120,14 +119,13 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<(Metrics,
     }
 
     if metrics.verify_duration.is_zero() {
-        let crit_path_v = if feat.is_empty() {
-            dir.parent().unwrap().join(format!(
+        let crit_path_v = match feat {
+            Some(f) if !f.is_empty() => dir.parent().unwrap().join(format!(
+                "target/criterion/{target}_{input_size}_{proving_system}_{f}/{target}_{input_size}_{proving_system}_{f}_verify/new/estimates.json"
+            )),
+            _ => dir.parent().unwrap().join(format!(
                 "target/criterion/{target}_{input_size}_{proving_system}/{target}_{input_size}_{proving_system}_verify/new/estimates.json"
-            ))
-        } else {
-            dir.parent().unwrap().join(format!(
-                "target/criterion/{target}_{input_size}_{proving_system}_{feat}/{target}_{input_size}_{proving_system}_{feat}_verify/new/estimates.json"
-            ))
+            )),
         };
         if crit_path_v.exists() {
             println!("Reading verify duration from {}", crit_path_v.display());
@@ -170,14 +168,13 @@ fn extract_metrics(dir: &Path, metrics_file_path: &Path) -> io::Result<(Metrics,
     }
 
     if metrics.peak_memory == 0 {
-        let mem_path = if feat.is_empty() {
-            dir.join(format!(
+        let mem_path = match feat {
+            Some(f) if !f.is_empty() => dir.join(format!(
+                "{target}_{input_size}_{proving_system}_{f}_mem_report.json"
+            )),
+            _ => dir.join(format!(
                 "{target}_{input_size}_{proving_system}_mem_report.json"
-            ))
-        } else {
-            dir.join(format!(
-                "{target}_{input_size}_{proving_system}_{feat}_mem_report.json"
-            ))
+            )),
         };
         if mem_path.exists() {
             println!("Reading peak memory from {}", mem_path.display());

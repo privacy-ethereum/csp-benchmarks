@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics};
 use crate::metadata::selected_sha2_inputs;
 use criterion::{BatchSize, Criterion};
@@ -75,9 +77,58 @@ pub struct BenchHarnessConfig<'a> {
     pub target: BenchTarget,
     pub system: ProvingSystem,
     pub feature: Option<&'a str>,
-    pub is_zkvm: bool,
     pub fixed_input_size: Option<usize>,
     pub mem_binary_name: &'a str,
+}
+
+use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum AuditStatus {
+    #[serde(rename = "audited")]
+    Audited,
+    #[serde(rename = "not_audited")]
+    NotAudited,
+    #[serde(rename = "partially_audited")]
+    PartiallyAudited,
+}
+
+impl FromStr for AuditStatus {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<AuditStatus, String> {
+        match s {
+            "audited" => Ok(AuditStatus::Audited),
+            "not_audited" => Ok(AuditStatus::NotAudited),
+            "partially_audited" => Ok(AuditStatus::PartiallyAudited),
+            _ => Err(format!("Invalid audit status: {}", s)),
+        }
+    }
+}
+
+#[skip_serializing_none]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BenchProperties {
+    // Classification
+    pub proving_system: Option<String>,
+    pub field_curve: Option<String>,
+    pub iop: Option<String>,
+    pub pcs: Option<String>,
+    pub arithm: Option<String>,
+    pub is_zk: Option<bool>,
+
+    // Security
+    pub security_bits: Option<u64>,
+    pub is_pq: Option<bool>,
+
+    // Maintenance / audit / zk
+    pub is_maintained: Option<bool>,
+    pub is_audited: Option<AuditStatus>,
+
+    // zkVM specifics
+    pub isa: Option<String>,
 }
 
 fn feat_suffix(feat: Option<&str>) -> String {
@@ -122,6 +173,7 @@ pub fn run_benchmarks_fn<
     PreparedContext,
     Proof,
     PrepareFn,
+    NumConstraintsFn,
     ProveFn,
     VerifyFn,
     PrepSizeFn,
@@ -130,7 +182,9 @@ pub fn run_benchmarks_fn<
 >(
     c: &mut Criterion,
     cfg: BenchHarnessConfig<'_>,
+    properties: BenchProperties,
     mut prepare: PrepareFn,
+    mut num_constraints: NumConstraintsFn,
     mut prove: ProveFn,
     mut verify: VerifyFn,
     mut preprocessing_size: PrepSizeFn,
@@ -139,6 +193,7 @@ pub fn run_benchmarks_fn<
 ) where
     PrepareFn: FnMut(usize) -> PreparedContext + Copy,
     ProveFn: FnMut(&PreparedContext) -> Proof + Copy,
+    NumConstraintsFn: FnMut(&PreparedContext) -> usize,
     VerifyFn: FnMut(&PreparedContext, &Proof),
     PrepSizeFn: FnMut(&PreparedContext) -> usize,
     ProofSizeFn: FnMut(&Proof) -> usize,
@@ -149,13 +204,16 @@ pub fn run_benchmarks_fn<
     for size in input_sizes_for(cfg.target, cfg.fixed_input_size) {
         let prepared_context = prepare(size);
 
-        let mut metrics = init_metrics(&cfg, target_str, system_str, size);
+        let mut metrics = init_metrics(&cfg, target_str, system_str, size, &properties);
+        metrics.is_zkvm = execution_cycles.is_some();
         metrics.preprocessing_size = preprocessing_size(&prepared_context);
+        metrics.num_constraints = num_constraints(&prepared_context);
         let proof = prove(&prepared_context);
         metrics.proof_size = proof_size(&proof);
 
         if let Some(ref cycles_fn) = execution_cycles {
-            metrics.cycles = cycles_fn(&prepared_context);
+            let c = cycles_fn(&prepared_context);
+            metrics.cycles = if c == 0 { None } else { Some(c) };
         }
 
         write_json_metrics(target_str, size, system_str, cfg.feature, &metrics);
@@ -200,6 +258,7 @@ pub fn run_benchmarks_with_state_fn<
     PreparedContext,
     Proof,
     PrepareFn,
+    NumConstraintsFn,
     ProveFn,
     VerifyFn,
     PrepSizeFn,
@@ -208,8 +267,10 @@ pub fn run_benchmarks_with_state_fn<
 >(
     c: &mut Criterion,
     cfg: BenchHarnessConfig<'_>,
+    properties: BenchProperties,
     shared: SharedState,
     mut prepare: PrepareFn,
+    mut num_constraints: NumConstraintsFn,
     mut prove: ProveFn,
     mut verify: VerifyFn,
     mut preprocessing_size: PrepSizeFn,
@@ -217,6 +278,7 @@ pub fn run_benchmarks_with_state_fn<
     execution_cycles: Option<ExecutionCyclesFn>,
 ) where
     PrepareFn: FnMut(usize, SharedState) -> PreparedContext + Copy,
+    NumConstraintsFn: FnMut(&PreparedContext, &SharedState) -> usize,
     ProveFn: FnMut(&PreparedContext, &SharedState) -> Proof + Copy,
     VerifyFn: FnMut(&PreparedContext, &Proof, &SharedState),
     PrepSizeFn: FnMut(&PreparedContext, &SharedState) -> usize,
@@ -228,14 +290,16 @@ pub fn run_benchmarks_with_state_fn<
     for size in input_sizes_for(cfg.target, cfg.fixed_input_size) {
         let prepared_context = prepare(size, shared);
 
-        let mut metrics = init_metrics(&cfg, target_str, system_str, size);
+        let mut metrics = init_metrics(&cfg, target_str, system_str, size, &properties);
+        metrics.is_zkvm = execution_cycles.is_some();
         metrics.preprocessing_size = preprocessing_size(&prepared_context, &shared);
-
+        metrics.num_constraints = num_constraints(&prepared_context, &shared);
         let proof = prove(&prepared_context, &shared);
         metrics.proof_size = proof_size(&proof, &shared);
 
         if let Some(ref cycles_fn) = execution_cycles {
-            metrics.cycles = cycles_fn(&prepared_context);
+            let c = cycles_fn(&prepared_context);
+            metrics.cycles = if c == 0 { None } else { Some(c) };
         }
 
         write_json_metrics(target_str, size, system_str, cfg.feature, &metrics);
@@ -292,13 +356,18 @@ fn init_metrics(
     target_str: &'static str,
     system_str: &'static str,
     size: usize,
+    properties: &BenchProperties,
 ) -> Metrics {
     Metrics::new(
         system_str.to_string(),
-        cfg.feature.unwrap_or("").to_string(),
-        cfg.is_zkvm,
+        match cfg.feature {
+            Some(f) if !f.is_empty() => Some(f.to_string()),
+            _ => None,
+        },
+        false,
         target_str.to_string(),
         size,
+        properties.clone(),
     )
 }
 
@@ -318,8 +387,8 @@ fn measure_ram(
 #[macro_export]
 macro_rules! __define_benchmark_harness {
     // With shared state
-    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, { $($shared_init:tt)* },
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
+    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr, { $($shared_init:tt)* },
+        $prepare:expr, $num_constraints:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;
@@ -329,13 +398,14 @@ macro_rules! __define_benchmark_harness {
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
                 fixed_input_size: None,
-                is_zkvm: system.is_zkvm(),
             };
             ::utils::harness::run_benchmarks_with_state_fn(
                 c,
                 cfg,
+                $properties,
                 &{ $($shared_init)* },
                 $prepare,
+                $num_constraints,
                 $prove,
                 $verify,
                 $prep_size,
@@ -346,9 +416,9 @@ macro_rules! __define_benchmark_harness {
         ::criterion::criterion_group!($public_group_ident, criterion_benchmarks);
         ::criterion::criterion_main!($public_group_ident);
     };
-    // With execution_cycles
-    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr,
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $execution_cycles:expr
+    // No shared state, with execution_cycles
+    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr,
+        $prepare:expr, $num_constraints:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $execution_cycles:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;
@@ -358,12 +428,13 @@ macro_rules! __define_benchmark_harness {
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
                 fixed_input_size: None,
-                is_zkvm: system.is_zkvm(),
             };
             ::utils::harness::run_benchmarks_fn(
                 c,
                 cfg,
+                $properties,
                 $prepare,
+                $num_constraints,
                 $prove,
                 $verify,
                 $prep_size,
@@ -374,8 +445,9 @@ macro_rules! __define_benchmark_harness {
         ::criterion::criterion_group!($public_group_ident, criterion_benchmarks);
         ::criterion::criterion_main!($public_group_ident);
     };
-    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, { $($shared_init:tt)* },
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $execution_cycles:expr
+    // With shared state and execution_cycles
+    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr, { $($shared_init:tt)* },
+        $prepare:expr, $num_constraints:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr, $execution_cycles:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;
@@ -385,13 +457,14 @@ macro_rules! __define_benchmark_harness {
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
                 fixed_input_size: None,
-                is_zkvm: system.is_zkvm(),
             };
             ::utils::harness::run_benchmarks_with_state_fn(
                 c,
                 cfg,
+                $properties,
                 &{ $($shared_init)* },
                 $prepare,
+                $num_constraints,
                 $prove,
                 $verify,
                 $prep_size,
@@ -402,9 +475,9 @@ macro_rules! __define_benchmark_harness {
         ::criterion::criterion_group!($public_group_ident, criterion_benchmarks);
         ::criterion::criterion_main!($public_group_ident);
     };
-    // With shared state - old syntax fallback (6 params)
-    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, { $($shared_init:tt)* },
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
+    // No shared state, no execution_cycles
+    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr, $properties:expr,
+        $prepare:expr, $num_constraints:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
     ) => {
         fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
             let system = $system;
@@ -414,41 +487,13 @@ macro_rules! __define_benchmark_harness {
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
                 fixed_input_size: None,
-                is_zkvm: system.is_zkvm(),
-            };
-            ::utils::harness::run_benchmarks_with_state_fn(
-                c,
-                cfg,
-                &{ $($shared_init)* },
-                $prepare,
-                $prove,
-                $verify,
-                $prep_size,
-                $proof_size,
-                None::<fn(&_) -> u64>,
-            );
-        }
-        ::criterion::criterion_group!($public_group_ident, criterion_benchmarks);
-        ::criterion::criterion_main!($public_group_ident);
-    };
-    // Without execution_cycles
-    ($public_group_ident:ident, $target:expr, $system:expr, $feature:expr, $mem_binary_name:expr,
-        $prepare:expr, $prove:expr, $verify:expr, $prep_size:expr, $proof_size:expr
-    ) => {
-        fn criterion_benchmarks(c: &mut ::criterion::Criterion) {
-            let system = $system;
-            let cfg = ::utils::harness::BenchHarnessConfig {
-                target: $target,
-                system,
-                feature: $feature,
-                mem_binary_name: $mem_binary_name,
-                fixed_input_size: None,
-                is_zkvm: system.is_zkvm(),
             };
             ::utils::harness::run_benchmarks_fn(
                 c,
                 cfg,
+                $properties,
                 $prepare,
+                $num_constraints,
                 $prove,
                 $verify,
                 $prep_size,

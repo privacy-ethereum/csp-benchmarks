@@ -13,6 +13,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::Jolt,
     None,
     "sha256_mem_jolt",
+    utils::harness::BenchProperties::default(),
     {
         let mut programs = HashMap::new();
         for input_size in utils::metadata::selected_sha2_inputs() {
@@ -27,6 +28,7 @@ utils::define_benchmark_harness!(
         programs
     },
     prepare_sha256,
+    |_, _| 0,
     prove_sha256,
     verify_sha256,
     preprocessing_size,
