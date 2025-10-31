@@ -2,4 +2,5 @@
 members = [
     "hash/sha256-provekit/noir-native-sha256",
     "hash/sha256-provekit/sha256_var_input",
+    "ecdsa/p256_bigcurve",
 ]

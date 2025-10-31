@@ -20,6 +20,7 @@ regex = "1"
 criterion = { version = "0.5", default-features = false }
 bincode = { workspace = true }
 ere-zkvm-interface = { workspace = true }
+p256 = "0.13.2"
 
 [[bin]]
 name = "collect_benchmarks"

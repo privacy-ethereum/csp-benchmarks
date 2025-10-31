@@ -17,6 +17,14 @@ provekit-verifier = { git = "https://github.com/worldfnd/ProveKit", rev = "d7dee
 name = "sha256_mem_provekit"
 path = "src/bin/sha256_mem.rs"
 
+[[bin]]
+name = "ecdsa_mem_provekit"
+path = "src/bin/ecdsa_mem.rs"
+
 [[bench]]
-name = "prove_verify"
+name = "sha256"
+harness = false
+
+[[bench]]
+name = "ecdsa"
 harness = false
