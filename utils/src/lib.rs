@@ -36,6 +36,7 @@ pub fn generate_sha256_input(input_size: usize) -> (Vec<u8>, Vec<u8>) {
 }
 
 /// Generate a random secp256r1 keypair and sign a sha256 32-byte hash of a 128-byte random message.
+#[allow(clippy::type_complexity)] // Allowing the return type to be "complex" for the consumers to not need to import the p256 crate
 pub fn generate_ecdsa_input() -> (Vec<u8>, (Vec<u8>, Vec<u8>), Vec<u8>) {
     let mut rng = StdRng::seed_from_u64(0xecd5a);
     let signing_key = SigningKey::random(&mut rng);
