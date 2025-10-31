@@ -10,10 +10,10 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_cairo_m",
     BenchProperties {
-        proving_system: Some("stwo/CSTARK/CircleSTARK".to_string()), // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#welcome-to-cairo-m
+        proving_system: Some("Circle STARK".to_string()), // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#welcome-to-cairo-m
         field_curve: Some("M31".to_string()), // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#welcome-to-cairo-m
-        iop: Some("circle IOPP".to_string()), // https://eprint.iacr.org/2024/278.pdf
-        pcs: Some("circle FRI".to_string()), // https://eprint.iacr.org/2024/278.pdf
+        iop: Some("Circle-FRI".to_string()), // https://eprint.iacr.org/2024/278.pdf
+        pcs: Some("Circle-FRI".to_string()), // https://eprint.iacr.org/2024/278.pdf
         arithm: Some("AIR".to_string()),
         is_zk: Some(false),
         security_bits: Some(96), // https://github.com/kkrt-labs/cairo-m/blob/main/crates/prover/src/prover_config.rs#L13-L20
