@@ -20,7 +20,7 @@ utils::define_benchmark_harness!(
         is_pq: Some(true),       // hash-based PCS
         is_maintained: Some(true), // https://github.com/kkrt-labs
         is_audited: Some(AuditStatus::NotAudited), // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about
-        isa: None,
+        isa: Some("Cairo ISA".to_string()), // https://github.com/kkrt-labs/cairo-m/blob/main/docs/design.md
     },
     |input_size| { prepare(input_size) },
     |_| 0,
