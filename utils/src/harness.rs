@@ -425,7 +425,6 @@ macro_rules! __define_benchmark_harness {
                 system,
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
-                fixed_input_size: None,
             };
             ::utils::harness::run_benchmarks_fn(
                 c,
