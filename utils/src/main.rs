@@ -13,10 +13,13 @@ struct Cli {
 enum Command {
     /// Generate inputs for sha256: prints hex-encoded message bytes then hex digest
     Sha256 {
-        /// Input size in bytes (default 15 to match existing non-Rust example)
-        #[arg(long, short = 'n', default_value_t = 15)]
+        /// Input size in bytes (default 128)
+        #[arg(long, short = 'n', default_value_t = 128)]
         size: usize,
     },
+
+    /// Generate inputs for ecdsa: prints hex-encoded hashed message, public key, and signature
+    Ecdsa,
 
     /// Query available sha256 input sizes from metadata
     Sizes {
@@ -46,6 +49,13 @@ fn main() {
             let (message_bytes, digest) = utils::generate_sha256_input(size);
             println!("{}", message_bytes.encode_hex::<String>());
             println!("{}", digest.encode_hex::<String>());
+        }
+        Command::Ecdsa => {
+            let (digest, (pub_key_x, pub_key_y), signature) = utils::generate_ecdsa_input();
+            println!("{}", digest.encode_hex::<String>());
+            println!("{}", pub_key_x.encode_hex::<String>());
+            println!("{}", pub_key_y.encode_hex::<String>());
+            println!("{}", signature.encode_hex::<String>());
         }
         Command::Sizes {
             command: SizesCommand::List,
