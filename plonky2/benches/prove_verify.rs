@@ -20,7 +20,7 @@ utils::define_benchmark_harness!(
         arithm: Some("Plonkish".to_string()), // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
         is_zk: Some(true), // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
         security_bits: Some(100), // https://github.com/0xPolygonZero/plonky2?tab=readme-ov-file#security
-        is_pq: Some(true),       // hash-based PCS
+        is_pq: Some(true),        // hash-based PCS
         is_maintained: Some(false), // deprecated: https://github.com/0xPolygonZero/plonky2?tab=readme-ov-file#%EF%B8%8F-plonky2-deprecation-notice
         is_audited: Some(AuditStatus::Audited), // https://github.com/0xPolygonZero/plonky2/tree/main/audits
         isa: None,
