@@ -45,7 +45,11 @@ pub fn prepare(input_size: usize) -> (WitnessFn, String, String) {
     let input_str = serde_json::to_string(&inputs).unwrap();
 
     // Prepare zkey path
-    let zkey_path = format!("./circuits/sha256/sha256_{input_size}/sha256_{input_size}_0001.zkey");
+    let current_dir = std::env::current_dir().expect("Failed to get current directory");
+    let zkey_path = format!(
+        "{}/circuits/sha256/sha256_{input_size}/sha256_{input_size}_0001.zkey",
+        current_dir.as_path().to_str().unwrap()
+    );
 
     (witness_fn, input_str, zkey_path)
 }
