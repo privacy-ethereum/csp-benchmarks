@@ -118,6 +118,13 @@ For `barretenberg` with the `sha256` target, there is an extra script:
 
 The root `./benchmark.sh` will invoke them in a fixed way via `hyperfine` and our helper scripts. Your scripts should follow the APIs below.
 
+### 4) Add metadata to `bench_props.json`
+
+- Each non-Rust benchmark folder MUST contain a `bench_props.json` file at its root. The root `benchmark.sh` will error out if this file is missing.
+- The file should contain the metadata for the benchmark.
+- You can copy the field structure from the example at `ligetron/bench_props.json`.
+- The full list of supported fields and their semantics is defined by `BenchProperties` in `utils/src/harness.rs`.
+
 #### API: `[target]_prepare.sh`
 
 - Required environment variables:
