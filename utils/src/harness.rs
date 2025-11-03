@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::str::FromStr;
 
 use crate::bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics};
@@ -112,11 +113,11 @@ impl FromStr for AuditStatus {
 #[serde(deny_unknown_fields)]
 pub struct BenchProperties {
     // Classification
-    pub proving_system: Option<String>,
-    pub field_curve: Option<String>,
-    pub iop: Option<String>,
-    pub pcs: Option<String>,
-    pub arithm: Option<String>,
+    pub proving_system: Option<Cow<'static, str>>,
+    pub field_curve: Option<Cow<'static, str>>,
+    pub iop: Option<Cow<'static, str>>,
+    pub pcs: Option<Cow<'static, str>>,
+    pub arithm: Option<Cow<'static, str>>,
     pub is_zk: Option<bool>,
 
     // Security
@@ -128,7 +129,52 @@ pub struct BenchProperties {
     pub is_audited: Option<AuditStatus>,
 
     // zkVM specifics
-    pub isa: Option<String>,
+    pub isa: Option<Cow<'static, str>>,
+}
+
+impl BenchProperties {
+    #[allow(clippy::too_many_arguments)]
+    /// Create a new BenchProperties struct.
+    /// # Arguments
+    /// * `proving_system` - The proving system name.
+    /// * `field_curve` - The finite field or curve used by the system.
+    /// * `iop` - The IOP used by the system.
+    /// * `pcs` - The PCS used by the system (if applicable).
+    /// * `arithm` - The arithmetization used by the system.
+    /// * `is_zk` - Whether the system is a zkVM.
+    /// * `security_bits` - The security (soundness) parameter of the system.
+    /// * `is_pq` - Whether the system is post-quantum-sound.
+    /// * `is_maintained` - Whether the system codebase is maintained.
+    /// * `is_audited` - The audit status of the system.
+    /// * `isa` - The instruction set architecture of the system (for zkVMs).
+    pub fn new(
+        proving_system: &'static str,
+        field_curve: &'static str,
+        iop: &'static str,
+        pcs: Option<&'static str>,
+        arithm: &'static str,
+        is_zk: bool,
+        security_bits: u64,
+        is_pq: bool,
+        is_maintained: bool,
+        is_audited: AuditStatus,
+        isa: Option<&'static str>,
+    ) -> Self {
+        // Serde deserialization default implementation does not allow static strings, so we need to convert them to Cow::Borrowed.
+        Self {
+            proving_system: Some(Cow::Borrowed(proving_system)),
+            field_curve: Some(Cow::Borrowed(field_curve)),
+            iop: Some(Cow::Borrowed(iop)),
+            pcs: pcs.map(Cow::Borrowed),
+            arithm: Some(Cow::Borrowed(arithm)),
+            is_zk: Some(is_zk),
+            security_bits: Some(security_bits),
+            is_pq: Some(is_pq),
+            is_maintained: Some(is_maintained),
+            is_audited: Some(is_audited),
+            isa: isa.map(Cow::Borrowed),
+        }
+    }
 }
 
 fn feat_suffix(feat: Option<&str>) -> String {

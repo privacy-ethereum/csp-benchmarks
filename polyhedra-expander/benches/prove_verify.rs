@@ -10,19 +10,19 @@ utils::define_benchmark_harness!(
     ProvingSystem::Expander,
     None,
     "sha256_mem_expander",
-    utils::harness::BenchProperties {
-        proving_system: Some("Libra".to_string()),
-        field_curve: Some("M31".to_string()), // See ./polyhedra-expander/src/bench.rs
-        iop: Some("GKR".to_string()),         // https://eprint.iacr.org/2019/317
-        pcs: Some("Orion".to_string()),       // See ./polyhedra-expander/src/bench.rs
-        arithm: Some("M31".to_string()),      // See ./polyhedra-expander/src/bench.rs
-        is_zk: Some(false),
-        security_bits: Some(128), // https://github.com/PolyhedraZK/Expander/blob/main/poly_commit/src/lib.rs#L6
-        is_pq: Some(true),        // Hash-based PCS (https://eprint.iacr.org/2022/1010.pdf)
-        is_maintained: Some(true),
-        is_audited: Some(AuditStatus::NotAudited),
-        isa: None,
-    },
+    utils::harness::BenchProperties::new(
+        "Libra",
+        "M31",         // See ./polyhedra-expander/src/bench.rs
+        "GKR",         // https://eprint.iacr.org/2019/317
+        Some("Orion"), // See ./polyhedra-expander/src/bench.rs
+        "M31",         // See ./polyhedra-expander/src/bench.rs
+        false,
+        128,  // https://github.com/PolyhedraZK/Expander/blob/main/poly_commit/src/lib.rs#L6
+        true, // Hash-based PCS (https://eprint.iacr.org/2022/1010.pdf)
+        true,
+        AuditStatus::NotAudited,
+        None,
+    ),
     {
         let universe = MPIConfig::init().expect("Failed to initialize MPI");
         let world = universe.world();

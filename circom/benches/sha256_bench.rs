@@ -10,19 +10,19 @@ utils::define_benchmark_harness!(
     ProvingSystem::Circom,
     None,
     "sha256_mem_circom",
-    utils::harness::BenchProperties {
-        proving_system: Some("Groth16".to_string()),
-        field_curve: Some("Bn254".to_string()),
-        iop: Some("Groth16".to_string()),
-        pcs: None,
-        arithm: Some("R1CS".to_string()),
-        is_zk: Some(true),
-        security_bits: Some(128),
-        is_pq: Some(false),
-        is_maintained: Some(true),
-        is_audited: Some(AuditStatus::PartiallyAudited),
-        isa: None,
-    },
+    utils::harness::BenchProperties::new(
+        "Groth16",
+        "Bn254",
+        "Groth16",
+        None,
+        "R1CS",
+        true,
+        128, // Bn254 curve
+        false,
+        true,
+        AuditStatus::PartiallyAudited, // e.g., https://veridise.com/wp-content/uploads/2023/02/VAR-circom-bigint.pdf
+        None,
+    ),
     |input_size| { prepare(input_size) },
     |(_witness_fn, _input_str, zkey_path)| {
         let (_, constraint_matrices) = ark_circom::read_zkey::<_, Bn254>(&mut BufReader::new(
