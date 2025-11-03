@@ -15,7 +15,7 @@ utils::define_benchmark_harness!(
         "M31",         // See ./polyhedra-expander/src/bench.rs
         "GKR",         // https://eprint.iacr.org/2019/317
         Some("Orion"), // See ./polyhedra-expander/src/bench.rs
-        "M31",         // See ./polyhedra-expander/src/bench.rs
+        "GKR",         // https://eprint.iacr.org/2019/317
         false,
         128,  // https://github.com/PolyhedraZK/Expander/blob/main/poly_commit/src/lib.rs#L6
         true, // Hash-based PCS (https://eprint.iacr.org/2022/1010.pdf)
