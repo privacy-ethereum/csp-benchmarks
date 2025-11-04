@@ -6,7 +6,19 @@ utils::define_benchmark_harness!(
     ProvingSystem::Provekit,
     None,
     "sha256_mem_provekit",
-    utils::harness::BenchProperties::default(),
+    BenchProperties::new(
+        "Spartan+WHIR", // https://hackmd.io/@clientsideproving/whir-based
+        "Bn254",        // https://hackmd.io/@clientsideproving/whir-based
+        "Spartan",      // https://hackmd.io/@clientsideproving/whir-based
+        Some("WHIR"),   // https://hackmd.io/@clientsideproving/whir-based
+        "R1CS",
+        false,
+        100,
+        true, // hash-based PCS
+        true, // https://github.com/worldfnd
+        AuditStatus::NotAudited,
+        None
+    ),
     prepare_sha256,
     |(proof_scheme, _, _)| { proof_scheme.r1cs.num_constraints() },
     |(proof_scheme, toml_path, _)| { prove(proof_scheme, toml_path) },
