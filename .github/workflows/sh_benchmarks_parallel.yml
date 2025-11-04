@@ -36,6 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          lfs: true
 
       - name: Determine base‑remote and fetch it
         id: base
@@ -104,6 +105,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+          lfs: true
 
       - name: Update bash under macOS for mapfile
         run: |
