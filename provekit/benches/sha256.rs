@@ -1,5 +1,5 @@
 use provekit::{prepare_sha256, preprocessing_size, prove, verify};
-use utils::harness::ProvingSystem;
+use utils::harness::{AuditStatus, BenchProperties, ProvingSystem};
 
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
