@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::str::FromStr;
 
 use crate::bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics};
@@ -77,7 +78,6 @@ pub struct BenchHarnessConfig<'a> {
     pub target: BenchTarget,
     pub system: ProvingSystem,
     pub feature: Option<&'a str>,
-    pub fixed_input_size: Option<usize>,
     pub mem_binary_name: &'a str,
 }
 
@@ -112,11 +112,11 @@ impl FromStr for AuditStatus {
 #[serde(deny_unknown_fields)]
 pub struct BenchProperties {
     // Classification
-    pub proving_system: Option<String>,
-    pub field_curve: Option<String>,
-    pub iop: Option<String>,
-    pub pcs: Option<String>,
-    pub arithm: Option<String>,
+    pub proving_system: Option<Cow<'static, str>>,
+    pub field_curve: Option<Cow<'static, str>>,
+    pub iop: Option<Cow<'static, str>>,
+    pub pcs: Option<Cow<'static, str>>,
+    pub arithm: Option<Cow<'static, str>>,
     pub is_zk: Option<bool>,
 
     // Security
@@ -128,7 +128,52 @@ pub struct BenchProperties {
     pub is_audited: Option<AuditStatus>,
 
     // zkVM specifics
-    pub isa: Option<String>,
+    pub isa: Option<Cow<'static, str>>,
+}
+
+impl BenchProperties {
+    #[allow(clippy::too_many_arguments)]
+    /// Create a new BenchProperties struct.
+    /// # Arguments
+    /// * `proving_system` - The proving system name.
+    /// * `field_curve` - The finite field or curve used by the system.
+    /// * `iop` - The IOP used by the system.
+    /// * `pcs` - The PCS used by the system (if applicable).
+    /// * `arithm` - The arithmetization used by the system.
+    /// * `is_zk` - Whether the system is a zkVM.
+    /// * `security_bits` - The security (soundness) parameter of the system.
+    /// * `is_pq` - Whether the system is post-quantum-sound.
+    /// * `is_maintained` - Whether the system codebase is maintained.
+    /// * `is_audited` - The audit status of the system.
+    /// * `isa` - The instruction set architecture of the system (for zkVMs).
+    pub fn new(
+        proving_system: &'static str,
+        field_curve: &'static str,
+        iop: &'static str,
+        pcs: Option<&'static str>,
+        arithm: &'static str,
+        is_zk: bool,
+        security_bits: u64,
+        is_pq: bool,
+        is_maintained: bool,
+        is_audited: AuditStatus,
+        isa: Option<&'static str>,
+    ) -> Self {
+        // Serde deserialization default implementation does not allow static strings, so we need to convert them to Cow::Borrowed.
+        Self {
+            proving_system: Some(Cow::Borrowed(proving_system)),
+            field_curve: Some(Cow::Borrowed(field_curve)),
+            iop: Some(Cow::Borrowed(iop)),
+            pcs: pcs.map(Cow::Borrowed),
+            arithm: Some(Cow::Borrowed(arithm)),
+            is_zk: Some(is_zk),
+            security_bits: Some(security_bits),
+            is_pq: Some(is_pq),
+            is_maintained: Some(is_maintained),
+            is_audited: Some(is_audited),
+            isa: isa.map(Cow::Borrowed),
+        }
+    }
 }
 
 fn feat_suffix(feat: Option<&str>) -> String {
@@ -160,7 +205,7 @@ fn mem_report_filename(target: &str, size: usize, system: &str, feat: Option<&st
     }
 }
 
-fn input_sizes_for(target: BenchTarget, _fixed: Option<usize>) -> Vec<usize> {
+fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
     match target {
         BenchTarget::Sha256 => selected_sha2_inputs(),
         BenchTarget::Ecdsa => vec![32],
@@ -201,7 +246,7 @@ pub fn run_benchmarks_fn<
     let target_str = cfg.target.as_str();
     let system_str = cfg.system.as_str();
 
-    for size in input_sizes_for(cfg.target, cfg.fixed_input_size) {
+    for size in input_sizes_for(cfg.target) {
         let prepared_context = prepare(size);
 
         let mut metrics = init_metrics(&cfg, target_str, system_str, size, &properties);
@@ -287,7 +332,7 @@ pub fn run_benchmarks_with_state_fn<
     let target_str = cfg.target.as_str();
     let system_str = cfg.system.as_str();
 
-    for size in input_sizes_for(cfg.target, cfg.fixed_input_size) {
+    for size in input_sizes_for(cfg.target) {
         let prepared_context = prepare(size, shared);
 
         let mut metrics = init_metrics(&cfg, target_str, system_str, size, &properties);
@@ -397,7 +442,6 @@ macro_rules! __define_benchmark_harness {
                 system,
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
-                fixed_input_size: None,
             };
             ::utils::harness::run_benchmarks_with_state_fn(
                 c,
@@ -427,7 +471,6 @@ macro_rules! __define_benchmark_harness {
                 system,
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
-                fixed_input_size: None,
             };
             ::utils::harness::run_benchmarks_fn(
                 c,
@@ -456,7 +499,6 @@ macro_rules! __define_benchmark_harness {
                 system,
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
-                fixed_input_size: None,
             };
             ::utils::harness::run_benchmarks_with_state_fn(
                 c,
@@ -486,7 +528,6 @@ macro_rules! __define_benchmark_harness {
                 system,
                 feature: $feature,
                 mem_binary_name: $mem_binary_name,
-                fixed_input_size: None,
             };
             ::utils::harness::run_benchmarks_fn(
                 c,

@@ -9,19 +9,19 @@ utils::define_benchmark_harness!(
     ProvingSystem::Binius64,
     None,
     "sha256_mem_binius64",
-    BenchProperties {
-        proving_system: Some("Binius64".to_string()),
-        field_curve: Some("GHASH binary field".to_string()), // https://www.binius.xyz/basics/binius64-vs-v0
-        iop: Some("Binius64".to_string()),
-        pcs: Some("Binius64".to_string()),
-        arithm: Some("Binius64".to_string()),
-        is_zk: Some(true),       // https://www.binius.xyz/basics/binius64-vs-v0
-        security_bits: Some(96), // https://github.com/IrreducibleOSS/binius64/blob/main/verifier/verifier/src/verify.rs#L40
-        is_pq: Some(true),       // hash-based PCS
-        is_maintained: Some(true),
-        is_audited: Some(AuditStatus::NotAudited),
-        isa: None,
-    },
+    BenchProperties::new(
+        "Binius64",
+        "GHASH binary field", // https://www.binius.xyz/basics/binius64-vs-v0
+        "Binius64",
+        Some("Binius64"),
+        "Binius64",
+        true, // https://www.binius.xyz/basics/binius64-vs-v0
+        96, // https://github.com/IrreducibleOSS/binius64/blob/main/verifier/verifier/src/verify.rs#L40
+        true, // hash-based PCS
+        true,
+        AuditStatus::NotAudited,
+        None,
+    ),
     |input_size| {
         prepare(input_size).expect("Failed to prepare sha256 circuit for prove/verify")
     },

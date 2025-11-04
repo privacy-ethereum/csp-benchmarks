@@ -3,6 +3,7 @@ use glob::glob;
 use regex::Regex;
 use serde::Deserialize;
 use serde_json::Value;
+use std::borrow::Cow;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
@@ -39,17 +40,17 @@ struct BenchPropsArgs {
 impl From<BenchPropsArgs> for BenchProperties {
     fn from(a: BenchPropsArgs) -> Self {
         BenchProperties {
-            proving_system: a.proving_system,
-            field_curve: a.field_curve,
-            iop: a.iop,
-            pcs: a.pcs,
-            arithm: a.arithm,
+            proving_system: a.proving_system.map(Cow::Owned),
+            field_curve: a.field_curve.map(Cow::Owned),
+            iop: a.iop.map(Cow::Owned),
+            pcs: a.pcs.map(Cow::Owned),
+            arithm: a.arithm.map(Cow::Owned),
             security_bits: a.security_bits,
             is_pq: a.is_pq,
             is_maintained: a.is_maintained,
             is_zk: a.is_zk,
             is_audited: a.is_audited.map(|s| AuditStatus::from_str(&s).unwrap()),
-            isa: a.isa,
+            isa: a.isa.map(Cow::Owned),
         }
     }
 }
