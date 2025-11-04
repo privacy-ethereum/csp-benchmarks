@@ -12,19 +12,19 @@ utils::define_benchmark_harness!(
     ProvingSystem::Plonky2,
     None,
     "sha256_no_lookup_mem",
-    BenchProperties {
-        proving_system: Some("Plonky2".to_string()), // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
-        field_curve: Some("Goldilocks".to_string()), // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
-        iop: Some("FRI".to_string()), // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
-        pcs: Some("FRI".to_string()), // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
-        arithm: Some("Plonkish".to_string()), // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
-        is_zk: Some(true), // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
-        security_bits: Some(100), // https://github.com/0xPolygonZero/plonky2?tab=readme-ov-file#security
-        is_pq: Some(true),        // hash-based PCS
-        is_maintained: Some(false), // deprecated: https://github.com/0xPolygonZero/plonky2?tab=readme-ov-file#%EF%B8%8F-plonky2-deprecation-notice
-        is_audited: Some(AuditStatus::Audited), // https://github.com/0xPolygonZero/plonky2/tree/main/audits
-        isa: None,
-    },
+    BenchProperties::new(
+        "Plonky2",    // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
+        "Goldilocks", // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
+        "FRI",        // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
+        Some("FRI"),  // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
+        "Plonkish",   // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
+        true,         // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
+        100,          // https://github.com/0xPolygonZero/plonky2?tab=readme-ov-file#security
+        true,         // hash-based PCS
+        false, // deprecated: https://github.com/0xPolygonZero/plonky2?tab=readme-ov-file#%EF%B8%8F-plonky2-deprecation-notice
+        AuditStatus::Audited, // https://github.com/0xPolygonZero/plonky2/tree/main/audits
+        None,
+    ),
     sha256_prepare,
     |(circuit_data, _)| { circuit_data.common.num_gate_constraints },
     |(circuit_data, pw)| { prove(circuit_data, pw.clone()) },
