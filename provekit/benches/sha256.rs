@@ -7,15 +7,15 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_provekit",
     BenchProperties::new(
-        "Spartan+WHIR", // https://hackmd.io/@clientsideproving/whir-based
-        "Bn254",        // https://hackmd.io/@clientsideproving/whir-based
-        "Spartan",      // https://hackmd.io/@clientsideproving/whir-based
-        Some("WHIR"),   // https://hackmd.io/@clientsideproving/whir-based
-        "R1CS",
-        false,
-        100,
+        "Spartan+WHIR", // https://github.com/worldfnd/provekit
+        "Bn254",        // https://github.com/worldfnd/provekit
+        "Spartan",      // https://github.com/worldfnd/provekit
+        Some("WHIR"),   // https://github.com/worldfnd/provekit
+        "R1CS",         // https://github.com/worldfnd/provekit
+        true,           // https://github.com/worldfnd/provekit/pull/138
+        128, // https://github.com/worldfnd/provekit/blob/d7deea66c41d56c1d411dd799d0d6066272323e4/provekit/r1cs-compiler/src/whir_r1cs.rs#L43
         true, // hash-based PCS
-        true, // https://github.com/worldfnd
+        true, // https://github.com/worldfnd/provekit
         AuditStatus::NotAudited,
         None
     ),
