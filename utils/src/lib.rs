@@ -49,6 +49,13 @@ pub fn generate_ecdsa_input() -> (Vec<u8>, (Vec<u8>, Vec<u8>), Vec<u8>) {
     let signature: Signature = signing_key
         .sign_prehash(&digest)
         .expect("Failed to sign prehashed digest");
+
+    // Normalize "s" of the signature because it is not normalized by default.
+    // More importantly, the "noir::std::ecdsa_secp256r1::verify_signature" expects "s" to be normalized.
+    let signature = signature
+        .normalize_s()
+        .expect("Failed to normalize signature");
+
     (
         digest,
         (pub_key_x, pub_key_y),
