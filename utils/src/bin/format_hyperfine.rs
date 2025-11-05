@@ -106,11 +106,13 @@ fn main() -> std::io::Result<()> {
             .to_string()
     });
 
-    // hyperfine files have the form: hyperfine_<target>_<size>_prover_metrics.json
-    let pattern = system_dir.join("hyperfine_*_*_prover_metrics.json");
+    // hyperfine files have the form of either:
+    //    hyperfine_<target>_<size>_prover_metrics.json
+    //    hyperfine_<target>_prover_metrics.json
+    let pattern = system_dir.join("hyperfine_*_prover_metrics.json");
     let pattern = pattern.to_string_lossy().into_owned();
-    let re =
-        Regex::new(r"hyperfine_(?P<target>[^_]+)_(?P<size>[^_]+)_prover_metrics\.json$").unwrap();
+    let re = Regex::new(r"hyperfine_(?P<target>[^_]+)(?:_(?P<size>[^_]+))?_prover_metrics\.json$")
+        .unwrap();
 
     for entry in glob(&pattern).unwrap() {
         let prover_path = match entry {
@@ -127,17 +129,23 @@ fn main() -> std::io::Result<()> {
             None => continue,
         };
         let target = caps.name("target").unwrap().as_str().to_string();
-        let size_str = caps.name("size").unwrap().as_str();
-        let input_size: usize = size_str.parse().unwrap_or_else(|_| {
-            eprintln!("Could not parse input size from {file_name}");
-            std::process::exit(2);
-        });
+        let size_str = caps.name("size").map(|s| s.as_str());
+        let input_size: Option<usize> = size_str.map(|s| s.parse().unwrap());
 
-        let verifier_path = system_dir.join(format!(
-            "hyperfine_{target}_{input_size}_verifier_metrics.json"
-        ));
-        let mem_path = system_dir.join(format!("{target}_{input_size}_mem_report.json"));
-        let sizes_path = system_dir.join(format!("{target}_{input_size}_sizes.json"));
+        let verifier_path = match input_size {
+            Some(size) => {
+                system_dir.join(format!("hyperfine_{target}_{size}_verifier_metrics.json"))
+            }
+            None => system_dir.join(format!("hyperfine_{target}_verifier_metrics.json")),
+        };
+        let mem_path = match input_size {
+            Some(size) => system_dir.join(format!("{target}_{size}_mem_report.json")),
+            None => system_dir.join(format!("{target}_mem_report.json")),
+        };
+        let sizes_path = match input_size {
+            Some(size) => system_dir.join(format!("{target}_{size}_sizes.json")),
+            None => system_dir.join(format!("{target}_sizes.json")),
+        };
 
         // Parse hyperfine JSONs to extract mean seconds
         let prover_mean_sec = read_hyperfine_mean_seconds(&prover_path)?;
@@ -162,7 +170,7 @@ fn main() -> std::io::Result<()> {
             feat,
             cli.is_zkvm,
             target.clone(),
-            input_size,
+            input_size.unwrap_or_default(),
             bench_properties,
         );
         metrics.proof_duration = to_duration_ns(prover_mean_sec);
@@ -183,9 +191,10 @@ fn main() -> std::io::Result<()> {
             metrics.preprocessing_size = preprocessing_size;
         }
 
-        let out_file = system_dir.join(format!(
-            "{target}_{input_size}_{proving_system}_metrics.json"
-        ));
+        let out_file = match input_size {
+            Some(size) => system_dir.join(format!("{target}_{size}_{proving_system}_metrics.json")),
+            None => system_dir.join(format!("{target}_{proving_system}_metrics.json")),
+        };
         utils::bench::write_json_metrics_file(out_file.to_str().unwrap(), &metrics);
 
         // Cleanup originals
