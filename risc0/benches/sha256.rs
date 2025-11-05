@@ -12,7 +12,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_risc0",
     utils::harness::BenchProperties::new(
-        "risc0",
+        "STARK",
         "BabyBear",  // 15 × 2^27 + 1; https://dev.risczero.com/proof-system-in-detail.pdf
         "STARK",     // https://dev.risczero.com/proof-system/stark-by-hand
         Some("FRI"), // https://dev.risczero.com/proof-system/stark-by-hand

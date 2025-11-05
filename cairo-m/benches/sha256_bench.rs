@@ -12,8 +12,8 @@ utils::define_benchmark_harness!(
     BenchProperties::new(
         "Circle STARK", // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#welcome-to-cairo-m
         "M31", // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#welcome-to-cairo-m
-        "Circle-FRI", // https://eprint.iacr.org/2024/278.pdf
-        Some("Circle-FRI"), // https://eprint.iacr.org/2024/278.pdf
+        "Circle FRI", // https://eprint.iacr.org/2024/278.pdf
+        Some("Circle FRI"), // https://eprint.iacr.org/2024/278.pdf
         "AIR",
         false,
         96, // https://github.com/kkrt-labs/cairo-m/blob/main/crates/prover/src/prover_config.rs#L13-L20

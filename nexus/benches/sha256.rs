@@ -12,9 +12,9 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_nexus",
     utils::harness::BenchProperties::new(
-        "nexus",
+        "Circle STARK",
         "M31",              // 2^31 - 1; https://specification.nexus.xyz/
-        "Circle STARK",     // STARKs over circle curves; https://eprint.iacr.org/2024/278.pdf
+        "Circle FRI",       // https://eprint.iacr.org/2024/278.pdf
         Some("Circle FRI"), // https://eprint.iacr.org/2024/278.pdf
         "AIR",              // https://specification.nexus.xyz/
         true,               // https://whitepaper.nexus.xyz/
