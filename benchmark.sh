@@ -6,7 +6,7 @@ set -euo pipefail
 
 SYSTEM_DIR=""
 RUNS=10
-TARGETS=("sha256")
+TARGETS=("sha256" "ecdsa")
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -70,41 +70,75 @@ for target in "${TARGETS[@]}"; do
     continue
   fi
 
-  for (( i=0; i<sizes_len; i++ )); do
-    INPUT_SIZE="$($UTILS_BIN sizes get --index "$i")"
+  if [ "$target" = "ecdsa" ]; then
+      PROVER_JSON_FILE="$STATE_DIR/prover.json"
+      VERIFIER_JSON_FILE="$STATE_DIR/verifier.json"
 
-    PROVER_JSON_FILE="$STATE_DIR/prover_${INPUT_SIZE}.json"
-    VERIFIER_JSON_FILE="$STATE_DIR/verifier_${INPUT_SIZE}.json"
-
-    step "[$TARGET] Prover (size ${INPUT_SIZE}):"
-    hyperfine --runs "$RUNS" \
-      --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
-      "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
-      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json"
-
-    step "[$TARGET] Verifier (size ${INPUT_SIZE}):"
-    if [[ -x "$PROVE_FOR_VERIY_SH" ]]; then
+      step "[$TARGET] Prover:"
       hyperfine --runs "$RUNS" \
-        --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_FOR_VERIY_SH > /dev/null 2>&1" \
-        "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
-        --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
-    else
+        --prepare "UTILS_BIN=$UTILS_BIN STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
+        "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
+        --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_prover_metrics.json"
+
+      step "[$TARGET] Verifier:"
+      if [[ -x "$PROVE_FOR_VERIY_SH" ]]; then
+        hyperfine --runs "$RUNS" \
+          --prepare "UTILS_BIN=$UTILS_BIN STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_FOR_VERIY_SH > /dev/null 2>&1" \
+          "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
+          --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_verifier_metrics.json"
+      else
+        hyperfine --runs "$RUNS" \
+          --prepare "UTILS_BIN=$UTILS_BIN STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
+          "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
+          --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_verifier_metrics.json"
+      fi
+
+      step "[$TARGET] RAM measurement"
+      MEM_JSON="$SYSTEM_DIR/${TARGET}_mem_report.json"
+      bash "$MEASURE_RAM_SCRIPT" -o "$MEM_JSON" -- bash -lc "STATE_JSON=\"$PROVER_JSON_FILE\" bash \"$PROVE_SH\"" || warn "Memory measurement failed"
+      ok "Memory report: $MEM_JSON"
+
+      step "[$TARGET] Size measurement"
+      SIZES_JSON="$SYSTEM_DIR/${TARGET}_sizes.json"
+      SIZES_JSON="$SIZES_JSON" STATE_JSON="$PROVER_JSON_FILE" bash "$MEASURE_SH" || warn "Size measurement failed"
+      ok "Sizes report: $SIZES_JSON"
+  elif [ "$target" = "sha256" ]; then
+    for (( i=0; i<sizes_len; i++ )); do
+      INPUT_SIZE="$($UTILS_BIN sizes get --index "$i")"
+
+      PROVER_JSON_FILE="$STATE_DIR/prover_${INPUT_SIZE}.json"
+      VERIFIER_JSON_FILE="$STATE_DIR/verifier_${INPUT_SIZE}.json"
+
+      step "[$TARGET] Prover (size ${INPUT_SIZE}):"
       hyperfine --runs "$RUNS" \
-        --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
-        "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
-        --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
-    fi
+        --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
+        "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
+        --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json"
 
-    step "[$TARGET] RAM measurement (size ${INPUT_SIZE})"
-    MEM_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_mem_report.json"
-    bash "$MEASURE_RAM_SCRIPT" -o "$MEM_JSON" -- bash -lc "STATE_JSON=\"$PROVER_JSON_FILE\" bash \"$PROVE_SH\"" || warn "Memory measurement failed"
-    ok "Memory report: $MEM_JSON"
+      step "[$TARGET] Verifier (size ${INPUT_SIZE}):"
+      if [[ -x "$PROVE_FOR_VERIY_SH" ]]; then
+        hyperfine --runs "$RUNS" \
+          --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_FOR_VERIY_SH > /dev/null 2>&1" \
+          "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
+          --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
+      else
+        hyperfine --runs "$RUNS" \
+          --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
+          "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
+          --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
+      fi
 
-    step "[$TARGET] Size measurement (size ${INPUT_SIZE})"
-    SIZES_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_sizes.json"
-    SIZES_JSON="$SIZES_JSON" STATE_JSON="$PROVER_JSON_FILE" bash "$MEASURE_SH" || warn "Size measurement failed"
-    ok "Sizes report: $SIZES_JSON"
-  done
+      step "[$TARGET] RAM measurement (size ${INPUT_SIZE})"
+      MEM_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_mem_report.json"
+      bash "$MEASURE_RAM_SCRIPT" -o "$MEM_JSON" -- bash -lc "STATE_JSON=\"$PROVER_JSON_FILE\" bash \"$PROVE_SH\"" || warn "Memory measurement failed"
+      ok "Memory report: $MEM_JSON"
+
+      step "[$TARGET] Size measurement (size ${INPUT_SIZE})"
+      SIZES_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_sizes.json"
+      SIZES_JSON="$SIZES_JSON" STATE_JSON="$PROVER_JSON_FILE" bash "$MEASURE_SH" || warn "Size measurement failed"
+      ok "Sizes report: $SIZES_JSON"
+    done
+  fi
 done
 
 step "Benchmark complete"
