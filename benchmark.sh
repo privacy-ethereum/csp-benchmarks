@@ -32,6 +32,12 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 UTILS_BIN="${SCRIPT_DIR}/target/release/utils"
 MEASURE_RAM_SCRIPT="${SCRIPT_DIR}/measure_mem_avg.sh"
+BENCH_PROPS_JSON="${SYSTEM_DIR}/bench_props.json"
+
+if [[ ! -f "$BENCH_PROPS_JSON" ]]; then
+  echo "bench_props.json not found: $BENCH_PROPS_JSON" >&2
+  exit 1
+fi
 
 step() { printf "\n\033[1;34m==> %s\033[0m\n" "$*"; }
 ok()   { printf "\033[1;32m✓ %s\033[0m\n" "$*"; }
@@ -112,7 +118,7 @@ fi
 
 if [[ -x "$FORMATTER_BIN" ]]; then
   step "Formatting hyperfine outputs into Metrics JSON"
-  "$FORMATTER_BIN" --system-dir "$SYSTEM_DIR" || warn "format_hyperfine failed"
+  "$FORMATTER_BIN" --system-dir "$SYSTEM_DIR" --properties "$BENCH_PROPS_JSON" || warn "format_hyperfine failed"
 else
   warn "format_hyperfine binary not found; skipping formatting"
 fi

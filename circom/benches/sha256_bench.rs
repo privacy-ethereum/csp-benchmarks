@@ -25,10 +25,9 @@ utils::define_benchmark_harness!(
     ),
     |input_size| { prepare(input_size) },
     |(_witness_fn, _input_str, zkey_path)| {
-        let (_, constraint_matrices) = ark_circom::read_zkey::<_, Bn254>(&mut BufReader::new(
-            File::open(zkey_path).expect("Unable to open zkey"),
-        ))
-        .expect("Unable to read zkey");
+        let mut buffer = BufReader::new(File::open(zkey_path).expect("Unable to open zkey"));
+        let (_, constraint_matrices) =
+            ark_circom::read_zkey::<_, Bn254>(&mut buffer).expect("Unable to read zkey");
         constraint_matrices.num_constraints
     },
     |(witness_fn, input_str, zkey_path)| {
