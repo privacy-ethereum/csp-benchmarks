@@ -25,6 +25,19 @@ impl BenchTarget {
     }
 }
 
+impl FromStr for BenchTarget {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<BenchTarget, String> {
+        match s {
+            "sha256" => Ok(BenchTarget::Sha256),
+            "ecdsa" => Ok(BenchTarget::Ecdsa),
+            "keccak" => Ok(BenchTarget::Keccak),
+            _ => Err(format!("Invalid benchmark target: {}", s)),
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 pub enum ProvingSystem {
     Binius64,

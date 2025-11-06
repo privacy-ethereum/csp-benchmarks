@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand};
 use hex::ToHex;
+use utils::BenchTarget;
 
 /// CLI to generate benchmark inputs and query available sizes
 #[derive(Parser, Debug)]
@@ -31,11 +32,19 @@ enum Command {
 #[derive(Subcommand, Debug)]
 enum SizesCommand {
     /// Print JSON array of sizes (e.g., [2048])
-    List,
+    List {
+        #[arg(long)]
+        target: BenchTarget,
+    },
     /// Print the number of sizes
-    Len,
+    Len {
+        #[arg(long)]
+        target: BenchTarget,
+    },
     /// Print the size at the given zero-based index
     Get {
+        #[arg(long)]
+        target: BenchTarget,
         #[arg(long)]
         index: usize,
     },
@@ -58,21 +67,21 @@ fn main() {
             println!("{}", signature.encode_hex::<String>());
         }
         Command::Sizes {
-            command: SizesCommand::List,
+            command: SizesCommand::List { target },
         } => {
-            let json = serde_json::to_string(&utils::metadata::selected_sha2_inputs())
-                .expect("serialize sizes");
+            let json =
+                serde_json::to_string(&utils::input_sizes_for(target)).expect("serialize sizes");
             println!("{}", json);
         }
         Command::Sizes {
-            command: SizesCommand::Len,
+            command: SizesCommand::Len { target },
         } => {
-            println!("{}", utils::metadata::selected_sha2_inputs().len());
+            println!("{}", utils::len_of_input_sizes_for(target));
         }
         Command::Sizes {
-            command: SizesCommand::Get { index },
+            command: SizesCommand::Get { target, index },
         } => {
-            let sizes = &utils::metadata::selected_sha2_inputs();
+            let sizes = &utils::input_sizes_for(target);
             if let Some(size) = sizes.get(index) {
                 println!("{}", size);
             } else {
