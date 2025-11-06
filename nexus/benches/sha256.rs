@@ -13,16 +13,16 @@ utils::define_benchmark_harness!(
     "sha256_mem_nexus",
     utils::harness::BenchProperties::new(
         "Circle STARK",
-        "M31",              // 2^31 - 1; https://specification.nexus.xyz/
-        "Circle FRI",       // https://eprint.iacr.org/2024/278.pdf
-        Some("Circle FRI"), // https://eprint.iacr.org/2024/278.pdf
-        "AIR",              // https://specification.nexus.xyz/
-        true,               // https://whitepaper.nexus.xyz/
-        128,
-        true,                    // hash-based PCS
-        true,                    // https://github.com/nexus-xyz/nexus-zkvm/releases
+        "M31",                   // 2^31 - 1; https://specification.nexus.xyz/
+        "Circle FRI",            // https://eprint.iacr.org/2024/278.pdf
+        Some("Circle FRI"),      // https://eprint.iacr.org/2024/278.pdf
+        "AIR",                   // https://specification.nexus.xyz/
+        true,                    // https://whitepaper.nexus.xyz/
+        0,    // TODO: https://github.com/privacy-ethereum/csp-benchmarks/issues/147
+        true, // hash-based PCS
+        true, // https://github.com/nexus-xyz/nexus-zkvm/releases
         AuditStatus::NotAudited, // https://github.com/nexus-xyz/nexus-zkvm
-        Some("RISC-V RV32I"),    // base ISA + precompiles; https://specification.nexus.xyz/
+        Some("RISC-V RV32I"), // base ISA + precompiles; https://specification.nexus.xyz/
     ),
     { load_or_compile_program(&RustRv32i, SHA256_BENCH) },
     prepare_sha256,
