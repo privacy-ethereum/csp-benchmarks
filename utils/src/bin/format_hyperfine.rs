@@ -187,15 +187,22 @@ fn main() -> std::io::Result<()> {
             metrics.preprocessing_size = preprocessing_size;
         }
 
-        if let Some(num_constraints_file) = &cli.num_constraints_file
-            && let Ok(num_constraints) =
+        if let Some(num_constraints_file) = &cli.num_constraints_file {
+            if let Ok(num_constraints) =
                 read_num_constraints_json(num_constraints_file, &target, input_size)
-        {
-            println!(
-                "Reading number of constraints from {}",
-                num_constraints_file.display()
-            );
-            metrics.num_constraints = num_constraints;
+            {
+                println!(
+                    "Reading number of constraints from {}",
+                    num_constraints_file.display()
+                );
+                metrics.num_constraints = num_constraints;
+            } else {
+                eprintln!(
+                    "Could not read number of constraints from {}",
+                    num_constraints_file.display()
+                );
+                std::process::exit(2);
+            }
         }
 
         let out_file = system_dir.join(format!(
