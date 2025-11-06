@@ -14,6 +14,8 @@ use p256::ecdsa::{Signature, SigningKey, signature::hazmat::PrehashSigner};
 
 pub use harness::{BenchHarnessConfig, BenchTarget, ProvingSystem};
 
+use crate::metadata::selected_sha2_inputs;
+
 pub fn write_json<T: Serialize>(data: &T, output_path: &str) {
     let json_data = serde_json::to_string_pretty(&data).expect("Failed to serialize to JSON");
     let path = Path::new(&output_path);
@@ -49,9 +51,32 @@ pub fn generate_ecdsa_input() -> (Vec<u8>, (Vec<u8>, Vec<u8>), Vec<u8>) {
     let signature: Signature = signing_key
         .sign_prehash(&digest)
         .expect("Failed to sign prehashed digest");
+
+    // Normalize "s" of the signature because it is not normalized by default.
+    // More importantly, the "noir::std::ecdsa_secp256r1::verify_signature" expects "s" to be normalized.
+    let signature = signature
+        .normalize_s()
+        .expect("Failed to normalize signature");
+
     (
         digest,
         (pub_key_x, pub_key_y),
         signature.to_bytes().to_vec(),
     )
+}
+
+pub fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
+    match target {
+        BenchTarget::Sha256 => selected_sha2_inputs(),
+        BenchTarget::Ecdsa => vec![32],
+        BenchTarget::Keccak => selected_sha2_inputs(),
+    }
+}
+
+pub fn len_of_input_sizes_for(target: BenchTarget) -> usize {
+    match target {
+        BenchTarget::Sha256 => selected_sha2_inputs().len(),
+        BenchTarget::Ecdsa => 1,
+        BenchTarget::Keccak => selected_sha2_inputs().len(),
+    }
 }

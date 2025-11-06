@@ -5,7 +5,7 @@ set -euo pipefail
 # Usage: benchmark.sh --system-dir <path> [--targets "sha256,poseidon,..."]
 
 SYSTEM_DIR=""
-TARGETS=("sha256")
+TARGETS=("sha256" "ecdsa")
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -63,14 +63,14 @@ fi
 
 step "Running benchmarks for system: $SYSTEM_DIR"
 
-sizes_len="$($UTILS_BIN sizes len)"
-[[ -n "$sizes_len" ]] || { echo "Failed to obtain sizes length from utils" >&2; exit 1; }
-
 STATE_DIR="$SYSTEM_DIR/.bench_state"
 mkdir -p "$STATE_DIR"
 
 for target in "${TARGETS[@]}"; do
   TARGET="$target"
+
+  sizes_len="$($UTILS_BIN sizes len --target "$TARGET")"
+  [[ -n "$sizes_len" ]] || { echo "Failed to obtain sizes length from utils" >&2; exit 1; }
 
   PREPARE_SH="${SYSTEM_DIR}/${TARGET}_prepare.sh"
   PROVE_SH="${SYSTEM_DIR}/${TARGET}_prove.sh"
@@ -84,7 +84,7 @@ for target in "${TARGETS[@]}"; do
   fi
 
   for (( i=0; i<sizes_len; i++ )); do
-    INPUT_SIZE="$($UTILS_BIN sizes get --index "$i")"
+    INPUT_SIZE="$($UTILS_BIN sizes get --target "$TARGET" --index "$i")"
 
     PROVER_JSON_FILE="$STATE_DIR/prover_${INPUT_SIZE}.json"
     VERIFIER_JSON_FILE="$STATE_DIR/verifier_${INPUT_SIZE}.json"

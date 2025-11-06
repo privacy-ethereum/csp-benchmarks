@@ -1,0 +1,12 @@
+{
+  "proving_system": "UltraHonk",
+  "field_curve": "BN254",
+  "iop": "UltraHonk",
+  "pcs": "KZG",
+  "arithm": "ACIR",
+  "is_zk": true,
+  "security_bits": 128,
+  "is_pq": false,
+  "is_maintained": true,
+  "is_audited": "not_audited"
+}
