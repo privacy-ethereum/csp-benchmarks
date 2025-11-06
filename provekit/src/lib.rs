@@ -42,24 +42,23 @@ pub fn prepare_sha256(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) 
 
     if let Ok(mut content) = fs::read_to_string(&circuit_source) {
         // Replace only the input param length in `fn main(input: [u8; N], ...)`
-        if let Some(fn_pos) = content.find("fn main(") {
-            if let Some(input_pos_rel) = content[fn_pos..].find("input: [u8;") {
-                let input_pos = fn_pos + input_pos_rel + "input: [u8;".len();
-                // Skip whitespace
-                let bytes = content.as_bytes();
-                let mut start = input_pos;
-                while start < bytes.len() && bytes[start].is_ascii_whitespace() {
-                    start += 1;
-                }
-                let mut end = start;
-                while end < bytes.len() && bytes[end].is_ascii_digit() {
-                    end += 1;
-                }
-                if start != end {
-                    content.replace_range(start..end, &input_size.to_string());
-                    fs::write(&circuit_source, content)
-                        .expect("Failed to update circuit input length");
-                }
+        if let Some(fn_pos) = content.find("fn main(")
+            && let Some(input_pos_rel) = content[fn_pos..].find("input: [u8;")
+        {
+            let input_pos = fn_pos + input_pos_rel + "input: [u8;".len();
+            // Skip whitespace
+            let bytes = content.as_bytes();
+            let mut start = input_pos;
+            while start < bytes.len() && bytes[start].is_ascii_whitespace() {
+                start += 1;
+            }
+            let mut end = start;
+            while end < bytes.len() && bytes[end].is_ascii_digit() {
+                end += 1;
+            }
+            if start != end {
+                content.replace_range(start..end, &input_size.to_string());
+                fs::write(&circuit_source, content).expect("Failed to update circuit input length");
             }
         }
     }

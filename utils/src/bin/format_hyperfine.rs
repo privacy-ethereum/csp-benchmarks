@@ -187,16 +187,15 @@ fn main() -> std::io::Result<()> {
             metrics.preprocessing_size = preprocessing_size;
         }
 
-        if let Some(num_constraints_file) = &cli.num_constraints_file {
-            if let Ok(num_constraints) =
-                read_num_constraints_json(&num_constraints_file, &target, input_size)
-            {
-                println!(
-                    "Reading number of constraints from {}",
-                    num_constraints_file.display()
-                );
-                metrics.num_constraints = num_constraints;
-            }
+        if let Some(num_constraints_file) = &cli.num_constraints_file
+            && let Ok(num_constraints) =
+                read_num_constraints_json(num_constraints_file, &target, input_size)
+        {
+            println!(
+                "Reading number of constraints from {}",
+                num_constraints_file.display()
+            );
+            metrics.num_constraints = num_constraints;
         }
 
         let out_file = system_dir.join(format!(
@@ -234,7 +233,7 @@ fn read_num_constraints_json(
     let target = v
         .get(target)
         .ok_or_else(|| io_err(&format!("missing {target} benchmark target")))?;
-    let size = target.get(&size.to_string()).ok_or_else(|| {
+    let size = target.get(size.to_string()).ok_or_else(|| {
         io_err(&format!(
             "missing circuit size for the input of {size} bytes for {target} benchmark target"
         ))
