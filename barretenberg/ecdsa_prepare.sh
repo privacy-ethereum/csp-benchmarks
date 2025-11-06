@@ -3,9 +3,11 @@ set -euo pipefail
 
 # Required env vars:
 # - UTILS_BIN: path to utils binary
+# - INPUT_SIZE: input size in bytes
 # - STATE_JSON: output JSON file path
 
 : "${UTILS_BIN:?UTILS_BIN is required}"
+: "${INPUT_SIZE:?INPUT_SIZE is required}"
 : "${STATE_JSON:?STATE_JSON is required}"
 
 ####   Compile circuits   ####
