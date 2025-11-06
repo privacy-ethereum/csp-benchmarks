@@ -34,8 +34,40 @@ fn compile_workspace() -> PathBuf {
 }
 
 pub fn prepare_sha256(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
+    // 1) Rewrite circuit input length to match input_size before compiling
+    let current_dir = std::env::current_dir().expect("Failed to get current directory");
+    let workspace_root_pre = current_dir.join(WORKSPACE_ROOT);
+    let circuit_source =
+        workspace_root_pre.join("hash/sha256-provekit/sha256_var_input/src/main.nr");
+
+    if let Ok(mut content) = fs::read_to_string(&circuit_source) {
+        // Replace only the input param length in `fn main(input: [u8; N], ...)`
+        if let Some(fn_pos) = content.find("fn main(") {
+            if let Some(input_pos_rel) = content[fn_pos..].find("input: [u8;") {
+                let input_pos = fn_pos + input_pos_rel + "input: [u8;".len();
+                // Skip whitespace
+                let bytes = content.as_bytes();
+                let mut start = input_pos;
+                while start < bytes.len() && bytes[start].is_ascii_whitespace() {
+                    start += 1;
+                }
+                let mut end = start;
+                while end < bytes.len() && bytes[end].is_ascii_digit() {
+                    end += 1;
+                }
+                if start != end {
+                    content.replace_range(start..end, &input_size.to_string());
+                    fs::write(&circuit_source, content)
+                        .expect("Failed to update circuit input length");
+                }
+            }
+        }
+    }
+
+    // 2) Compile workspace
     let workspace_root = compile_workspace();
 
+    // 3) Load scheme and prepare TOML matching the chosen size
     let package_name = "sha256_var_input";
     let circuit_path = workspace_root
         .join("target")
@@ -48,8 +80,8 @@ pub fn prepare_sha256(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) 
     let circuit_member_dir = workspace_root.join(SHA256_CIRCUIT_SUB_PATH).join(dir_name);
     fs::create_dir_all(&circuit_member_dir).expect("Failed to create circuit dir");
 
-    // The circuit's input array size is fixed to 2048 bytes, but the actual hashed message size is input_len = {input_size}
-    let (data, _digest) = utils::generate_sha256_input(2048);
+    // Generate exactly `input_size` bytes of input; circuit expects fixed array with `input_size` elements
+    let (data, _digest) = utils::generate_sha256_input(input_size);
     let toml_content = format!(
         "input = [{}]\ninput_len = {input_size}",
         data.iter()

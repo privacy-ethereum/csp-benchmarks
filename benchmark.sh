@@ -5,7 +5,6 @@ set -euo pipefail
 # Usage: benchmark.sh --system-dir <path> [--targets "sha256,poseidon,..."]
 
 SYSTEM_DIR=""
-RUNS=10
 TARGETS=("sha256")
 
 while [[ $# -gt 0 ]]; do
@@ -14,12 +13,20 @@ while [[ $# -gt 0 ]]; do
       SYSTEM_DIR="$2"; shift 2 ;;
     --targets)
       IFS=',' read -r -a TARGETS <<< "$2"; shift 2 ;;
+    --logging-run)
+      LOGGING_RUN=true; shift ;;
     *)
       echo "Unknown argument: $1" >&2; exit 2 ;;
   esac
 done
 
-if [[ -z "$SYSTEM_DIR" ]]; then
+if [[ -z "${LOGGING_RUN:-}" ]]; then
+  RUNS=10
+else
+  RUNS=1
+fi
+
+if [[ -z "${SYSTEM_DIR:-}" ]]; then
   echo "--system-dir is required (path containing prepare.sh, prove.sh, verify.sh)" >&2
   exit 2
 fi
@@ -33,9 +40,15 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 UTILS_BIN="${SCRIPT_DIR}/target/release/utils"
 MEASURE_RAM_SCRIPT="${SCRIPT_DIR}/measure_mem_avg.sh"
 BENCH_PROPS_JSON="${SYSTEM_DIR}/bench_props.json"
+NUM_CONSTRAINTS="${SYSTEM_DIR}/circuit_sizes.json"
 
 if [[ ! -f "$BENCH_PROPS_JSON" ]]; then
   echo "bench_props.json not found: $BENCH_PROPS_JSON" >&2
+  exit 1
+fi
+
+if [[ ! -f "$NUM_CONSTRAINTS" ]]; then
+  echo "circuit_sizes.json not found: $NUM_CONSTRAINTS" >&2
   exit 1
 fi
 
@@ -77,11 +90,18 @@ for target in "${TARGETS[@]}"; do
     VERIFIER_JSON_FILE="$STATE_DIR/verifier_${INPUT_SIZE}.json"
 
     step "[$TARGET] Prover (size ${INPUT_SIZE}):"
-    hyperfine --runs "$RUNS" \
+    if [[ -z "${LOGGING_RUN:-}" ]]; then
+    SHOW_OUTPUT=""
+    else
+    SHOW_OUTPUT="--show-output"
+    fi
+
+    hyperfine $SHOW_OUTPUT --runs "$RUNS" \
       --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$PROVER_JSON_FILE bash $PREPARE_SH" \
       "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
       --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json"
 
+  if [[ -z "${LOGGING_RUN:-}" ]]; then
     step "[$TARGET] Verifier (size ${INPUT_SIZE}):"
     if [[ -x "$PROVE_FOR_VERIY_SH" ]]; then
       hyperfine --runs "$RUNS" \
@@ -104,6 +124,7 @@ for target in "${TARGETS[@]}"; do
     SIZES_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_sizes.json"
     SIZES_JSON="$SIZES_JSON" STATE_JSON="$PROVER_JSON_FILE" bash "$MEASURE_SH" || warn "Size measurement failed"
     ok "Sizes report: $SIZES_JSON"
+  fi
   done
 done
 
@@ -118,7 +139,7 @@ fi
 
 if [[ -x "$FORMATTER_BIN" ]]; then
   step "Formatting hyperfine outputs into Metrics JSON"
-  "$FORMATTER_BIN" --system-dir "$SYSTEM_DIR" --properties "$BENCH_PROPS_JSON" || warn "format_hyperfine failed"
+  "$FORMATTER_BIN" --system-dir "$SYSTEM_DIR" --properties "$BENCH_PROPS_JSON" --num-constraints-file "$NUM_CONSTRAINTS" || warn "format_hyperfine failed"
 else
   warn "format_hyperfine binary not found; skipping formatting"
 fi

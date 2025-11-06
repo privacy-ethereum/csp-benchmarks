@@ -78,6 +78,10 @@ struct Cli {
     #[arg(long)]
     properties: Option<PathBuf>,
 
+    /// Optional path to number of constraints file (JSON)
+    #[arg(long)]
+    num_constraints_file: Option<PathBuf>,
+
     /// CLI overrides for BenchProperties (fields not provided remain unchanged)
     #[command(flatten)]
     props: BenchPropsArgs,
@@ -183,6 +187,18 @@ fn main() -> std::io::Result<()> {
             metrics.preprocessing_size = preprocessing_size;
         }
 
+        if let Some(num_constraints_file) = &cli.num_constraints_file {
+            if let Ok(num_constraints) =
+                read_num_constraints_json(&num_constraints_file, &target, input_size)
+            {
+                println!(
+                    "Reading number of constraints from {}",
+                    num_constraints_file.display()
+                );
+                metrics.num_constraints = num_constraints;
+            }
+        }
+
         let out_file = system_dir.join(format!(
             "{target}_{input_size}_{proving_system}_metrics.json"
         ));
@@ -196,6 +212,40 @@ fn main() -> std::io::Result<()> {
     }
 
     Ok(())
+}
+
+/// Reads the number of constraints from the circuit_sizes.json file
+/// for the given target and size.
+/// The file contents are expected to be in the following format:
+/// {
+///   "target": {
+///     "size": number_of_constraints
+///   }
+/// }
+///
+/// Returns the number of constraints for the given target and size.
+fn read_num_constraints_json(
+    num_constraints_file: &PathBuf,
+    target: &str,
+    size: usize,
+) -> std::io::Result<usize> {
+    let v: Value = serde_json::from_str(&fs::read_to_string(num_constraints_file)?)?;
+
+    let target = v
+        .get(target)
+        .ok_or_else(|| io_err(&format!("missing {target} benchmark target")))?;
+    let size = target.get(&size.to_string()).ok_or_else(|| {
+        io_err(&format!(
+            "missing circuit size for the input of {size} bytes for {target} benchmark target"
+        ))
+    })?;
+    Ok(size
+        .as_u64()
+        .ok_or_else(|| {
+            io_err(&format!(
+                "number of constraints value is not a number for the input of {size} bytes for {target} benchmark target"
+            ))
+        })? as usize)
 }
 
 fn load_properties_json(path: &Path) -> std::io::Result<BenchProperties> {

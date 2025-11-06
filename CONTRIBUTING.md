@@ -15,7 +15,7 @@ Use the shared benchmark harness in the `utils` crate to register Criterion benc
 #### What you write:
 
 - A one‑line set of settings passed to a macro: the target (e.g., `BenchTarget::Sha256`), the proving system (e.g., `ProvingSystem::Plonky2`), an optional feature tag (`None` or `Some("feature")`), and a unique memory‑measurement binary name (e.g., `"sha256_mem_plonky2"`).
-- Five small closures that perform the corresponding operations with your proving system: `prepare`, `prove`, `verify`, `preprocessing_size`, `proof_size`.
+- Six small closures that perform the corresponding operations with your proving system: `prepare`, `num_constraints`, `prove`, `verify`, `preprocessing_size`, `proof_size`.
 
 #### Input sizes:
 
@@ -28,7 +28,7 @@ Use the shared benchmark harness in the `utils` crate to register Criterion benc
 
 #### Quickstart (no shared state)
 
-Provide closures for the five operations; the harness handles looping, timing, and file outputs. Pass the benchmark settings directly as macro arguments.
+Provide closures for the six operations; the harness handles looping, timing, and file outputs. Pass the benchmark settings directly as macro arguments.
 
 ```rust
 use utils::harness::{BenchTarget, ProvingSystem};
@@ -39,6 +39,7 @@ utils::define_benchmark_harness!(
     None,                           // optional feature tag
     "sha256_mem_binius64",         // memory-measurement binary name
     |input_size| { /* return prepared context for input_size */ },
+    |prepared| { /* return number of constraints/gates as usize */ 0 },
     |prepared| { /* build and return proof */ },
     |prepared, proof| { /* verify */ },
     |prepared| { /* compute preprocessing size in bytes */ 0 },
@@ -202,6 +203,36 @@ https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd8136
 - Ensure your `[target]_prove.sh` script performs a "lean" proof so memory is measured accurately.
 - Ensure all four scripts are executable (`chmod +x`).
 
+### Reporting circuit size (constraints/gates) for non-Rust systems
+
+Non-Rust systems typically do not expose the number of constraints/gates as a dedicated public API or a CLI command. Therefore, you can report the value by manually measuring the circuit size during a single preparation/proving run for each input size.
+
+- Include a `circuit_sizes.json` in your system folder mapping the target and input sizes to the number of constraints/gates. The orchestrator reads this file (`--num-constraints-file`) and writes the values into the Metrics JSONs.
+
+Example (`circuit_sizes.json`):
+
+```json
+{
+  "sha256": {
+    "128": 67890,
+    ...
+  },
+  "ecdsa": {
+    "32": 12345,
+    ...
+  },
+  ...
+}
+```
+
+- How to obtain the numbers is system‑specific. Typically, you can obtain the circuit size during a single preparation/proving run for each input size, then copy values into `circuit_sizes.json`. Please keep a `circuit_sizes.log` with the raw prints for reference.
+
+- Tip: use a single‑iteration logging run to quickly emit sizes without full benchmarking:
+
+```bash
+BENCH_INPUT_PROFILE=full sh ./benchmark.sh --system-dir ./barretenberg --logging-run
+```
+
 ### 5) File naming recap for non-Rust systems
 
 - Metrics: `[target]_[size]_[proving_system]_metrics.json`
@@ -209,3 +240,12 @@ https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd8136
 - Sizes (produced by your `[target]_measure.sh`): contains `proof_size` and `preprocessing_size` as shown above
 
 Use `ligetron` and `barretenberg` as a reference implementation.
+
+## Useful Commands
+
+Logging run to collect additional circuit data for non-rust benchmarks (e.g., print out the number of constraints/gates) will run only a single iteration of the hyperfine benchmark and skip verification and size measurement to quickly print out the logs.
+
+```bash
+# For example, for Noir/Barretenberg
+BENCH_INPUT_PROFILE=full sh ./benchmark.sh --system-dir ./barretenberg --logging-run
+```

@@ -14,14 +14,28 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WORKSPACE_ROOT_PATH="${SCRIPT_DIR}/circuits"
 
+# Update circuit to use INPUT_SIZE for the input parameter only
+CIRCUIT_SOURCE="${WORKSPACE_ROOT_PATH}/hash/sha256/src/main.nr"
+if [[ -f "$CIRCUIT_SOURCE" ]]; then
+  # Replace the input array length in `fn main(input: [u8; N], ...)`
+  sed -E -i.bak "s/(fn[[:space:]]+main\([[:space:]]*input:[[:space:]]*\[u8;)[[:space:]]*[0-9]+/\1 ${INPUT_SIZE}/" "$CIRCUIT_SOURCE"
+  # Remove backup file if it exists
+  rm -f "${CIRCUIT_SOURCE}.bak"
+else
+  echo "Error: Circuit source file not found: $CIRCUIT_SOURCE" >&2
+  exit 1
+fi
+
 cd "$WORKSPACE_ROOT_PATH"
 nargo compile --workspace --silence-warnings --skip-brillig-constraints-check
+# Uncomment this to log the circuit size
+# noir-profiler gates --artifact-path ./target/sha256.json --backend-path bb --output ./target -- --include_gates_per_opcode
 cd ../..
 
 CIRCUIT_PATH="${WORKSPACE_ROOT_PATH}/target/sha256.json"
 
 ####   Generate input(Prover.toml)   ####
-GEN="$("$UTILS_BIN" sha256 -n 2048)"
+GEN="$("$UTILS_BIN" sha256 -n ${INPUT_SIZE})"
 MSG="$(printf "%s\n" "$GEN" | sed -n '1p')"
 HEX_NO_PREFIX="$(printf "%s\n" "$GEN" | sed -n '2p')"
 
