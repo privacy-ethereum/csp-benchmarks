@@ -85,8 +85,8 @@ for target in "${TARGETS[@]}"; do
   for (( i=0; i<sizes_len; i++ )); do
     INPUT_SIZE="$($UTILS_BIN sizes get --target "$TARGET" --index "$i")"
 
-    PROVER_JSON_FILE="$STATE_DIR/prover_${INPUT_SIZE}.json"
-    VERIFIER_JSON_FILE="$STATE_DIR/verifier_${INPUT_SIZE}.json"
+    PROVER_JSON_FILE="$STATE_DIR/prover_${TARGET}_${INPUT_SIZE}.json"
+    VERIFIER_JSON_FILE="$STATE_DIR/verifier_${TARGET}_${INPUT_SIZE}.json"
 
     step "[$TARGET] Prover (size ${INPUT_SIZE}):"
     if [[ -z "${LOGGING_RUN:-}" ]]; then
