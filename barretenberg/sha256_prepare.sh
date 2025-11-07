@@ -28,8 +28,6 @@ fi
 
 cd "$WORKSPACE_ROOT_PATH"
 nargo compile --workspace --silence-warnings --skip-brillig-constraints-check
-# Uncomment this to log the circuit size
-# noir-profiler gates --artifact-path ./target/sha256.json --backend-path bb --output ./target -- --include_gates_per_opcode
 cd ../..
 
 CIRCUIT_PATH="${WORKSPACE_ROOT_PATH}/target/sha256.json"
