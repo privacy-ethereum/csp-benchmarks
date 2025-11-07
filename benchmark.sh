@@ -13,14 +13,18 @@ while [[ $# -gt 0 ]]; do
       SYSTEM_DIR="$2"; shift 2 ;;
     --targets)
       IFS=',' read -r -a TARGETS <<< "$2"; shift 2 ;;
-    --logging-run)
+    --logging)
       LOGGING_RUN=true; shift ;;
+    --quick)
+      QUICK_RUN=true; shift ;;
+    --no-ram)
+      NO_RAM=true; shift ;;
     *)
       echo "Unknown argument: $1" >&2; exit 2 ;;
   esac
 done
 
-if [[ -z "${LOGGING_RUN:-}" ]]; then
+if [[ -z "${QUICK_RUN:-}" ]]; then
   RUNS=10
 else
   RUNS=1
@@ -44,11 +48,6 @@ NUM_CONSTRAINTS="${SYSTEM_DIR}/circuit_sizes.json"
 
 if [[ ! -f "$BENCH_PROPS_JSON" ]]; then
   echo "bench_props.json not found: $BENCH_PROPS_JSON" >&2
-  exit 1
-fi
-
-if [[ ! -f "$NUM_CONSTRAINTS" ]]; then
-  echo "circuit_sizes.json not found: $NUM_CONSTRAINTS" >&2
   exit 1
 fi
 
@@ -101,7 +100,6 @@ for target in "${TARGETS[@]}"; do
       "STATE_JSON=$PROVER_JSON_FILE bash $PROVE_SH" \
       --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json"
 
-  if [[ -z "${LOGGING_RUN:-}" ]]; then
     step "[$TARGET] Verifier (size ${INPUT_SIZE}):"
     if [[ -x "$PROVE_FOR_VERIY_SH" ]]; then
       hyperfine --runs "$RUNS" \
@@ -115,16 +113,17 @@ for target in "${TARGETS[@]}"; do
         --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
     fi
 
-    step "[$TARGET] RAM measurement (size ${INPUT_SIZE})"
-    MEM_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_mem_report.json"
-    bash "$MEASURE_RAM_SCRIPT" -o "$MEM_JSON" -- bash -lc "STATE_JSON=\"$PROVER_JSON_FILE\" bash \"$PROVE_SH\"" || warn "Memory measurement failed"
-    ok "Memory report: $MEM_JSON"
+    if [[ -z "${NO_RAM:-}" ]]; then
+      step "[$TARGET] RAM measurement (size ${INPUT_SIZE})"
+      MEM_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_mem_report.json"
+      bash "$MEASURE_RAM_SCRIPT" -o "$MEM_JSON" -- bash -lc "STATE_JSON=\"$PROVER_JSON_FILE\" bash \"$PROVE_SH\"" || warn "Memory measurement failed"
+      ok "Memory report: $MEM_JSON"
+    fi
 
     step "[$TARGET] Size measurement (size ${INPUT_SIZE})"
     SIZES_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_sizes.json"
     SIZES_JSON="$SIZES_JSON" STATE_JSON="$PROVER_JSON_FILE" bash "$MEASURE_SH" || warn "Size measurement failed"
     ok "Sizes report: $SIZES_JSON"
-  fi
   done
 done
 
@@ -135,6 +134,11 @@ FORMATTER_BIN="${SCRIPT_DIR}/target/release/format_hyperfine"
 if [[ ! -x "$FORMATTER_BIN" ]]; then
   step "Building format_hyperfine binary"
   (cd "$SCRIPT_DIR" && cargo build --release -p utils --bin format_hyperfine >/dev/null 2>&1) || warn "Failed to build format_hyperfine"
+fi
+
+if [[ ! -f "$NUM_CONSTRAINTS" ]]; then
+  echo "circuit_sizes.json not found: $NUM_CONSTRAINTS" >&2
+  exit 1
 fi
 
 if [[ -x "$FORMATTER_BIN" ]]; then

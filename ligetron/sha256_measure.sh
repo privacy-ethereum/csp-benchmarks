@@ -39,3 +39,43 @@ echo "$json_output" > "$OUT_JSON"
 jq . "$OUT_JSON" || true
 
 
+
+# === Compute and update circuit_sizes.json (Ligetron) ===
+# Perform a dummy proving run to capture constraint counts from Stage 1
+PROVER_BIN="${SCRIPT_DIR}/ligero-prover/build/webgpu_prover"
+if [[ -x "$PROVER_BIN" ]]; then
+  DUMMY_OUTPUT="$($PROVER_BIN "$(cat "$STATE_JSON")" 2>&1 || true)"
+
+  # Extract first-stage linear and quadratic counts and sum them
+  CONSTRAINTS_SUM=$(printf "%s\n" "$DUMMY_OUTPUT" | awk '
+    /^Start Stage 1/ { in_s1=1; next }
+    in_s1 && /Num Linear constraints:/ { if (match($0, /[0-9]+/)) lin=substr($0, RSTART, RLENGTH); next }
+    in_s1 && /Num quadratic constraints:/ { if (match($0, /[0-9]+/)) quad=substr($0, RSTART, RLENGTH); print lin+quad; exit }
+  ')
+
+  if [[ -n "$CONSTRAINTS_SUM" ]]; then
+    # Derive input size label from SIZES_JSON filename: sha256_<SIZE>_sizes.json
+    SIZE_LABEL=$(basename "$OUT_JSON" | sed -E 's/^sha256_([^_]+)_sizes\.json$/\1/')
+    if [[ -n "$SIZE_LABEL" ]]; then
+      SYSTEM_DIR="$(cd "$(dirname "$0")" && pwd)"
+      CONSTRAINTS_JSON_PATH="${SYSTEM_DIR}/circuit_sizes.json"
+
+      if [[ -f "$CONSTRAINTS_JSON_PATH" ]]; then
+        UPDATED_JSON=$(jq \
+          --arg size_key "$SIZE_LABEL" \
+          --argjson size_val "$CONSTRAINTS_SUM" \
+          '.sha256[$size_key] = $size_val | . // {sha256: {($size_key): $size_val}}' \
+          "$CONSTRAINTS_JSON_PATH")
+      else
+        UPDATED_JSON=$(jq -n \
+          --arg size_key "$SIZE_LABEL" \
+          --argjson size_val "$CONSTRAINTS_SUM" \
+          '{sha256: {($size_key): $size_val}}')
+      fi
+
+      printf "%s\n" "$UPDATED_JSON" > "$CONSTRAINTS_JSON_PATH"
+    fi
+  fi
+else
+  echo "Warning: Ligetron prover binary not found; skipping constraints generation" >&2
+fi

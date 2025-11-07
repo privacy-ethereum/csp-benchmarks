@@ -1,3 +1,2 @@
 third_party/
 !bench_props.json
-!circuit_sizes.json

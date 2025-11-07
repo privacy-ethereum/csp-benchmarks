@@ -38,3 +38,44 @@ json_output=$(jq -n \
 
 echo "$json_output" > "$OUT_JSON"
 jq . "$OUT_JSON" || true
+
+# === Compute and update circuit_sizes.json with Circuit size (Barretenberg) ===
+# We run noir-profiler to obtain the circuit size and update the per-system JSON
+if command -v noir-profiler >/dev/null 2>&1; then
+  # Derive input size label from the output filename: sha256_<SIZE>_sizes.json
+  SIZE_LABEL=$(basename "$OUT_JSON" | sed -E 's/^sha256_([^_]+)_sizes\.json$/\1/')
+  # Run from the workspace root to respect relative paths in the command
+  CIRCUIT_SIZE=$(
+    cd "$WORKSPACE_ROOT_PATH" && \
+    { noir-profiler gates \
+        --artifact-path ./target/sha256.json \
+        --backend-path bb \
+        --output ./target \
+        -- --include_gates_per_opcode 2>&1 || true; } \
+      | sed -n 's/.*Circuit size: \([0-9][0-9]*\).*/\1/p' \
+      | head -n1
+  )
+
+  if [[ -n "$CIRCUIT_SIZE" && -n "$SIZE_LABEL" ]]; then
+    SYSTEM_DIR="$(cd "$(dirname "$0")" && pwd)"
+    CONSTRAINTS_JSON_PATH="${SYSTEM_DIR}/circuit_sizes.json"
+
+    # Build updated JSON with jq
+    if [[ -f "$CONSTRAINTS_JSON_PATH" ]]; then
+      UPDATED_JSON=$(jq \
+        --arg size_key "$SIZE_LABEL" \
+        --argjson size_val "$CIRCUIT_SIZE" \
+        '.sha256[$size_key] = $size_val | . // {sha256: {($size_key): $size_val}}' \
+        "$CONSTRAINTS_JSON_PATH")
+    else
+      UPDATED_JSON=$(jq -n \
+        --arg size_key "$SIZE_LABEL" \
+        --argjson size_val "$CIRCUIT_SIZE" \
+        '{sha256: {($size_key): $size_val}}')
+    fi
+
+    printf "%s\n" "$UPDATED_JSON" > "$CONSTRAINTS_JSON_PATH"
+  fi
+else
+  echo "Warning: noir-profiler not found; skipping circuit size generation" >&2
+fi

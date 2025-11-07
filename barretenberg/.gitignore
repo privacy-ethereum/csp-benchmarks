@@ -2,5 +2,3 @@ circuits/hash/sha256/Prover.toml
 circuits/hash/sha256/Prover_*.toml
 out
 !bench_props.json
-!circuit_sizes.log
-!circuit_sizes.json
