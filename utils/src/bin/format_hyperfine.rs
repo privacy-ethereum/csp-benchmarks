@@ -3,56 +3,36 @@ use glob::glob;
 use regex::Regex;
 use serde::Deserialize;
 use serde_json::Value;
-use std::borrow::Cow;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::str::FromStr;
 use std::time::Duration;
 use utils::bench::Metrics;
-use utils::harness::{AuditStatus, BenchProperties};
+use utils::harness::BenchProperties;
 
 #[derive(clap::Args, Debug, Clone, Default)]
 struct BenchPropsArgs {
     #[arg(long)]
-    proving_system: Option<String>,
+    proving_system: String,
     #[arg(long)]
-    field_curve: Option<String>,
+    field_curve: String,
     #[arg(long)]
-    iop: Option<String>,
+    iop: String,
     #[arg(long)]
     pcs: Option<String>,
     #[arg(long)]
-    arithm: Option<String>,
+    arithm: String,
     #[arg(long)]
-    security_bits: Option<u64>,
+    security_bits: u64,
     #[arg(long)]
-    is_pq: Option<bool>,
+    is_pq: bool,
     #[arg(long)]
-    is_maintained: Option<bool>,
+    is_maintained: bool,
     #[arg(long)]
-    is_zk: Option<bool>,
+    is_zk: bool,
     #[arg(long)]
-    is_audited: Option<String>,
+    is_audited: String,
     #[arg(long)]
     isa: Option<String>,
-}
-
-impl From<BenchPropsArgs> for BenchProperties {
-    fn from(a: BenchPropsArgs) -> Self {
-        BenchProperties {
-            proving_system: a.proving_system.map(Cow::Owned),
-            field_curve: a.field_curve.map(Cow::Owned),
-            iop: a.iop.map(Cow::Owned),
-            pcs: a.pcs.map(Cow::Owned),
-            arithm: a.arithm.map(Cow::Owned),
-            security_bits: a.security_bits,
-            is_pq: a.is_pq,
-            is_maintained: a.is_maintained,
-            is_zk: a.is_zk,
-            is_audited: a.is_audited.map(|s| AuditStatus::from_str(&s).unwrap()),
-            isa: a.isa.map(Cow::Owned),
-        }
-    }
 }
 
 #[derive(Parser, Debug)]
@@ -81,10 +61,6 @@ struct Cli {
     /// Optional path to number of constraints file (JSON)
     #[arg(long)]
     num_constraints_file: Option<PathBuf>,
-
-    /// CLI overrides for BenchProperties (fields not provided remain unchanged)
-    #[command(flatten)]
-    props: BenchPropsArgs,
 }
 
 #[derive(Deserialize)]
@@ -154,12 +130,13 @@ fn main() -> std::io::Result<()> {
             _ => None,
         };
 
-        let file_props = match &cli.properties {
+        let bench_properties = match &cli.properties {
             Some(p) => load_properties_json(p)?,
-            None => BenchProperties::default(),
+            None => {
+                eprintln!("No properties file provided");
+                std::process::exit(2);
+            }
         };
-        let override_props: BenchProperties = cli.props.clone().into();
-        let bench_properties = merge_props(file_props, override_props);
 
         let mut metrics = Metrics::new(
             proving_system.clone(),
@@ -257,28 +234,6 @@ fn read_num_constraints_json(
 fn load_properties_json(path: &Path) -> std::io::Result<BenchProperties> {
     let s = fs::read_to_string(path)?;
     serde_json::from_str::<BenchProperties>(&s).map_err(|e| io_err(&e.to_string()))
-}
-
-fn merge_props(mut base: BenchProperties, override_: BenchProperties) -> BenchProperties {
-    macro_rules! take {
-        ($f:ident) => {
-            if override_.$f.is_some() {
-                base.$f = override_.$f;
-            }
-        };
-    }
-    take!(proving_system);
-    take!(field_curve);
-    take!(iop);
-    take!(pcs);
-    take!(arithm);
-    take!(security_bits);
-    take!(is_pq);
-    take!(is_maintained);
-    take!(is_zk);
-    take!(is_audited);
-    take!(isa);
-    base
 }
 
 fn read_hyperfine_mean_seconds(path: &Path) -> std::io::Result<f64> {
