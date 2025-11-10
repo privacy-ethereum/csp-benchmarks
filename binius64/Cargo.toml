@@ -17,7 +17,6 @@ sha2 = { workspace = true }
 tracing-profile = "0.10.3"
 binius-frontend = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
 binius-circuits = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
-binius-examples = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
 binius-prover = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
 binius-verifier = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
 binius-core = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }

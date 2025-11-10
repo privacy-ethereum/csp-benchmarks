@@ -16,9 +16,9 @@ use binius_verifier::{
 };
 use sha2::digest::{Digest, FixedOutputReset, Output, core_api::BlockSizeUser};
 
-use binius_examples::{
-    ExampleCircuit, StdProver, StdVerifier,
-    circuits::sha256::{Instance, Params, Sha256Example},
+mod binius_examples_copy;
+use binius_examples_copy::{
+    ExampleCircuit, Instance, Params, Sha256Example, StdProver, StdVerifier,
 };
 
 /// Setup the prover and verifier and use SHA256 for Merkle tree compression.
