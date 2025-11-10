@@ -16,10 +16,8 @@ use binius_verifier::{
 };
 use sha2::digest::{Digest, FixedOutputReset, Output, core_api::BlockSizeUser};
 
-mod binius_examples_copy;
-use binius_examples_copy::{
-    ExampleCircuit, Instance, Params, Sha256Example, StdProver, StdVerifier,
-};
+mod utils;
+use utils::{CircuitTrait, Instance, Params, Sha256Circuit, StdProver, StdVerifier};
 
 /// Setup the prover and verifier and use SHA256 for Merkle tree compression.
 /// Providing the `key_collection` skips expensive key collection building.
@@ -46,7 +44,7 @@ pub fn prepare(
     StdVerifier,
     StdProver,
     ConstraintSystem,
-    Sha256Example,
+    Sha256Circuit,
     Circuit,
     usize,
 )> {
@@ -61,7 +59,7 @@ pub fn prepare(
 
     // Build the circuit
     let mut builder = CircuitBuilder::new();
-    let sha256_circuit = Sha256Example::build(params, &mut builder)?;
+    let sha256_circuit = Sha256Circuit::build(params, &mut builder)?;
     let compiled_circuit = builder.build();
 
     // Set up prover and verifier
@@ -83,7 +81,7 @@ pub fn prepare(
 pub fn prove<D, C, PC>(
     prover: &Prover<OptimalPackedB128, PC, D>,
     compiled_circuit: &Circuit,
-    sha256_circuit: &Sha256Example,
+    sha256_circuit: &Sha256Circuit,
     input_size: usize,
 ) -> Result<(Vec<u8>, Vec<Word>)>
 where

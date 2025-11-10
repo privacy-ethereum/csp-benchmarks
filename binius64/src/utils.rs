@@ -17,11 +17,11 @@ use sha2::Digest;
 use std::array;
 
 // Reference: https://github.com/IrreducibleOSS/binius64/blob/main/prover/examples/src/circuits/sha256.rs
-pub struct Sha256Example {
+pub struct Sha256Circuit {
     sha256_gadget: Sha256,
 }
 
-impl ExampleCircuit for Sha256Example {
+impl CircuitTrait for Sha256Circuit {
     type Params = Params;
     type Instance = Instance;
 
@@ -111,7 +111,7 @@ pub type StdProver =
     Prover<OptimalPackedB128, ParallelCompressionAdaptor<StdCompression>, StdDigest>;
 
 // Reference: https://github.com/IrreducibleOSS/binius64/blob/main/prover/examples/src/lib.rs
-pub trait ExampleCircuit: Sized {
+pub trait CircuitTrait: Sized {
     /// Circuit parameters that affect the structure of the circuit.
     /// These are typically compile-time constants or bounds.
     type Params: clap::Args;
