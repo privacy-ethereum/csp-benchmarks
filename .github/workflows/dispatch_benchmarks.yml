@@ -16,6 +16,11 @@ on:
         required: false
         default: false
         type: boolean
+      prod-run:
+        description: "Run children on self-hosted runner"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   actions: write
@@ -46,6 +51,7 @@ jobs:
       - name: Dispatch Rust Benchmarks (parallel)
         env:
           GH_TOKEN: ${{ github.token }}
+          PROD_RUN: ${{ github.event.inputs['prod-run'] }}
         shell: bash
         run: |
           set -euo pipefail
@@ -55,11 +61,13 @@ jobs:
           gh workflow run "Rust Benchmarks (parallel)" \
             --ref "$REF" \
             -f run_all="$RUN_ALL" \
-            -f include_optional="$INCLUDE_OPTIONAL"
+            -f include_optional="$INCLUDE_OPTIONAL" \
+            -f prod_run="$PROD_RUN"
 
       - name: Dispatch Non-Rust Benchmarks (parallel)
         env:
           GH_TOKEN: ${{ github.token }}
+          PROD_RUN: ${{ github.event.inputs['prod-run'] }}
         shell: bash
         run: |
           set -euo pipefail
@@ -67,4 +75,5 @@ jobs:
           RUN_ALL='${{ github.event.inputs.run_all }}'
           gh workflow run "Non-Rust Benchmarks (parallel)" \
             --ref "$REF" \
-            -f run_all="$RUN_ALL"
+            -f run_all="$RUN_ALL" \
+            -f prod_run="$PROD_RUN"

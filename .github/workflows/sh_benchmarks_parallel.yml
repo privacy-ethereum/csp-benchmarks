@@ -18,6 +18,11 @@ on:
         required: false
         default: false
         type: boolean
+      prod_run:
+        description: "Run on self-hosted runner"
+        required: false
+        default: false
+        type: boolean
 
 env:
   CARGO_TERM_COLOR: always
@@ -28,7 +33,7 @@ env:
 
 jobs:
   detect-folders:
-    runs-on: macos-latest
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.prod_run == true) && 'self-hosted' || 'macos-latest' }}
     outputs:
       folders: ${{ steps.set.outputs.folders }}
     steps:
@@ -94,9 +99,11 @@ jobs:
   run-benchmarks:
     if: ${{ needs.detect-folders.outputs.folders != '' && needs.detect-folders.outputs.folders != '[]' }}
     needs: [detect-folders]
-    runs-on: macos-latest
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.prod_run == true) && 'self-hosted' || 'macos-latest' }}
     strategy:
       fail-fast: false
+      # When dispatched with prod_run=true (self-hosted), run matrix sequentially
+      max-parallel: ${{ (github.event_name == 'workflow_dispatch' && inputs.prod_run == true) && 1 || 99 }}
       matrix:
         folder: ${{ fromJson(needs.detect-folders.outputs.folders) }}
 

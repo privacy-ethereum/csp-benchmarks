@@ -23,6 +23,11 @@ on:
         required: false
         default: false
         type: boolean
+      prod_run:
+        description: "Run on self-hosted runner"
+        required: false
+        default: false
+        type: boolean
 
 env:
   CARGO_TERM_COLOR: always
@@ -31,7 +36,7 @@ env:
 
 jobs:
   detect-crates:
-    runs-on: macos-latest
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.prod_run == true) && 'self-hosted' || 'macos-latest' }}
     outputs:
       crates: ${{ steps.set.outputs.crates }}
     steps:
@@ -123,7 +128,7 @@ jobs:
   prepare-cache:
     needs: detect-crates
     if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
-    runs-on: macos-latest
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.prod_run == true) && 'self-hosted' || 'macos-latest' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -194,9 +199,11 @@ jobs:
   bench:
     if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
     needs: [prepare-cache, detect-crates]
-    runs-on: macos-latest
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.prod_run == true) && 'self-hosted' || 'macos-latest' }}
     strategy:
       fail-fast: false
+      # When dispatched with prod_run=true (self-hosted), run matrix sequentially
+      max-parallel: ${{ (github.event_name == 'workflow_dispatch' && inputs.prod_run == true) && 1 || 99 }}
       matrix:
         crate: ${{ fromJson(needs.detect-crates.outputs.crates) }}
 
