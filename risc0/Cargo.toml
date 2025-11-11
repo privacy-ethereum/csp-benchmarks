@@ -17,6 +17,14 @@ utils = { workspace = true }
 name = "sha256"
 harness = false
 
+[[bench]]
+name = "ecdsa"
+harness = false
+
 [[bin]]
 name = "sha256_mem_risc0"
 path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "ecdsa_mem_risc0"
+path = "src/bin/ecdsa_mem.rs"

@@ -1,17 +1,31 @@
-use crate::zkvm::instance::{CompiledProgram, compile_guest_program};
-use crate::zkvm::{PreparedSha256, ProofArtifacts};
+use crate::zkvm::instance::{CompiledProgram, ProofArtifacts, compile_guest_program};
+use crate::zkvm::traits::PreparedBenchmark;
+use crate::zkvm::{PreparedEcdsa, PreparedSha256};
 use bincode::Options;
 use ere_zkvm_interface::Compiler;
 use ere_zkvm_interface::zkVM;
 use std::fs;
 use std::path::PathBuf;
 
-/// Prove a SHA-256 benchmark using the prepared zkVM instance.
+/// Prove any benchmark using the prepared zkVM instance.
+pub fn prove<P: PreparedBenchmark, SharedState>(prepared: &P, _: &SharedState) -> ProofArtifacts {
+    prepared.prove().expect("prove failed")
+}
+
+/// Prove a SHA-256 benchmark (type-specific wrapper for compatibility).
 pub fn prove_sha256<V: zkVM, SharedState>(
     prepared: &PreparedSha256<V>,
-    _: &SharedState,
+    shared_state: &SharedState,
 ) -> ProofArtifacts {
-    prepared.prove().expect("prove failed")
+    prove(prepared, shared_state)
+}
+
+/// Prove an ECDSA benchmark (type-specific wrapper for compatibility).
+pub fn prove_ecdsa<V: zkVM, SharedState>(
+    prepared: &PreparedEcdsa<V>,
+    shared_state: &SharedState,
+) -> ProofArtifacts {
+    prove(prepared, shared_state)
 }
 
 /// Verify a SHA-256 proof with digest checking.
@@ -23,13 +37,25 @@ pub fn verify_sha256<V: zkVM, SharedState>(
     prepared.verify_with_digest(proof).expect("verify failed");
 }
 
-/// Get the execution cycles for the prepared program.
-pub fn execution_cycles<V: zkVM>(prepared: &PreparedSha256<V>) -> u64 {
+/// Verify an ECDSA proof with expected values checking.
+pub fn verify_ecdsa<V: zkVM, SharedState>(
+    prepared: &PreparedEcdsa<V>,
+    proof: &ProofArtifacts,
+    _: &SharedState,
+) {
+    prepared.verify_with_expected(proof).expect("verify failed");
+}
+
+/// Get the execution cycles for any prepared benchmark.
+pub fn execution_cycles<P: PreparedBenchmark>(prepared: &P) -> u64 {
     prepared.execution_cycles().expect("execute failed")
 }
 
-/// Get the preprocessing (compiled program) size.
-pub fn preprocessing_size<V, SharedState>(prepared: &PreparedSha256<V>, _: &SharedState) -> usize {
+/// Get the preprocessing (compiled program) size for any prepared benchmark.
+pub fn preprocessing_size<P: PreparedBenchmark, SharedState>(
+    prepared: &P,
+    _: &SharedState,
+) -> usize {
     prepared.compiled_size()
 }
 
@@ -62,7 +88,7 @@ pub fn load_compiled_program<C: Compiler>(benchmark_name: &str) -> CompiledProgr
         .expect("missing compiled guest; the harness should have compiled it already");
     let program: C::Program = bincode::options()
         .deserialize(&program_bin)
-        .expect("failed to deserialize compiled guest program");
+        .expect("failed to deserialize compiled program");
     let byte_size = program_bin.len();
     CompiledProgram { program, byte_size }
 }
