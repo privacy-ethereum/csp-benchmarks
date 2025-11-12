@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: "Git ref (branch, tag, or SHA) to run on"
+        description: "Git ref name to run on (branch or tag)"
         required: false
       run_all:
         description: "Force running all benches regardless of changes"
@@ -45,7 +45,7 @@ jobs:
           if [[ -n "$REF_INPUT" ]]; then
             echo "ref=$REF_INPUT" >> "$GITHUB_OUTPUT"
           else
-            echo "ref=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+            echo "ref=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Dispatch Rust Benchmarks (parallel)
