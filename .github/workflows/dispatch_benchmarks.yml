@@ -58,7 +58,7 @@ jobs:
           REF='${{ steps.ref.outputs.ref }}'
           RUN_ALL='${{ github.event.inputs.run_all }}'
           INCLUDE_OPTIONAL='${{ github.event.inputs.include_optional }}'
-          gh workflow run "Rust Benchmarks (parallel)" \
+          gh workflow run -R "$GITHUB_REPOSITORY" "Rust Benchmarks (parallel)" \
             --ref "$REF" \
             -f run_all="$RUN_ALL" \
             -f include_optional="$INCLUDE_OPTIONAL" \
@@ -73,7 +73,7 @@ jobs:
           set -euo pipefail
           REF='${{ steps.ref.outputs.ref }}'
           RUN_ALL='${{ github.event.inputs.run_all }}'
-          gh workflow run "Non-Rust Benchmarks (parallel)" \
+          gh workflow run -R "$GITHUB_REPOSITORY" "Non-Rust Benchmarks (parallel)" \
             --ref "$REF" \
             -f run_all="$RUN_ALL" \
             -f prod_run="$PROD_RUN"
