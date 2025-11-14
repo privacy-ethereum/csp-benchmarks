@@ -161,7 +161,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ${{ inputs.ligero_path }}/build
-        key: native-build-${{ runner.os }}-${{ contains(runner.labels, 'self-hosted') ? 'selfhosted' : 'gh' }}-Release-${{ hashFiles(format('{0}/CMakeLists.txt', inputs.ligero_path)) }}-${{ hashFiles(format('{0}/src/**', inputs.ligero_path)) }}
+        key: "native-build-${{ runner.os }}-${{ github.workspace }}-Release-${{ hashFiles(format('{0}/CMakeLists.txt', inputs.ligero_path)) }}-${{ hashFiles(format('{0}/src/**', inputs.ligero_path)) }}"
 
     - name: Fix CMake cache if source path differs
       shell: bash
