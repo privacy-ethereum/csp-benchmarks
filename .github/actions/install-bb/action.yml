@@ -13,6 +13,6 @@ runs:
     - shell: bash
       run: |
         curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/next/barretenberg/bbup/install | bash
-        source ~/.bashrc
+        export PATH="$HOME/.bb:$PATH"
         bbup -v ${{ inputs.version }}
         echo "$HOME/.bb" >> $GITHUB_PATH
