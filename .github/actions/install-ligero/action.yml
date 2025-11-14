@@ -167,15 +167,16 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        CACHE="${{ inputs.ligero_path }}/build/CMakeCache.txt"
-        if [[ -f "$CACHE" ]]; then
-          want="$(cd "${{ inputs.ligero_path }}" && pwd)"
-          have="$(awk -F= '/^CMAKE_HOME_DIRECTORY:/{print $2; exit}' "$CACHE" || true)"
+        want="$(cd "${{ inputs.ligero_path }}" && pwd)"
+        while IFS= read -r -d '' cache; do
+          have="$(awk -F= '/^CMAKE_HOME_DIRECTORY:/{print $2; exit}' "$cache" || true)"
           if [[ -n "$have" && "$have" != "$want" ]]; then
-            echo "CMakeCache source dir mismatch: have=$have want=$want; removing CMakeCache.txt"
-            rm -f "$CACHE"
+            echo "CMakeCache mismatch: $cache (have=$have, want=$want) -> removing"
+            rm -f "$cache"
+            dir="$(dirname "$cache")"
+            rm -rf "$dir/CMakeFiles" || true
           fi
-        fi
+        done < <(find "${{ inputs.ligero_path }}/build" -name CMakeCache.txt -print0)
     - name: Configure & build native
       shell: bash
       run: |
