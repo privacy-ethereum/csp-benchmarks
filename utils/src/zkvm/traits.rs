@@ -1,8 +1,29 @@
-use ere_zkvm_interface::{Compiler, Input, zkVM};
+use crate::zkvm::instance::ProofArtifacts;
+use ere_zkvm_interface::{Compiler, Input, zkVM, zkVMError};
 
 /// Program to be benchmarked.
 pub trait Program {
     const NAME: &'static str;
+}
+
+/// Common interface for prepared benchmark instances.
+pub trait PreparedBenchmark {
+    type VM: zkVM;
+
+    /// Get the compiled program size in bytes.
+    fn compiled_size(&self) -> usize;
+
+    /// Execute the program and return the total number of cycles.
+    fn execution_cycles(&self) -> Result<u64, zkVMError>;
+
+    /// Generate a proof for the prepared benchmark.
+    fn prove(&self) -> Result<ProofArtifacts, zkVMError>;
+
+    /// Get a reference to the underlying zkVM instance.
+    fn vm(&self) -> &Self::VM;
+
+    /// Get a reference to the input data.
+    fn input(&self) -> &Input;
 }
 
 /// Marker trait for benchmark configuration types.

@@ -10,7 +10,7 @@ pub mod harness;
 pub mod metadata;
 pub mod zkvm;
 
-use p256::ecdsa::{Signature, SigningKey, signature::hazmat::PrehashSigner};
+use k256::ecdsa::{Signature, SigningKey, signature::hazmat::PrehashSigner};
 
 pub use harness::{BenchHarnessConfig, BenchTarget, ProvingSystem};
 
@@ -37,16 +37,17 @@ pub fn generate_sha256_input(input_size: usize) -> (Vec<u8>, Vec<u8>) {
     (message_bytes, digest_bytes)
 }
 
-/// Generate a random secp256r1 keypair and sign a sha256 32-byte hash of a 128-byte random message.
-#[allow(clippy::type_complexity)] // Allowing the return type to be "complex" for the consumers to not need to import the p256 crate
+/// Generate secp256k1 ECDSA test input: (digest, (pub_key_x, pub_key_y), signature).
+#[allow(clippy::type_complexity)]
 pub fn generate_ecdsa_input() -> (Vec<u8>, (Vec<u8>, Vec<u8>), Vec<u8>) {
     let mut rng = StdRng::seed_from_u64(0xecd5a);
     let signing_key = SigningKey::random(&mut rng);
     let verifying_key = signing_key.verifying_key().to_encoded_point(false);
     let (pub_key_x, pub_key_y) = (
-        verifying_key.x().unwrap().clone().to_vec(),
-        verifying_key.y().unwrap().clone().to_vec(),
+        verifying_key.x().unwrap().to_vec(),
+        verifying_key.y().unwrap().to_vec(),
     );
+
     let (_message, digest) = generate_sha256_input(128);
     let signature: Signature = signing_key
         .sign_prehash(&digest)
@@ -54,9 +55,8 @@ pub fn generate_ecdsa_input() -> (Vec<u8>, (Vec<u8>, Vec<u8>), Vec<u8>) {
 
     // Normalize "s" of the signature because it is not normalized by default.
     // More importantly, the "noir::std::ecdsa_secp256r1::verify_signature" expects "s" to be normalized.
-    let signature = signature
-        .normalize_s()
-        .expect("Failed to normalize signature");
+    // normalize_s() returns None if the signature is already normalized, in which case we keep the original.
+    let signature = signature.normalize_s().unwrap_or(signature);
 
     (
         digest,
@@ -73,10 +73,38 @@ pub fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
     }
 }
 
-pub fn len_of_input_sizes_for(target: BenchTarget) -> usize {
-    match target {
-        BenchTarget::Sha256 => selected_sha2_inputs().len(),
-        BenchTarget::Ecdsa => 1,
-        BenchTarget::Keccak => selected_sha2_inputs().len(),
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use k256::EncodedPoint;
+    use k256::ecdsa::{Signature, VerifyingKey};
+
+    #[test]
+    fn test_generate_ecdsa_input_produces_valid_components() {
+        let (digest, (pub_key_x, pub_key_y), signature_bytes) = generate_ecdsa_input();
+
+        assert_eq!(pub_key_x.len(), 32);
+        assert_eq!(pub_key_y.len(), 32);
+        assert_eq!(signature_bytes.len(), 64);
+        assert_eq!(digest.len(), 32);
+
+        let mut encoded = Vec::with_capacity(65);
+        encoded.push(0x04);
+        encoded.extend_from_slice(&pub_key_x);
+        encoded.extend_from_slice(&pub_key_y);
+
+        let encoded_point =
+            EncodedPoint::from_bytes(&encoded).expect("should produce valid encoded point");
+        let _verifying_key = VerifyingKey::from_encoded_point(&encoded_point)
+            .expect("should produce valid verifying key");
+        let _signature =
+            Signature::from_slice(&signature_bytes).expect("should produce valid signature");
+    }
+
+    #[test]
+    fn test_ecdsa_input_is_deterministic() {
+        let input1 = generate_ecdsa_input();
+        let input2 = generate_ecdsa_input();
+        assert_eq!(input1, input2);
     }
 }
