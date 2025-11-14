@@ -76,7 +76,7 @@ fn main() {
         Command::Sizes {
             command: SizesCommand::Len { target },
         } => {
-            println!("{}", utils::len_of_input_sizes_for(target));
+            println!("{}", utils::input_sizes_for(target).len());
         }
         Command::Sizes {
             command: SizesCommand::Get { target, index },

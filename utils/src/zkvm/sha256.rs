@@ -1,31 +1,9 @@
-use ere_zkvm_interface::{
-    Input, ProgramProvingReport, Proof, ProofKind, PublicValues, zkVM, zkVMError,
-};
+use crate::zkvm::instance::ProofArtifacts;
+use crate::zkvm::traits::PreparedBenchmark;
+use ere_zkvm_interface::{Input, Proof, ProofKind, PublicValues, zkVM, zkVMError};
 
 /// Benchmark name for SHA256 programs.
 pub const SHA256_BENCH: &str = "sha256";
-
-/// Result of executing `zkVM::prove` for a SHA-256 benchmark.
-#[derive(Clone)]
-pub struct ProofArtifacts {
-    pub public_values: PublicValues,
-    pub proof: Proof,
-    pub report: ProgramProvingReport,
-}
-
-impl ProofArtifacts {
-    pub fn new(public_values: PublicValues, proof: Proof, report: ProgramProvingReport) -> Self {
-        Self {
-            public_values,
-            proof,
-            report,
-        }
-    }
-
-    pub fn proof_size(&self) -> usize {
-        self.proof.as_bytes().len()
-    }
-}
 
 /// Common preparation data for zkVM SHA-256 benchmarks.
 pub struct PreparedSha256<V> {
@@ -111,6 +89,30 @@ where
     pub fn execution_cycles(&self) -> Result<u64, zkVMError> {
         let (_, report) = self.vm.execute(&self.input)?;
         Ok(report.total_num_cycles)
+    }
+}
+
+impl<V: zkVM> PreparedBenchmark for PreparedSha256<V> {
+    type VM = V;
+
+    fn compiled_size(&self) -> usize {
+        self.compiled_size
+    }
+
+    fn execution_cycles(&self) -> Result<u64, zkVMError> {
+        PreparedSha256::execution_cycles(self)
+    }
+
+    fn prove(&self) -> Result<ProofArtifacts, zkVMError> {
+        PreparedSha256::prove(self)
+    }
+
+    fn vm(&self) -> &Self::VM {
+        &self.vm
+    }
+
+    fn input(&self) -> &Input {
+        &self.input
     }
 }
 
