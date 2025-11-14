@@ -221,7 +221,7 @@ fn mem_report_filename(target: &str, size: usize, system: &str, feat: Option<&st
 fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
     match target {
         BenchTarget::Sha256 => selected_sha2_inputs(),
-        BenchTarget::Ecdsa => vec![0],
+        BenchTarget::Ecdsa => vec![32],
         BenchTarget::Keccak => selected_sha2_inputs(),
     }
 }

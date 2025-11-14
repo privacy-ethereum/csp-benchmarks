@@ -68,7 +68,7 @@ pub fn generate_ecdsa_input() -> (Vec<u8>, (Vec<u8>, Vec<u8>), Vec<u8>) {
 pub fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
     match target {
         BenchTarget::Sha256 => selected_sha2_inputs(),
-        BenchTarget::Ecdsa => vec![0],
+        BenchTarget::Ecdsa => vec![32],
         BenchTarget::Keccak => selected_sha2_inputs(),
     }
 }
