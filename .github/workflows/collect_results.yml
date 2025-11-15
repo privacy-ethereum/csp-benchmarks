@@ -5,10 +5,16 @@ on:
   workflow_run:
     workflows: ["Rust Benchmarks (parallel)", "Non-Rust Benchmarks (parallel)"]
     types: [completed]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit SHA to collect results for (defaults to current HEAD)"
+        required: false
+        type: string
 
 # collapse multiple triggers for the same commit into one survivor
 concurrency:
-  group: fanin-${{ github.event.workflow_run.head_sha || github.sha }}
+  group: fanin-${{ github.event.inputs.sha || github.event.workflow_run.head_sha || github.sha }}
   cancel-in-progress: true
 
 permissions:
@@ -21,7 +27,7 @@ jobs:
     env:
       HOMEBREW_NO_AUTO_UPDATE: "1"
       HOMEBREW_NO_ENV_HINTS: "1"
-      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      SHA: ${{ github.event.inputs.sha || github.event.workflow_run.head_sha || github.sha }}
       GH_TOKEN: ${{ github.token }}
       # keep in sync with on.workflow_run.workflows
       REQUIRED_WORKFLOWS_JSON: '["Rust Benchmarks (parallel)", "Non-Rust Benchmarks (parallel)"]'
