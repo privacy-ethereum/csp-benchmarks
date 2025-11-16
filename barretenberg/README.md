@@ -1,11 +1,11 @@
 # Noir + Barretenberg SHA256 benchmarks
 
-This benchmark code is from: https://github.com/noir-lang/sha256/tree/main. 
+This benchmark code is from: https://github.com/noir-lang/sha256/tree/main.
 
-Bench props are from: 
+Bench props are from:
+
 - https://deepwiki.com/AztecProtocol/barretenberg#proving-systems
 - https://deepwiki.com/AztecProtocol/barretenberg/6.1-ultrahonk
-
 
 ## Installation & Test Run
 

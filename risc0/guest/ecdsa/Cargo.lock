@@ -756,6 +756,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "k256"
+version = "0.13.3"
+source = "git+https://github.com/risc0/RustCrypto-elliptic-curves?tag=k256%2Fv0.13.3-risczero.1#ff5d67b095cfcc2569b7789f2079ed87ef2c7756"
+dependencies = [
+ "bytemuck",
+ "cfg-if",
+ "ecdsa",
+ "elliptic-curve",
+ "once_cell",
+ "risc0-bigint2",
+ "serdect",
+ "sha2",
+]
+
+[[package]]
 name = "keccak"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -905,18 +920,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d"
 
 [[package]]
-name = "p256"
-version = "0.13.2"
-source = "git+https://github.com/risc0/RustCrypto-elliptic-curves?tag=k256%2Fv0.13.3-risczero.1#ff5d67b095cfcc2569b7789f2079ed87ef2c7756"
-dependencies = [
- "ecdsa",
- "elliptic-curve",
- "primeorder",
- "serdect",
- "sha2",
-]
-
-[[package]]
 name = "paste"
 version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -957,15 +960,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85eae3c4ed2f50dcfe72643da4befc30deadb458a9b590d720cde2f2b1e97da9"
 dependencies = [
  "zerocopy",
-]
-
-[[package]]
-name = "primeorder"
-version = "0.13.6"
-source = "git+https://github.com/risc0/RustCrypto-elliptic-curves?tag=k256%2Fv0.13.3-risczero.1#ff5d67b095cfcc2569b7789f2079ed87ef2c7756"
-dependencies = [
- "elliptic-curve",
- "serdect",
 ]
 
 [[package]]
@@ -1089,6 +1083,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "risc0-bigint2"
+version = "1.4.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e916aa385e61e31935d7964aaeaec1fae9da617af6415d6363864147f430ebff"
+dependencies = [
+ "include_bytes_aligned",
+ "stability",
+]
+
+[[package]]
 name = "risc0-binfmt"
 version = "3.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1174,7 +1178,7 @@ name = "risc0-ecdsa"
 version = "0.1.0"
 dependencies = [
  "bincode",
- "p256",
+ "k256",
  "risc0-zkvm",
 ]
 

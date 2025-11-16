@@ -48,7 +48,7 @@ pub fn prepare_ecdsa(
     let vm = EreRisc0::new(program.program.clone(), ProverResourceType::Cpu)
         .expect("failed to build risc0 prover instance");
 
-    let (digest, (pub_key_x, pub_key_y), signature) = utils::generate_ecdsa_input();
+    let (digest, (pub_key_x, pub_key_y), signature) = utils::generate_ecdsa_k256_input();
 
     let encoded_verifying_key = encode_public_key(&pub_key_x, &pub_key_y)
         .expect("generated public key should have valid size");
