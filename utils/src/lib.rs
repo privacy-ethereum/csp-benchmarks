@@ -10,8 +10,8 @@ pub mod harness;
 pub mod metadata;
 pub mod zkvm;
 
-use p256::ecdsa::{Signature, SigningKey, signature::hazmat::PrehashSigner};
 use k256::ecdsa::{Signature as K256Signature, SigningKey as K256SigningKey};
+use p256::ecdsa::{Signature, SigningKey, signature::hazmat::PrehashSigner};
 
 pub use harness::{BenchHarnessConfig, BenchTarget, ProvingSystem};
 
@@ -103,10 +103,10 @@ pub fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use p256::EncodedPoint;
-    use p256::ecdsa::{Signature, VerifyingKey};
     use k256::EncodedPoint as K256EncodedPoint;
     use k256::ecdsa::{Signature as K256Signature, VerifyingKey as K256VerifyingKey};
+    use p256::EncodedPoint;
+    use p256::ecdsa::{Signature, VerifyingKey};
 
     #[test]
     fn test_generate_ecdsa_input_produces_valid_components() {
