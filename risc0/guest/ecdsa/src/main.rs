@@ -1,6 +1,6 @@
 #![no_main]
 
-use p256::{
+use k256::{
     EncodedPoint,
     ecdsa::{Signature, VerifyingKey, signature::hazmat::PrehashVerifier},
 };

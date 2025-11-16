@@ -13199,6 +13199,7 @@ dependencies = [
  "glob",
  "hex",
  "human-repr",
+ "k256",
  "libc",
  "p256",
  "rand 0.8.5",
