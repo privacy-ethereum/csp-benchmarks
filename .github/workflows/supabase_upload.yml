@@ -10,6 +10,7 @@ on:
         type: choice
         options:
           - dev
+          - staging
           - prod
       run_id:
         description: "Workflow run ID containing the collected-benchmarks artifact"
@@ -61,6 +62,9 @@ jobs:
           if [ "${{ inputs.environment }}" = "dev" ]; then
             API_KEY="${DEV_API_KEY}"
             API_URL="https://deploy-preview-524--ethproofs.netlify.app/api/v0/csp-benchmarks/upload"
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            API_KEY="${STAGING_API_KEY}"
+            API_URL="https://staging--ethproofs.netlify.app/api/v0/csp-benchmarks/upload"
           else
             API_KEY="${PROD_API_KEY}"
             API_URL="https://ethproofs.net/api/v0/csp-benchmarks/upload"
