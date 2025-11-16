@@ -121,24 +121,24 @@ impl FromStr for AuditStatus {
 }
 
 #[skip_serializing_none]
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BenchProperties {
     // Classification
-    pub proving_system: Option<Cow<'static, str>>,
-    pub field_curve: Option<Cow<'static, str>>,
-    pub iop: Option<Cow<'static, str>>,
+    pub proving_system: Cow<'static, str>,
+    pub field_curve: Cow<'static, str>,
+    pub iop: Cow<'static, str>,
     pub pcs: Option<Cow<'static, str>>,
-    pub arithm: Option<Cow<'static, str>>,
-    pub is_zk: Option<bool>,
+    pub arithm: Cow<'static, str>,
+    pub is_zk: bool,
 
     // Security
-    pub security_bits: Option<u64>,
-    pub is_pq: Option<bool>,
+    pub security_bits: u64,
+    pub is_pq: bool,
 
     // Maintenance / audit / zk
-    pub is_maintained: Option<bool>,
-    pub is_audited: Option<AuditStatus>,
+    pub is_maintained: bool,
+    pub is_audited: AuditStatus,
 
     // zkVM specifics
     pub isa: Option<Cow<'static, str>>,
@@ -174,17 +174,35 @@ impl BenchProperties {
     ) -> Self {
         // Serde deserialization default implementation does not allow static strings, so we need to convert them to Cow::Borrowed.
         Self {
-            proving_system: Some(Cow::Borrowed(proving_system)),
-            field_curve: Some(Cow::Borrowed(field_curve)),
-            iop: Some(Cow::Borrowed(iop)),
+            proving_system: Cow::Borrowed(proving_system),
+            field_curve: Cow::Borrowed(field_curve),
+            iop: Cow::Borrowed(iop),
             pcs: pcs.map(Cow::Borrowed),
-            arithm: Some(Cow::Borrowed(arithm)),
-            is_zk: Some(is_zk),
-            security_bits: Some(security_bits),
-            is_pq: Some(is_pq),
-            is_maintained: Some(is_maintained),
-            is_audited: Some(is_audited),
+            arithm: Cow::Borrowed(arithm),
+            is_zk,
+            security_bits,
+            is_pq,
+            is_maintained,
+            is_audited,
             isa: isa.map(Cow::Borrowed),
+        }
+    }
+}
+
+impl Default for BenchProperties {
+    fn default() -> Self {
+        Self {
+            proving_system: Cow::Borrowed(""),
+            field_curve: Cow::Borrowed(""),
+            iop: Cow::Borrowed(""),
+            pcs: None,
+            arithm: Cow::Borrowed(""),
+            is_zk: false,
+            security_bits: 0,
+            is_pq: false,
+            is_maintained: false,
+            is_audited: AuditStatus::NotAudited,
+            isa: None,
         }
     }
 }
