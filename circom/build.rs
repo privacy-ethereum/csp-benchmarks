@@ -13,27 +13,27 @@ fn find_rapidsnark_dirs(out_dir: &str) -> Vec<PathBuf> {
     let build_root = out_path.parent().and_then(|p| p.parent());
     let target = std::env::var("TARGET").ok();
 
-    if let Some(build_root) = build_root {
-        if let Ok(entries) = fs::read_dir(build_root) {
-            for entry in entries.flatten() {
-                let path = entry.path();
-                let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
-                    continue;
-                };
-                if !name.starts_with("rust-rapidsnark-") {
-                    continue;
-                }
-                let base = path.join("out").join("rapidsnark");
-                let mut candidates = Vec::new();
-                if let Some(ref triple) = target {
-                    candidates.push(base.join(triple));
-                }
-                candidates.push(base.join("aarch64-apple-darwin"));
-                candidates.push(base.join("x86_64-apple-darwin"));
-                for candidate in candidates {
-                    if candidate.join("librapidsnark.dylib").exists() {
-                        dirs.push(candidate);
-                    }
+    if let Some(build_root) = build_root
+        && let Ok(entries) = fs::read_dir(build_root)
+    {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
+                continue;
+            };
+            if !name.starts_with("rust-rapidsnark-") {
+                continue;
+            }
+            let base = path.join("out").join("rapidsnark");
+            let mut candidates = Vec::new();
+            if let Some(ref triple) = target {
+                candidates.push(base.join(triple));
+            }
+            candidates.push(base.join("aarch64-apple-darwin"));
+            candidates.push(base.join("x86_64-apple-darwin"));
+            for candidate in candidates {
+                if candidate.join("librapidsnark.dylib").exists() {
+                    dirs.push(candidate);
                 }
             }
         }

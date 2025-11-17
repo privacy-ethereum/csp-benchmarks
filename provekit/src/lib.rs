@@ -2,14 +2,30 @@ use provekit_common::{NoirProof, NoirProofScheme};
 use provekit_prover::NoirProofSchemeProver;
 use provekit_r1cs_compiler::NoirProofSchemeBuilder;
 use provekit_verifier::NoirProofSchemeVerifier;
+use std::borrow::Cow;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use utils::generate_ecdsa_input;
+use utils::harness::{AuditStatus, BenchProperties};
 
 const WORKSPACE_ROOT: &str = "circuits";
 const SHA256_CIRCUIT_SUB_PATH: &str = "hash/sha256-provekit";
 const ECDSA_CIRCUIT_SUB_PATH: &str = "ecdsa";
+
+pub const PROVEKIT_PROPS: BenchProperties = BenchProperties {
+    proving_system: Cow::Borrowed("Spartan+WHIR"), // https://github.com/worldfnd/provekit
+    field_curve: Cow::Borrowed("Bn254"),           // https://github.com/worldfnd/provekit
+    iop: Cow::Borrowed("Spartan"),                 // https://github.com/worldfnd/provekit
+    pcs: Some(Cow::Borrowed("WHIR")),              // https://github.com/worldfnd/provekit
+    arithm: Cow::Borrowed("R1CS"),                 // https://github.com/worldfnd/provekit
+    is_zk: true,                                   // https://github.com/worldfnd/provekit/pull/138
+    security_bits: 128, // https://github.com/worldfnd/provekit/blob/d7deea66c41d56c1d411dd799d0d6066272323e4/provekit/r1cs-compiler/src/whir_r1cs.rs#L43
+    is_pq: true,        // hash-based PCS
+    is_maintained: true, // https://github.com/worldfnd/provekit
+    is_audited: AuditStatus::NotAudited,
+    isa: None,
+};
 
 fn compile_workspace() -> PathBuf {
     let current_dir = std::env::current_dir().expect("Failed to get current directory");

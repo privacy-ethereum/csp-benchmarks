@@ -1,4 +1,4 @@
-use provekit::{prepare_ecdsa, preprocessing_size, prove, verify};
+use provekit::{PROVEKIT_PROPS, prepare_ecdsa, preprocessing_size, prove, verify};
 use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
@@ -6,7 +6,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::Provekit,
     None,
     "ecdsa_mem_provekit",
-    utils::harness::BenchProperties::default(),
+    PROVEKIT_PROPS,
     prepare_ecdsa,
     |(proof_scheme, _, _)| { proof_scheme.r1cs.num_constraints() },
     |(proof_scheme, toml_path, _)| { prove(proof_scheme, toml_path) },
