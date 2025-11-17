@@ -15,6 +15,6 @@ fn main() {
 }
 
 fn sha256_no_lookup_mem(input_size: usize) {
-    let (data, pw) = sha256_prepare(input_size);
+    let (data, pw, _) = sha256_prepare(input_size);
     let _proof = prove(&data, pw);
 }

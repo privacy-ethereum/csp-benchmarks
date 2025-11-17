@@ -26,13 +26,13 @@ utils::define_benchmark_harness!(
         None,
     ),
     sha256_prepare,
-    |(circuit_data, _)| { circuit_data.common.num_gate_constraints },
-    |(circuit_data, pw)| { prove(circuit_data, pw.clone()) },
-    |(circuit_data, _pw), proof| {
+    |(_, _, n_gates)| *n_gates,
+    |(circuit_data, pw, _)| { prove(circuit_data, pw.clone()) },
+    |(circuit_data, _pw, _), proof| {
         let verifier_data = circuit_data.verifier_data();
         verify(&verifier_data, proof.clone());
     },
-    |(circuit_data, _pw)| {
+    |(circuit_data, _pw, _)| {
         let gate_serializer = U32GateSerializer;
         let common_data_size = circuit_data
             .common

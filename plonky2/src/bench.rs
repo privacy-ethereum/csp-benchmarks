@@ -26,7 +26,7 @@ pub fn prove(
     data.prove(pw).unwrap()
 }
 
-pub fn sha256_prepare(input_size: usize) -> (CircuitData<F, C, D>, PartialWitness<F>) {
+pub fn sha256_prepare(input_size: usize) -> (CircuitData<F, C, D>, PartialWitness<F>, usize) {
     let (msg, hash) = utils::generate_sha256_input(input_size);
 
     let msg_bits = array_to_bits(&msg);
@@ -52,9 +52,6 @@ pub fn sha256_prepare(input_size: usize) -> (CircuitData<F, C, D>, PartialWitnes
         }
     }
 
-    println!(
-        "Constructing inner proof with {} gates",
-        builder.num_gates()
-    );
-    (builder.build::<C>(), pw)
+    let n_gates = builder.num_gates();
+    (builder.build::<C>(), pw, n_gates)
 }
