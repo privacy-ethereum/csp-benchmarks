@@ -56,12 +56,13 @@ jobs:
       - name: Upload Payload
         env:
           DEV_API_KEY: ${{ secrets.ETHPROOFS_DEV_KEY }}
+          STAGING_API_KEY: ${{ secrets.ETHPROOFS_STAGING_KEY }}
           PROD_API_KEY: ${{ secrets.ETHPROOFS_API_KEY }}
         run: |
           set -euo pipefail
           if [ "${{ inputs.environment }}" = "dev" ]; then
             API_KEY="${DEV_API_KEY}"
-            API_URL="https://deploy-preview-524--ethproofs.netlify.app/api/v0/csp-benchmarks/upload"
+            API_URL="https://deploy-preview-549--ethproofs.netlify.app/api/v0/csp-benchmarks/upload"
           elif [ "${{ inputs.environment }}" = "staging" ]; then
             API_KEY="${STAGING_API_KEY}"
             API_URL="https://staging--ethproofs.netlify.app/api/v0/csp-benchmarks/upload"
