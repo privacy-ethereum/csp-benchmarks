@@ -68,7 +68,7 @@ jobs:
             API_URL="https://staging--ethproofs.netlify.app/api/v0/csp-benchmarks/upload"
           else
             API_KEY="${PROD_API_KEY}"
-            API_URL="https://ethproofs.net/api/v0/csp-benchmarks/upload"
+            API_URL="https://ethproofs.org/api/v0/csp-benchmarks/upload"
           fi
           if [ -z "${API_KEY:-}" ]; then
             echo "ETHPROOFS_DEV_KEY secret is not set; aborting." >&2
