@@ -88,6 +88,12 @@ for target in "${TARGETS[@]}"; do
     PROVER_JSON_FILE="$STATE_DIR/prover_${TARGET}_${INPUT_SIZE}.json"
     VERIFIER_JSON_FILE="$STATE_DIR/verifier_${TARGET}_${INPUT_SIZE}.json"
 
+    step "[$TARGET] Size measurement (size ${INPUT_SIZE})"
+    SIZES_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_sizes.json"
+    SIZES_JSON="$SIZES_JSON" UTILS_BIN="$UTILS_BIN" INPUT_SIZE="$INPUT_SIZE" STATE_JSON="$PROVER_JSON_FILE" bash "$PREPARE_SH"
+    SIZES_JSON="$SIZES_JSON" STATE_JSON="$PROVER_JSON_FILE" bash "$MEASURE_SH" || warn "Size measurement failed"
+    ok "Sizes report: $SIZES_JSON"
+
     step "[$TARGET] Prover (size ${INPUT_SIZE}):"
     if [[ -z "${LOGGING_RUN:-}" ]]; then
     SHOW_OUTPUT=""
@@ -119,11 +125,6 @@ for target in "${TARGETS[@]}"; do
       bash "$MEASURE_RAM_SCRIPT" -o "$MEM_JSON" -- bash -lc "STATE_JSON=\"$PROVER_JSON_FILE\" bash \"$PROVE_SH\"" || warn "Memory measurement failed"
       ok "Memory report: $MEM_JSON"
     fi
-
-    step "[$TARGET] Size measurement (size ${INPUT_SIZE})"
-    SIZES_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_sizes.json"
-    SIZES_JSON="$SIZES_JSON" STATE_JSON="$PROVER_JSON_FILE" bash "$MEASURE_SH" || warn "Size measurement failed"
-    ok "Sizes report: $SIZES_JSON"
   done
 done
 

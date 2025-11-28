@@ -3,6 +3,27 @@
 # Common helpers for Barretenberg measurement scripts.
 # Do not set shell options here; this file is meant to be sourced.
 
+# Barretenberg CRS directory
+BB_CRS_DIR="${HOME}/.bb-crs"
+
+# Clear the CRS cache directory
+bb_clear_crs() {
+  if [[ -d "$BB_CRS_DIR" ]]; then
+    rm -rf "$BB_CRS_DIR"
+    echo "Cleared CRS cache: $BB_CRS_DIR" >&2
+  fi
+}
+
+# Measure total size of CRS files in bytes
+# Returns 0 if directory doesn't exist
+bb_measure_crs_size() {
+  if [[ -d "$BB_CRS_DIR" ]]; then
+    du -sk "$BB_CRS_DIR" 2>/dev/null | awk '{print $1 * 1024}'
+  else
+    echo "0"
+  fi
+}
+
 bb_write_sizes_and_constraints() {
   # Args:
   #   $1 = target name (e.g., sha256, ecdsa)
@@ -10,11 +31,13 @@ bb_write_sizes_and_constraints() {
   #   $3 = STATE_JSON path
   #   $4 = OUT_JSON path
   #   $5 = SYSTEM_DIR (directory containing system scripts)
+  #   $6 = CRS size in bytes
   local TARGET_NAME="$1"
   local ARTIFACT_BASENAME="$2"
   local STATE_JSON_PATH="$3"
   local OUT_JSON_PATH="$4"
   local SYSTEM_DIR="$5"
+  local CRS_SIZE_BYTES="${6:-0}"
 
   local WORKSPACE_ROOT_PATH proof_path proof_size_bytes CIRCUIT_PATH circuit_size preprocessing_size_bytes
 
@@ -30,13 +53,14 @@ bb_write_sizes_and_constraints() {
 
   CIRCUIT_PATH=$(jq -r '."circuit-path"' "$STATE_JSON_PATH")
   circuit_size=$(stat -f %z "$CIRCUIT_PATH" 2>/dev/null || stat -c %s "$CIRCUIT_PATH")
-  preprocessing_size_bytes=$(( circuit_size ))
+  preprocessing_size_bytes=$(( circuit_size + CRS_SIZE_BYTES ))
 
   local json_output
   json_output=$(jq -n \
     --argjson proof_size "$proof_size_bytes" \
     --argjson preprocessing_size "$preprocessing_size_bytes" \
-    '{proof_size: $proof_size, preprocessing_size: $preprocessing_size}')
+    --argjson crs_size "$CRS_SIZE_BYTES" \
+    '{proof_size: $proof_size, preprocessing_size: $preprocessing_size, crs_size: $crs_size}')
 
   echo "$json_output" > "$OUT_JSON_PATH"
   jq . "$OUT_JSON_PATH" || true

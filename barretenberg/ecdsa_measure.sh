@@ -11,9 +11,16 @@ OUT_JSON="${SIZES_JSON:-}"
 : "${STATE_JSON:?STATE_JSON is required}"
 : "${SIZES_JSON:?SIZES_JSON is required}"
 
+# Use shared common helper
+. "$SCRIPT_DIR/_measure_common.sh"
+
+# Clear CRS cache
+bb_clear_crs
+
 # Run one proving cycle to generate artifacts for measurement
 "$SCRIPT_DIR/ecdsa_prove.sh" >/dev/null 2>&1 || true
 
-# Use shared common helper to write sizes and update constraints
-. "$SCRIPT_DIR/_measure_common.sh"
-bb_write_sizes_and_constraints "ecdsa" "ecdsa.json" "$STATE_JSON" "$OUT_JSON" "$SCRIPT_DIR"
+# Measure CRS size after proving
+CRS_SIZE=$(bb_measure_crs_size)
+
+bb_write_sizes_and_constraints "ecdsa" "ecdsa.json" "$STATE_JSON" "$OUT_JSON" "$SCRIPT_DIR" "$CRS_SIZE"
