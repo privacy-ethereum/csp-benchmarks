@@ -7,10 +7,10 @@ concurrency:
 on:
   push:
     branches:
-      - "CSP-Q3-2025"
+      - "main"
   pull_request:
     branches:
-      - "CSP-Q3-2025"
+      - "main"
   workflow_dispatch:
     inputs:
       run_all:
@@ -55,7 +55,7 @@ jobs:
             REMOTE=upstream
           fi
 
-          BASE_BRANCH="CSP-Q3-2025"
+          BASE_BRANCH="main"
           git fetch --prune --no-tags --depth=1 "$REMOTE" "$BASE_BRANCH"
 
           # expose for later steps
