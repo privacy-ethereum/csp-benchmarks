@@ -1,10 +1,8 @@
-# Circom SHA256 benchmarks
-
-This benchmark code is from: https://github.com/brevis-network/zk-benchmark/tree/main/circom
+# Miden benchmarks
 
 ## Prerequisites
 
-Use the same toolchain as `.github/workflows/rust_benchmarks_parallel.yml`:
+Use the same Rust toolchain that CI applies (`.github/workflows/rust_benchmarks_parallel.yml`):
 
 ```bash
 rustup toolchain install nightly-2025-08-18-aarch64-apple-darwin \
@@ -12,7 +10,7 @@ rustup toolchain install nightly-2025-08-18-aarch64-apple-darwin \
 rustup override set nightly-2025-08-18-aarch64-apple-darwin
 ```
 
-## Run SHA256 benches
+## Benchmarking
 
 ```bash
 cargo bench

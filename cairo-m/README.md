@@ -2,14 +2,24 @@
 
 This benchmark code is from: https://github.com/kkrt-labs/zkvm-benchmarks/tree/master/cairo-m
 
-## Run SHA256 benches
+## Prerequisites
 
-1. Install the prerequisites for MacOS users
-https://github.com/kkrt-labs/cairo-m?tab=readme-ov-file#note-for-macos-users
-
-2. Run the benchmark
+Follow the same toolchain setup that CI applies in `.github/workflows/rust_benchmarks_parallel.yml`:
 
 ```bash
-chmod +x ../measure_mem_avg.sh
-RUSTFLAGS="-C link-arg=-fuse-ld=lld -C target-cpu=native" cargo bench 
+brew install llvm lld
+export CC=/opt/homebrew/opt/llvm/bin/clang
+export CXX=/opt/homebrew/opt/llvm/bin/clang++
+export AR=/opt/homebrew/opt/llvm/bin/llvm-ar
+export RANLIB=/opt/homebrew/opt/llvm/bin/llvm-ranlib
+
+rustup toolchain install nightly-2025-04-06-aarch64-apple-darwin \
+  --component llvm-tools rustc-dev rust-src
+rustup override set nightly-2025-04-06-aarch64-apple-darwin
+```
+
+## Run SHA256 benches
+
+```bash
+RUSTFLAGS="-C link-arg=-fuse-ld=lld -C target-cpu=native" cargo bench
 ```

@@ -2,9 +2,18 @@
 
 These benchmarks use official circuits from the Binius64 project: https://github.com/IrreducibleOSS/binius64/blob/main/prover/examples/src/circuits/sha256.rs
 
-# Run SHA256 benches
+## Prerequisites
+
+Use the same toolchain as `.github/workflows/rust_benchmarks_parallel.yml`:
 
 ```bash
-chmod +x ../measure_mem_avg.sh
+rustup toolchain install nightly-2025-08-18-aarch64-apple-darwin \
+  --component llvm-tools rustc-dev
+rustup override set nightly-2025-08-18-aarch64-apple-darwin
+```
+
+## Run SHA256 benches
+
+```bash
 RUSTFLAGS="-C target-cpu=native" cargo bench
 ```

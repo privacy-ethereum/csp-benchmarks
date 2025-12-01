@@ -1,15 +1,21 @@
 # Polyhedra Expander SHA256 benchmark
 
-## How to run
+## Prerequisites
 
-```
-cd polyhedra-expander
-cargo bench
-```
-
-# Measure SHA256 RAM footprint
+Polyhedra Expander depends on MPI and the workspace nightly toolchain. Reproduce the CI environment (`.github/actions/install-ompi` plus the Rust workflow) before running benches:
 
 ```bash
-chmod +x ../measure_mem_avg.sh
-../measure_mem_avg.sh --json sha256_2048_polyhedra_expander_mem_report.json -- cargo r -r --bin measure
+brew install open-mpi
+mpirun --version
+
+rustup toolchain install nightly-2025-08-18-aarch64-apple-darwin \
+  --component llvm-tools rustc-dev
+rustup override set nightly-2025-08-18-aarch64-apple-darwin
+```
+
+## How to run
+
+```bash
+cd polyhedra-expander
+cargo bench
 ```
