@@ -1,4 +1,4 @@
-# Polyhedra Expander SHA256 benchmark
+# Polyhedra Expander benchmark
 
 ## Prerequisites
 

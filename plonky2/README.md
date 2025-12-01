@@ -15,7 +15,7 @@ rustup toolchain install nightly-2025-08-18-aarch64-apple-darwin \
 rustup override set nightly-2025-08-18-aarch64-apple-darwin
 ```
 
-## Benchmarking SHA256 with Plonky2
+## Benchmarking
 
 ```bash
 cargo bench

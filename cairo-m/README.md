@@ -18,7 +18,7 @@ rustup toolchain install nightly-2025-04-06-aarch64-apple-darwin \
 rustup override set nightly-2025-04-06-aarch64-apple-darwin
 ```
 
-## Run SHA256 benches
+## Run the benchmark
 
 ```bash
 RUSTFLAGS="-C link-arg=-fuse-ld=lld -C target-cpu=native" cargo bench
