@@ -1,21 +1,89 @@
-# zkID Benchmarks
+# Client-Side Proving Benchmarks
 
-## Motivation
+This repository contains benchmarks of zero-knowledge proving systems and zkVMs. The goal is to _continuously_ map the landscape of proving systems that are suitable for client-side environments.
 
-In many conventional digital identity systems, a credential issuer signs a SHA256 hash of some attributes, and the verifier should learn the preimage of the hash to check the signature. Many applications are exploring a zero-knowledge (ZK) based approach to digital identity that allows proving statements about the hash preimage without revealing the plaintext data. Many conventional digital identity systems use a combination of SHA256 hash function and ECDSA signature scheme. These cryptographic algorithms are known to be ZK-un-friendly and may introduce a bottleneck in the ZK-based digital identity systems. This repository contains a set of SHA256 benchmarks in various proving systems. The choice of proving systems was based on the following requirements:
+All benchmark results are published on [ethproofs.org](https://ethproofs.org/csp-benchmarks) quarterly, where they are rendered into a user-friendly comparison interface.
 
-| Requirement                                         | Rationale                                                  |
-| --------------------------------------------------- | ---------------------------------------------------------- |
-| No trusted setup / long structured reference string | Fewer security assumptions and less mobile bandwidth usage |
-| Overall low bandwidth usage                         | Mobile device limitations                                  |
-| Recursive proving                                   | Offline verifiable presentation generation capability      |
-| Fast proving                                        | Mobile device limitations                                  |
-| Post-quantum security                               | Future-proofing                                            |
+## Why CSP benchmarking?
 
-## Benchmarks
+Client-side proving (CSP) is emerging as a requirement for privacy-preserving applications like anonymous credentials, private transfers, and more. Many systems claim to be “CSP-friendly,” but their real performance varies dramatically across four important dimensions:
 
-The SHA256 benchmarks that use ZKVMs have minimal circuits that only hash the hardcoded input. We kept the circuits as simple as possible to minimize the ZKVM overhead, so the benchmarks better reflect the proving system performance on SHA256.
+- proving time
+- peak memory
+- proof size
+- preprocessing size
 
-### Running the benchmarks
+This repository provides a unified benchmarking harness for comparing proving systems under identical conditions.
 
-Please refer to the individual README files in each subfolder for instructions on how to run the benchmarks.
+## What we benchmark
+
+We aim to benchmark the canonical circuits that correspond to typical use cases or represent typical bottlenecks in client-side ZK proving, for example SHA-256, ECDSA, Keccak etc. The planned benchmarking scope can be found in this [spreadsheet](https://docs.google.com/spreadsheets/d/1LFG-icfQf4-3YoxoR4GPdkcbAmD01mLPhiM3x4ufmnU/edit?usp=sharing).
+
+## How we run the benchmarks
+
+As of Q3 2025, we run benchmarks quarterly on a dedicated AWS `mac2.metal` host which has the following specifications:
+
+- Apple M1 CPU with 8 cores (arm64 architecture)
+- 16 GB RAM
+
+This hardware is one of the closest to a client-side device among the available cloud options (i.e., close to iPhone chip, has no CUDA, has no AVX, etc.).
+
+Our future plans include running the benchmarks in a cloud device farm (Android and iOS mobile devices).
+
+## How you can run benchmarks locally
+
+1.  **Install the prerequisites**
+    - Install Rust via `rustup` together with the nightly toolchains used in [CI](./.github/workflows/rust_benchmarks_parallel.yml): `nightly-2025-08-18-aarch64-apple-darwin` (default) plus `nightly-2025-04-06` for crates such as `nexus` and `cairo-m`. Add the `llvm-tools`, `rustc-dev`, `rustfmt`, and `clippy` components so `cargo bench` matches the workflow in `.github/workflows/rust_benchmarks_parallel.yml`.
+    - Ensure `cargo`, `cmake`, and a recent `clang`/`lld` are available (the helper actions under [`.github/actions/install-llvm`](./.github/actions/install-llvm) show the expected setup). Install Homebrew packages `bash`, `jq`, and `hyperfine`, plus `/usr/bin/time` for RAM measurements.
+    - Install per-system toolchains as needed: OpenMPI for `polyhedra-expander`, the Ligero prover stack for `ligetron`, Noir version >=1.0.0-beta.13 for `barretenberg`, and vendor SDKs such as RISC Zero, SP1, or OpenVM. Each folder documents its own bootstrap script and the matching GitHub Action ([`install-risc0`](./.github/actions/install-risc0), [`install-sp1`](./.github/actions/install-sp1), [`install-openvm`](./.github/actions/install-openvm), etc.) can be used as a reference.
+2.  **Run the benchmarks**
+
+    - Build the workspace once: `cargo build --release --workspace`.
+    - For Rust crates, run
+
+    ```bash
+    BENCH_INPUT_PROFILE=full cargo bench
+    ```
+
+    - Alternatively, to run individual benchmarks, `cd` into the crate directory and run `BENCH_INPUT_PROFILE=full cargo bench`.
+    - Use `BENCH_INPUT_PROFILE=reduced` to run with a reduced set of input sizes.
+    - For non-Rust systems, build the utilities crate (`cargo build --release -p utils`) and invoke `benchmark.sh`, e.g. `BENCH_INPUT_PROFILE=full bash ./benchmark.sh --system-dir ./barretenberg --logging --quick` (see [sh_benchmarks_parallel.yml](./.github/workflows/sh_benchmarks_parallel.yml)).
+
+## Repository structure
+
+- `utils/` – shared Rust crate that defines the benchmark harness, metadata about input sizes, common zkVM traits, and helper binaries (`utils`, `collect_benchmarks`, `format_hyperfine`).
+- `mobile/` – mobile benchmarks for Android and iOS.
+- `benchmark.sh` / `measure_mem_avg.sh` – orchestration scripts for non-Rust systems and RAM measurement.
+- `results/` – storage for published benchmark results.
+- Rust proving system and zkVM crates such as `binius64/`, `plonky2/`, `polyhedra-expander/`, `provekit/`, etc., each exposing a Criterion bench target registered through the shared harness.
+- Non-Rust proving system folders (`barretenberg/`, `ligetron/`, etc.) that contain the shell scripts required by `benchmark.sh`.
+
+## Result format & metrics
+
+- Every benchmark run produces `{target}_{input}_{system}_[optional_feature]_metrics.json`, following the schema implemented in `utils::bench::Metrics`: name, feature tag, target, input size, prove/verify wall-clock durations, optional execution cycles (for zkVMs), proof and preprocessing sizes, constraint counts, peak memory, and the descriptive `BenchProperties` block (classification, security level, audit status, ISA, etc.).
+- Peak memory is captured separately via `{target}_{input}_{system}_[optional_feature]_mem_report.json`, which stores the average of 10 `/usr/bin/time` samples gathered by `measure_mem_avg.sh`. Non-Rust systems also emit `{target}_{input}_sizes.json` for proof/preprocessing and update a shared `circuit_sizes.json` keyed by target and input size.
+- For non-Rust systems, raw `hyperfine_{target}_{input}_*.json` files are post-processed by the `format_hyperfine` binary so their timing data can be merged with the size, RAM, and constraint metadata.
+- When running in Github Actions, aggregated outputs are checked into `results/` and uploaded to [ethproofs.org](https://ethproofs.org/csp-benchmarks).
+
+## Methodology
+
+- Rust benchmarks register with the `utils::define_benchmark_harness!` macro (see `CONTRIBUTING.md`). The harness iterates over the canonical input sizes defined in `utils::metadata`, executes Criterion benches for prove and verify, records metrics, and invokes the dedicated memory binary.
+- Non-Rust systems achieve the same by orchestrating `{target}_prepare.sh`, `{target}_prove.sh`, `{target}_verify.sh`, and `{target}_measure.sh` scripts in each system folder via `benchmark.sh`.
+- Bench runs are parameterized by the `BENCH_INPUT_PROFILE` environment variable (`full` for full range of input sizes, `reduced` for PR/local smoke tests).
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for detailed instructions on adding new Rust or non-Rust systems, registering benchmarks in the workspace, and supplying the metadata required by the shared harness and orchestrator.
+
+## About the authors
+
+https://pse.dev/projects/client-side-proving
+
+## Acknowledgements
+
+We are thankful to
+
+- [zkID team](https://pse.dev/projects/zk-id) for kickstarting the project
+- [EthProofs team](https://ethproofs.org) for building the webpage and hosting the results
+- [EF Applied Cryptography Team](https://github.com/eth-act) for the unified zkVM interface library - [ere](https://github.com/eth-act/ere)
+- Everyone who helped us refine the benchmarking methodology and the results
