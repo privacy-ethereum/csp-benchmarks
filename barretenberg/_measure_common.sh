@@ -59,8 +59,7 @@ bb_write_sizes_and_constraints() {
   json_output=$(jq -n \
     --argjson proof_size "$proof_size_bytes" \
     --argjson preprocessing_size "$preprocessing_size_bytes" \
-    --argjson crs_size "$CRS_SIZE_BYTES" \
-    '{proof_size: $proof_size, preprocessing_size: $preprocessing_size, crs_size: $crs_size}')
+    '{proof_size: $proof_size, preprocessing_size: $preprocessing_size}')
 
   echo "$json_output" > "$OUT_JSON_PATH"
   jq . "$OUT_JSON_PATH" || true
