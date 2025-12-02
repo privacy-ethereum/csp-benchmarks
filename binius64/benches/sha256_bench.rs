@@ -15,7 +15,7 @@ utils::define_benchmark_harness!(
         "Binius64",
         Some("Binius64"),
         "Binius64",
-        true, // https://www.binius.xyz/basics/binius64-vs-v0
+        false, // https://www.irreducible.com/posts/announcing-binius64
         96, // https://github.com/IrreducibleOSS/binius64/blob/main/verifier/verifier/src/verify.rs#L40
         true, // hash-based PCS
         true,
