@@ -2,10 +2,7 @@ use anyhow::Result;
 use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_verifier::hash::{StdCompression, StdDigest};
 use binius64::{
-    circuits::{
-        KeccakCircuit,
-        keccak::KeccakParams,
-    },
+    circuits::{KeccakCircuit, keccak::KeccakParams},
     prepare, prove,
 };
 use clap::Parser;
@@ -36,11 +33,6 @@ fn keccak_mem(input_size: usize) -> Result<()> {
         StdCompression,
         ParallelCompressionAdaptor<StdCompression>,
         KeccakCircuit,
-    >(
-        &prover,
-        &compiled_circuit,
-        &keccak_circuit,
-        input_size,
-    )?;
+    >(&prover, &compiled_circuit, &keccak_circuit, input_size)?;
     Ok(())
 }

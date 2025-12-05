@@ -32,11 +32,6 @@ fn sha256_mem(input_size: usize) -> Result<()> {
         StdCompression,
         ParallelCompressionAdaptor<StdCompression>,
         Sha256Circuit,
-    >(
-        &prover,
-        &compiled_circuit,
-        &sha256_circuit,
-        input_size,
-    )?;
+    >(&prover, &compiled_circuit, &sha256_circuit, input_size)?;
     Ok(())
 }
