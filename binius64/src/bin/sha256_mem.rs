@@ -1,7 +1,7 @@
 use anyhow::Result;
 use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_verifier::hash::{StdCompression, StdDigest};
-use binius64::circuits::sha256::{Sha256Instance, Sha256Params};
+use binius64::circuits::sha256::Sha256Params;
 use binius64::{circuits::Sha256Circuit, prepare, prove};
 use clap::Parser;
 
@@ -36,10 +36,7 @@ fn sha256_mem(input_size: usize) -> Result<()> {
         &prover,
         &compiled_circuit,
         &sha256_circuit,
-        Sha256Instance {
-            message_len: Some(input_size),
-            message_string: None,
-        },
+        input_size,
     )?;
     Ok(())
 }

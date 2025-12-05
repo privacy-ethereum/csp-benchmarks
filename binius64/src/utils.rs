@@ -53,7 +53,7 @@ pub trait CircuitTrait: Sized {
 
     /// Instance data used to populate the witness.
     /// This represents the actual input values for a specific proof.
-    type Instance: clap::Args;
+    type Instance;
 
     /// Build the circuit with the given parameters.
     ///

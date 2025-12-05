@@ -2,10 +2,7 @@ use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_utils::serialization::SerializeBytes;
 use binius_verifier::hash::{StdCompression, StdDigest};
 use binius64::{
-    circuits::{
-        KeccakCircuit,
-        keccak::{KeccakInstance, KeccakParams},
-    },
+    circuits::{KeccakCircuit, keccak::KeccakParams},
     prepare,
 };
 use utils::harness::{AuditStatus, BenchProperties, ProvingSystem};
@@ -44,15 +41,7 @@ utils::define_benchmark_harness!(
             StdCompression,
             ParallelCompressionAdaptor<StdCompression>,
             KeccakCircuit,
-        >(
-            prover,
-            compiled_circuit,
-            keccak_circuit,
-            KeccakInstance {
-                message_len: Some(*input_size),
-                message_string: None,
-            },
-        )
+        >(prover, compiled_circuit, keccak_circuit, *input_size)
         .expect("Failed to prove keccak circuit")
     },
     |(verifier, _prover, _cs, _keccak_circuit, _compiled_circuit, _input_size),

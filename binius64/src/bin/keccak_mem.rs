@@ -4,7 +4,7 @@ use binius_verifier::hash::{StdCompression, StdDigest};
 use binius64::{
     circuits::{
         KeccakCircuit,
-        keccak::{KeccakInstance, KeccakParams},
+        keccak::KeccakParams,
     },
     prepare, prove,
 };
@@ -40,10 +40,7 @@ fn keccak_mem(input_size: usize) -> Result<()> {
         &prover,
         &compiled_circuit,
         &keccak_circuit,
-        KeccakInstance {
-            message_len: Some(input_size),
-            message_string: None,
-        },
+        input_size,
     )?;
     Ok(())
 }

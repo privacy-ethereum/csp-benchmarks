@@ -4,12 +4,11 @@ use anyhow::Result;
 use binius_circuits::keccak::{Keccak256, N_WORDS_PER_DIGEST};
 use binius_frontend::{CircuitBuilder, Wire, WitnessFiller};
 use clap::Args;
-use sha3::Digest;
 
 use crate::utils::{
-    CircuitTrait, DEFAULT_HASH_MESSAGE_BYTES, determine_hash_max_bytes_from_args,
-    generate_message_bytes, zero_pad_message,
+    CircuitTrait, DEFAULT_HASH_MESSAGE_BYTES, determine_hash_max_bytes_from_args, zero_pad_message,
 };
+use utils::generate_keccak_input;
 
 pub type KeccakParams = <KeccakCircuit as CircuitTrait>::Params;
 pub type KeccakInstance = <KeccakCircuit as CircuitTrait>::Instance;
@@ -27,21 +26,9 @@ pub struct Params {
     pub max_len_bytes: Option<usize>,
 }
 
-#[derive(Args, Debug, Clone)]
-#[group(multiple = false)]
-pub struct Instance {
-    /// Length of the randomly generated message, in bytes (defaults to 1024)
-    #[arg(long)]
-    pub message_len: Option<usize>,
-
-    /// UTF-8 string to hash (if not provided, random bytes are generated)
-    #[arg(long)]
-    pub message_string: Option<String>,
-}
-
 impl CircuitTrait for KeccakCircuit {
     type Params = Params;
-    type Instance = Instance;
+    type Instance = usize;
 
     fn build(params: Params, builder: &mut CircuitBuilder) -> Result<Self> {
         let max_len_bytes = determine_hash_max_bytes_from_args(params.max_len_bytes)?;
@@ -60,17 +47,18 @@ impl CircuitTrait for KeccakCircuit {
         })
     }
 
-    fn populate_witness(&self, instance: Instance, w: &mut WitnessFiller) -> Result<()> {
-        // Step 1: Get raw message bytes
-        let raw_message = generate_message_bytes(instance.message_string, instance.message_len);
+    fn populate_witness(&self, message_len_bytes: usize, w: &mut WitnessFiller) -> Result<()> {
+        // Step 1: Generate a deterministic message and its Keccak-256 digest using shared utils
+        let (message_bytes, digest_bytes) = generate_keccak_input(message_len_bytes);
 
         // Step 2: Zero-pad to maximum length
-        let padded_message = zero_pad_message(raw_message, self.max_len_bytes)?;
+        let padded_message = zero_pad_message(message_bytes, self.max_len_bytes)?;
 
-        // Step 3: Compute digest using reference implementation
-        let mut hasher = sha3::Keccak256::new();
-        hasher.update(&padded_message);
-        let digest: [u8; 32] = hasher.finalize().into();
+        // Step 3: Convert digest bytes to fixed-size array
+        let digest: [u8; 32] = digest_bytes
+            .as_slice()
+            .try_into()
+            .expect("Keccak-256 digest must be 32 bytes");
 
         // Step 4: Populate witness values
         self.keccak_hash.populate_len_bytes(w, padded_message.len());

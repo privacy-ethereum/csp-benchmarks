@@ -6,14 +6,13 @@ use binius_frontend::{CircuitBuilder, Wire, WitnessFiller};
 
 use binius_circuits::sha256::Sha256;
 use clap::Args;
-use sha2::Digest;
 
 use std::array;
 
 use crate::utils::{
-    CircuitTrait, DEFAULT_HASH_MESSAGE_BYTES, determine_hash_max_bytes_from_args,
-    generate_message_bytes, zero_pad_message,
+    CircuitTrait, DEFAULT_HASH_MESSAGE_BYTES, determine_hash_max_bytes_from_args, zero_pad_message,
 };
+use utils::generate_sha256_input;
 
 pub type Sha256Params = <Sha256Circuit as CircuitTrait>::Params;
 pub type Sha256Instance = <Sha256Circuit as CircuitTrait>::Instance;
@@ -24,7 +23,7 @@ pub struct Sha256Circuit {
 
 impl CircuitTrait for Sha256Circuit {
     type Params = Params;
-    type Instance = Instance;
+    type Instance = usize;
 
     fn build(params: Params, builder: &mut CircuitBuilder) -> Result<Self> {
         let max_len_bytes = determine_hash_max_bytes_from_args(params.max_len_bytes)?;
@@ -39,21 +38,24 @@ impl CircuitTrait for Sha256Circuit {
         Ok(Self { sha256_gadget })
     }
 
-    fn populate_witness(&self, instance: Instance, w: &mut WitnessFiller) -> Result<()> {
-        // Step 1: Get raw message bytes
-        let raw_message = generate_message_bytes(instance.message_string, instance.message_len);
+    fn populate_witness(&self, message_len_bytes: usize, w: &mut WitnessFiller) -> Result<()> {
+        // Step 1: Generate a deterministic message and its SHA-256 digest using shared utils
+        let (message_bytes, digest_bytes) = generate_sha256_input(message_len_bytes);
 
         // Step 2: Zero-pad to maximum length
-        let padded_message = zero_pad_message(raw_message, self.sha256_gadget.max_len_bytes())?;
+        let padded_message = zero_pad_message(message_bytes, self.sha256_gadget.max_len_bytes())?;
 
-        // Step 3: Compute digest using reference implementation
-        let digest = sha2::Sha256::digest(&padded_message);
+        // Step 3: Convert digest bytes to fixed-size array
+        let digest: [u8; 32] = digest_bytes
+            .as_slice()
+            .try_into()
+            .expect("SHA-256 digest must be 32 bytes");
 
         // Step 4: Populate witness values
         self.sha256_gadget
             .populate_len_bytes(w, padded_message.len());
         self.sha256_gadget.populate_message(w, &padded_message);
-        self.sha256_gadget.populate_digest(w, digest.into());
+        self.sha256_gadget.populate_digest(w, digest);
 
         Ok(())
     }
@@ -87,16 +89,4 @@ pub struct Params {
     /// runtime witness).
     #[arg(long, default_value_t = false)]
     pub exact_len: bool,
-}
-
-#[derive(Args, Debug, Clone)]
-#[group(multiple = false)]
-pub struct Instance {
-    /// Length of the randomly generated message, in bytes (defaults to 1024).
-    #[arg(long)]
-    pub message_len: Option<usize>,
-
-    /// UTF-8 string to hash (if not provided, random bytes are generated)
-    #[arg(long)]
-    pub message_string: Option<String>,
 }

@@ -2,7 +2,7 @@ use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_utils::serialization::SerializeBytes;
 use binius_verifier::hash::{StdCompression, StdDigest};
 use binius64::circuits::Sha256Circuit;
-use binius64::circuits::sha256::{Sha256Instance, Sha256Params};
+use binius64::circuits::sha256::Sha256Params;
 use binius64::prepare;
 
 use utils::harness::{AuditStatus, BenchProperties, ProvingSystem};
@@ -42,15 +42,7 @@ utils::define_benchmark_harness!(
             StdCompression,
             ParallelCompressionAdaptor<StdCompression>,
             Sha256Circuit,
-        >(
-            prover,
-            compiled_circuit,
-            sha256_circuit,
-            Sha256Instance {
-                message_len: Some(*input_size),
-                message_string: None,
-            },
-        )
+        >(prover, compiled_circuit, sha256_circuit, *input_size)
         .expect("Failed to prove sha256 circuit")
     },
     |(verifier, _prover, _cs, _sha256_circuit, _compiled_circuit, _input_size),
