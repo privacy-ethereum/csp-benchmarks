@@ -25,12 +25,12 @@ utils::define_benchmark_harness!(
     { compile_program() },
     |input_size, program: &Program| { prepare(input_size, program) },
     |_, _| 0,
-    |(program, (entrypoint_name, runner_inputs)), _: &&Program| {
+    |(program, (entrypoint_name, runner_inputs)), _| {
         prove(program, (entrypoint_name, runner_inputs))
     },
     |_, proof, _| { verify(proof) },
-    |(compiled_program, _), _: &&Program| { compiled_program.len() },
-    |proof, _: &&Program| proof.stark_proof.size_estimate(),
+    |(compiled_program, _), _| { compiled_program.len() },
+    |proof, _| proof.stark_proof.size_estimate(),
     |(program, (entrypoint_name, runner_inputs)): &(Program, (String, Vec<InputValue>))| {
         // Run/Execute the program
         let runner_output = run_cairo_program(
