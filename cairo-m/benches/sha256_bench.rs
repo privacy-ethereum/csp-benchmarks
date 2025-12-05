@@ -1,4 +1,4 @@
-use cairo_m::{prepare, prove, verify};
+use cairo_m::{compile_program, prepare, prove, verify};
 use cairo_m_common::{InputValue, Program};
 use cairo_m_prover::{adapter::import_from_runner_output, public_data::PublicData};
 use cairo_m_runner::run_cairo_program;
@@ -22,14 +22,15 @@ utils::define_benchmark_harness!(
         AuditStatus::NotAudited, // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about
         Some("Cairo ISA"), // https://github.com/kkrt-labs/cairo-m/blob/main/docs/design.md
     ),
-    |input_size| { prepare(input_size) },
-    |_| 0,
-    |(program, (entrypoint_name, runner_inputs))| {
+    { compile_program() },
+    |input_size, program: &Program| { prepare(input_size, program) },
+    |_, _| 0,
+    |(program, (entrypoint_name, runner_inputs)), _| {
         prove(program, (entrypoint_name, runner_inputs))
     },
-    |_, proof| { verify(proof) },
-    |(compiled_program, _)| { compiled_program.len() },
-    |proof| proof.stark_proof.size_estimate(),
+    |_, proof, _| { verify(proof) },
+    |(compiled_program, _), _| { compiled_program.len() },
+    |proof, _| proof.stark_proof.size_estimate(),
     |(program, (entrypoint_name, runner_inputs)): &(Program, (String, Vec<InputValue>))| {
         // Run/Execute the program
         let runner_output = run_cairo_program(

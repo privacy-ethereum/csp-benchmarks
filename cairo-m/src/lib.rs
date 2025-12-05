@@ -1,13 +1,26 @@
 use cairo_m_common::{InputValue, Program};
-use cairo_m_compiler::{CompilerOptions, compile_cairo};
+use cairo_m_compiler::{compile_cairo, CompilerOptions};
 use cairo_m_prover::{
-    Proof, adapter::import_from_runner_output, prover::prove_cairo_m,
-    prover_config::REGULAR_96_BITS, verifier::verify_cairo_m,
+    adapter::import_from_runner_output, prover::prove_cairo_m, prover_config::REGULAR_96_BITS,
+    verifier::verify_cairo_m, Proof,
 };
 use cairo_m_runner::run_cairo_program;
 use std::fs;
 use stwo_prover::core::vcs::blake2_merkle::{Blake2sMerkleChannel, Blake2sMerkleHasher};
 use utils::generate_sha256_input;
+
+/// Compile the Cairo-M SHA256 program from source.
+pub fn compile_program() -> Program {
+    let source_path = "programs/sha256.cm".to_string();
+    let source_text = fs::read_to_string(&source_path).expect("Failed to read sha256.cm");
+    let options = CompilerOptions {
+        verbose: false,
+        optimization_level: Default::default(),
+    };
+    let output =
+        compile_cairo(source_text, source_path, options).expect("Failed to compile sha256.cm");
+    (*output.program).clone()
+}
 
 /// Prepares a message for the Cairo-M SHA256 function by padding it and
 /// converting it to u32 words.
@@ -32,21 +45,12 @@ fn prepare_sha256_input(msg: &[u8]) -> Vec<u32> {
         .collect()
 }
 
-// TODO: Separate the program compilation, like in other benchmarks.
-// The blocker is that `compiled_program` doesn't implement proper serde, cannot be serialized to a file and deserialized from it.
-// Once this is fixed, the program compilation can be separated from the `prepare`.
-pub fn prepare(input_size: usize) -> (Program, (String, Vec<InputValue>)) {
-    // Compile the program
-    let source_path = "programs/sha256.cm".to_string();
-    let source_text = fs::read_to_string(&source_path).expect("Failed to read sha256.cm");
-    let options = CompilerOptions {
-        verbose: false,
-        optimization_level: Default::default(),
-    };
-    let output =
-        compile_cairo(source_text, source_path, options).expect("Failed to compile sha256.cm");
-    let compiled_program = (*output.program).clone();
-
+/// Prepare the input for the Cairo-M SHA256 program.
+/// Takes a pre-compiled program and input size, returns the program with its inputs.
+pub fn prepare(
+    input_size: usize,
+    compiled_program: &Program,
+) -> (Program, (String, Vec<InputValue>)) {
     // Generate input using sha2_input
     let (input_bytes, _digest) = generate_sha256_input(2048);
 
@@ -66,7 +70,7 @@ pub fn prepare(input_size: usize) -> (Program, (String, Vec<InputValue>)) {
         InputValue::Number(num_chunks as i64),
     ];
 
-    (compiled_program, (entrypoint_name, runner_inputs))
+    (compiled_program.clone(), (entrypoint_name, runner_inputs))
 }
 
 pub fn prove(

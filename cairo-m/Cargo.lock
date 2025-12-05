@@ -423,8 +423,8 @@ dependencies = [
 
 [[package]]
 name = "cairo-m-common"
-version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/kkrt-labs/cairo-m?rev=79c1b1e#79c1b1e83f7b959babe3c991eca0902954a31385"
 dependencies = [
  "anyhow",
  "num-traits",
@@ -438,8 +438,8 @@ dependencies = [
 
 [[package]]
 name = "cairo-m-compiler"
-version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/kkrt-labs/cairo-m?rev=79c1b1e#79c1b1e83f7b959babe3c991eca0902954a31385"
 dependencies = [
  "anyhow",
  "ariadne",
@@ -465,8 +465,8 @@ dependencies = [
 
 [[package]]
 name = "cairo-m-compiler-codegen"
-version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/kkrt-labs/cairo-m?rev=79c1b1e#79c1b1e83f7b959babe3c991eca0902954a31385"
 dependencies = [
  "cairo-m-common",
  "cairo-m-compiler-diagnostics",
@@ -490,8 +490,8 @@ dependencies = [
 
 [[package]]
 name = "cairo-m-compiler-diagnostics"
-version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/kkrt-labs/cairo-m?rev=79c1b1e#79c1b1e83f7b959babe3c991eca0902954a31385"
 dependencies = [
  "ariadne",
  "chumsky",
@@ -499,8 +499,8 @@ dependencies = [
 
 [[package]]
 name = "cairo-m-compiler-mir"
-version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/kkrt-labs/cairo-m?rev=79c1b1e#79c1b1e83f7b959babe3c991eca0902954a31385"
 dependencies = [
  "cairo-m-compiler-diagnostics",
  "cairo-m-compiler-parser",
@@ -516,8 +516,8 @@ dependencies = [
 
 [[package]]
 name = "cairo-m-compiler-parser"
-version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/kkrt-labs/cairo-m?rev=79c1b1e#79c1b1e83f7b959babe3c991eca0902954a31385"
 dependencies = [
  "ariadne",
  "cairo-m-compiler-diagnostics",
@@ -535,8 +535,8 @@ dependencies = [
 
 [[package]]
 name = "cairo-m-compiler-semantic"
-version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/kkrt-labs/cairo-m?rev=79c1b1e#79c1b1e83f7b959babe3c991eca0902954a31385"
 dependencies = [
  "anyhow",
  "ariadne",
@@ -561,8 +561,8 @@ dependencies = [
 
 [[package]]
 name = "cairo-m-project"
-version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/kkrt-labs/cairo-m?rev=79c1b1e#79c1b1e83f7b959babe3c991eca0902954a31385"
 dependencies = [
  "anyhow",
  "ignore",
@@ -575,8 +575,8 @@ dependencies = [
 
 [[package]]
 name = "cairo-m-prover"
-version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/kkrt-labs/cairo-m?rev=79c1b1e#79c1b1e83f7b959babe3c991eca0902954a31385"
 dependencies = [
  "anyhow",
  "bytemuck",
@@ -604,8 +604,8 @@ dependencies = [
 
 [[package]]
 name = "cairo-m-runner"
-version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/kkrt-labs/cairo-m?rev=79c1b1e#79c1b1e83f7b959babe3c991eca0902954a31385"
 dependencies = [
  "anyhow",
  "cairo-m-common",
@@ -626,8 +626,8 @@ dependencies = [
 
 [[package]]
 name = "cairo-m-test-utils"
-version = "0.1.0-alpha"
-source = "git+https://github.com/kkrt-labs/cairo-m?tag=v0.1.0-alpha.1#c0174020c59232133147282e518d7eb3363cdd7d"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/kkrt-labs/cairo-m?rev=79c1b1e#79c1b1e83f7b959babe3c991eca0902954a31385"
 dependencies = [
  "once_cell",
  "pulldown-cmark",
@@ -987,6 +987,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e7c1832837b905bbfb5101e07cc24c8deddf52f93225eee6ead5f4d63d53ddcb"
 dependencies = [
  "const-oid",
+ "pem-rfc7468",
  "zeroize",
 ]
 
@@ -1073,6 +1074,7 @@ dependencies = [
  "ff 0.13.1",
  "generic-array",
  "group 0.13.0",
+ "pem-rfc7468",
  "pkcs8",
  "rand_core 0.6.4",
  "sec1",
@@ -1766,6 +1768,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6790f58c7ff633d8771f42965289203411a5e5c68388703c06e14f24770b41e"
 
 [[package]]
+name = "p256"
+version = "0.13.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c9863ad85fa8f4460f9c48cb909d38a0d689dba1f6f6988a5e3e0d31071bcd4b"
+dependencies = [
+ "ecdsa",
+ "elliptic-curve",
+ "primeorder",
+ "sha2",
+]
+
+[[package]]
 name = "pairing"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1845,6 +1859,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 
 [[package]]
+name = "pem-rfc7468"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "88b39c9bfcfc231068454382784bb460aae594343fb030d46e9f50a645418412"
+dependencies = [
+ "base64ct",
+]
+
+[[package]]
 name = "pin-project-lite"
 version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1907,6 +1930,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85eae3c4ed2f50dcfe72643da4befc30deadb458a9b590d720cde2f2b1e97da9"
 dependencies = [
  "zerocopy",
+]
+
+[[package]]
+name = "primeorder"
+version = "0.13.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "353e1ca18966c16d9deb1c69278edbc5f194139612772bd9537af60ac231e1e6"
+dependencies = [
+ "elliptic-curve",
 ]
 
 [[package]]
@@ -3230,6 +3262,7 @@ dependencies = [
  "human-repr",
  "k256",
  "libc",
+ "p256",
  "rand 0.8.5",
  "regex",
  "serde",

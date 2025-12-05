@@ -1,4 +1,4 @@
-use cairo_m::{prepare, prove};
+use cairo_m::{compile_program, prepare, prove};
 use clap::Parser;
 
 #[derive(Parser, Debug)]
@@ -15,6 +15,6 @@ fn main() {
 }
 
 fn sha256_mem(input_size: usize) {
-    let (program, (entrypoint_name, runner_inputs)) = prepare(input_size);
+    let (program, (entrypoint_name, runner_inputs)) = prepare(input_size, &compile_program());
     let _ = prove(&program, (&entrypoint_name, &runner_inputs));
 }
