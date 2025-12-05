@@ -1,30 +1,18 @@
 use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_utils::serialization::SerializeBytes;
 use binius_verifier::hash::{StdCompression, StdDigest};
-use binius64::circuits::Sha256Circuit;
 use binius64::circuits::sha256::Sha256Params;
 use binius64::prepare;
+use binius64::{BINIUS64_BENCH_PROPERTIES, circuits::Sha256Circuit};
 
-use utils::harness::{AuditStatus, BenchProperties, ProvingSystem};
+use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
     ProvingSystem::Binius64,
     None,
     "sha256_mem_binius64",
-    BenchProperties::new(
-        "Binius64",
-        "GHASH binary field", // https://www.binius.xyz/basics/binius64-vs-v0
-        "Binius64",
-        Some("Binius64"),
-        "Binius64",
-        false, // https://www.irreducible.com/posts/announcing-binius64
-        96, // https://github.com/IrreducibleOSS/binius64/blob/main/verifier/verifier/src/verify.rs#L40
-        true, // hash-based PCS
-        true,
-        AuditStatus::NotAudited,
-        None,
-    ),
+    BINIUS64_BENCH_PROPERTIES,
     |input_size| {
         prepare::<Sha256Circuit>(
             input_size,

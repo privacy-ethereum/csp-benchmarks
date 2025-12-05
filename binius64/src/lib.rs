@@ -1,3 +1,6 @@
+use std::borrow::Cow;
+
+use ::utils::harness::{AuditStatus, BenchProperties};
 use anyhow::Result;
 use binius_core::{Word, constraint_system::ConstraintSystem};
 use binius_frontend::{Circuit, CircuitBuilder};
@@ -20,6 +23,20 @@ use crate::utils::{CircuitTrait, StdProver, StdVerifier};
 
 pub mod circuits;
 pub mod utils;
+
+pub const BINIUS64_BENCH_PROPERTIES: BenchProperties = BenchProperties {
+    proving_system: Cow::Borrowed("Binius64"),
+    field_curve: Cow::Borrowed("GHASH binary field"), // https://www.binius.xyz/basics/binius64-vs-v0
+    iop: Cow::Borrowed("Binius64"),
+    pcs: Some(Cow::Borrowed("Binius64")),
+    arithm: Cow::Borrowed("Binius64"),
+    is_zk: false,      // https://www.irreducible.com/posts/announcing-binius64
+    security_bits: 96, // https://github.com/IrreducibleOSS/binius64/blob/main/verifier/verifier/src/verify.rs#L40
+    is_pq: true,       // hash-based PCS
+    is_maintained: true,
+    is_audited: AuditStatus::NotAudited,
+    isa: None,
+};
 
 /// Setup the prover and verifier and use SHA256 for Merkle tree compression.
 /// Providing the `key_collection` skips expensive key collection building.
