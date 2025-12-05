@@ -13,6 +13,7 @@ tracing = { workspace = true }
 criterion = { workspace = true }
 utils = { workspace = true }
 sha2 = { workspace = true }
+sha3 = { workspace = true }
 
 tracing-profile = "0.10.3"
 binius-frontend = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bfbd6" }
@@ -26,6 +27,14 @@ binius-utils = { git = "https://github.com/IrreducibleOSS/binius64", rev = "d8bf
 name = "sha256_bench"
 harness = false
 
+[[bench]]
+name = "keccak_bench"
+harness = false
+
 [[bin]]
 name = "sha256_mem_binius64"
 path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "keccak_mem_binius64"
+path = "src/bin/keccak_mem.rs"

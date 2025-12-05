@@ -2052,6 +2052,7 @@ dependencies = [
  "criterion",
  "rand 0.8.5",
  "sha2",
+ "sha3",
  "tracing",
  "tracing-profile",
  "utils 0.1.0",
@@ -13208,6 +13209,7 @@ dependencies = [
  "serde_json",
  "serde_with",
  "sha2",
+ "sha3",
  "tabled",
 ]
 

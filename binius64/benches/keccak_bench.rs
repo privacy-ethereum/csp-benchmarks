@@ -1,17 +1,20 @@
 use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
 use binius_utils::serialization::SerializeBytes;
 use binius_verifier::hash::{StdCompression, StdDigest};
-use binius64::circuits::Sha256Circuit;
-use binius64::circuits::sha256::{Sha256Instance, Sha256Params};
-use binius64::prepare;
-
+use binius64::{
+    circuits::{
+        KeccakCircuit,
+        keccak::{KeccakInstance, KeccakParams},
+    },
+    prepare,
+};
 use utils::harness::{AuditStatus, BenchProperties, ProvingSystem};
 
 utils::define_benchmark_harness!(
-    BenchTarget::Sha256,
+    BenchTarget::Keccak,
     ProvingSystem::Binius64,
     None,
-    "sha256_mem_binius64",
+    "keccak_mem_binius64",
     BenchProperties::new(
         "Binius64",
         "GHASH binary field", // https://www.binius.xyz/basics/binius64-vs-v0
@@ -26,43 +29,42 @@ utils::define_benchmark_harness!(
         None,
     ),
     |input_size| {
-        prepare::<Sha256Circuit>(
+        prepare::<KeccakCircuit>(
             input_size,
-            Sha256Params {
+            KeccakParams {
                 max_len_bytes: Some(input_size),
-                exact_len: true,
             },
         )
-        .expect("Failed to prepare sha256 circuit for prove/verify")
+        .expect("Failed to prepare keccak circuit for prove/verify")
     },
     |(_, _, cs, _, _, _)| { cs.n_and_constraints() + cs.n_mul_constraints() },
-    |(_verifier, prover, _cs, sha256_circuit, compiled_circuit, input_size)| {
+    |(_verifier, prover, _cs, keccak_circuit, compiled_circuit, input_size)| {
         binius64::prove::<
             StdDigest,
             StdCompression,
             ParallelCompressionAdaptor<StdCompression>,
-            Sha256Circuit,
+            KeccakCircuit,
         >(
             prover,
             compiled_circuit,
-            sha256_circuit,
-            Sha256Instance {
+            keccak_circuit,
+            KeccakInstance {
                 message_len: Some(*input_size),
                 message_string: None,
             },
         )
-        .expect("Failed to prove sha256 circuit")
+        .expect("Failed to prove keccak circuit")
     },
-    |(verifier, _prover, _cs, _sha256_circuit, _compiled_circuit, _input_size),
+    |(verifier, _prover, _cs, _keccak_circuit, _compiled_circuit, _input_size),
      (proof, pub_witness)| {
         binius64::verify::<StdDigest, StdCompression, ParallelCompressionAdaptor<StdCompression>>(
             verifier,
             pub_witness,
             proof,
         )
-        .expect("Failed to verify sha256 circuit")
+        .expect("Failed to verify keccak circuit")
     },
-    |(_verifier, _prover, cs, _sha256_circuit, _compiled_circuit, _input_size)| {
+    |(_verifier, _prover, cs, _keccak_circuit, _compiled_circuit, _input_size)| {
         let mut buf: Vec<u8> = Vec::new();
         cs.serialize(&mut buf)
             .expect("Failed to serialize constraint system into byte array");

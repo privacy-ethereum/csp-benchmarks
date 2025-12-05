@@ -16,12 +16,14 @@ use binius_verifier::{
 };
 use sha2::digest::{Digest, FixedOutputReset, Output, core_api::BlockSizeUser};
 
-mod utils;
-use utils::{CircuitTrait, Instance, Params, Sha256Circuit, StdProver, StdVerifier};
+use crate::utils::{CircuitTrait, StdProver, StdVerifier};
+
+pub mod circuits;
+pub mod utils;
 
 /// Setup the prover and verifier and use SHA256 for Merkle tree compression.
 /// Providing the `key_collection` skips expensive key collection building.
-fn setup_sha256(
+fn setup(
     cs: ConstraintSystem,
     log_inv_rate: usize,
     key_collection: Option<KeyCollection>,
@@ -38,65 +40,43 @@ fn setup_sha256(
 }
 
 // Use the default configs/params
-pub fn prepare(
+pub fn prepare<CT: CircuitTrait>(
     input_size: usize,
-) -> Result<(
-    StdVerifier,
-    StdProver,
-    ConstraintSystem,
-    Sha256Circuit,
-    Circuit,
-    usize,
-)> {
+    params: CT::Params,
+) -> Result<(StdVerifier, StdProver, ConstraintSystem, CT, Circuit, usize)> {
     // Extract common arguments
     let log_inv_rate = 1;
 
-    // Prepare Params
-    let params = Params {
-        max_len_bytes: Some(input_size),
-        exact_len: true,
-    };
-
     // Build the circuit
     let mut builder = CircuitBuilder::new();
-    let sha256_circuit = Sha256Circuit::build(params, &mut builder)?;
+
+    let circuit = CT::build(params, &mut builder)?;
     let compiled_circuit = builder.build();
 
     // Set up prover and verifier
     let cs = compiled_circuit.constraint_system().clone();
 
     // Using SHA256 compression for Merkle tree
-    let (verifier, prover) = setup_sha256(cs.clone(), log_inv_rate as usize, None)?;
-
-    Ok((
-        verifier,
-        prover,
-        cs,
-        sha256_circuit,
-        compiled_circuit,
-        input_size,
-    ))
+    let (verifier, prover) = setup(cs.clone(), log_inv_rate as usize, None)?;
+    Ok((verifier, prover, cs, circuit, compiled_circuit, input_size))
 }
 
-pub fn prove<D, C, PC>(
+pub fn prove<D, C, PC, CT>(
     prover: &Prover<OptimalPackedB128, PC, D>,
     compiled_circuit: &Circuit,
-    sha256_circuit: &Sha256Circuit,
-    input_size: usize,
+    circuit: &CT,
+    instance: CT::Instance,
 ) -> Result<(Vec<u8>, Vec<Word>)>
 where
     D: ParallelDigest + Digest + BlockSizeUser,
     D::Digest: BlockSizeUser + FixedOutputReset,
     C: PseudoCompressionFunction<Output<D>, 2>,
     PC: ParallelPseudoCompression<Output<D::Digest>, 2>,
+    CT: CircuitTrait,
 {
     // Population of the input to the witness and then evaluating the circuit.
-    let instance = Instance {
-        message_len: Some(input_size),
-        message_string: None,
-    };
     let mut filler = compiled_circuit.new_witness_filler();
-    sha256_circuit.populate_witness(instance, &mut filler)?; // input population
+    circuit.populate_witness(instance, &mut filler)?; // input population
     compiled_circuit.populate_wire_witness(&mut filler)?; // circuit evaluation
     let witness = filler.into_value_vec();
 
