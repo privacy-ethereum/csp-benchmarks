@@ -1,6 +1,7 @@
 use rand::{RngCore, SeedableRng, rngs::StdRng};
 use serde::Serialize;
 use sha2::{Digest, Sha256};
+use sha3::Keccak256;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
@@ -33,6 +34,18 @@ pub fn generate_sha256_input(input_size: usize) -> (Vec<u8>, Vec<u8>) {
     rng.fill_bytes(&mut message_bytes);
 
     let mut hasher = Sha256::new();
+    hasher.update(&message_bytes);
+    let digest_bytes = hasher.finalize().to_vec();
+    (message_bytes, digest_bytes)
+}
+
+/// Generate a random message of `input_size` bytes and its keccak256 digest.
+pub fn generate_keccak_input(input_size: usize) -> (Vec<u8>, Vec<u8>) {
+    let mut message_bytes = vec![0u8; input_size];
+    let mut rng = StdRng::seed_from_u64(input_size as u64);
+    rng.fill_bytes(&mut message_bytes);
+
+    let mut hasher = Keccak256::new();
     hasher.update(&message_bytes);
     let digest_bytes = hasher.finalize().to_vec();
     (message_bytes, digest_bytes)
