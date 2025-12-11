@@ -19,6 +19,13 @@ enum Command {
         size: usize,
     },
 
+    /// Generate inputs for keccak256: prints hex-encoded message bytes then hex digest
+    Keccak {
+        /// Input size in bytes (default 128)
+        #[arg(long, short = 'n', default_value_t = 128)]
+        size: usize,
+    },
+
     /// Generate inputs for ecdsa: prints hex-encoded hashed message, public key, and signature
     Ecdsa,
 
@@ -56,6 +63,11 @@ fn main() {
     match cli.command {
         Command::Sha256 { size } => {
             let (message_bytes, digest) = utils::generate_sha256_input(size);
+            println!("{}", message_bytes.encode_hex::<String>());
+            println!("{}", digest.encode_hex::<String>());
+        }
+        Command::Keccak { size } => {
+            let (message_bytes, digest) = utils::generate_keccak_input(size);
             println!("{}", message_bytes.encode_hex::<String>());
             println!("{}", digest.encode_hex::<String>());
         }

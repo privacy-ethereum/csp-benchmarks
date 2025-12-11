@@ -5,7 +5,7 @@ set -euo pipefail
 # Usage: benchmark.sh --system-dir <path> [--targets "sha256,poseidon,..."]
 
 SYSTEM_DIR=""
-TARGETS=("sha256" "ecdsa")
+TARGETS=("sha256" "ecdsa" "keccak")
 
 while [[ $# -gt 0 ]]; do
   case "$1" in

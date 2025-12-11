@@ -1,4 +1,3 @@
-circuits/hash/sha256/Prover.toml
-circuits/hash/sha256/Prover_*.toml
+**/*Prover*.toml
 out
 !bench_props.json
