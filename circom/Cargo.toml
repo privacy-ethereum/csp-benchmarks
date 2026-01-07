@@ -25,6 +25,14 @@ witnesscalc-adapter = "0.1"
 name = "sha256_bench"
 harness = false
 
+[[bench]]
+name = "poseidon_bench"
+harness = false
+
 [[bin]]
 name = "sha256_mem_circom"
 path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "poseidon_mem_circom"
+path = "src/bin/poseidon_mem.rs"

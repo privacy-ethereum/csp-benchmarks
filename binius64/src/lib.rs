@@ -123,3 +123,19 @@ where
 
     Ok(())
 }
+
+pub fn count_constraints(cs: &ConstraintSystem) -> usize {
+    cs.n_and_constraints() + cs.n_mul_constraints()
+}
+
+pub fn preprocessing_size(cs: &ConstraintSystem) -> usize {
+    use binius_utils::serialization::SerializeBytes;
+    let mut buf: Vec<u8> = Vec::new();
+    cs.serialize(&mut buf)
+        .expect("Failed to serialize constraint system into byte array");
+    buf.len()
+}
+
+pub fn proof_size(proof: &(Vec<u8>, Vec<Word>)) -> usize {
+    proof.0.len()
+}

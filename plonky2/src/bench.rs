@@ -1,5 +1,6 @@
 use plonky2::{
     field::goldilocks_field::GoldilocksField,
+    hash::poseidon::PoseidonHash,
     iop::witness::{PartialWitness, WitnessWrite},
     plonk::{
         circuit_builder::CircuitBuilder,
@@ -50,6 +51,29 @@ pub fn sha256_prepare(input_size: usize) -> (CircuitData<F, C, D>, PartialWitnes
         } else {
             builder.assert_zero(targets.digest[i].target);
         }
+    }
+
+    let n_gates = builder.num_gates();
+    (builder.build::<C>(), pw, n_gates)
+}
+
+pub fn poseidon_prepare(input_size: usize) -> (CircuitData<F, C, D>, PartialWitness<F>, usize) {
+    use plonky2::field::types::Field;
+
+    let inputs = utils::generate_poseidon_input_goldilocks(input_size);
+    let mut builder = CircuitBuilder::<F, D>::new(CircuitConfig::standard_recursion_config());
+
+    let input_targets: Vec<_> = (0..input_size)
+        .map(|_| builder.add_virtual_target())
+        .collect();
+
+    let hash_out = builder.hash_n_to_hash_no_pad::<PoseidonHash>(input_targets.clone());
+    builder.register_public_inputs(&hash_out.elements);
+
+    let mut pw = PartialWitness::new();
+    for (i, target) in input_targets.iter().enumerate() {
+        pw.set_target(*target, F::from_canonical_u64(inputs[i]))
+            .unwrap();
     }
 
     let n_gates = builder.num_gates();

@@ -23,6 +23,7 @@ ere-zkvm-interface = { workspace = true }
 p256 = "0.13.2"
 k256 = "0.13.3"
 sha3.workspace = true
+num-bigint = "0.4"
 
 [[bin]]
 name = "collect_benchmarks"

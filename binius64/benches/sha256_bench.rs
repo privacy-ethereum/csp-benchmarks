@@ -1,10 +1,10 @@
 use binius_prover::hash::parallel_compression::ParallelCompressionAdaptor;
-use binius_utils::serialization::SerializeBytes;
 use binius_verifier::hash::{StdCompression, StdDigest};
-use binius64::circuits::sha256::Sha256Params;
-use binius64::prepare;
-use binius64::{BINIUS64_BENCH_PROPERTIES, circuits::Sha256Circuit};
-
+use binius64::{
+    BINIUS64_BENCH_PROPERTIES,
+    circuits::{Sha256Circuit, sha256::Sha256Params},
+    count_constraints, prepare, preprocessing_size, proof_size,
+};
 use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
@@ -23,7 +23,7 @@ utils::define_benchmark_harness!(
         )
         .expect("Failed to prepare sha256 circuit for prove/verify")
     },
-    |(_, _, cs, _, _, _)| { cs.n_and_constraints() + cs.n_mul_constraints() },
+    |(_, _, cs, _, _, _)| count_constraints(cs),
     |(_verifier, prover, _cs, sha256_circuit, compiled_circuit, input_size)| {
         binius64::prove::<
             StdDigest,
@@ -42,11 +42,6 @@ utils::define_benchmark_harness!(
         )
         .expect("Failed to verify sha256 circuit")
     },
-    |(_verifier, _prover, cs, _sha256_circuit, _compiled_circuit, _input_size)| {
-        let mut buf: Vec<u8> = Vec::new();
-        cs.serialize(&mut buf)
-            .expect("Failed to serialize constraint system into byte array");
-        buf.len()
-    },
-    |(proof, _pub_witness)| proof.len()
+    |(_, _, cs, _, _, _)| preprocessing_size(cs),
+    |proof| proof_size(proof)
 );

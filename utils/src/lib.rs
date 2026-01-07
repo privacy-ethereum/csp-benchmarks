@@ -1,3 +1,4 @@
+use num_bigint::BigUint;
 use rand::{RngCore, SeedableRng, rngs::StdRng};
 use serde::Serialize;
 use sha2::{Digest, Sha256};
@@ -16,7 +17,7 @@ use p256::ecdsa::{Signature, SigningKey, signature::hazmat::PrehashSigner};
 
 pub use harness::{BenchHarnessConfig, BenchTarget, ProvingSystem};
 
-use crate::metadata::selected_sha2_inputs;
+use crate::metadata::{selected_poseidon_inputs, selected_sha2_inputs};
 
 pub fn write_json<T: Serialize>(data: &T, output_path: &str) {
     let json_data = serde_json::to_string_pretty(&data).expect("Failed to serialize to JSON");
@@ -49,6 +50,42 @@ pub fn generate_keccak_input(input_size: usize) -> (Vec<u8>, Vec<u8>) {
     hasher.update(&message_bytes);
     let digest_bytes = hasher.finalize().to_vec();
     (message_bytes, digest_bytes)
+}
+
+pub fn generate_poseidon_input(input_size: usize) -> Vec<[u8; 32]> {
+    let mut rng = StdRng::seed_from_u64(input_size as u64);
+
+    (0..input_size)
+        .map(|_| {
+            let mut bytes = [0u8; 32];
+            rng.fill_bytes(&mut bytes);
+            bytes[31] &= 0x1f;
+            bytes
+        })
+        .collect()
+}
+
+pub fn generate_poseidon_input_strings(input_size: usize) -> Vec<String> {
+    generate_poseidon_input(input_size)
+        .into_iter()
+        .map(|bytes| BigUint::from_bytes_le(&bytes).to_string())
+        .collect()
+}
+
+pub fn generate_poseidon_input_m31(input_size: usize) -> Vec<u32> {
+    let mut rng = StdRng::seed_from_u64(input_size as u64);
+    let m31_mod: u32 = (1 << 31) - 1;
+
+    (0..input_size).map(|_| rng.next_u32() % m31_mod).collect()
+}
+
+pub fn generate_poseidon_input_goldilocks(input_size: usize) -> Vec<u64> {
+    let mut rng = StdRng::seed_from_u64(input_size as u64);
+    const GOLDILOCKS_PRIME: u64 = 0xFFFFFFFF00000001;
+
+    (0..input_size)
+        .map(|_| rng.next_u64() % GOLDILOCKS_PRIME)
+        .collect()
 }
 
 /// Generate secp256r1 (p256) ECDSA test input: (digest, (pub_key_x, pub_key_y), signature).
@@ -110,6 +147,8 @@ pub fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
         BenchTarget::Sha256 => selected_sha2_inputs(),
         BenchTarget::Ecdsa => vec![32],
         BenchTarget::Keccak => selected_sha2_inputs(),
+        BenchTarget::Poseidon => selected_poseidon_inputs(),
+        BenchTarget::Poseidon2 => selected_poseidon_inputs(),
     }
 }
 
