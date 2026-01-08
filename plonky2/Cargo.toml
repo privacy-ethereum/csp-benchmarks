@@ -19,9 +19,17 @@ utils = { workspace = true }
 clap = { workspace = true }
 
 [[bench]]
-name = "prove_verify"
+name = "sha256"
+harness = false
+
+[[bench]]
+name = "poseidon"
 harness = false
 
 [[bin]]
 name = "sha256_no_lookup_mem"
 path = "src/bin/sha256_no_lookup_mem.rs"
+
+[[bin]]
+name = "poseidon_mem_plonky2"
+path = "src/bin/poseidon_mem.rs"

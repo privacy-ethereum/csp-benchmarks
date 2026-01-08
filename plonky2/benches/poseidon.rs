@@ -1,17 +1,16 @@
-use plonky2_sha256::bench::{prove, sha256_prepare, verify};
-
-use plonky2::{plonk::config::PoseidonGoldilocksConfig, util::serialization::Write};
-use plonky2_u32::gates::arithmetic_u32::{U32GateSerializer, U32GeneratorSerializer};
+use plonky2::plonk::config::PoseidonGoldilocksConfig;
+use plonky2::util::serialization::{DefaultGateSerializer, DefaultGeneratorSerializer, Write};
+use plonky2_sha256::bench::{poseidon_prepare, prove, verify};
 use utils::harness::{AuditStatus, BenchProperties, ProvingSystem};
 
 const D: usize = 2;
 type C = PoseidonGoldilocksConfig;
 
 utils::define_benchmark_harness!(
-    BenchTarget::Sha256,
+    BenchTarget::Poseidon,
     ProvingSystem::Plonky2,
     None,
-    "sha256_no_lookup_mem",
+    "poseidon_mem_plonky2",
     BenchProperties::new(
         "Plonky2",    // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
         "Goldilocks", // https://github.com/0xPolygonZero/plonky2/blob/main/plonky2/plonky2.pdf
@@ -25,7 +24,7 @@ utils::define_benchmark_harness!(
         AuditStatus::Audited, // https://github.com/0xPolygonZero/plonky2/tree/main/audits
         None,
     ),
-    sha256_prepare,
+    poseidon_prepare,
     |(_, _, n_gates)| *n_gates,
     |(circuit_data, pw, _)| { prove(circuit_data, pw.clone()) },
     |(circuit_data, _pw, _), proof| {
@@ -33,13 +32,13 @@ utils::define_benchmark_harness!(
         verify(&verifier_data, proof.clone());
     },
     |(circuit_data, _pw, _)| {
-        let gate_serializer = U32GateSerializer;
+        let gate_serializer = DefaultGateSerializer;
         let common_data_size = circuit_data
             .common
             .to_bytes(&gate_serializer)
             .unwrap()
             .len();
-        let generator_serializer = U32GeneratorSerializer::<C, D>::default();
+        let generator_serializer = DefaultGeneratorSerializer::<C, D>::default();
         let prover_data_size = circuit_data
             .prover_only
             .to_bytes(&generator_serializer, &circuit_data.common)
