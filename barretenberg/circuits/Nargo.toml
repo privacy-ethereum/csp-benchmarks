@@ -2,6 +2,7 @@
 members = [
     "hash/sha256",
     "hash/keccak256",
+    "hash/poseidon",
     "ecdsa",
     "hash/poseidon2",
 ]
