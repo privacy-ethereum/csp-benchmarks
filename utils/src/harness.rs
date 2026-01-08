@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::str::FromStr;
 
 use crate::bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics};
-use crate::metadata::selected_sha2_inputs;
+use crate::metadata::{selected_poseidon_inputs, selected_sha2_inputs};
 use criterion::{BatchSize, Criterion};
 
 const SAMPLE_SIZE: usize = 10;
@@ -12,7 +12,8 @@ pub enum BenchTarget {
     Sha256,
     Ecdsa,
     Keccak,
-    // Add more targets here
+    Poseidon,
+    Poseidon2,
 }
 
 impl BenchTarget {
@@ -21,6 +22,8 @@ impl BenchTarget {
             BenchTarget::Sha256 => "sha256",
             BenchTarget::Ecdsa => "ecdsa",
             BenchTarget::Keccak => "keccak",
+            BenchTarget::Poseidon => "poseidon",
+            BenchTarget::Poseidon2 => "poseidon2",
         }
     }
 }
@@ -33,6 +36,8 @@ impl FromStr for BenchTarget {
             "sha256" => Ok(BenchTarget::Sha256),
             "ecdsa" => Ok(BenchTarget::Ecdsa),
             "keccak" => Ok(BenchTarget::Keccak),
+            "poseidon" => Ok(BenchTarget::Poseidon),
+            "poseidon2" => Ok(BenchTarget::Poseidon2),
             _ => Err(format!("Invalid benchmark target: {}", s)),
         }
     }
@@ -241,6 +246,8 @@ fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
         BenchTarget::Sha256 => selected_sha2_inputs(),
         BenchTarget::Ecdsa => vec![32],
         BenchTarget::Keccak => selected_sha2_inputs(),
+        BenchTarget::Poseidon => selected_poseidon_inputs(),
+        BenchTarget::Poseidon2 => selected_poseidon_inputs(),
     }
 }
 
@@ -588,5 +595,11 @@ macro_rules! define_benchmark_harness {
     };
     (BenchTarget::Keccak, $($rest:tt)*) => {
         $crate::__define_benchmark_harness!(keccak, $crate::harness::BenchTarget::Keccak, $($rest)*);
+    };
+    (BenchTarget::Poseidon, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(poseidon, $crate::harness::BenchTarget::Poseidon, $($rest)*);
+    };
+    (BenchTarget::Poseidon2, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(poseidon2, $crate::harness::BenchTarget::Poseidon2, $($rest)*);
     };
 }

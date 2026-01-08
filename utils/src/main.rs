@@ -29,6 +29,13 @@ enum Command {
     /// Generate inputs for ecdsa: prints hex-encoded hashed message, public key, and signature
     Ecdsa,
 
+    /// Generate inputs for poseidon: prints field elements as decimal strings (one per line)
+    Poseidon {
+        /// Number of field elements (default 2)
+        #[arg(long, short = 'n', default_value_t = 2)]
+        size: usize,
+    },
+
     /// Query available sha256 input sizes from metadata
     Sizes {
         #[command(subcommand)]
@@ -77,6 +84,12 @@ fn main() {
             println!("{}", pub_key_x.encode_hex::<String>());
             println!("{}", pub_key_y.encode_hex::<String>());
             println!("{}", signature.encode_hex::<String>());
+        }
+        Command::Poseidon { size } => {
+            let field_elements = utils::generate_poseidon_input_strings(size);
+            for elem in field_elements {
+                println!("{}", elem);
+            }
         }
         Command::Sizes {
             command: SizesCommand::List { target },

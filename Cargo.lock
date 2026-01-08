@@ -13202,6 +13202,7 @@ dependencies = [
  "human-repr",
  "k256",
  "libc",
+ "num-bigint 0.4.6",
  "p256",
  "rand 0.8.5",
  "regex",
