@@ -43,11 +43,19 @@ fn find_rapidsnark_dirs(out_dir: &str) -> Vec<PathBuf> {
 }
 
 fn main() {
+    // SHA256 circuits
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_128");
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_256");
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_512");
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_1024");
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_2048");
+
+    // Poseidon circuits
+    witnesscalc_adapter::build_and_link("./circuits/poseidon/poseidon_2");
+    witnesscalc_adapter::build_and_link("./circuits/poseidon/poseidon_4");
+    witnesscalc_adapter::build_and_link("./circuits/poseidon/poseidon_8");
+    witnesscalc_adapter::build_and_link("./circuits/poseidon/poseidon_12");
+    witnesscalc_adapter::build_and_link("./circuits/poseidon/poseidon_16");
 
     if let Ok(out_dir) = std::env::var("OUT_DIR") {
         let lib_dir = Path::new(&out_dir)

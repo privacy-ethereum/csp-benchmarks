@@ -1,10 +1,32 @@
+pub mod poseidon;
+
 use circom_prover::{
     CircomProver,
     prover::{CircomProof, ProofLib},
     witness::WitnessFn,
 };
 use std::collections::HashMap;
+use std::path::Path;
 use utils::generate_sha256_input;
+
+pub fn sum_file_sizes_in_the_dir(file_path: &str) -> std::io::Result<usize> {
+    let dir = Path::new(file_path)
+        .parent()
+        .expect("File should have a parent directory");
+
+    let mut total_size: usize = 0;
+
+    for entry in std::fs::read_dir(dir)? {
+        let entry = entry?;
+        let metadata = entry.metadata()?;
+
+        if metadata.is_file() {
+            total_size += metadata.len() as usize;
+        }
+    }
+
+    Ok(total_size)
+}
 
 // Prepare witness generator
 witnesscalc_adapter::witness!(sha256_128);
@@ -70,4 +92,22 @@ pub fn verify(proof: CircomProof, zkey_path: String) {
     let valid = CircomProver::verify(ProofLib::Rapidsnark, proof, zkey_path).unwrap();
 
     assert!(valid);
+}
+
+pub fn read_constraint_count(zkey_path: &str) -> usize {
+    use ark_bn254::Bn254;
+    use circom_prover::prover::ark_circom;
+    use std::fs::File;
+    use std::io::BufReader;
+
+    let mut buffer = BufReader::new(File::open(zkey_path).expect("Unable to open zkey"));
+    let (_, constraint_matrices) =
+        ark_circom::read_zkey::<_, Bn254>(&mut buffer).expect("Unable to read zkey");
+    constraint_matrices.num_constraints
+}
+
+pub fn proof_size(proof: &CircomProof) -> usize {
+    serde_json::to_vec(proof)
+        .expect("Failed to serialize proof")
+        .len()
 }
