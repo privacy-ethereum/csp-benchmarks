@@ -122,10 +122,11 @@ print_array_from_string() {
 } > "$TOML_PATH"
 
 ####    Create STATE JSON    ####
-JQ_PROG='{"workspace-root-path":$workspace, "circuit-path":$circuit, "toml-path":$toml}'
+JQ_PROG='{"workspace-root-path":$workspace, "circuit-path":$circuit, "toml-path":$toml, "benchmark-name":$bench}'
 
 jq -nc \
   --arg workspace "$WORKSPACE_ROOT_PATH" \
   --arg circuit "$CIRCUIT_PATH" \
   --arg toml "$TOML_PATH" \
+  --arg bench "ecdsa" \
   "$JQ_PROG" > "$STATE_JSON"

@@ -72,10 +72,9 @@ for target in "${TARGETS[@]}"; do
   [[ -n "$sizes_len" ]] || { echo "Failed to obtain sizes length from utils" >&2; exit 1; }
 
   PREPARE_SH="${SYSTEM_DIR}/${TARGET}_prepare.sh"
-  PROVE_SH="${SYSTEM_DIR}/${TARGET}_prove.sh"
-  VERIFY_SH="${SYSTEM_DIR}/${TARGET}_verify.sh"
   MEASURE_SH="${SYSTEM_DIR}/${TARGET}_measure.sh"
-  PROVE_FOR_VERIY_SH="${SYSTEM_DIR}/${TARGET}_prove_for_verify.sh"
+  PROVE_SH="${SYSTEM_DIR}/prove.sh"
+  VERIFY_SH="${SYSTEM_DIR}/verify.sh"
 
   if [[ ! -x "$PREPARE_SH" ]]; then
     warn "Skipping target $TARGET: prepare script not found/executable"
@@ -107,17 +106,10 @@ for target in "${TARGETS[@]}"; do
       --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json"
 
     step "[$TARGET] Verifier (size ${INPUT_SIZE}):"
-    if [[ -x "$PROVE_FOR_VERIY_SH" ]]; then
-      hyperfine --runs "$RUNS" \
-        --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_FOR_VERIY_SH > /dev/null 2>&1" \
-        "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
-        --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
-    else
-      hyperfine --runs "$RUNS" \
-        --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
-        "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
-        --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
-    fi
+    hyperfine --runs "$RUNS" \
+      --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && WRITE_VK=1 STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
+      "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
+      --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
 
     if [[ -z "${NO_RAM:-}" ]]; then
       step "[$TARGET] RAM measurement (size ${INPUT_SIZE})"

@@ -112,12 +112,13 @@ TOML_PATH="${CIRCUIT_MEMBER_DIR}/Prover_${INPUT_SIZE}.toml"
 } > "$TOML_PATH"
 
 ####    Create STATE JSON    ####
-JQ_PROG='{"workspace-root-path":$workspace, "circuit-path":$circuit, "toml-path":$toml, "input-size":$len}'
+JQ_PROG='{"workspace-root-path":$workspace, "circuit-path":$circuit, "toml-path":$toml, "input-size":$len, "benchmark-name":$bench}'
 
 jq -nc \
   --arg workspace "$WORKSPACE_ROOT_PATH" \
   --arg circuit "$CIRCUIT_PATH" \
   --arg toml "$TOML_PATH" \
   --argjson len "$INPUT_SIZE" \
+  --arg bench "keccak" \
   "$JQ_PROG" > "$STATE_JSON"
 
