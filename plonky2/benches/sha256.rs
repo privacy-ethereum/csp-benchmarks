@@ -1,6 +1,6 @@
 use plonky2::{plonk::config::PoseidonGoldilocksConfig, util::serialization::Write};
-use plonky2_sha256::bench::{prove, sha256_prepare, verify};
 use plonky2_sha256::PLONKY2_BENCH_PROPERTIES;
+use plonky2_sha256::bench::{prove, sha256_prepare, verify};
 use plonky2_u32::gates::arithmetic_u32::{U32GateSerializer, U32GeneratorSerializer};
 use utils::harness::ProvingSystem;
 

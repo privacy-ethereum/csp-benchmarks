@@ -1,7 +1,7 @@
 use plonky2::plonk::config::PoseidonGoldilocksConfig;
 use plonky2::util::serialization::{DefaultGateSerializer, DefaultGeneratorSerializer, Write};
-use plonky2_sha256::bench::{poseidon_prepare, prove, verify};
 use plonky2_sha256::PLONKY2_BENCH_PROPERTIES;
+use plonky2_sha256::bench::{poseidon_prepare, prove, verify};
 use utils::harness::ProvingSystem;
 
 const D: usize = 2;
