@@ -72,7 +72,7 @@ for target in "${TARGETS[@]}"; do
   [[ -n "$sizes_len" ]] || { echo "Failed to obtain sizes length from utils" >&2; exit 1; }
 
   PREPARE_SH="${SYSTEM_DIR}/${TARGET}_prepare.sh"
-  MEASURE_SH="${SYSTEM_DIR}/${TARGET}_measure.sh"
+  MEASURE_SH="${SYSTEM_DIR}/measure.sh"
   PROVE_SH="${SYSTEM_DIR}/prove.sh"
   VERIFY_SH="${SYSTEM_DIR}/verify.sh"
 

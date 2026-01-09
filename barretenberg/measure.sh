@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# Common helpers for Barretenberg measurement scripts.
-# Do not set shell options here; this file is meant to be sourced.
+# Required env vars:
+# - STATE_JSON: path to JSON arguments (must contain benchmark-name)
+# - SIZES_JSON: output JSON path
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+OUT_JSON="${SIZES_JSON:-}"
+
+: "${STATE_JSON:?STATE_JSON is required}"
+: "${SIZES_JSON:?SIZES_JSON is required}"
 
 # Barretenberg CRS directory
 BB_CRS_DIR="${HOME}/.bb-crs"
@@ -107,4 +115,9 @@ bb_write_sizes_and_constraints() {
   fi
 }
 
+BENCHMARK_NAME=$(jq -r '."benchmark-name"' "$STATE_JSON")
 
+bb_clear_crs
+"$SCRIPT_DIR/prove.sh" >/dev/null 2>&1 || true
+CRS_SIZE=$(bb_measure_crs_size)
+bb_write_sizes_and_constraints "$BENCHMARK_NAME" "${BENCHMARK_NAME}.json" "$STATE_JSON" "$OUT_JSON" "$SCRIPT_DIR" "$CRS_SIZE"
