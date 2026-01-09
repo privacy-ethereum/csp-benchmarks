@@ -1,4 +1,6 @@
-use circom::{CIRCOM_BENCH_PROPERTIES, prepare, proof_size, read_constraint_count, sum_file_sizes_in_the_dir};
+use circom::{
+    CIRCOM_BENCH_PROPERTIES, prepare, proof_size, read_constraint_count, sum_file_sizes_in_the_dir,
+};
 use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
