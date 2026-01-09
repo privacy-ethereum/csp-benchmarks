@@ -1,24 +1,12 @@
-use circom::{prepare, proof_size, read_constraint_count, sum_file_sizes_in_the_dir};
-use utils::harness::{AuditStatus, ProvingSystem};
+use circom::{CIRCOM_BENCH_PROPERTIES, prepare, proof_size, read_constraint_count, sum_file_sizes_in_the_dir};
+use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
     ProvingSystem::Circom,
     None,
     "sha256_mem_circom",
-    utils::harness::BenchProperties::new(
-        "Groth16",
-        "Bn254",
-        "Groth16",
-        None,
-        "R1CS",
-        true,
-        128, // Bn254 curve
-        false,
-        true,
-        AuditStatus::PartiallyAudited, // e.g., https://veridise.com/wp-content/uploads/2023/02/VAR-circom-bigint.pdf
-        None,
-    ),
+    CIRCOM_BENCH_PROPERTIES,
     |input_size| { prepare(input_size) },
     |(_witness_fn, _input_str, zkey_path)| read_constraint_count(zkey_path),
     |(witness_fn, input_str, zkey_path)| {
