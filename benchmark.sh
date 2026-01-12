@@ -55,6 +55,14 @@ step() { printf "\n\033[1;34m==> %s\033[0m\n" "$*"; }
 ok()   { printf "\033[1;32m✓ %s\033[0m\n" "$*"; }
 warn() { printf "\033[1;33m! %s\033[0m\n" "$*"; }
 
+resolve_script() {
+  local name="$1" target="$2" dir="$3"
+  local specific="${dir}/${target}_${name}.sh" generic="${dir}/${name}.sh"
+  if [[ -x "$specific" ]]; then echo "$specific"
+  elif [[ -x "$generic" ]]; then echo "$generic"
+  fi
+}
+
 if [[ ! -x "$UTILS_BIN" ]]; then
   echo "utils binary not found or not executable: $UTILS_BIN" >&2
   exit 1
@@ -72,9 +80,10 @@ for target in "${TARGETS[@]}"; do
   [[ -n "$sizes_len" ]] || { echo "Failed to obtain sizes length from utils" >&2; exit 1; }
 
   PREPARE_SH="${SYSTEM_DIR}/${TARGET}_prepare.sh"
-  MEASURE_SH="${SYSTEM_DIR}/measure.sh"
-  PROVE_SH="${SYSTEM_DIR}/prove.sh"
-  VERIFY_SH="${SYSTEM_DIR}/verify.sh"
+  PROVE_SH="$(resolve_script prove "$TARGET" "$SYSTEM_DIR")"
+  VERIFY_SH="$(resolve_script verify "$TARGET" "$SYSTEM_DIR")"
+  MEASURE_SH="$(resolve_script measure "$TARGET" "$SYSTEM_DIR")"
+  PREPARE_VERIFY_SH="$(resolve_script prepare_verify "$TARGET" "$SYSTEM_DIR")"
 
   if [[ ! -x "$PREPARE_SH" ]]; then
     warn "Skipping target $TARGET: prepare script not found/executable"
@@ -106,8 +115,13 @@ for target in "${TARGETS[@]}"; do
       --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_prover_metrics.json"
 
     step "[$TARGET] Verifier (size ${INPUT_SIZE}):"
+    if [[ -n "$PREPARE_VERIFY_SH" ]]; then
+      VERIFY_PREP_CMD="STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_VERIFY_SH"
+    else
+      VERIFY_PREP_CMD="STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH"
+    fi
     hyperfine --runs "$RUNS" \
-      --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && WRITE_VK=1 STATE_JSON=$VERIFIER_JSON_FILE bash $PROVE_SH > /dev/null 2>&1" \
+      --prepare "UTILS_BIN=$UTILS_BIN INPUT_SIZE=$INPUT_SIZE STATE_JSON=$VERIFIER_JSON_FILE bash $PREPARE_SH && $VERIFY_PREP_CMD > /dev/null 2>&1" \
       "STATE_JSON=$VERIFIER_JSON_FILE bash $VERIFY_SH" \
       --export-json "$SYSTEM_DIR/hyperfine_${TARGET}_${INPUT_SIZE}_verifier_metrics.json"
 
