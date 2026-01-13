@@ -18,6 +18,7 @@ pub const CIRCOM_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     pcs: None,
     arithm: Cow::Borrowed("R1CS"),
     is_zk: true,
+    is_zkvm: false,
     security_bits: 128, // Bn254 curve
     is_pq: false,
     is_maintained: true,

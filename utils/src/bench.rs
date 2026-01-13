@@ -70,7 +70,6 @@ pub struct Metrics {
     pub name: String,
     #[tabled(display_with = "display_string")]
     pub feat: Option<String>,
-    pub is_zkvm: bool,
     pub target: String,
     #[tabled(display_with = "display_bytes")]
     pub input_size: usize,
@@ -120,7 +119,6 @@ impl Metrics {
     pub fn new(
         name: String,
         feat: Option<String>,
-        is_zkvm: bool,
         target: String,
         size: usize,
         bench_properties: BenchProperties,
@@ -128,7 +126,6 @@ impl Metrics {
         Metrics {
             name,
             feat,
-            is_zkvm,
             target,
             input_size: size,
             proof_duration: Duration::default(),

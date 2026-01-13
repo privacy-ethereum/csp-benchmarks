@@ -19,6 +19,7 @@ pub fn risc0_bench_properties() -> BenchProperties {
         Some("FRI"), // https://dev.risczero.com/proof-system/stark-by-hand
         "AIR",       // https://dev.risczero.com/proof-system/proof-system-sequence-diagram
         true,        // https://dev.risczero.com/api/security-model
+        true,        // zkVM
         96,   // 96-bit base STARK, 99-bit recursion; https://dev.risczero.com/api/security-model
         true, // STARK is PQ-safe (Groth16 compression is not); https://dev.risczero.com/api/security-model
         true, // https://github.com/risc0/risc0/releases

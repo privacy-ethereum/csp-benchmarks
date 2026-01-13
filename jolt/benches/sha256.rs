@@ -13,7 +13,10 @@ utils::define_benchmark_harness!(
     ProvingSystem::Jolt,
     None,
     "sha256_mem_jolt",
-    utils::harness::BenchProperties::default(),
+    utils::harness::BenchProperties {
+        is_zkvm: true,
+        ..Default::default()
+    },
     {
         let mut programs = HashMap::new();
         for input_size in utils::metadata::selected_sha2_inputs() {

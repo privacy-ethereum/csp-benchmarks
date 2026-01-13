@@ -31,6 +31,7 @@ pub const BINIUS64_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     pcs: Some(Cow::Borrowed("Binius64")),
     arithm: Cow::Borrowed("Binius64"),
     is_zk: false,      // https://www.irreducible.com/posts/announcing-binius64
+    is_zkvm: false,
     security_bits: 96, // https://github.com/IrreducibleOSS/binius64/blob/main/verifier/verifier/src/verify.rs#L40
     is_pq: true,       // hash-based PCS
     is_maintained: true,

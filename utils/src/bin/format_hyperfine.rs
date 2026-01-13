@@ -50,10 +50,6 @@ struct Cli {
     #[arg(long, default_value = "")]
     feature: Option<String>,
 
-    /// Mark as zkVM system (default: false)
-    #[arg(long, default_value_t = false)]
-    is_zkvm: bool,
-
     /// Optional path to properties file (JSON) to populate BenchProperties
     #[arg(long)]
     properties: Option<PathBuf>,
@@ -141,7 +137,6 @@ fn main() -> std::io::Result<()> {
         let mut metrics = Metrics::new(
             proving_system.clone(),
             feat,
-            cli.is_zkvm,
             target.clone(),
             input_size,
             bench_properties,

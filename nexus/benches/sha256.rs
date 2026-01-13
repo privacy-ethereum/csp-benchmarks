@@ -19,6 +19,7 @@ utils::define_benchmark_harness!(
         "AIR",                   // https://specification.nexus.xyz/
         true,                    // https://whitepaper.nexus.xyz/
         0,    // TODO: https://github.com/privacy-ethereum/csp-benchmarks/issues/147
+        true, // zkVM
         true, // hash-based PCS
         true, // https://github.com/nexus-xyz/nexus-zkvm/releases
         AuditStatus::NotAudited, // https://github.com/nexus-xyz/nexus-zkvm

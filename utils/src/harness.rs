@@ -77,18 +77,6 @@ impl ProvingSystem {
             ProvingSystem::Nexus => "nexus",
         }
     }
-
-    pub fn is_zkvm(&self) -> bool {
-        matches!(
-            self,
-            ProvingSystem::Risc0
-                | ProvingSystem::Sp1
-                | ProvingSystem::Jolt
-                | ProvingSystem::Miden
-                | ProvingSystem::CairoM
-                | ProvingSystem::Nexus
-        )
-    }
 }
 
 #[derive(Clone, Debug)]
@@ -136,6 +124,8 @@ pub struct BenchProperties {
     pub pcs: Option<Cow<'static, str>>,
     pub arithm: Cow<'static, str>,
     pub is_zk: bool,
+    #[serde(default)]
+    pub is_zkvm: bool,
 
     // Security
     pub security_bits: u64,
@@ -158,7 +148,8 @@ impl BenchProperties {
     /// * `iop` - The IOP used by the system.
     /// * `pcs` - The PCS used by the system (if applicable).
     /// * `arithm` - The arithmetization used by the system.
-    /// * `is_zk` - Whether the system is a zkVM.
+    /// * `is_zk` - Whether the system provides zero-knowledge.
+    /// * `is_zkvm` - Whether the system is a zkVM.
     /// * `security_bits` - The security (soundness) parameter of the system.
     /// * `is_pq` - Whether the system is post-quantum-sound.
     /// * `is_maintained` - Whether the system codebase is maintained.
@@ -171,6 +162,7 @@ impl BenchProperties {
         pcs: Option<&'static str>,
         arithm: &'static str,
         is_zk: bool,
+        is_zkvm: bool,
         security_bits: u64,
         is_pq: bool,
         is_maintained: bool,
@@ -185,6 +177,7 @@ impl BenchProperties {
             pcs: pcs.map(Cow::Borrowed),
             arithm: Cow::Borrowed(arithm),
             is_zk,
+            is_zkvm,
             security_bits,
             is_pq,
             is_maintained,
@@ -203,6 +196,7 @@ impl Default for BenchProperties {
             pcs: None,
             arithm: Cow::Borrowed(""),
             is_zk: false,
+            is_zkvm: false,
             security_bits: 0,
             is_pq: false,
             is_maintained: false,
@@ -288,7 +282,6 @@ pub fn run_benchmarks_fn<
         let prepared_context = prepare(size);
 
         let mut metrics = init_metrics(&cfg, target_str, system_str, size, &properties);
-        metrics.is_zkvm = execution_cycles.is_some();
         metrics.preprocessing_size = preprocessing_size(&prepared_context);
         metrics.num_constraints = num_constraints(&prepared_context);
         let proof = prove(&prepared_context);
@@ -374,7 +367,6 @@ pub fn run_benchmarks_with_state_fn<
         let prepared_context = prepare(size, shared);
 
         let mut metrics = init_metrics(&cfg, target_str, system_str, size, &properties);
-        metrics.is_zkvm = execution_cycles.is_some();
         metrics.preprocessing_size = preprocessing_size(&prepared_context, &shared);
         metrics.num_constraints = num_constraints(&prepared_context, &shared);
         let proof = prove(&prepared_context, &shared);
@@ -447,7 +439,6 @@ fn init_metrics(
             Some(f) if !f.is_empty() => Some(f.to_string()),
             _ => None,
         },
-        false,
         target_str.to_string(),
         size,
         properties.clone(),

@@ -5,6 +5,7 @@
   "pcs": "KZG",
   "arithm": "ACIR",
   "is_zk": true,
+  "is_zkvm": false,
   "security_bits": 128,
   "is_pq": false,
   "is_maintained": true,

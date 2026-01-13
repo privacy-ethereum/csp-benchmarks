@@ -11,7 +11,10 @@ utils::define_benchmark_harness!(
     ProvingSystem::OpenVM,
     None,
     "sha256_mem_openvm",
-    utils::harness::BenchProperties::default(),
+    utils::harness::BenchProperties {
+        is_zkvm: true,
+        ..Default::default()
+    },
     { load_or_compile_program(&RustRv32imaCustomized, SHA256_BENCH) },
     prepare_sha256,
     |_, _| 0,

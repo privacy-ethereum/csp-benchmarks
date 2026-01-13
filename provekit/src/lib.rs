@@ -20,6 +20,7 @@ pub const PROVEKIT_PROPS: BenchProperties = BenchProperties {
     pcs: Some(Cow::Borrowed("WHIR")),              // https://github.com/worldfnd/provekit
     arithm: Cow::Borrowed("R1CS"),                 // https://github.com/worldfnd/provekit
     is_zk: true,                                   // https://github.com/worldfnd/provekit/pull/138
+    is_zkvm: false,
     security_bits: 128, // https://github.com/worldfnd/provekit/blob/d7deea66c41d56c1d411dd799d0d6066272323e4/provekit/r1cs-compiler/src/whir_r1cs.rs#L43
     is_pq: true,        // hash-based PCS
     is_maintained: true, // https://github.com/worldfnd/provekit
