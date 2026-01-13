@@ -124,6 +124,7 @@ pub struct BenchProperties {
     pub pcs: Option<Cow<'static, str>>,
     pub arithm: Cow<'static, str>,
     pub is_zk: bool,
+    /// True if the proving system is a zkVM (executes guest programs rather than fixed circuits).
     #[serde(default)]
     pub is_zkvm: bool,
 
@@ -149,7 +150,7 @@ impl BenchProperties {
     /// * `pcs` - The PCS used by the system (if applicable).
     /// * `arithm` - The arithmetization used by the system.
     /// * `is_zk` - Whether the system provides zero-knowledge.
-    /// * `is_zkvm` - Whether the system is a zkVM.
+    /// * `is_zkvm` - Whether the system executes guest programs as a zkVM (set to false for circuit-only proof systems).
     /// * `security_bits` - The security (soundness) parameter of the system.
     /// * `is_pq` - Whether the system is post-quantum-sound.
     /// * `is_maintained` - Whether the system codebase is maintained.
