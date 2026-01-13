@@ -18,7 +18,7 @@ utils::define_benchmark_harness!(
         "GKR",         // https://eprint.iacr.org/2019/317
         false,
         128,  // https://github.com/PolyhedraZK/Expander/blob/main/poly_commit/src/lib.rs#L6
-        false,
+        false, // not a zkVM
         true, // Hash-based PCS (https://eprint.iacr.org/2022/1010.pdf)
         true,
         AuditStatus::NotAudited,

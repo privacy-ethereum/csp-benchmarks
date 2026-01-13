@@ -124,7 +124,7 @@ pub struct BenchProperties {
     pub pcs: Option<Cow<'static, str>>,
     pub arithm: Cow<'static, str>,
     pub is_zk: bool,
-    /// True if the proving system is a zkVM (executes guest programs rather than fixed circuits).
+    /// True if the proving system is a zkVM (executes guest programs rather than fixed circuits); defaults to false when omitted.
     #[serde(default)]
     pub is_zkvm: bool,
 
