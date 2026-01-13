@@ -3262,6 +3262,7 @@ dependencies = [
  "human-repr",
  "k256",
  "libc",
+ "num-bigint",
  "p256",
  "rand 0.8.5",
  "regex",
@@ -3269,6 +3270,7 @@ dependencies = [
  "serde_json",
  "serde_with",
  "sha2",
+ "sha3",
  "tabled",
 ]
 

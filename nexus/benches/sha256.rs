@@ -3,8 +3,8 @@ use nexus::{
     execution_cycles, prepare_sha256, preprocessing_size, proof_size, prove_sha256, verify_sha256,
 };
 use utils::harness::{AuditStatus, ProvingSystem};
-use utils::zkvm::helpers::load_or_compile_program;
 use utils::zkvm::SHA256_BENCH;
+use utils::zkvm::helpers::load_or_compile_program;
 
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
@@ -18,8 +18,8 @@ utils::define_benchmark_harness!(
         Some("Circle FRI"),      // https://eprint.iacr.org/2024/278.pdf
         "AIR",                   // https://specification.nexus.xyz/
         true,                    // https://whitepaper.nexus.xyz/
+        true,                    // zkVM
         0,    // TODO: https://github.com/privacy-ethereum/csp-benchmarks/issues/147
-        true, // zkVM
         true, // hash-based PCS
         true, // https://github.com/nexus-xyz/nexus-zkvm/releases
         AuditStatus::NotAudited, // https://github.com/nexus-xyz/nexus-zkvm

@@ -18,8 +18,8 @@ utils::define_benchmark_harness!(
         Some("FRI"), // https://0xmiden.github.io/miden-vm/user_docs/assembly/cryptographic_operations.html#fri-folding
         "AIR", // https://0xmiden.github.io/miden-vm/design/chiplets/hasher.html?highlight=AIR#air-constraints
         true,  // https://github.com/0xPolygonMiden/miden-vm
+        true,  // zkVM
         128, // Target security = 128 bits (bench config); https://github.com/eth-act/ere/blob/ae6baa03c157512b905bf393c0f94b6b9b3b420c/crates/zkvm/miden/src/zkvm.rs#L100
-        true, // zkVM
         true, // hash-based PCS
         true, // https://github.com/0xPolygonMiden/miden-vm/releases
         AuditStatus::NotAudited, // https://github.com/0xPolygonMiden/miden-vm
