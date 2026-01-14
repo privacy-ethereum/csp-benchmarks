@@ -150,7 +150,10 @@ fi
 
 if [[ -x "$FORMATTER_BIN" ]]; then
   step "Formatting hyperfine outputs into Metrics JSON"
-  "$FORMATTER_BIN" --system-dir "$SYSTEM_DIR" --properties "$BENCH_PROPS_JSON" --num-constraints-file "$NUM_CONSTRAINTS" || warn "format_hyperfine failed"
+  "$FORMATTER_BIN" --system-dir "$SYSTEM_DIR" --properties "$BENCH_PROPS_JSON" --num-constraints-file "$NUM_CONSTRAINTS" || {
+    echo "format_hyperfine failed" >&2
+    exit 1
+  }
 else
   warn "format_hyperfine binary not found; skipping formatting"
 fi
