@@ -50,6 +50,13 @@ fn main() {
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_1024");
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_2048");
 
+    // Keccak circuits
+    witnesscalc_adapter::build_and_link("./circuits/keccak/keccak_128");
+    witnesscalc_adapter::build_and_link("./circuits/keccak/keccak_256");
+    witnesscalc_adapter::build_and_link("./circuits/keccak/keccak_512");
+    witnesscalc_adapter::build_and_link("./circuits/keccak/keccak_1024");
+    witnesscalc_adapter::build_and_link("./circuits/keccak/keccak_2048");
+
     // Poseidon circuits
     witnesscalc_adapter::build_and_link("./circuits/poseidon/poseidon_2");
     witnesscalc_adapter::build_and_link("./circuits/poseidon/poseidon_4");

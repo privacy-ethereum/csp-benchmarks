@@ -1,6 +1,9 @@
 [submodule "ligetron/ligero-prover"]
-path = ligetron/ligero-prover
-url = https://github.com/ligeroinc/ligero-prover.git
+	path = ligetron/ligero-prover
+	url = https://github.com/ligeroinc/ligero-prover.git
 [submodule "circom/circomlib"]
 	path = circom/circomlib
 	url = https://github.com/iden3/circomlib.git
+[submodule "circom/hash-circuits"]
+	path = circom/hash-circuits
+	url = https://github.com/bkomuves/hash-circuits

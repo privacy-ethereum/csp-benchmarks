@@ -17,7 +17,7 @@ use p256::ecdsa::{Signature, SigningKey, signature::hazmat::PrehashSigner};
 
 pub use harness::{BenchHarnessConfig, BenchTarget, ProvingSystem};
 
-use crate::metadata::{selected_poseidon_inputs, selected_sha2_inputs};
+use crate::metadata::{selected_keccak_inputs, selected_poseidon_inputs, selected_sha2_inputs};
 
 pub fn write_json<T: Serialize>(data: &T, output_path: &str) {
     let json_data = serde_json::to_string_pretty(&data).expect("Failed to serialize to JSON");
@@ -146,7 +146,7 @@ pub fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
     match target {
         BenchTarget::Sha256 => selected_sha2_inputs(),
         BenchTarget::Ecdsa => vec![32],
-        BenchTarget::Keccak => selected_sha2_inputs(),
+        BenchTarget::Keccak => selected_keccak_inputs(),
         BenchTarget::Poseidon => selected_poseidon_inputs(),
         BenchTarget::Poseidon2 => selected_poseidon_inputs(),
     }

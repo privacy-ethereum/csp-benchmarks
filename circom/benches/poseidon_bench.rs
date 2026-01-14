@@ -21,5 +21,5 @@ utils::define_benchmark_harness!(
     |(_witness_fn, _input_str, zkey_path)| {
         sum_file_sizes_in_the_dir(zkey_path).expect("Unable to compute preprocessing size")
     },
-    |proof| proof_size(proof)
+    proof_size
 );

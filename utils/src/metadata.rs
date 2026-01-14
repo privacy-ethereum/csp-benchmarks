@@ -17,3 +17,13 @@ pub fn selected_poseidon_inputs() -> Vec<usize> {
         _ => POSEIDON_INPUTS_FULL.to_vec(),
     }
 }
+
+const KECCAK_INPUTS_REDUCED: [usize; 2] = [128, 256];
+const KECCAK_INPUTS_FULL: [usize; 5] = [128, 256, 512, 1024, 2048];
+
+pub fn selected_keccak_inputs() -> Vec<usize> {
+    match std::env::var("BENCH_INPUT_PROFILE").ok().as_deref() {
+        Some("reduced") => KECCAK_INPUTS_REDUCED.to_vec(),
+        _ => KECCAK_INPUTS_FULL.to_vec(),
+    }
+}
