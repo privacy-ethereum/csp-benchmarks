@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::str::FromStr;
 
 use crate::bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics};
-use crate::metadata::{selected_keccak_inputs, selected_poseidon_inputs, selected_sha2_inputs};
+use crate::metadata::{selected_byte_inputs, selected_field_element_inputs};
 use criterion::{BatchSize, Criterion};
 
 const SAMPLE_SIZE: usize = 10;
@@ -238,11 +238,9 @@ fn mem_report_filename(target: &str, size: usize, system: &str, feat: Option<&st
 
 fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
     match target {
-        BenchTarget::Sha256 => selected_sha2_inputs(),
+        BenchTarget::Sha256 | BenchTarget::Keccak => selected_byte_inputs(),
         BenchTarget::Ecdsa => vec![32],
-        BenchTarget::Keccak => selected_keccak_inputs(),
-        BenchTarget::Poseidon => selected_poseidon_inputs(),
-        BenchTarget::Poseidon2 => selected_poseidon_inputs(),
+        BenchTarget::Poseidon | BenchTarget::Poseidon2 => selected_field_element_inputs(),
     }
 }
 

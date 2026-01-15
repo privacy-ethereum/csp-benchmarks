@@ -19,7 +19,7 @@ utils::define_benchmark_harness!(
     },
     {
         let mut programs = HashMap::new();
-        for input_size in utils::metadata::selected_sha2_inputs() {
+        for input_size in utils::metadata::selected_byte_inputs() {
             programs.insert(
                 input_size,
                 load_or_compile_program(

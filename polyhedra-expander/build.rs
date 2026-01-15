@@ -10,15 +10,15 @@ use std::path::PathBuf;
 fn main() {
     let root = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
-    // Read the metadata::SHA2_INPUTS at build-time by including the file and evaluating it here
+    // Read the metadata::BYTE_INPUTS at build-time by including the file and evaluating it here
     let workspace_root = root.parent().unwrap();
 
     let utils_metadata = workspace_root.join("polyhedra-expander/src/metadata.rs");
     let contents = fs::read_to_string(&utils_metadata).expect("read src/metadata.rs");
 
-    // Always parse the full set of input sizes from const SHA2_INPUTS_FULL: [usize; N] = [a, b, c];
+    // Always parse the full set of input sizes from const BYTE_INPUTS_FULL: [usize; N] = [a, b, c];
     let mut sizes: Vec<String> = Vec::new();
-    if let Some(id_start) = contents.find("SHA2_INPUTS_FULL") {
+    if let Some(id_start) = contents.find("BYTE_INPUTS_FULL") {
         let after_id = &contents[id_start..];
         if let Some(eq_rel) = after_id.find('=') {
             let after_eq = &after_id[eq_rel + 1..];
@@ -40,7 +40,7 @@ fn main() {
 
     assert!(
         !sizes.is_empty(),
-        "Failed to parse sizes from utils/src/metadata.rs: SHA2_INPUTS is empty"
+        "Failed to parse sizes from utils/src/metadata.rs: BYTE_INPUTS is empty"
     );
 
     // Single template file approach
