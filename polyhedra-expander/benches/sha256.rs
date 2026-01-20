@@ -1,6 +1,6 @@
 use gkr_engine::MPIConfig;
 use sha256_expander_benchmark::bench::{get_constraints, prepare, prove, verify};
-use sha256_expander_benchmark::expander_bench_properties;
+use sha256_expander_benchmark::EXPANDER_BENCH_PROPERTIES;
 use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
@@ -8,7 +8,7 @@ utils::define_benchmark_harness!(
     ProvingSystem::Expander,
     None,
     "sha256_mem_expander",
-    expander_bench_properties(),
+    EXPANDER_BENCH_PROPERTIES,
     {
         let universe = MPIConfig::init().expect("Failed to initialize MPI");
         let world = universe.world();
