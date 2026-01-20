@@ -1,6 +1,6 @@
 use std::env;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// `build.rs` is used to generate the circuits for different input sizes.
 /// This is necessary because Expander is using a macro to build the circuit for a fixed input size.
@@ -16,7 +16,13 @@ fn main() {
     let contents = fs::read_to_string(&utils_metadata).expect("read src/metadata.rs");
 
     generate_circuit(&root, &out_dir, &contents, "BYTE_INPUTS_FULL", "sha256");
-    generate_circuit(&root, &out_dir, &contents, "FIELD_ELEMENT_INPUTS_FULL", "poseidon");
+    generate_circuit(
+        &root,
+        &out_dir,
+        &contents,
+        "FIELD_ELEMENT_INPUTS_FULL",
+        "poseidon",
+    );
 
     println!("cargo:rerun-if-env-changed=BENCH_INPUT_PROFILE");
     println!("cargo:rerun-if-changed=templates/sha256_sizes.rs.tpl");
@@ -24,7 +30,7 @@ fn main() {
     println!("cargo:rerun-if-changed={}", utils_metadata.display());
 }
 
-fn generate_circuit(root: &PathBuf, out_dir: &PathBuf, contents: &str, const_name: &str, name: &str) {
+fn generate_circuit(root: &Path, out_dir: &Path, contents: &str, const_name: &str, name: &str) {
     // Parse input sizes from const
     let mut sizes: Vec<String> = Vec::new();
     if let Some(id_start) = contents.find(const_name) {
@@ -60,8 +66,12 @@ fn generate_circuit(root: &PathBuf, out_dir: &PathBuf, contents: &str, const_nam
 
     let match_arm_begin_tag = "// BEGIN_MATCH_ARM";
     let match_arm_end_tag = "// END_MATCH_ARM";
-    let match_arm_start = template.find(match_arm_begin_tag).expect("BEGIN_MATCH_ARM not found");
-    let match_arm_end = template.find(match_arm_end_tag).expect("END_MATCH_ARM not found");
+    let match_arm_start = template
+        .find(match_arm_begin_tag)
+        .expect("BEGIN_MATCH_ARM not found");
+    let match_arm_end = template
+        .find(match_arm_end_tag)
+        .expect("END_MATCH_ARM not found");
     let match_arm_snippet = &template[match_arm_start + match_arm_begin_tag.len()..match_arm_end];
 
     let mut decls_rendered = String::new();

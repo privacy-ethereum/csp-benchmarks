@@ -1,6 +1,6 @@
 use gkr_engine::MPIConfig;
-use sha256_expander_benchmark::bench::{get_constraints, prepare, prove, verify};
 use sha256_expander_benchmark::EXPANDER_BENCH_PROPERTIES;
+use sha256_expander_benchmark::bench::{get_constraints, prepare, prove, verify};
 use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
