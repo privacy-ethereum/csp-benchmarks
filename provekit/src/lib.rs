@@ -119,8 +119,19 @@ pub fn prepare_poseidon(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf
     let circuit_source = workspace_root_pre.join("hash/poseidon/src/main.nr");
 
     if let Ok(mut content) = fs::read_to_string(&circuit_source) {
-        if let Some(hash_pos) = content.find("hash_") {
-            let start = hash_pos + "hash_".len();
+        if let Some(import_pos) = content.find("poseidon::bn254::hash_") {
+            let start = import_pos + "poseidon::bn254::hash_".len();
+            let mut end = start;
+            while end < content.len() && content.as_bytes()[end].is_ascii_digit() {
+                end += 1;
+            }
+            if start != end {
+                content.replace_range(start..end, &input_size.to_string());
+            }
+        }
+
+        if let Some(hash_pos) = content.find("    hash_") {
+            let start = hash_pos + "    hash_".len();
             let mut end = start;
             while end < content.len() && content.as_bytes()[end].is_ascii_digit() {
                 end += 1;
