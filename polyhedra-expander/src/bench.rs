@@ -172,7 +172,7 @@ macro_rules! prepare_arm {
     }};
 }
 
-fn serialize_outputs(
+pub fn serialize_outputs(
     compile_result: CompileResult<M31SingleConfig>,
     witness: Witness<M31SingleConfig>,
 ) -> (Vec<u8>, Vec<u8>) {

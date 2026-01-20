@@ -27,9 +27,17 @@ paste = "1.0"
 criterion = "0.5.1"
 
 [[bench]]
-name = "prove_verify"
+name = "sha256"
+harness = false
+
+[[bench]]
+name = "poseidon"
 harness = false
 
 [[bin]]
 name = "sha256_mem_expander"
 path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "poseidon_mem_expander"
+path = "src/bin/poseidon_mem.rs"
