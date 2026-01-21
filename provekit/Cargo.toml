@@ -21,10 +21,18 @@ path = "src/bin/sha256_mem.rs"
 name = "ecdsa_mem_provekit"
 path = "src/bin/ecdsa_mem.rs"
 
+[[bin]]
+name = "poseidon_mem_provekit"
+path = "src/bin/poseidon_mem.rs"
+
 [[bench]]
 name = "sha256"
 harness = false
 
 [[bench]]
 name = "ecdsa"
+harness = false
+
+[[bench]]
+name = "poseidon"
 harness = false

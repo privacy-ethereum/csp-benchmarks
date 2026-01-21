@@ -11,6 +11,7 @@ use utils::harness::{AuditStatus, BenchProperties};
 
 const WORKSPACE_ROOT: &str = "circuits";
 const SHA256_CIRCUIT_SUB_PATH: &str = "hash/sha256-provekit";
+const POSEIDON_CIRCUIT_SUB_PATH: &str = "hash/poseidon";
 const ECDSA_CIRCUIT_SUB_PATH: &str = "ecdsa";
 
 pub const PROVEKIT_PROPS: BenchProperties = BenchProperties {
@@ -104,6 +105,82 @@ pub fn prepare_sha256(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) 
             .map(u8::to_string)
             .collect::<Vec<_>>()
             .join(", "),
+    );
+
+    let toml_path = circuit_member_dir.join("Prover.toml");
+    fs::write(&toml_path, toml_content).expect("Failed to write Prover.toml");
+
+    (proof_scheme, toml_path, circuit_path)
+}
+
+pub fn prepare_poseidon(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
+    let current_dir = std::env::current_dir().expect("Failed to get current directory");
+    let workspace_root_pre = current_dir.join(WORKSPACE_ROOT);
+    let circuit_source = workspace_root_pre.join("hash/poseidon/src/main.nr");
+
+    if let Ok(mut content) = fs::read_to_string(&circuit_source) {
+        if let Some(import_pos) = content.find("poseidon::bn254::hash_") {
+            let start = import_pos + "poseidon::bn254::hash_".len();
+            let mut end = start;
+            while end < content.len() && content.as_bytes()[end].is_ascii_digit() {
+                end += 1;
+            }
+            if start != end {
+                content.replace_range(start..end, &input_size.to_string());
+            }
+        }
+
+        if let Some(hash_pos) = content.find("    hash_") {
+            let start = hash_pos + "    hash_".len();
+            let mut end = start;
+            while end < content.len() && content.as_bytes()[end].is_ascii_digit() {
+                end += 1;
+            }
+            if start != end {
+                content.replace_range(start..end, &input_size.to_string());
+            }
+        }
+
+        if let Some(field_pos) = content.find("[Field;") {
+            let start = field_pos + "[Field;".len();
+            let bytes = content.as_bytes();
+            let mut num_start = start;
+            while num_start < bytes.len() && bytes[num_start].is_ascii_whitespace() {
+                num_start += 1;
+            }
+            let mut end = num_start;
+            while end < bytes.len() && bytes[end].is_ascii_digit() {
+                end += 1;
+            }
+            if num_start != end {
+                content.replace_range(num_start..end, &input_size.to_string());
+            }
+        }
+
+        fs::write(&circuit_source, content).expect("Failed to update circuit");
+    }
+
+    let workspace_root = compile_workspace();
+
+    let package_name = "poseidon";
+    let circuit_path = workspace_root
+        .join("target")
+        .join(format!("{package_name}.json"));
+
+    let proof_scheme = NoirProofScheme::from_file(circuit_path.to_str().unwrap())
+        .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
+
+    let circuit_member_dir = workspace_root.join(POSEIDON_CIRCUIT_SUB_PATH);
+    fs::create_dir_all(&circuit_member_dir).expect("Failed to create circuit dir");
+
+    let field_elements = utils::generate_poseidon_input_strings(input_size);
+    let toml_content = format!(
+        "inputs = [{}]",
+        field_elements
+            .iter()
+            .map(|s| format!("\"{}\"", s))
+            .collect::<Vec<_>>()
+            .join(", ")
     );
 
     let toml_path = circuit_member_dir.join("Prover.toml");
