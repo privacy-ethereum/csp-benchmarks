@@ -1,0 +1,13 @@
+[package]
+name = "risc0-keccak"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+risc0-zkvm = { version = "3.0.3", default-features = false, features = [
+    "std",
+    "unstable",
+] }
+sha3 = { version = "0.10" }
+
+[workspace]

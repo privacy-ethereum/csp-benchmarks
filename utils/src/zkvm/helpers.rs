@@ -1,6 +1,8 @@
+use crate::zkvm::ecdsa::PreparedEcdsa;
 use crate::zkvm::instance::{CompiledProgram, ProofArtifacts, compile_guest_program};
+use crate::zkvm::keccak::PreparedKeccak;
+use crate::zkvm::sha256::PreparedSha256;
 use crate::zkvm::traits::PreparedBenchmark;
-use crate::zkvm::{PreparedEcdsa, PreparedSha256};
 use bincode::Options;
 use ere_zkvm_interface::Compiler;
 use ere_zkvm_interface::zkVM;
@@ -28,6 +30,14 @@ pub fn prove_ecdsa<V: zkVM, SharedState>(
     prove(prepared, shared_state)
 }
 
+/// Prove a Keccak benchmark (type-specific wrapper for compatibility).
+pub fn prove_keccak<V: zkVM, SharedState>(
+    prepared: &PreparedKeccak<V>,
+    shared_state: &SharedState,
+) -> ProofArtifacts {
+    prove(prepared, shared_state)
+}
+
 /// Verify a SHA-256 proof with digest checking.
 pub fn verify_sha256<V: zkVM, SharedState>(
     prepared: &PreparedSha256<V>,
@@ -44,6 +54,15 @@ pub fn verify_ecdsa<V: zkVM, SharedState>(
     _: &SharedState,
 ) {
     prepared.verify_with_expected(proof).expect("verify failed");
+}
+
+/// Verify a Keccak proof with digest checking.
+pub fn verify_keccak<V: zkVM, SharedState>(
+    prepared: &PreparedKeccak<V>,
+    proof: &ProofArtifacts,
+    _: &SharedState,
+) {
+    prepared.verify_with_digest(proof).expect("verify failed");
 }
 
 /// Get the execution cycles for any prepared benchmark.

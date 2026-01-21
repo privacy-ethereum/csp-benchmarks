@@ -2,13 +2,13 @@ use ere_risc0::{EreRisc0, compiler::RustRv32imaCustomized};
 use ere_zkvm_interface::ProverResourceType;
 use utils::harness::{AuditStatus, BenchProperties};
 use utils::zkvm::{
-    CompiledProgram, PreparedEcdsa, PreparedSha256, build_ecdsa_input, build_input,
+    CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedSha256, build_ecdsa_input, build_input,
     encode_public_key,
 };
 
 pub use utils::zkvm::{
-    execution_cycles, preprocessing_size, proof_size, prove_ecdsa, prove_sha256, verify_ecdsa,
-    verify_sha256,
+    execution_cycles, preprocessing_size, proof_size, prove_ecdsa, prove_keccak, prove_sha256,
+    verify_ecdsa, verify_keccak, verify_sha256,
 };
 
 pub fn risc0_bench_properties() -> BenchProperties {
@@ -64,4 +64,18 @@ pub fn prepare_ecdsa(
         (pub_key_x, pub_key_y),
         digest,
     )
+}
+
+/// Prepares a Keccak256 hash benchmark.
+pub fn prepare_keccak(
+    input_size: usize,
+    program: &CompiledProgram<RustRv32imaCustomized>,
+) -> PreparedKeccak<EreRisc0> {
+    let vm = EreRisc0::new(program.program.clone(), ProverResourceType::Cpu)
+        .expect("failed to build risc0 prover instance");
+
+    let (message_bytes, digest) = utils::generate_keccak_input(input_size);
+    let input = build_input(message_bytes);
+
+    PreparedKeccak::with_expected_digest(vm, input, program.byte_size, digest)
 }
