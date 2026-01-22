@@ -7,7 +7,7 @@ use utils::zkvm::{
 };
 
 pub use utils::zkvm::{
-    execution_cycles, preprocessing_size, proof_size, prove_ecdsa, prove_keccak, prove_sha256,
+    execution_cycles, preprocessing_size, proof_size, prove, prove_ecdsa, prove_sha256,
     verify_ecdsa, verify_keccak, verify_sha256,
 };
 

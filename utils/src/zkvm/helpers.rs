@@ -1,7 +1,6 @@
 use crate::zkvm::ecdsa::PreparedEcdsa;
+use crate::zkvm::hash::PreparedHash;
 use crate::zkvm::instance::{CompiledProgram, ProofArtifacts, compile_guest_program};
-use crate::zkvm::keccak::PreparedKeccak;
-use crate::zkvm::sha256::PreparedSha256;
 use crate::zkvm::traits::PreparedBenchmark;
 use bincode::Options;
 use ere_zkvm_interface::Compiler;
@@ -14,13 +13,8 @@ pub fn prove<P: PreparedBenchmark, SharedState>(prepared: &P, _: &SharedState) -
     prepared.prove().expect("prove failed")
 }
 
-/// Prove a SHA-256 benchmark (type-specific wrapper for compatibility).
-pub fn prove_sha256<V: zkVM, SharedState>(
-    prepared: &PreparedSha256<V>,
-    shared_state: &SharedState,
-) -> ProofArtifacts {
-    prove(prepared, shared_state)
-}
+/// Prove a SHA-256 benchmark
+pub use prove as prove_sha256;
 
 /// Prove an ECDSA benchmark (type-specific wrapper for compatibility).
 pub fn prove_ecdsa<V: zkVM, SharedState>(
@@ -30,22 +24,20 @@ pub fn prove_ecdsa<V: zkVM, SharedState>(
     prove(prepared, shared_state)
 }
 
-/// Prove a Keccak benchmark (type-specific wrapper for compatibility).
-pub fn prove_keccak<V: zkVM, SharedState>(
-    prepared: &PreparedKeccak<V>,
-    shared_state: &SharedState,
-) -> ProofArtifacts {
-    prove(prepared, shared_state)
-}
-
-/// Verify a SHA-256 proof with digest checking.
-pub fn verify_sha256<V: zkVM, SharedState>(
-    prepared: &PreparedSha256<V>,
+/// Verify a hash proof with digest checking.
+pub fn verify_hash<V: zkVM, SharedState>(
+    prepared: &PreparedHash<V>,
     proof: &ProofArtifacts,
     _: &SharedState,
 ) {
     prepared.verify_with_digest(proof).expect("verify failed");
 }
+
+/// Verify a SHA-256 proof with digest checking.
+pub use verify_hash as verify_sha256;
+
+/// Verify a Keccak proof with digest checking.
+pub use verify_hash as verify_keccak;
 
 /// Verify an ECDSA proof with expected values checking.
 pub fn verify_ecdsa<V: zkVM, SharedState>(
@@ -54,15 +46,6 @@ pub fn verify_ecdsa<V: zkVM, SharedState>(
     _: &SharedState,
 ) {
     prepared.verify_with_expected(proof).expect("verify failed");
-}
-
-/// Verify a Keccak proof with digest checking.
-pub fn verify_keccak<V: zkVM, SharedState>(
-    prepared: &PreparedKeccak<V>,
-    proof: &ProofArtifacts,
-    _: &SharedState,
-) {
-    prepared.verify_with_digest(proof).expect("verify failed");
 }
 
 /// Get the execution cycles for any prepared benchmark.

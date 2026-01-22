@@ -1,6 +1,6 @@
 use ere_risc0::compiler::RustRv32imaCustomized;
 use risc0::{
-    execution_cycles, prepare_keccak, preprocessing_size, proof_size, prove_keccak,
+    execution_cycles, prepare_keccak, preprocessing_size, proof_size, prove,
     risc0_bench_properties, verify_keccak,
 };
 use utils::harness::ProvingSystem;
@@ -16,7 +16,7 @@ utils::define_benchmark_harness!(
     { load_or_compile_program(&RustRv32imaCustomized, KECCAK_BENCH) },
     prepare_keccak,
     |_, _| 0,
-    prove_keccak,
+    prove,
     verify_keccak,
     preprocessing_size,
     proof_size,
