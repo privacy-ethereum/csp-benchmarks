@@ -14,7 +14,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 use risc0_zkvm::guest::env;
-use sha3::{Digest as _, Keccak256};
+use tiny_keccak::{Hasher, Keccak};
 
 fn main() {
     let data = env::read_frame();
@@ -24,5 +24,11 @@ fn main() {
 
 #[inline]
 pub fn keccak(data: impl AsRef<[u8]>) -> [u8; 32] {
-    Keccak256::digest(data).into()
+    let mut hasher = Keccak::v256();
+    hasher.update(data.as_ref());
+
+    let mut output = [0u8; 32];
+    hasher.finalize(&mut output);
+
+    output
 }
