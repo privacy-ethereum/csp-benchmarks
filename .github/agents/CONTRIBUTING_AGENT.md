@@ -144,16 +144,20 @@ BENCH_INPUT_PROFILE=full cargo bench -p my-system
    ```json
    {
      "proving_system": "MySystem",
-     "classification": "ZkVm",
-     "has_recursive_proof_composition": true,
-     "security_level": 100,
-     "targets": ["sha256", "keccak", "ecdsa"],
-     "audit_report_links": [],
-     "languages": ["Noir"],
-     "isa": "None"
+     "field_curve": "BN254",
+     "iop": "Groth16",
+     "pcs": "KZG",
+     "arithm": "R1CS",
+     "is_zk": true,
+     "is_zkvm": false,
+     "security_bits": 128,
+     "is_pq": false,
+     "is_maintained": true,
+     "is_audited": "not_audited",
+     "isa": null
    }
    ```
-   See `utils/src/harness.rs` for full `BenchProperties` schema.
+   See `utils/src/harness.rs` for full `BenchProperties` schema. Valid values for `is_audited`: `"audited"`, `"not_audited"`, `"partially_audited"`. For zkVMs, set `is_zkvm: true` and provide an `isa` value (e.g., `"RISC-V"`, `"WASM"`). Refer to `barretenberg/bench_props.json` and `ligetron/bench_props.json` for concrete examples.
 
 4. **Implement 4-5 shell scripts per target**:
 
@@ -182,7 +186,10 @@ BENCH_INPUT_PROFILE=full cargo bench -p my-system
    - **Output**: 
      - Write JSON to `$SIZES_JSON`: `{"proof_size": N, "preprocessing_size": M}`
      - Update/create `circuit_sizes.json` in your folder with constraint counts
-   - **Purpose**: Measure artifact sizes and record circuit complexity
+   - **Purpose**: Measure three key metrics:
+     1. **Proof size**: Size of the generated proof in bytes
+     2. **Preprocessing size**: Size of preprocessing artifacts (e.g., proving key/zkey) in bytes
+     3. **Circuit constraints/gates**: Number of constraints or gates in the compiled circuit
 
 5. **Make scripts executable**:
    ```bash
@@ -190,6 +197,9 @@ BENCH_INPUT_PROFILE=full cargo bench -p my-system
    ```
 
 6. **Create/update `circuit_sizes.json`** dynamically in `[target]_measure.sh`:
+   
+   The `[target]_measure.sh` script must compile the circuit for the given input size and measure the number of constraints in the resulting compiled circuit. This is done dynamically because non-Rust systems typically do not expose constraint counts as a dedicated API. The script should update `circuit_sizes.json` with the measured values:
+   
    ```json
    {
      "sha256": {
@@ -325,6 +335,11 @@ As a Claude agent working on this repository:
 
 Before reporting completion:
 1. Run `cargo build --release --workspace` successfully
+   - **Note**: Some crates (`cairo-m`, `nexus`) are excluded from the workspace. Build them separately:
+     ```bash
+     cargo build --release -p cairo-m
+     cargo build --release -p nexus
+     ```
 2. Run `cargo clippy` with no errors
 3. Run `cargo fmt --check` 
 4. Test benchmark with `BENCH_INPUT_PROFILE=reduced`
