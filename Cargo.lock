@@ -2197,7 +2197,7 @@ dependencies = [
 [[package]]
 name = "block-multiplier"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=d7deea66c41d56c1d411dd799d0d6066272323e4#d7deea66c41d56c1d411dd799d0d6066272323e4"
+source = "git+https://github.com/worldfnd/ProveKit?rev=f8728dbe041648b17bfe17e04776edc95210bc49#f8728dbe041648b17bfe17e04776edc95210bc49"
 dependencies = [
  "block-multiplier-codegen",
  "fp-rounding",
@@ -2208,7 +2208,7 @@ dependencies = [
 [[package]]
 name = "block-multiplier-codegen"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=d7deea66c41d56c1d411dd799d0d6066272323e4#d7deea66c41d56c1d411dd799d0d6066272323e4"
+source = "git+https://github.com/worldfnd/ProveKit?rev=f8728dbe041648b17bfe17e04776edc95210bc49#f8728dbe041648b17bfe17e04776edc95210bc49"
 dependencies = [
  "hla",
 ]
@@ -4226,7 +4226,7 @@ dependencies = [
 [[package]]
 name = "fp-rounding"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=d7deea66c41d56c1d411dd799d0d6066272323e4#d7deea66c41d56c1d411dd799d0d6066272323e4"
+source = "git+https://github.com/worldfnd/ProveKit?rev=f8728dbe041648b17bfe17e04776edc95210bc49#f8728dbe041648b17bfe17e04776edc95210bc49"
 
 [[package]]
 name = "fs_extra"
@@ -4911,7 +4911,7 @@ checksum = "bcaaec4551594c969335c98c903c1397853d4198408ea609190f420500f6be71"
 [[package]]
 name = "hla"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=d7deea66c41d56c1d411dd799d0d6066272323e4#d7deea66c41d56c1d411dd799d0d6066272323e4"
+source = "git+https://github.com/worldfnd/ProveKit?rev=f8728dbe041648b17bfe17e04776edc95210bc49#f8728dbe041648b17bfe17e04776edc95210bc49"
 dependencies = [
  "paste",
 ]
@@ -6856,6 +6856,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8a3895c6391c39d7fe7ebc444a87eb2991b2a0bc718fdabd071eec617fc68e4"
 dependencies = [
  "winapi",
+]
+
+[[package]]
+name = "ntt"
+version = "0.1.0"
+source = "git+https://github.com/worldfnd/ProveKit?rev=f8728dbe041648b17bfe17e04776edc95210bc49#f8728dbe041648b17bfe17e04776edc95210bc49"
+dependencies = [
+ "ark-bn254",
+ "ark-ff 0.5.0",
+ "rayon",
 ]
 
 [[package]]
@@ -9444,7 +9454,7 @@ dependencies = [
 [[package]]
 name = "provekit-common"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=d7deea66c41d56c1d411dd799d0d6066272323e4#d7deea66c41d56c1d411dd799d0d6066272323e4"
+source = "git+https://github.com/worldfnd/ProveKit?rev=f8728dbe041648b17bfe17e04776edc95210bc49#f8728dbe041648b17bfe17e04776edc95210bc49"
 dependencies = [
  "acir",
  "anyhow",
@@ -9456,7 +9466,6 @@ dependencies = [
  "bytes",
  "hex",
  "itertools 0.14.0",
- "noir_artifact_cli",
  "noirc_abi",
  "postcard",
  "rand 0.8.5",
@@ -9477,7 +9486,7 @@ dependencies = [
 [[package]]
 name = "provekit-prover"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=d7deea66c41d56c1d411dd799d0d6066272323e4#d7deea66c41d56c1d411dd799d0d6066272323e4"
+source = "git+https://github.com/worldfnd/ProveKit?rev=f8728dbe041648b17bfe17e04776edc95210bc49#f8728dbe041648b17bfe17e04776edc95210bc49"
 dependencies = [
  "acir",
  "anyhow",
@@ -9485,6 +9494,7 @@ dependencies = [
  "ark-std 0.5.0",
  "bn254_blackbox_solver",
  "nargo",
+ "noir_artifact_cli",
  "noirc_abi",
  "provekit-common",
  "rand 0.9.2",
@@ -9498,14 +9508,16 @@ dependencies = [
 [[package]]
 name = "provekit-r1cs-compiler"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=d7deea66c41d56c1d411dd799d0d6066272323e4#d7deea66c41d56c1d411dd799d0d6066272323e4"
+source = "git+https://github.com/worldfnd/ProveKit?rev=f8728dbe041648b17bfe17e04776edc95210bc49#f8728dbe041648b17bfe17e04776edc95210bc49"
 dependencies = [
  "acir",
  "anyhow",
+ "ark-bn254",
  "ark-ff 0.5.0",
  "ark-std 0.5.0",
  "noirc_abi",
  "noirc_artifacts",
+ "ntt",
  "postcard",
  "provekit-common",
  "serde",
@@ -9517,12 +9529,11 @@ dependencies = [
 [[package]]
 name = "provekit-verifier"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=d7deea66c41d56c1d411dd799d0d6066272323e4#d7deea66c41d56c1d411dd799d0d6066272323e4"
+source = "git+https://github.com/worldfnd/ProveKit?rev=f8728dbe041648b17bfe17e04776edc95210bc49#f8728dbe041648b17bfe17e04776edc95210bc49"
 dependencies = [
  "anyhow",
  "ark-std 0.5.0",
  "provekit-common",
- "provekit-prover",
  "spongefish",
  "tracing",
  "whir",
@@ -11301,13 +11312,12 @@ checksum = "85636c14b73d81f541e525f585c0a2109e6744e1565b5c1668e31c70c10ed65c"
 [[package]]
 name = "skyscraper"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=d7deea66c41d56c1d411dd799d0d6066272323e4#d7deea66c41d56c1d411dd799d0d6066272323e4"
+source = "git+https://github.com/worldfnd/ProveKit?rev=f8728dbe041648b17bfe17e04776edc95210bc49#f8728dbe041648b17bfe17e04776edc95210bc49"
 dependencies = [
  "ark-bn254",
  "ark-ff 0.5.0",
  "block-multiplier",
  "fp-rounding",
- "proptest",
  "rayon",
  "seq-macro",
  "zerocopy",
@@ -11869,7 +11879,7 @@ dependencies = [
 [[package]]
 name = "spongefish"
 version = "0.2.0-alpha"
-source = "git+https://github.com/arkworks-rs/spongefish#fce4bfed23b2deb9a9f174178b6c9f59f580cc81"
+source = "git+https://github.com/arkworks-rs/spongefish?rev=ecb4f08373ed930175585c856517efdb1851fb47#ecb4f08373ed930175585c856517efdb1851fb47"
 dependencies = [
  "ark-ec 0.5.0",
  "ark-ff 0.5.0",
@@ -11887,7 +11897,7 @@ dependencies = [
 [[package]]
 name = "spongefish-pow"
 version = "0.1.0-alpha"
-source = "git+https://github.com/arkworks-rs/spongefish#fce4bfed23b2deb9a9f174178b6c9f59f580cc81"
+source = "git+https://github.com/arkworks-rs/spongefish?rev=ecb4f08373ed930175585c856517efdb1851fb47#ecb4f08373ed930175585c856517efdb1851fb47"
 dependencies = [
  "blake3",
  "bytemuck",
@@ -13506,7 +13516,7 @@ dependencies = [
 [[package]]
 name = "whir"
 version = "0.1.0"
-source = "git+https://github.com/WizardOfMenlo/whir/?rev=48fc0909d6a0d803d61c35b0c18499ad704da211#48fc0909d6a0d803d61c35b0c18499ad704da211"
+source = "git+https://github.com/WizardOfMenlo/whir/?rev=cf1599b56ff50e09142ebe6d2e2fbd86875c9986#cf1599b56ff50e09142ebe6d2e2fbd86875c9986"
 dependencies = [
  "ark-crypto-primitives",
  "ark-ff 0.5.0",

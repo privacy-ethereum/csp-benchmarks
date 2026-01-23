@@ -8,10 +8,10 @@ rand = { workspace = true }
 utils = { workspace = true }
 criterion = { workspace = true }
 clap = { workspace = true }
-provekit-common = { git = "https://github.com/worldfnd/ProveKit", rev = "d7deea66c41d56c1d411dd799d0d6066272323e4"}
-provekit-r1cs-compiler = { git = "https://github.com/worldfnd/ProveKit", rev = "d7deea66c41d56c1d411dd799d0d6066272323e4"}
-provekit-prover = { git = "https://github.com/worldfnd/ProveKit", rev = "d7deea66c41d56c1d411dd799d0d6066272323e4"}
-provekit-verifier = { git = "https://github.com/worldfnd/ProveKit", rev = "d7deea66c41d56c1d411dd799d0d6066272323e4"}
+provekit-common = { git = "https://github.com/worldfnd/ProveKit", rev = "f8728dbe041648b17bfe17e04776edc95210bc49"}
+provekit-r1cs-compiler = { git = "https://github.com/worldfnd/ProveKit", rev = "f8728dbe041648b17bfe17e04776edc95210bc49"}
+provekit-prover = { git = "https://github.com/worldfnd/ProveKit", rev = "f8728dbe041648b17bfe17e04776edc95210bc49"}
+provekit-verifier = { git = "https://github.com/worldfnd/ProveKit", rev = "f8728dbe041648b17bfe17e04776edc95210bc49"}
 
 [[bin]]
 name = "sha256_mem_provekit"
@@ -25,6 +25,10 @@ path = "src/bin/ecdsa_mem.rs"
 name = "poseidon_mem_provekit"
 path = "src/bin/poseidon_mem.rs"
 
+[[bin]]
+name = "keccak_mem_provekit"
+path = "src/bin/keccak_mem.rs"
+
 [[bench]]
 name = "sha256"
 harness = false
@@ -35,4 +39,8 @@ harness = false
 
 [[bench]]
 name = "poseidon"
+harness = false
+
+[[bench]]
+name = "keccak"
 harness = false

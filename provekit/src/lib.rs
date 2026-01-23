@@ -1,7 +1,7 @@
-use provekit_common::{NoirProof, NoirProofScheme};
-use provekit_prover::NoirProofSchemeProver;
+use provekit_common::{NoirProof, NoirProofScheme, Prover, Verifier};
+use provekit_prover::Prove;
 use provekit_r1cs_compiler::NoirProofSchemeBuilder;
-use provekit_verifier::NoirProofSchemeVerifier;
+use provekit_verifier::Verify;
 use std::borrow::Cow;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -12,6 +12,7 @@ use utils::harness::{AuditStatus, BenchProperties};
 const WORKSPACE_ROOT: &str = "circuits";
 const SHA256_CIRCUIT_SUB_PATH: &str = "hash/sha256-provekit";
 const POSEIDON_CIRCUIT_SUB_PATH: &str = "hash/poseidon";
+const KECCAK_CIRCUIT_SUB_PATH: &str = "hash/keccak";
 const ECDSA_CIRCUIT_SUB_PATH: &str = "ecdsa";
 
 pub const PROVEKIT_PROPS: BenchProperties = BenchProperties {
@@ -90,7 +91,7 @@ pub fn prepare_sha256(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) 
         .join("target")
         .join(format!("{package_name}.json"));
 
-    let proof_scheme = NoirProofScheme::from_file(circuit_path.to_str().unwrap())
+    let proof_scheme = NoirProofScheme::from_file(&circuit_path)
         .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
 
     let dir_name = "sha256_var_input";
@@ -167,7 +168,7 @@ pub fn prepare_poseidon(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf
         .join("target")
         .join(format!("{package_name}.json"));
 
-    let proof_scheme = NoirProofScheme::from_file(circuit_path.to_str().unwrap())
+    let proof_scheme = NoirProofScheme::from_file(&circuit_path)
         .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
 
     let circuit_member_dir = workspace_root.join(POSEIDON_CIRCUIT_SUB_PATH);
@@ -189,6 +190,64 @@ pub fn prepare_poseidon(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf
     (proof_scheme, toml_path, circuit_path)
 }
 
+pub fn prepare_keccak(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
+    let current_dir = std::env::current_dir().expect("Failed to get current directory");
+    let workspace_root_pre = current_dir.join(WORKSPACE_ROOT);
+    let circuit_source = workspace_root_pre.join("hash/keccak/src/main.nr");
+
+    if let Ok(mut content) = fs::read_to_string(&circuit_source)
+        && let Some(fn_pos) = content.find("fn main(")
+        && let Some(msg_pos_rel) = content[fn_pos..].find("msg: [u8;")
+    {
+        let msg_pos = fn_pos + msg_pos_rel + "msg: [u8;".len();
+        let bytes = content.as_bytes();
+        let mut start = msg_pos;
+        while start < bytes.len() && bytes[start].is_ascii_whitespace() {
+            start += 1;
+        }
+        let mut end = start;
+        while end < bytes.len() && bytes[end].is_ascii_digit() {
+            end += 1;
+        }
+        if start != end {
+            content.replace_range(start..end, &input_size.to_string());
+            fs::write(&circuit_source, content).expect("Failed to update circuit input length");
+        }
+    }
+
+    let workspace_root = compile_workspace();
+
+    let package_name = "keccak";
+    let circuit_path = workspace_root
+        .join("target")
+        .join(format!("{package_name}.json"));
+
+    let proof_scheme = NoirProofScheme::from_file(&circuit_path)
+        .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
+
+    let circuit_member_dir = workspace_root.join(KECCAK_CIRCUIT_SUB_PATH);
+    fs::create_dir_all(&circuit_member_dir).expect("Failed to create circuit dir");
+
+    let (data, digest) = utils::generate_keccak_input(input_size);
+    let toml_content = format!(
+        "msg = [{}]\nmessage_size = {input_size}\nresult = [{}]",
+        data.iter()
+            .map(u8::to_string)
+            .collect::<Vec<_>>()
+            .join(", "),
+        digest
+            .iter()
+            .map(u8::to_string)
+            .collect::<Vec<_>>()
+            .join(", "),
+    );
+
+    let toml_path = circuit_member_dir.join("Prover.toml");
+    fs::write(&toml_path, toml_content).expect("Failed to write Prover.toml");
+
+    (proof_scheme, toml_path, circuit_path)
+}
+
 pub fn prepare_ecdsa(_: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
     let workspace_root = compile_workspace();
 
@@ -197,7 +256,7 @@ pub fn prepare_ecdsa(_: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
         .join("target")
         .join(format!("{package_name}.json"));
 
-    let proof_scheme = NoirProofScheme::from_file(circuit_path.to_str().unwrap())
+    let proof_scheme = NoirProofScheme::from_file(&circuit_path)
         .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
 
     let dir_name = "p256_bigcurve";
@@ -236,17 +295,14 @@ pub fn prepare_ecdsa(_: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
 }
 
 pub fn prove(proof_scheme: &NoirProofScheme, toml_path: &Path) -> NoirProof {
-    let witness_map = proof_scheme
-        .read_witness(toml_path.to_str().unwrap())
-        .expect("Failed to read witness");
-    proof_scheme
-        .prove(&witness_map)
-        .expect("Proof generation failed")
+    let prover = Prover::from_noir_proof_scheme(proof_scheme.clone());
+    prover.prove(toml_path).expect("Proof generation failed")
 }
 
 /// Verify a proof with the given scheme
 pub fn verify(proof: &NoirProof, proof_scheme: &NoirProofScheme) -> Result<(), &'static str> {
-    proof_scheme.verify(proof).map_err(|_| "Proof is not valid")
+    let mut verifier = Verifier::from_noir_proof_scheme(proof_scheme.clone());
+    verifier.verify(proof).map_err(|_| "Proof is not valid")
 }
 
 pub fn preprocessing_size(circuit_path: &Path) -> usize {
