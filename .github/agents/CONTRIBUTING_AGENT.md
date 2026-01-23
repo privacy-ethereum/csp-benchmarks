@@ -316,7 +316,7 @@ As a Claude agent working on this repository:
 
 ## Security Considerations
 
-- Check for vulnerabilities with `codeql_checker` before finalizing
+- Check for vulnerabilities with `codeql_checker` tool (available in the agent environment) before finalizing
 - Don't commit secrets or credentials
 - Validate all external inputs in benchmark code
 - Use safe Rust practices (avoid unwrap() in production code paths)
@@ -330,8 +330,8 @@ Before reporting completion:
 4. Test benchmark with `BENCH_INPUT_PROFILE=reduced`
 5. Verify output files are generated correctly
 6. Check git status to ensure only intended files are staged
-7. Request code review via `code_review` tool
-8. Run `codeql_checker` for security validation
+7. Request code review via `code_review` tool (available in the agent environment)
+8. Run `codeql_checker` tool (available in the agent environment) for security validation
 
 ---
 
