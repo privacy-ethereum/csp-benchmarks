@@ -248,7 +248,7 @@ BENCH_INPUT_PROFILE=full bash ./benchmark.sh \
 
 ### DO:
 - ✅ Read CONTRIBUTING.md thoroughly before starting
-- ✅ Use `cargo fmt` and `cargo clippy` for Rust code
+- ✅ Use `cargo fmt --all -- --check` and `cargo clippy --workspace --all-targets --all-features` for Rust code (as defined in `.github/workflows/lints.yml`)
 - ✅ Test with `BENCH_INPUT_PROFILE=reduced` first for quick iteration
 - ✅ Make scripts executable with `chmod +x`
 - ✅ Use the shared harness macro - don't write custom benchmark code
@@ -295,12 +295,13 @@ BENCH_INPUT_PROFILE=full bash ./benchmark.sh \
 - `.github/workflows/sh_benchmarks_parallel.yml`: Non-Rust benchmarks
 
 ### Pre-submit Checklist
-1. Code compiles: `cargo build --release --workspace`
-2. Linting passes: `cargo clippy`
-3. Formatting correct: `cargo fmt --check`
+1. Code compiles: `cargo build --workspace`
+2. Linting passes: `cargo clippy --workspace --all-targets --all-features`
+3. Formatting correct: `cargo fmt --all -- --check`
 4. Quick benchmark runs: `BENCH_INPUT_PROFILE=reduced cargo bench`
 5. Scripts are executable: `chmod +x my-system/*.sh` (for non-Rust)
 6. CI workflow updated (for non-Rust): folder added to `sh_benchmarks_parallel.yml`
+7. For excluded crates (cairo-m, nexus): Run commands from within their directories
 
 ## Getting Help
 
@@ -334,14 +335,15 @@ As a Claude agent working on this repository:
 ## Final Validation
 
 Before reporting completion:
-1. Run `cargo build --release --workspace` successfully
+1. Run `cargo build --workspace` successfully
    - **Note**: Some crates (`cairo-m`, `nexus`) are excluded from the workspace. Build them separately:
      ```bash
-     cargo build --release -p cairo-m
-     cargo build --release -p nexus
+     cd cairo-m && cargo build && cd ..
+     cd nexus && cargo build && cd ..
      ```
-2. Run `cargo clippy` with no errors
-3. Run `cargo fmt --check` 
+2. Run `cargo clippy --workspace --all-targets --all-features` with no errors
+   - For excluded crates: `cd cairo-m && cargo clippy --all-targets --all-features && cd ..` (and same for nexus)
+3. Run `cargo fmt --all -- --check` 
 4. Test benchmark with `BENCH_INPUT_PROFILE=reduced`
 5. Verify output files are generated correctly
 6. Check git status to ensure only intended files are staged
