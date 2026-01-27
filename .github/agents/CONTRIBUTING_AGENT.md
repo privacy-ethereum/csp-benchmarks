@@ -66,13 +66,30 @@ The file at `/home/runner/work/csp-benchmarks/csp-benchmarks/CONTRIBUTING.md` co
 
    **Pattern A: No shared state**
    ```rust
-   use utils::harness::{BenchTarget, ProvingSystem};
+   use utils::harness::{BenchTarget, ProvingSystem, BenchProperties, AuditStatus};
+   use std::borrow::Cow;
+   
+   const MY_SYSTEM_BENCH_PROPERTIES: BenchProperties = BenchProperties {
+       proving_system: Cow::Borrowed("MySystem"),
+       field_curve: Cow::Borrowed("BN254"),
+       iop: Cow::Borrowed("Groth16"),
+       pcs: None,
+       arithm: Cow::Borrowed("R1CS"),
+       is_zk: true,
+       is_zkvm: false,
+       security_bits: 128,
+       is_pq: false,
+       is_maintained: true,
+       is_audited: AuditStatus::NotAudited,
+       isa: None,
+   };
    
    utils::define_benchmark_harness!(
        BenchTarget::Sha256,            // target
        ProvingSystem::MySystem,        // proving system
        None,                           // optional feature tag
        "sha256_mem_mysystem",         // memory binary name
+       MY_SYSTEM_BENCH_PROPERTIES,    // BenchProperties
        |input_size| { /* prepare */ },
        |prepared| { /* num_constraints */ 0 },
        |prepared| { /* prove */ },
@@ -84,13 +101,17 @@ The file at `/home/runner/work/csp-benchmarks/csp-benchmarks/CONTRIBUTING.md` co
 
    **Pattern B: With shared state**
    ```rust
+   use utils::harness::{BenchTarget, ProvingSystem, BenchProperties};
+   
    utils::define_benchmark_harness!(
        BenchTarget::Sha256,
        ProvingSystem::MySystem,
        None,
        "sha256_mem_mysystem",
+       MY_SYSTEM_BENCH_PROPERTIES,    // BenchProperties
        { /* initialize shared state once */ },
        |size, shared| { /* prepare with shared */ },
+       |prepared, shared| { /* num_constraints with shared */ 0 },
        |prepared, shared| { /* prove with shared */ },
        |prepared, proof, shared| { /* verify with shared */ },
        |prepared, shared| { /* preprocessing_size */ 0 },
@@ -252,7 +273,7 @@ BENCH_INPUT_PROFILE=full bash ./benchmark.sh \
 - ✅ Test with `BENCH_INPUT_PROFILE=reduced` first for quick iteration
 - ✅ Make scripts executable with `chmod +x`
 - ✅ Use the shared harness macro - don't write custom benchmark code
-- ✅ Follow existing examples (plonky2, sp1, barretenberg, ligetron)
+- ✅ Follow existing examples (plonky2, circom, sp1, barretenberg, ligetron)
 - ✅ Record circuit sizes accurately
 - ✅ Ensure memory binaries perform only preprocessing + proving
 - ✅ Use `git --no-pager` when running git commands via bash
@@ -280,7 +301,7 @@ BENCH_INPUT_PROFILE=full bash ./benchmark.sh \
 ## Reference Examples
 
 ### Rust Benchmarks
-- **Simple**: `plonky2/benches/sha256.rs`
+- **Simple**: `plonky2/benches/sha256.rs`, `circom/benches/sha256_bench.rs`
 - **With shared state**: `polyhedra-expander/benches/sha256.rs`
 - **zkVM**: `sp1/benches/sha256.rs`, `risc0/benches/sha256.rs`
 
