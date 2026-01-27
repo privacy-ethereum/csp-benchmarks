@@ -59,32 +59,32 @@ impl State {
     }
 }
 
-fn get_round_constant(round: u32) -> Lane {
-    if round == 0 { Lane { lo: 0x00000001, hi: 0x00000000 } }
-    else if round == 1 { Lane { lo: 0x00008082, hi: 0x00000000 } }
-    else if round == 2 { Lane { lo: 0x0000808A, hi: 0x80000000 } }
-    else if round == 3 { Lane { lo: 0x80008000, hi: 0x80000000 } }
-    else if round == 4 { Lane { lo: 0x0000808B, hi: 0x00000000 } }
-    else if round == 5 { Lane { lo: 0x80000001, hi: 0x00000000 } }
-    else if round == 6 { Lane { lo: 0x80008081, hi: 0x80000000 } }
-    else if round == 7 { Lane { lo: 0x00008009, hi: 0x80000000 } }
-    else if round == 8 { Lane { lo: 0x0000008A, hi: 0x00000000 } }
-    else if round == 9 { Lane { lo: 0x00000088, hi: 0x00000000 } }
-    else if round == 10 { Lane { lo: 0x80008009, hi: 0x00000000 } }
-    else if round == 11 { Lane { lo: 0x8000000A, hi: 0x00000000 } }
-    else if round == 12 { Lane { lo: 0x8000808B, hi: 0x00000000 } }
-    else if round == 13 { Lane { lo: 0x0000008B, hi: 0x80000000 } }
-    else if round == 14 { Lane { lo: 0x00008089, hi: 0x80000000 } }
-    else if round == 15 { Lane { lo: 0x00008003, hi: 0x80000000 } }
-    else if round == 16 { Lane { lo: 0x00008002, hi: 0x80000000 } }
-    else if round == 17 { Lane { lo: 0x00000080, hi: 0x80000000 } }
-    else if round == 18 { Lane { lo: 0x0000800A, hi: 0x00000000 } }
-    else if round == 19 { Lane { lo: 0x8000000A, hi: 0x80000000 } }
-    else if round == 20 { Lane { lo: 0x80008081, hi: 0x80000000 } }
-    else if round == 21 { Lane { lo: 0x00008080, hi: 0x80000000 } }
-    else if round == 22 { Lane { lo: 0x80000001, hi: 0x00000000 } }
-    else { Lane { lo: 0x80008008, hi: 0x80000000 } }
-}
+global ROUND_CONSTANTS: [Lane; 24] = [
+    Lane { lo: 0x00000001, hi: 0x00000000 },
+    Lane { lo: 0x00008082, hi: 0x00000000 },
+    Lane { lo: 0x0000808A, hi: 0x80000000 },
+    Lane { lo: 0x80008000, hi: 0x80000000 },
+    Lane { lo: 0x0000808B, hi: 0x00000000 },
+    Lane { lo: 0x80000001, hi: 0x00000000 },
+    Lane { lo: 0x80008081, hi: 0x80000000 },
+    Lane { lo: 0x00008009, hi: 0x80000000 },
+    Lane { lo: 0x0000008A, hi: 0x00000000 },
+    Lane { lo: 0x00000088, hi: 0x00000000 },
+    Lane { lo: 0x80008009, hi: 0x00000000 },
+    Lane { lo: 0x8000000A, hi: 0x00000000 },
+    Lane { lo: 0x8000808B, hi: 0x00000000 },
+    Lane { lo: 0x0000008B, hi: 0x80000000 },
+    Lane { lo: 0x00008089, hi: 0x80000000 },
+    Lane { lo: 0x00008003, hi: 0x80000000 },
+    Lane { lo: 0x00008002, hi: 0x80000000 },
+    Lane { lo: 0x00000080, hi: 0x80000000 },
+    Lane { lo: 0x0000800A, hi: 0x00000000 },
+    Lane { lo: 0x8000000A, hi: 0x80000000 },
+    Lane { lo: 0x80008081, hi: 0x80000000 },
+    Lane { lo: 0x00008080, hi: 0x80000000 },
+    Lane { lo: 0x80000001, hi: 0x00000000 },
+    Lane { lo: 0x80008008, hi: 0x80000000 },
+];
 
 // Keccak-f[1600] permutation: 24 rounds of theta, rho, pi, chi, iota
 fn keccakf1600(state: State) -> State {
@@ -140,7 +140,7 @@ fn keccakf1600(state: State) -> State {
         a[24] = s[24].xor(s[20].not().and(s[21]));
 
         // iota: XOR round constant into lane 0
-        a[0] = a[0].xor(get_round_constant(round));
+        a[0] = a[0].xor(ROUND_CONSTANTS[round]);
     }
 
     State { lanes: a }
