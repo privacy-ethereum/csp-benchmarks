@@ -1,16 +1,17 @@
-//! SHA256 benchmark using Stwo prover.
+//! SHA256 benchmark using Rookie Numbers prover.
 
 use stwo_bench::{
-    num_constraints, prepare, preprocessing_size, proof_size, prove, verify, STWO_BENCH_PROPERTIES,
+    num_constraints, prepare, preprocessing_size, proof_size, prove, verify,
+    ROOKIE_NUMBERS_BENCH_PROPERTIES,
 };
 use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
-    ProvingSystem::Stwo,
+    ProvingSystem::RookieNumbers,
     None,
-    "sha256_mem_stwo",
-    STWO_BENCH_PROPERTIES,
+    "sha256_mem_rookie_numbers",
+    ROOKIE_NUMBERS_BENCH_PROPERTIES,
     // prepare: |input_size| -> PreparedContext
     |input_size| prepare(input_size),
     // num_constraints: |ctx| -> usize

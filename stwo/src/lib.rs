@@ -10,9 +10,9 @@ use sha256::preprocessed::PreProcessedTrace;
 use sha256::{prove_sha256, verify_sha256, Blake2sMerkleHasher, Column, PcsConfig, StarkProof};
 use utils::harness::{AuditStatus, BenchProperties};
 
-/// Benchmark properties for Stwo prover.
-pub const STWO_BENCH_PROPERTIES: BenchProperties = BenchProperties {
-    proving_system: Cow::Borrowed("Stwo"),
+/// Benchmark properties for Rookie Numbers prover (using Stwo library).
+pub const ROOKIE_NUMBERS_BENCH_PROPERTIES: BenchProperties = BenchProperties {
+    proving_system: Cow::Borrowed("Rookie Numbers"),
     field_curve: Cow::Borrowed("M31"),
     iop: Cow::Borrowed("FRI"),
     pcs: Some(Cow::Borrowed("Circle-PCS")),
