@@ -27,3 +27,4 @@ tmp/
 *.sym
 *.wtns
 *.ptau
+.claude
