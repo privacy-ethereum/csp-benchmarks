@@ -161,6 +161,7 @@ jobs:
           fi
 
       - name: Install Rust toolchain (stable)
+        if: ${{ matrix.folder != 'rookie-numbers' }}
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
