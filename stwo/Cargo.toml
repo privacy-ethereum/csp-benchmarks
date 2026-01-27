@@ -14,7 +14,7 @@ utils = { workspace = true }
 serde = { workspace = true }
 
 # Stwo dependencies from rookie-numbers (using re-exports to avoid version conflicts)
-sha256 = { git = "https://github.com/clementwalter/rookie-numbers", rev = "f57e21a", default-features = false, features = ["parallel"] }
+sha256 = { git = "https://github.com/clementwalter/rookie-numbers", rev = "86246f0", default-features = false, features = ["parallel"] }
 
 [[bench]]
 name = "sha256"
