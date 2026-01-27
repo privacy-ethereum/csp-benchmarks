@@ -1,10 +1,10 @@
-//! Memory measurement binary for Stwo SHA256 prover.
+//! Memory measurement binary for Rookie Numbers SHA256 prover.
 //!
 //! This binary is used by the harness to measure peak memory usage
 //! during proof generation.
 
 use clap::Parser;
-use stwo_bench::{prepare, prove};
+use rookie_numbers::{prepare, prove};
 
 #[derive(Parser, Debug)]
 struct Args {

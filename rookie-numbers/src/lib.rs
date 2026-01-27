@@ -1,6 +1,6 @@
-//! Stwo SHA256 benchmark integration for csp-benchmarks.
+//! Rookie Numbers SHA256 benchmark integration for csp-benchmarks.
 //!
-//! This crate wraps the Stwo SHA256 prover from rookie-numbers to integrate
+//! This crate wraps the Rookie Numbers SHA256 prover from rookie-numbers to integrate
 //! with the csp-benchmarks Rust harness.
 
 use std::borrow::Cow;
@@ -40,9 +40,9 @@ pub struct PreparedSha256 {
     pub input_size: usize,
 }
 
-/// Convert input size in bytes to log_size for Stwo.
+/// Convert input size in bytes to log_size.
 ///
-/// Stwo processes SHA256 in batches. The log_size is the log2 of the number
+/// Rookie Numbers processes SHA256 in batches. The log_size is the log2 of the number
 /// of SHA256 compression function instances. For benchmarking, we map:
 /// - Small inputs (128-2048 bytes) to reasonable log_sizes that demonstrate
 ///   the prover's performance.
@@ -75,7 +75,7 @@ fn input_size_to_log_size(input_size: usize) -> u32 {
     }
 }
 
-/// Prepare the Stwo prover for benchmarking.
+/// Prepare the Rookie Numbers prover for benchmarking.
 ///
 /// # Arguments
 /// * `input_size` - Input size in bytes (from the harness)
@@ -115,7 +115,7 @@ pub fn verify(ctx: &PreparedSha256, proof: &StwoProof) {
 
 /// Get the number of constraints (trace length) for the proof.
 ///
-/// For Stwo AIR, this is the trace length: 64 rounds × 2^log_size instances.
+/// For Rookie Numbers AIR, this is the trace length: 64 rounds × 2^log_size instances.
 ///
 /// # Arguments
 /// * `ctx` - Prepared benchmark context
@@ -123,7 +123,7 @@ pub fn verify(ctx: &PreparedSha256, proof: &StwoProof) {
 /// # Returns
 /// Total number of trace rows (constraint count equivalent for AIR).
 pub fn num_constraints(ctx: &PreparedSha256) -> usize {
-    // Stwo SHA256 trace: 64 rounds per instance × number of instances
+    // Rookie Numbers SHA256 trace: 64 rounds per instance × number of instances
     64 * (1 << ctx.log_size)
 }
 

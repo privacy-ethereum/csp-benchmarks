@@ -12,13 +12,9 @@ members = [
     "risc0",
     "sp1",
     "spartan2",
-    "stwo",
     "utils",
 ]
-exclude = [
-    "cairo-m",
-    "nexus",
-]
+exclude = ["cairo-m", "nexus", "rookie-numbers"]
 
 [workspace.dependencies]
 anyhow = "1.0.81"

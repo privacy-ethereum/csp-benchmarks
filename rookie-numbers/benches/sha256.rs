@@ -1,6 +1,6 @@
 //! SHA256 benchmark using Rookie Numbers prover.
 
-use stwo_bench::{
+use rookie_numbers::{
     num_constraints, prepare, preprocessing_size, proof_size, prove, verify,
     ROOKIE_NUMBERS_BENCH_PROPERTIES,
 };
