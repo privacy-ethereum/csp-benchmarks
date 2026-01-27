@@ -58,6 +58,7 @@ pub enum ProvingSystem {
     CairoM,
     Nexus,
     Spartan2,
+    Stwo,
     // Extend as needed
 }
 
@@ -77,6 +78,7 @@ impl ProvingSystem {
             ProvingSystem::CairoM => "cairo-m",
             ProvingSystem::Nexus => "nexus",
             ProvingSystem::Spartan2 => "spartan2",
+            ProvingSystem::Stwo => "stwo",
         }
     }
 }

@@ -166,6 +166,12 @@ jobs:
           profile: minimal
           components: llvm-tools, rustc-dev, rust-src, rustfmt, clippy
 
+      - name: Install Stwo toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2025-07-14
+          profile: minimal
+
       - name: Install OpenVM
         if: ${{ github.event.inputs.include_optional == true }}
         uses: ./.github/actions/install-openvm
@@ -186,9 +192,9 @@ jobs:
         run: |
           INCLUDE_OPTIONAL='${{ github.event.inputs.include_optional }}'
           if [[ "$INCLUDE_OPTIONAL" == "true" ]]; then
-            cargo build --release --workspace
+            cargo build --release --workspace --exclude stwo-bench
           else
-            cargo build --release --workspace --exclude openvm --exclude sp1
+            cargo build --release --workspace --exclude openvm --exclude jolt --exclude sp1 --exclude stwo-bench
           fi
 
       - name: Build nexus and cairo-m separately
@@ -200,6 +206,10 @@ jobs:
           if echo "$CRATES" | grep -q '"cairo-m"'; then
             cd cairo-m && cargo build --release && cd ..
           fi
+
+      - name: Build stwo separately (requires nightly-2025-07-14)
+        run: |
+          cd stwo && cargo build --release && cd ..
 
   bench:
     if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
@@ -273,6 +283,14 @@ jobs:
       - name: Install LLVM and LLD for cairo-m
         if: ${{ contains(matrix.crate, 'cairo-m') }}
         uses: ./.github/actions/install-llvm
+
+      - name: Install Stwo toolchain
+        if: ${{ contains(matrix.crate, 'stwo') }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2025-07-14
+          override: true
+          profile: minimal
 
       - name: Build and copy excluded memory benchmark binary to workspace target
         if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') }}

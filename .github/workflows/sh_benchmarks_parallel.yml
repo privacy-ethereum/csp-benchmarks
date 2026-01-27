@@ -74,7 +74,6 @@ jobs:
           FOLDERS=(
             ligetron
             barretenberg
-            rookie-numbers
           )
 
           # ─── 2. filter by diff (or include all when run_all=true) ───────
@@ -138,14 +137,6 @@ jobs:
         with:
           version: "0.87.0"
 
-      - name: Setup Rust nightly for rookie-numbers (only when folder is rookie-numbers)
-        if: ${{ matrix.folder == 'rookie-numbers' }}
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2025-07-14
-          override: true
-          profile: minimal
-
       - name: Ensure jq present
         run: |
           if ! command -v jq >/dev/null 2>&1; then
@@ -161,7 +152,6 @@ jobs:
           fi
 
       - name: Install Rust toolchain (stable)
-        if: ${{ matrix.folder != 'rookie-numbers' }}
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
