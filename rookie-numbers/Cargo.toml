@@ -6,7 +6,7 @@ edition = "2021"
 [lib]
 
 [dependencies]
-sha256 = { git = "https://github.com/clementwalter/rookie-numbers", rev = "86246f0", default-features = false, features = [
+sha256 = { git = "https://github.com/clementwalter/rookie-numbers", rev = "ec6b9273ac83823dfe45992ce6a2580275ce51e7", default-features = false, features = [
   "parallel",
 ] }
 utils = { path = "../utils" }

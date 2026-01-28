@@ -1632,7 +1632,7 @@ dependencies = [
 [[package]]
 name = "sha256"
 version = "0.0.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=86246f0#86246f0c9e68342a349d178d5147ac3ecb8f9e03"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=ec6b9273ac83823dfe45992ce6a2580275ce51e7#ec6b9273ac83823dfe45992ce6a2580275ce51e7"
 dependencies = [
  "anyhow",
  "bincode",
@@ -1760,7 +1760,7 @@ dependencies = [
 [[package]]
 name = "std-shims"
 version = "0.1.0"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=86246f0#86246f0c9e68342a349d178d5147ac3ecb8f9e03"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=ec6b9273ac83823dfe45992ce6a2580275ce51e7#ec6b9273ac83823dfe45992ce6a2580275ce51e7"
 
 [[package]]
 name = "strsim"
@@ -1792,7 +1792,7 @@ dependencies = [
 [[package]]
 name = "stwo"
 version = "0.1.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=86246f0#86246f0c9e68342a349d178d5147ac3ecb8f9e03"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=ec6b9273ac83823dfe45992ce6a2580275ce51e7#ec6b9273ac83823dfe45992ce6a2580275ce51e7"
 dependencies = [
  "blake2",
  "blake3",
@@ -1820,7 +1820,7 @@ dependencies = [
 [[package]]
 name = "stwo-constraint-framework"
 version = "0.1.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=86246f0#86246f0c9e68342a349d178d5147ac3ecb8f9e03"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=ec6b9273ac83823dfe45992ce6a2580275ce51e7#ec6b9273ac83823dfe45992ce6a2580275ce51e7"
 dependencies = [
  "hashbrown 0.16.1",
  "itertools 0.12.1",
@@ -2080,7 +2080,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 [[package]]
 name = "utils"
 version = "0.0.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=86246f0#86246f0c9e68342a349d178d5147ac3ecb8f9e03"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=ec6b9273ac83823dfe45992ce6a2580275ce51e7#ec6b9273ac83823dfe45992ce6a2580275ce51e7"
 dependencies = [
  "bytemuck",
  "divan",

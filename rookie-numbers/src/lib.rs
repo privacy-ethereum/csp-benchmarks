@@ -7,7 +7,9 @@ use std::borrow::Cow;
 
 use sha256::components::ClaimedSum;
 use sha256::preprocessed::PreProcessedTrace;
-use sha256::{prove_sha256, verify_sha256, Blake2sMerkleHasher, Column, PcsConfig, StarkProof};
+use sha256::{
+    prove_sha256, verify_sha256, Blake2sMerkleHasher, Column, FriConfig, PcsConfig, StarkProof,
+};
 use utils::harness::{AuditStatus, BenchProperties};
 
 /// Benchmark properties for Rookie Numbers prover (using Stwo library).
@@ -19,7 +21,7 @@ pub const ROOKIE_NUMBERS_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     arithm: Cow::Borrowed("AIR"),
     is_zk: false,
     is_zkvm: false,
-    security_bits: 128,
+    security_bits: 96,
     is_pq: true,
     is_maintained: true,
     is_audited: AuditStatus::NotAudited,
