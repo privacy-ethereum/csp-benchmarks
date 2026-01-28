@@ -447,6 +447,8 @@ dependencies = [
  "num-traits",
  "once_cell",
  "oorandom",
+ "plotters",
+ "rayon",
  "regex",
  "serde",
  "serde_derive",
@@ -1252,6 +1254,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "plotters"
+version = "0.3.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5aeb6f403d7a4911efb1e33402027fc44f29b5bf6def3effcc22d7bb75f2b747"
+dependencies = [
+ "num-traits",
+ "plotters-backend",
+ "plotters-svg",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "plotters-backend"
+version = "0.3.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df42e13c12958a16b3f7f4386b9ab1f3e7933914ecea48da7139435263a4172a"
+
+[[package]]
+name = "plotters-svg"
+version = "0.3.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "51bae2ac328883f7acdfea3d66a7c35751187f870bc81f94563733a154d7a670"
+dependencies = [
+ "plotters-backend",
+]
+
+[[package]]
 name = "powerfmt"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1447,6 +1477,7 @@ version = "0.1.0"
 dependencies = [
  "bincode",
  "clap",
+ "criterion",
  "sha256",
  "utils 0.1.0",
 ]
@@ -1632,7 +1663,7 @@ dependencies = [
 [[package]]
 name = "sha256"
 version = "0.0.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=ec6b9273ac83823dfe45992ce6a2580275ce51e7#ec6b9273ac83823dfe45992ce6a2580275ce51e7"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=85e9c2f59e9259414ab2153bdb5e7e4c0546235f#85e9c2f59e9259414ab2153bdb5e7e4c0546235f"
 dependencies = [
  "anyhow",
  "bincode",
@@ -1760,7 +1791,7 @@ dependencies = [
 [[package]]
 name = "std-shims"
 version = "0.1.0"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=ec6b9273ac83823dfe45992ce6a2580275ce51e7#ec6b9273ac83823dfe45992ce6a2580275ce51e7"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=85e9c2f59e9259414ab2153bdb5e7e4c0546235f#85e9c2f59e9259414ab2153bdb5e7e4c0546235f"
 
 [[package]]
 name = "strsim"
@@ -1792,7 +1823,7 @@ dependencies = [
 [[package]]
 name = "stwo"
 version = "0.1.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=ec6b9273ac83823dfe45992ce6a2580275ce51e7#ec6b9273ac83823dfe45992ce6a2580275ce51e7"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=85e9c2f59e9259414ab2153bdb5e7e4c0546235f#85e9c2f59e9259414ab2153bdb5e7e4c0546235f"
 dependencies = [
  "blake2",
  "blake3",
@@ -1820,7 +1851,7 @@ dependencies = [
 [[package]]
 name = "stwo-constraint-framework"
 version = "0.1.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=ec6b9273ac83823dfe45992ce6a2580275ce51e7#ec6b9273ac83823dfe45992ce6a2580275ce51e7"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=85e9c2f59e9259414ab2153bdb5e7e4c0546235f#85e9c2f59e9259414ab2153bdb5e7e4c0546235f"
 dependencies = [
  "hashbrown 0.16.1",
  "itertools 0.12.1",
@@ -2080,7 +2111,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 [[package]]
 name = "utils"
 version = "0.0.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=ec6b9273ac83823dfe45992ce6a2580275ce51e7#ec6b9273ac83823dfe45992ce6a2580275ce51e7"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=85e9c2f59e9259414ab2153bdb5e7e4c0546235f#85e9c2f59e9259414ab2153bdb5e7e4c0546235f"
 dependencies = [
  "bytemuck",
  "divan",
@@ -2183,6 +2214,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f01b580c9ac74c8d8f0c0e4afb04eeef2acf145458e52c03845ee9cd23e3d12"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "web-sys"
+version = "0.3.85"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "312e32e551d92129218ea9a2452120f4aabc03529ef03e4d0d82fb2780608598"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
 ]
 
 [[package]]

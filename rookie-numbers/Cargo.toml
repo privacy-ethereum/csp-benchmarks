@@ -6,12 +6,13 @@ edition = "2021"
 [lib]
 
 [dependencies]
-sha256 = { git = "https://github.com/clementwalter/rookie-numbers", rev = "ec6b9273ac83823dfe45992ce6a2580275ce51e7", default-features = false, features = [
+sha256 = { git = "https://github.com/clementwalter/rookie-numbers", rev = "85e9c2f59e9259414ab2153bdb5e7e4c0546235f", default-features = false, features = [
   "parallel",
 ] }
 utils = { path = "../utils" }
 bincode = "1.3.3"
 clap = { version = "4.5.20", features = ["derive", "env"] }
+criterion = "0.5.1"
 
 [[bench]]
 name = "sha256"

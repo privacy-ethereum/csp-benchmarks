@@ -4,8 +4,8 @@
 //! during proof generation.
 
 use clap::Parser;
-use rookie_numbers::{prepare, prove};
-
+use rookie_numbers::secure_pcs_config;
+use sha256::prove_sha256;
 #[derive(Parser, Debug)]
 struct Args {
     /// Input size parameter in bytes
@@ -21,8 +21,8 @@ fn main() {
 
 fn sha256_mem(input_size: usize) {
     // Prepare the prover context
-    let ctx = prepare(input_size);
+    let (message_bytes, _digest) = utils::generate_sha256_input(input_size);
 
     // Generate the proof (this is what we're measuring memory for)
-    let _proof = prove(&ctx);
+    let _proof = prove_sha256(&message_bytes, secure_pcs_config());
 }
