@@ -75,6 +75,16 @@ fn input_size_to_log_size(input_size: usize) -> u32 {
     }
 }
 
+fn secure_pcs_config() -> PcsConfig {
+    PcsConfig {
+        pow_bits: 26,
+        fri_config: FriConfig {
+            log_last_layer_degree_bound: 0,
+            log_blowup_factor: 1,
+            n_queries: 70,
+        },
+    }
+}
 /// Prepare the Rookie Numbers prover for benchmarking.
 ///
 /// # Arguments
@@ -87,7 +97,7 @@ pub fn prepare(input_size: usize) -> PreparedSha256 {
 
     PreparedSha256 {
         log_size,
-        config: PcsConfig::default(),
+        config: secure_pcs_config(),
         input_size,
     }
 }
