@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::str::FromStr;
 
-use crate::bench::{compile_binary, run_measure_mem_script, write_json_metrics, Metrics};
+use crate::bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics};
 use crate::metadata::{selected_byte_inputs, selected_field_element_inputs};
 use criterion::{BatchSize, Criterion};
 

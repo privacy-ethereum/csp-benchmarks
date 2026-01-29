@@ -2,18 +2,18 @@ use crate::harness::BenchProperties;
 use human_repr::{HumanCount, HumanDuration};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
-use serde_with::{serde_as, DurationNanoSeconds};
+use serde_with::{DurationNanoSeconds, serde_as};
 use std::{
     fmt::Display,
     process::Command,
     sync::{
-        atomic::{AtomicBool, AtomicUsize, Ordering},
         Arc,
+        atomic::{AtomicBool, AtomicUsize, Ordering},
     },
     thread,
     time::Duration,
 };
-use tabled::{settings::Style, Table, Tabled};
+use tabled::{Table, Tabled, settings::Style};
 
 fn get_current_memory_usage() -> Result<usize, std::io::Error> {
     unsafe {

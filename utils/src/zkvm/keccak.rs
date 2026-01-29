@@ -1,3 +1,3 @@
-pub use crate::zkvm::hash::{build_input, PreparedHash as PreparedKeccak};
+pub use crate::zkvm::hash::{PreparedHash as PreparedKeccak, build_input};
 
 pub const KECCAK_BENCH: &str = "keccak";

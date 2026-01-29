@@ -7,6 +7,3 @@
 [submodule "circom/hash-circuits"]
 	path = circom/hash-circuits
 	url = https://github.com/bkomuves/hash-circuits
-[submodule "rookie-numbers/repo"]
-	path = rookie-numbers/repo
-	url = https://github.com/clementwalter/rookie-numbers.git

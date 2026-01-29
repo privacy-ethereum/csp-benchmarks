@@ -1,10 +1,10 @@
 use crate::zkvm::ecdsa::PreparedEcdsa;
 use crate::zkvm::hash::PreparedHash;
-use crate::zkvm::instance::{compile_guest_program, CompiledProgram, ProofArtifacts};
+use crate::zkvm::instance::{CompiledProgram, ProofArtifacts, compile_guest_program};
 use crate::zkvm::traits::PreparedBenchmark;
 use bincode::Options;
-use ere_zkvm_interface::zkVM;
 use ere_zkvm_interface::Compiler;
+use ere_zkvm_interface::zkVM;
 use std::fs;
 use std::path::PathBuf;
 
