@@ -53,31 +53,14 @@ BENCH_INPUT_PROFILE=reduced bash ./benchmark.sh --system-dir ./<system> --loggin
 - **Rust**: the harness emits `{target}_{input}_{system}_[feature]_{metrics|mem_report}.json`
 - **Non-Rust**: the orchestrator emits `{target}_{input}_{system}_metrics.json`, `{target}_{input}_{system}_mem_report.json`, and expects `circuit_sizes.json`
 
-## Common Pitfalls and Best Practices
+## Common Gotchas
 
-### DO:
+- Follow existing examples (plonky2, circom, sp1, barretenberg, ligetron) for patterns
+- Record circuit sizes accurately in your measure scripts
+- Ensure memory binaries perform only preprocessing + proving (no verify)
+- Don't break existing benchmarks while adding new ones
 
-- ✅ Use `cargo fmt --all -- --check` and `cargo clippy --workspace --all-targets --all-features` for Rust code (as defined in
-  `.github/workflows/lints.yml`)
-- ✅ Test with `BENCH_INPUT_PROFILE=reduced` first for quick iteration
-- ✅ Make scripts executable with `chmod +x`
-- ✅ Use the shared harness macro - don't write custom benchmark code
-- ✅ Follow existing examples (plonky2, circom, sp1, barretenberg, ligetron)
-- ✅ Record circuit sizes accurately
-- ✅ Ensure memory binaries perform only preprocessing + proving
-- ✅ Use `git --no-pager` when running git commands via bash
-- ✅ Validate that your benchmarks run successfully before submitting
-
-### DON'T:
-
-- ❌ Add benchmarks without using the shared harness
-- ❌ Forget to register new crates in root Cargo.toml
-- ❌ Forget to add non-Rust systems to CI workflow
-- ❌ Create non-executable shell scripts
-- ❌ Modify the utils crate without understanding implications
-- ❌ Break existing benchmarks while adding new ones
-- ❌ Include build artifacts or generated files in commits
-- ❌ Use interactive pagers in bash commands (always use --no-pager)
+See `CONTRIBUTING.md` for comprehensive guidelines on adding benchmarks.
 
 ## Final Validation
 
