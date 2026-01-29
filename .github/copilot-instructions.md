@@ -57,9 +57,9 @@ BENCH_INPUT_PROFILE=reduced bash ./benchmark.sh --system-dir ./<system> --loggin
 
 ### DO:
 
-- ✅ Use `cargo fmt --all -- --check` and `cargo clippy --workspace --all-targets --all-features` for Rust code (as defined in
-  `.github/workflows/lints.yml`)
+- ✅ Use `cargo fmt --all -- --check` and `cargo clippy --workspace --all-targets --all-features` for Rust code (as defined in `.github/workflows/lints.yml`)
 - ✅ Test with `BENCH_INPUT_PROFILE=reduced` first for quick iteration
+- ✅ Make scripts executable with `chmod +x`
 - ✅ Make scripts executable with `chmod +x`
 - ✅ Use the shared harness macro - don't write custom benchmark code
 - ✅ Follow existing examples (plonky2, circom, sp1, barretenberg, ligetron)
