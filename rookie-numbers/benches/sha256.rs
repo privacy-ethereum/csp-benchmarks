@@ -13,13 +13,13 @@ utils::define_benchmark_harness!(
     // prepare: |input_size| -> PreparedContext
     |input_size| utils::generate_sha256_input(input_size).0,
     // num_constraints: |ctx| -> usize
-    |_words| 0,
+    |_words| 8589, // number of columns of the main+interaction trace
     // prove: |words| -> Proof
     |words| prove_sha256(&words, secure_pcs_config()),
     // verify: |words, proof| -> ()
     |_words, proof| verify_sha256(proof.0.clone(), proof.1, &proof.2).expect("verify failed"),
     // preprocessing_size: |words| -> usize
-    |_words| 0,
+    |_words| 110, // number of preprocessed columns
     // proof_size: |proof| -> usize
     |proof| bincode::serialize(proof).map(|v| v.len()).unwrap_or(0)
 );
