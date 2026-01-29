@@ -21,5 +21,5 @@ utils::define_benchmark_harness!(
     // preprocessing_size: |words| -> usize
     |_words| 0,
     // proof_size: |proof| -> usize
-    |proof| bincode::serialize(&proof.0).map(|v| v.len()).unwrap_or(0)
+    |proof| bincode::serialize(proof).map(|v| v.len()).unwrap_or(0)
 );
