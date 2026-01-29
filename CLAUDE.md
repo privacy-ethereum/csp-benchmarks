@@ -1,6 +1,6 @@
 # CSP Benchmarks (agent notes)
 
-See `README.MD` for project overview and `CONTRIBUTING.md` for the full contributor guide.
+This file is a pointer; see `.github/copilot-instructions.md` for the canonical, up-to-date instructions.
 
 ## Golden rules
 
