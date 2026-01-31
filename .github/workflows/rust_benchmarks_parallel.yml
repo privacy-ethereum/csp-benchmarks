@@ -195,10 +195,13 @@ jobs:
 
       - name: Build nexus and cairo-m separately
         run: |
-          if: ${{ contains(matrix.crate, 'nexus') }}
-          cd nexus && cargo build --release && cd ..
-          if: ${{ contains(matrix.crate, 'cairo-m') }}
-          cd cairo-m && cargo build --release && cd ..
+          CRATES='${{ needs.detect-crates.outputs.crates }}'
+          if echo "$CRATES" | grep -q '"nexus"'; then
+            cd nexus && cargo build --release && cd ..
+          fi
+          if echo "$CRATES" | grep -q '"cairo-m"'; then
+            cd cairo-m && cargo build --release && cd ..
+          fi
 
   bench:
     if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
