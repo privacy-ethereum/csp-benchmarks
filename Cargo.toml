@@ -11,11 +11,12 @@ members = [
     "miden",
     "risc0",
     "sp1",
+    "spartan2",
     "utils",
 ]
 exclude = [
     "cairo-m",
-    "nexus"
+    "nexus",
 ]
 
 [workspace.dependencies]

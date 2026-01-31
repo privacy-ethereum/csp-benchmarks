@@ -1,0 +1,29 @@
+[package]
+name = "spartan2-bench"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+spartan2 = { git = "https://github.com/microsoft/Spartan2.git", default-features = false }
+bellpepper = "0.4.0"
+bellpepper-core = "0.4.0"
+ff = { version = "0.13.0", features = ["derive"] }
+sha2 = "0.10.7"
+bincode = { workspace = true }
+utils = { workspace = true }
+clap = { workspace = true }
+
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[[bin]]
+name = "sha256_mem_spartan2"
+path = "src/bin/sha256_mem_spartan2.rs"
+
+[[bench]]
+name = "sha256"
+harness = false
+
+[profile.release]
+debug = true
