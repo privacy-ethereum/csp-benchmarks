@@ -1,10 +1,18 @@
 name: "Install RISC0 toolchain"
 description: "Installs the RISC0 toolchain components required for benchmarks"
 
+inputs:
+  github-token:
+    description: "GitHub token for API authentication"
+    required: false
+    default: ""
+
 runs:
   using: "composite"
   steps:
     - shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
         set -Eeuo pipefail
 

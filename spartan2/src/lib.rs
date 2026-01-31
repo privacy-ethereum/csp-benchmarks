@@ -69,8 +69,7 @@ pub fn num_constraints(prepared: &PreparedSha256) -> usize {
     // sizes() returns [num_cons_unpadded, num_shared_unpadded, num_precommitted_unpadded, num_rest_unpadded,
     //                  num_cons, num_shared, num_precommitted, num_rest, num_public, num_challenges]
     let sizes = prepared.pk.sizes();
-    let num_constraints = sizes[4]; // num_cons (padded)
-    num_constraints
+    sizes[4] // num_cons (padded)
 }
 
 /// Get preprocessing size (proving key size)
