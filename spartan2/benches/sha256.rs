@@ -1,5 +1,5 @@
 use spartan2_bench::{
-    num_constraints, preprocessing_size, prepare_sha256, proof_size, prove_sha256, verify_sha256,
+    num_constraints, prepare_sha256, preprocessing_size, proof_size, prove_sha256, verify_sha256,
     SPARTAN2_BENCH_PROPERTIES,
 };
 use utils::harness::ProvingSystem;

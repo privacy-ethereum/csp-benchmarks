@@ -195,7 +195,9 @@ jobs:
 
       - name: Build nexus and cairo-m separately
         run: |
+          if: ${{ contains(matrix.crate, 'nexus') }}
           cd nexus && cargo build --release && cd ..
+          if: ${{ contains(matrix.crate, 'cairo-m') }}
           cd cairo-m && cargo build --release && cd ..
 
   bench:
