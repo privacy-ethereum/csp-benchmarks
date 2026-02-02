@@ -1663,10 +1663,11 @@ dependencies = [
 [[package]]
 name = "sha256"
 version = "0.0.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=ea995fbadd9482a827c9ef19bfd7c3e140da70bf#ea995fbadd9482a827c9ef19bfd7c3e140da70bf"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=53f8717bb7172742f155851bc8d0d8d4a6edc2a1#53f8717bb7172742f155851bc8d0d8d4a6edc2a1"
 dependencies = [
  "anyhow",
  "bincode",
+ "bytemuck",
  "clap",
  "itertools 0.13.0",
  "num-traits",
@@ -1791,7 +1792,7 @@ dependencies = [
 [[package]]
 name = "std-shims"
 version = "0.1.0"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=ea995fbadd9482a827c9ef19bfd7c3e140da70bf#ea995fbadd9482a827c9ef19bfd7c3e140da70bf"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=53f8717bb7172742f155851bc8d0d8d4a6edc2a1#53f8717bb7172742f155851bc8d0d8d4a6edc2a1"
 
 [[package]]
 name = "strsim"
@@ -1823,7 +1824,7 @@ dependencies = [
 [[package]]
 name = "stwo"
 version = "0.1.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=ea995fbadd9482a827c9ef19bfd7c3e140da70bf#ea995fbadd9482a827c9ef19bfd7c3e140da70bf"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=53f8717bb7172742f155851bc8d0d8d4a6edc2a1#53f8717bb7172742f155851bc8d0d8d4a6edc2a1"
 dependencies = [
  "blake2",
  "blake3",
@@ -1851,7 +1852,7 @@ dependencies = [
 [[package]]
 name = "stwo-constraint-framework"
 version = "0.1.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=ea995fbadd9482a827c9ef19bfd7c3e140da70bf#ea995fbadd9482a827c9ef19bfd7c3e140da70bf"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=53f8717bb7172742f155851bc8d0d8d4a6edc2a1#53f8717bb7172742f155851bc8d0d8d4a6edc2a1"
 dependencies = [
  "hashbrown 0.16.1",
  "itertools 0.12.1",
@@ -2111,7 +2112,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 [[package]]
 name = "utils"
 version = "0.0.1"
-source = "git+https://github.com/clementwalter/rookie-numbers?rev=ea995fbadd9482a827c9ef19bfd7c3e140da70bf#ea995fbadd9482a827c9ef19bfd7c3e140da70bf"
+source = "git+https://github.com/clementwalter/rookie-numbers?rev=53f8717bb7172742f155851bc8d0d8d4a6edc2a1#53f8717bb7172742f155851bc8d0d8d4a6edc2a1"
 dependencies = [
  "bytemuck",
  "divan",

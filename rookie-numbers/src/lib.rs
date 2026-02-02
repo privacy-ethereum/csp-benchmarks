@@ -1,6 +1,8 @@
-use sha256::{FriConfig, PcsConfig};
 use std::borrow::Cow;
 use utils::harness::{AuditStatus, BenchProperties};
+
+// Re-export types from sha256 crate
+pub use sha256::{FriConfig, PcsConfig, MAX_PREPROCESSED_LOG_SIZE};
 
 /// Benchmark properties for Rookie Numbers prover
 pub const ROOKIE_NUMBERS_BENCH_PROPERTIES: BenchProperties = BenchProperties {

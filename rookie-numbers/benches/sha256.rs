@@ -1,7 +1,9 @@
 //! SHA256 benchmark using Rookie Numbers prover.
 
-use rookie_numbers::{secure_pcs_config, ROOKIE_NUMBERS_BENCH_PROPERTIES};
-use sha256::{prove_sha256, verify_sha256};
+use rookie_numbers::{
+    secure_pcs_config, MAX_PREPROCESSED_LOG_SIZE, ROOKIE_NUMBERS_BENCH_PROPERTIES,
+};
+use sha256::{preprocess_sha256, prove_sha256, verify_sha256};
 use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
@@ -10,16 +12,21 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_rookie_numbers",
     ROOKIE_NUMBERS_BENCH_PROPERTIES,
-    // prepare: |input_size| -> PreparedContext
-    |input_size| utils::generate_sha256_input(input_size).0,
-    // num_constraints: |ctx| -> usize
-    |_words| 8589, // number of columns of the main+interaction trace
-    // prove: |words| -> Proof
-    |words| prove_sha256(&words, secure_pcs_config()),
-    // verify: |words, proof| -> ()
-    |_words, proof| verify_sha256(proof.0.clone(), proof.1, &proof.2).expect("verify failed"),
-    // preprocessing_size: |words| -> usize
-    |_words| 110, // number of preprocessed columns
-    // proof_size: |proof| -> usize
-    |proof| bincode::serialize(proof).map(|v| v.len()).unwrap_or(0)
+    // Shared state: preprocess once with MAX_PREPROCESSED_LOG_SIZE
+    { preprocess_sha256(MAX_PREPROCESSED_LOG_SIZE, secure_pcs_config()) },
+    // prepare: |input_size, &preprocessed| -> PreparedContext
+    |input_size, _preprocessed| utils::generate_sha256_input(input_size).0,
+    // num_constraints: |ctx, &shared| -> usize
+    |_words, _preprocessed| 1076, // components.n_constraints()
+    // prove: |words, &shared| -> Proof
+    |words, preprocessed| prove_sha256(words, secure_pcs_config(), preprocessed),
+    // verify: |words, proof, &shared| -> ()
+    |_words, proof, _preprocessed| verify_sha256(proof.0.clone(), proof.1, &proof.2)
+        .expect("verify failed"),
+    // preprocessing_size: |words, &shared| -> usize
+    |_words, preprocessed| bincode::serialize(preprocessed)
+        .map(|v| v.len())
+        .unwrap_or(0),
+    // proof_size: |proof, &shared| -> usize
+    |proof, _preprocessed| bincode::serialize(proof).map(|v| v.len()).unwrap_or(0)
 );
