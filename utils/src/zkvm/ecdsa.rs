@@ -1,6 +1,6 @@
 use crate::zkvm::instance::ProofArtifacts;
 use crate::zkvm::traits::PreparedBenchmark;
-use ere_zkvm_interface::{Input, Proof, ProofKind, PublicValues, zkVM, zkVMError};
+use ere_zkvm_interface::{Input, Proof, ProofKind, PublicValues, zkVM};
 
 /// Benchmark name for ECDSA programs.
 pub const ECDSA_BENCH: &str = "ecdsa";
@@ -91,20 +91,20 @@ impl<V> PreparedEcdsa<V>
 where
     V: zkVM,
 {
-    pub fn prove(&self) -> Result<ProofArtifacts, zkVMError> {
+    pub fn prove(&self) -> Result<ProofArtifacts, anyhow::Error> {
         let (public_values, proof, report) = self.vm.prove(&self.input, ProofKind::default())?;
         Ok(ProofArtifacts::new(public_values, proof, report))
     }
 
-    pub fn verify(&self, proof: &Proof) -> Result<PublicValues, zkVMError> {
+    pub fn verify(&self, proof: &Proof) -> Result<PublicValues, anyhow::Error> {
         self.vm.verify(proof)
     }
 
-    pub fn verify_with_expected(&self, proof: &ProofArtifacts) -> Result<(), zkVMError> {
+    pub fn verify_with_expected(&self, proof: &ProofArtifacts) -> Result<(), anyhow::Error> {
         let public_values = self.vm.verify(&proof.proof)?;
 
         if public_values != proof.public_values {
-            return Err(zkVMError::other("public values mismatch"));
+            return Err(anyhow::anyhow!("public values mismatch"));
         }
 
         // Validate expected values if provided
@@ -115,25 +115,25 @@ where
             use bincode::Options;
             let (committed_key, committed_msg): (Vec<u8>, Vec<u8>) = bincode::options()
                 .deserialize(&public_values)
-                .map_err(|_| zkVMError::other("failed to deserialize public values"))?;
+                .map_err(|_| anyhow::anyhow!("failed to deserialize public values"))?;
 
             // Reconstruct expected encoded key from x,y coordinates
-            let expected_encoded =
-                encode_public_key(&expected_key.0, &expected_key.1).map_err(zkVMError::other)?;
+            let expected_encoded = encode_public_key(&expected_key.0, &expected_key.1)
+                .map_err(|e| anyhow::anyhow!("{}", e))?;
 
             if committed_key != expected_encoded {
-                return Err(zkVMError::other("public key mismatch"));
+                return Err(anyhow::anyhow!("public key mismatch"));
             }
 
             if committed_msg != *expected_msg {
-                return Err(zkVMError::other("message mismatch"));
+                return Err(anyhow::anyhow!("message mismatch"));
             }
         }
 
         Ok(())
     }
 
-    pub fn execution_cycles(&self) -> Result<u64, zkVMError> {
+    pub fn execution_cycles(&self) -> Result<u64, anyhow::Error> {
         let (_, report) = self.vm.execute(&self.input)?;
         Ok(report.total_num_cycles)
     }
@@ -146,11 +146,11 @@ impl<V: zkVM> PreparedBenchmark for PreparedEcdsa<V> {
         self.compiled_size
     }
 
-    fn execution_cycles(&self) -> Result<u64, zkVMError> {
+    fn execution_cycles(&self) -> Result<u64, anyhow::Error> {
         PreparedEcdsa::execution_cycles(self)
     }
 
-    fn prove(&self) -> Result<ProofArtifacts, zkVMError> {
+    fn prove(&self) -> Result<ProofArtifacts, anyhow::Error> {
         PreparedEcdsa::prove(self)
     }
 
@@ -178,14 +178,12 @@ pub fn build_ecdsa_input(
         return Err("Signature must be 64 bytes");
     }
 
-    let mut input = Input::new();
     let data = (encoded_verifying_key, message, signature);
     let serialized = bincode::options()
         .serialize(&data)
         .expect("failed to serialize ECDSA input");
 
-    input.write_bytes(serialized);
-    Ok(input)
+    Ok(Input::new().with_stdin(serialized))
 }
 
 #[cfg(test)]

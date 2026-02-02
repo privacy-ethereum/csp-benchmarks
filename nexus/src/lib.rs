@@ -10,7 +10,7 @@ pub fn prepare_sha256(
     input_size: usize,
     program: &CompiledProgram<RustRv32i>,
 ) -> PreparedSha256<EreNexus> {
-    let vm = EreNexus::new(program.program.clone(), ProverResourceType::Cpu);
+    let vm = EreNexus::new(program.program.clone(), ProverResourceType::Cpu).unwrap();
 
     let (message_bytes, digest) = utils::generate_sha256_input(input_size);
     let input = build_input(message_bytes);

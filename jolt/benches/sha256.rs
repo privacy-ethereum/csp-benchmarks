@@ -1,4 +1,4 @@
-use ere_jolt::compiler::RustRv32imaCustomized;
+use ere_jolt::compiler::RustRv64imacCustomized;
 use jolt::{
     execution_cycles, prepare_sha256, preprocessing_size, proof_size, prove_sha256, verify_sha256,
 };
@@ -23,7 +23,7 @@ utils::define_benchmark_harness!(
             programs.insert(
                 input_size,
                 load_or_compile_program(
-                    &RustRv32imaCustomized,
+                    &RustRv64imacCustomized,
                     &format!("{}_{}", SHA256_BENCH, input_size),
                 ),
             );

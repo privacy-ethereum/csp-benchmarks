@@ -1,4 +1,5 @@
-use.std::crypto::hashes::sha256
+use miden::core::crypto::hashes::sha256
+use miden::core::sys
 
 #! Generic SHA-256 driver (uses stdlib `sha256::hash_memory`)
 #!
@@ -41,7 +42,7 @@ begin
         adv_push.1 u32assert       # w2
         adv_push.1 u32assert       # w1
         adv_push.1 u32assert       # w0
-        mem_load.0 mem_storew dropw
+        mem_load.0 mem_storew_be dropw
 
         # Advance write pointer; decrement remaining block count
         mem_load.0 u32overflowing_add.4 assertz mem_store.0
@@ -52,10 +53,7 @@ begin
     # Hash memory → digest (requires stack [addr, len] with addr on top)
     mem_load.1                      # len
     push.10000                      # addr
-    exec.sha256::hash_memory
+    exec.sha256::hash_bytes
 
-    # Truncate to keep only 8-word digest
-    swapdw
-    dropw
-    dropw
+    exec.sys::truncate_stack
 end

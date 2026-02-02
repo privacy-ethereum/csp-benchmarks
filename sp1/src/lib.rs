@@ -10,7 +10,8 @@ pub fn prepare_sha256(
     input_size: usize,
     program: &CompiledProgram<RustRv32imaCustomized>,
 ) -> PreparedSha256<EreSP1> {
-    let vm = EreSP1::new(program.program.clone(), ProverResourceType::Cpu);
+    let vm = EreSP1::new(program.program.clone(), ProverResourceType::Cpu)
+        .expect("failed to build sp1 prover instance");
 
     let (message_bytes, digest) = utils::generate_sha256_input(input_size);
     let input = build_input(message_bytes);
