@@ -15,7 +15,11 @@ runs:
         export PATH="$HOME/.risc0/bin:$PATH"
         echo "$HOME/.risc0/bin" >> "$GITHUB_PATH"
 
-        echo "GITHUB_TOKEN length: ${#GITHUB_TOKEN:-0}"
+        if [[ -n "${GITHUB_TOKEN-}" ]]; then
+          echo "GITHUB_TOKEN length: ${#GITHUB_TOKEN}"
+        else
+          echo "GITHUB_TOKEN is UNSET"
+        fi
         rzup install rust 1.88.0
         rzup install cpp 2024.1.5
         rzup install r0vm 3.0.3
