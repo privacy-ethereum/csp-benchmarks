@@ -12059,7 +12059,7 @@ dependencies = [
 [[package]]
 name = "spartan2"
 version = "0.7.0"
-source = "git+https://github.com/microsoft/Spartan2.git#80a6a26f2bb6f3c7cf9eb3a26ff575cab47d2502"
+source = "git+https://github.com/microsoft/Spartan2.git?rev=80a6a26#80a6a26f2bb6f3c7cf9eb3a26ff575cab47d2502"
 dependencies = [
  "bellpepper",
  "bellpepper-core",

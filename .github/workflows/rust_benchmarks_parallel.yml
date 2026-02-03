@@ -267,8 +267,6 @@ jobs:
       - name: Install RISC0 toolchain
         if: ${{ contains(matrix.crate, 'risc0') }}
         uses: ./.github/actions/install-risc0
-        with:
-          github-token: ${{ secrets.GH_PAT }}
 
       - name: Install SP1 toolchain
         if: ${{ contains(matrix.crate, 'sp1') }}
