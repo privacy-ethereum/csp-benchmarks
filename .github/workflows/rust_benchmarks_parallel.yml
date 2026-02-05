@@ -174,8 +174,6 @@ jobs:
 
       - name: Install RISC0 toolchain
         uses: ./.github/actions/install-risc0
-        with:
-          github-token: ${{ secrets.GH_PAT }}
 
       - name: Install SP1 toolchain
         if: ${{ github.event.inputs.include_optional == true }}
