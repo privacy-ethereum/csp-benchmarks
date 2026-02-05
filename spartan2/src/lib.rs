@@ -17,7 +17,7 @@ pub const SPARTAN2_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     iop: Cow::Borrowed("Spartan"),
     pcs: Some(Cow::Borrowed("Hyrax")),
     arithm: Cow::Borrowed("R1CS"),
-    is_zk: true,
+    is_zk: true, //https://github.com/microsoft/Spartan2/pull/73
     is_zkvm: false,
     security_bits: 128,
     is_pq: false,
