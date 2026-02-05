@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use ere_jolt::{EreJolt, compiler::RustRv32imaCustomized};
+use ere_jolt::{EreJolt, compiler::RustRv64imacCustomized};
 use ere_zkvm_interface::ProverResourceType;
 use utils::zkvm::{CompiledProgram, PreparedSha256, build_input};
 
@@ -10,7 +10,7 @@ pub use utils::zkvm::{
 
 pub fn prepare_sha256(
     input_size: usize,
-    programs: &HashMap<usize, CompiledProgram<RustRv32imaCustomized>>,
+    programs: &HashMap<usize, CompiledProgram<RustRv64imacCustomized>>,
 ) -> PreparedSha256<EreJolt> {
     let program = &programs
         .get(&input_size)

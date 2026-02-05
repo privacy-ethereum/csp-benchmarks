@@ -1,6 +1,6 @@
 use crate::zkvm::instance::ProofArtifacts;
 use crate::zkvm::traits::PreparedBenchmark;
-use ere_zkvm_interface::{Input, Proof, ProofKind, PublicValues, zkVM, zkVMError};
+use ere_zkvm_interface::{Input, Proof, ProofKind, PublicValues, zkVM};
 
 /// Common preparation data for zkVM hash benchmarks.
 pub struct PreparedHash<V> {
@@ -55,27 +55,27 @@ impl<V> PreparedHash<V>
 where
     V: zkVM,
 {
-    pub fn prove(&self) -> Result<ProofArtifacts, zkVMError> {
+    pub fn prove(&self) -> Result<ProofArtifacts, anyhow::Error> {
         let (public_values, proof, report) = self.vm.prove(&self.input, ProofKind::default())?;
         Ok(ProofArtifacts::new(public_values, proof, report))
     }
 
-    pub fn verify(&self, proof: &Proof) -> Result<PublicValues, zkVMError> {
+    pub fn verify(&self, proof: &Proof) -> Result<PublicValues, anyhow::Error> {
         self.vm.verify(proof)
     }
 
-    pub fn verify_with_digest(&self, proof: &ProofArtifacts) -> Result<(), zkVMError> {
+    pub fn verify_with_digest(&self, proof: &ProofArtifacts) -> Result<(), anyhow::Error> {
         let public_values = self.vm.verify(&proof.proof)?;
 
         if public_values != proof.public_values {
-            return Err(zkVMError::other("public values mismatch"));
+            return Err(anyhow::anyhow!("public values mismatch"));
         }
 
         match &self.expected_digest {
             None => {}
             Some(expected) => {
                 if public_values != *expected {
-                    return Err(zkVMError::other("digest mismatch"));
+                    return Err(anyhow::anyhow!("digest mismatch"));
                 }
             }
         }
@@ -83,7 +83,7 @@ where
         Ok(())
     }
 
-    pub fn execution_cycles(&self) -> Result<u64, zkVMError> {
+    pub fn execution_cycles(&self) -> Result<u64, anyhow::Error> {
         let (_, report) = self.vm.execute(&self.input)?;
         Ok(report.total_num_cycles)
     }
@@ -96,11 +96,11 @@ impl<V: zkVM> PreparedBenchmark for PreparedHash<V> {
         self.compiled_size
     }
 
-    fn execution_cycles(&self) -> Result<u64, zkVMError> {
+    fn execution_cycles(&self) -> Result<u64, anyhow::Error> {
         PreparedHash::execution_cycles(self)
     }
 
-    fn prove(&self) -> Result<ProofArtifacts, zkVMError> {
+    fn prove(&self) -> Result<ProofArtifacts, anyhow::Error> {
         PreparedHash::prove(self)
     }
 
@@ -115,7 +115,5 @@ impl<V: zkVM> PreparedBenchmark for PreparedHash<V> {
 
 /// Builds default zkVM input from raw message bytes.
 pub fn build_input(message_bytes: Vec<u8>) -> Input {
-    let mut input = Input::new();
-    input.write_bytes(message_bytes);
-    input
+    Input::new().with_stdin(message_bytes)
 }

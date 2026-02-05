@@ -36,9 +36,11 @@ pub fn verify_sha256(
 }
 
 fn build_input(data: Vec<u8>) -> Input {
-    let mut input = Input::new();
     let len = data.len();
-    input.write_bytes((len as u64).to_le_bytes().to_vec());
+    let mut stdin = Vec::new();
+
+    // Write the length as u64 LE bytes
+    stdin.extend_from_slice(&(len as u64).to_le_bytes());
 
     let blocks = len.div_ceil(16);
     let words_needed = blocks * 4;
@@ -55,15 +57,14 @@ fn build_input(data: Vec<u8>) -> Input {
 
     for block in words.chunks_exact(4) {
         for &word in block.iter().rev() {
-            input.write_bytes((word as u64).to_le_bytes().to_vec());
+            stdin.extend_from_slice(&(word as u64).to_le_bytes());
         }
     }
-    input
+    Input::new().with_stdin(stdin)
 }
 
 fn decode_public_values(raw: &[u8]) -> Vec<u8> {
     raw.chunks_exact(8)
-        .skip(1)
         .take(8)
         .flat_map(|chunk| {
             let word =

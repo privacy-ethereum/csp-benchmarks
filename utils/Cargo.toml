@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+anyhow = { workspace = true }
 serde = { workspace = true }
 serde_with = "3.8"
 serde_json = { workspace = true }

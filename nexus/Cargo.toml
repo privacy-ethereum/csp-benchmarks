@@ -4,8 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-ere-nexus = { git = "https://github.com/eth-act/ere", tag = "v0.0.13" }
-ere-zkvm-interface = { git = "https://github.com/eth-act/ere", tag = "v0.0.13" }
+zmij = "=1.0.0"
+ere-nexus = { git = "https://github.com/eth-act/ere", rev = "aaf2efcc78fecf5f3b7d149a0042c97057a10fb6" }
+ere-zkvm-interface = { git = "https://github.com/eth-act/ere", rev = "aaf2efcc78fecf5f3b7d149a0042c97057a10fb6" }
 criterion = "0.5.1"
 clap = { version = "4.5.20", features = ["derive", "env"] }
 utils = { path = "../utils" }

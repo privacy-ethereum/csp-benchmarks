@@ -4,8 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-# disable CUDA 
-ere-openvm = { git = "https://github.com/eth-act/ere", tag = "v0.0.13", default-features = false }
+ere-openvm = { git = "https://github.com/eth-act/ere", rev = "aaf2efcc78fecf5f3b7d149a0042c97057a10fb6", default-features = false, features = ["compiler", "zkvm"] }
 
 # Workspace
 criterion = { workspace = true }

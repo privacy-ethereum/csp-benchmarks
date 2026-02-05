@@ -1,9 +1,9 @@
+use bincode::Options;
 use ere_risc0::{EreRisc0, compiler::RustRv32imaCustomized};
-use ere_zkvm_interface::ProverResourceType;
+use ere_zkvm_interface::{Input, ProverResourceType};
 use utils::harness::{AuditStatus, BenchProperties};
 use utils::zkvm::{
-    CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedSha256, build_ecdsa_input, build_input,
-    encode_public_key,
+    CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedSha256, encode_public_key,
 };
 
 pub use utils::zkvm::{
@@ -36,7 +36,7 @@ pub fn prepare_sha256(
         .expect("failed to build risc0 prover instance");
 
     let (message_bytes, digest) = utils::generate_sha256_input(input_size);
-    let input = build_input(message_bytes);
+    let input = build_framed_input(message_bytes);
 
     PreparedSha256::with_expected_digest(vm, input, program.byte_size, digest)
 }
@@ -54,8 +54,7 @@ pub fn prepare_ecdsa(
     let encoded_verifying_key = encode_public_key(&pub_key_x, &pub_key_y)
         .expect("generated public key should have valid size");
 
-    let input = build_ecdsa_input(encoded_verifying_key.clone(), digest.clone(), signature)
-        .expect("generated ECDSA input should have valid sizes");
+    let input = build_framed_ecdsa_input(encoded_verifying_key.clone(), digest.clone(), signature);
 
     PreparedEcdsa::with_expected_values(
         vm,
@@ -75,7 +74,29 @@ pub fn prepare_keccak(
         .expect("failed to build risc0 prover instance");
 
     let (message_bytes, digest) = utils::generate_keccak_input(input_size);
-    let input = build_input(message_bytes);
+    let input = build_framed_input(message_bytes);
 
     PreparedKeccak::with_expected_digest(vm, input, program.byte_size, digest)
+}
+
+/// Build risc0 input with length-prefixed frame format.
+fn build_framed_input(data: Vec<u8>) -> Input {
+    let len = data.len() as u32;
+    let mut framed = Vec::with_capacity(4 + data.len());
+    framed.extend_from_slice(&len.to_le_bytes());
+    framed.extend(data);
+    Input::new().with_stdin(framed)
+}
+
+/// Build risc0 ECDSA input with framing.
+fn build_framed_ecdsa_input(
+    encoded_verifying_key: Vec<u8>,
+    digest: Vec<u8>,
+    signature: Vec<u8>,
+) -> Input {
+    let data = (encoded_verifying_key, digest, signature);
+    let serialized = bincode::options()
+        .serialize(&data)
+        .expect("failed to serialize ECDSA input");
+    build_framed_input(serialized)
 }

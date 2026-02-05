@@ -1,5 +1,5 @@
 use crate::zkvm::instance::ProofArtifacts;
-use ere_zkvm_interface::{Compiler, Input, zkVM, zkVMError};
+use ere_zkvm_interface::{Compiler, Input, zkVM};
 
 /// Program to be benchmarked.
 pub trait Program {
@@ -14,10 +14,10 @@ pub trait PreparedBenchmark {
     fn compiled_size(&self) -> usize;
 
     /// Execute the program and return the total number of cycles.
-    fn execution_cycles(&self) -> Result<u64, zkVMError>;
+    fn execution_cycles(&self) -> Result<u64, anyhow::Error>;
 
     /// Generate a proof for the prepared benchmark.
-    fn prove(&self) -> Result<ProofArtifacts, zkVMError>;
+    fn prove(&self) -> Result<ProofArtifacts, anyhow::Error>;
 
     /// Get a reference to the underlying zkVM instance.
     fn vm(&self) -> &Self::VM;
