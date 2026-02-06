@@ -28,3 +28,4 @@ tmp/
 *.wtns
 *.ptau
 .claude
+.codex
