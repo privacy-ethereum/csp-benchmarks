@@ -1,0 +1,42 @@
+use miden::core::crypto::dsa::ecdsa_k256_keccak
+use miden::core::sys
+
+#! ECDSA secp256k1-keccak signature verification.
+#! Reads compressed PK, digest, and signature+recovery from the advice tape,
+#! stores them in memory, then calls verify_prehash.
+#!
+#! Memory layout:
+#!   10000..10008: compressed public key (3 words)
+#!   10100..10104: message digest (2 words)
+#!   10200..10216: signature + recovery ID (5 words)
+begin
+    # Compressed public key (3 words at 10000, 10004, 10008)
+    adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert
+    push.10000 mem_storew_be dropw
+    adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert
+    push.10004 mem_storew_be dropw
+    adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert
+    push.10008 mem_storew_be dropw
+
+    # Message digest (2 words at 10100, 10104)
+    adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert
+    push.10100 mem_storew_be dropw
+    adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert
+    push.10104 mem_storew_be dropw
+
+    # Signature + recovery ID (5 words at 10200..10216)
+    adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert
+    push.10200 mem_storew_be dropw
+    adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert
+    push.10204 mem_storew_be dropw
+    adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert
+    push.10208 mem_storew_be dropw
+    adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert
+    push.10212 mem_storew_be dropw
+    adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert  adv_push.1 u32assert
+    push.10216 mem_storew_be dropw
+
+    push.10200 push.10100 push.10000
+    exec.ecdsa_k256_keccak::verify_prehash
+    exec.sys::truncate_stack
+end

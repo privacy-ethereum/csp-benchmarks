@@ -1,9 +1,31 @@
 use ere_miden::{EreMiden, compiler::MidenAsm};
 use ere_zkvm_interface::{Input, ProverResource};
+use k256::ecdsa::{RecoveryId, Signature, VerifyingKey};
+use k256::{EncodedPoint, FieldBytes};
 use std::convert::TryInto;
-use utils::zkvm::{CompiledProgram, PreparedSha256, ProofArtifacts};
+use utils::harness::{AuditStatus, BenchProperties};
+use utils::zkvm::{CompiledProgram, PreparedEcdsa, PreparedSha256, ProofArtifacts};
 
-pub use utils::zkvm::{execution_cycles, preprocessing_size, proof_size, prove_sha256};
+pub use utils::zkvm::{
+    execution_cycles, preprocessing_size, proof_size, prove_ecdsa, prove_sha256,
+};
+
+pub fn miden_bench_properties() -> BenchProperties {
+    BenchProperties::new(
+        "STARK",
+        "Goldilocks",
+        "STARK",
+        Some("FRI"),
+        "AIR",
+        true, // is_zk
+        true, // is_zkvm
+        128,  // security_bits
+        true, // is_pq (hash-based PCS)
+        true, // is_maintained
+        AuditStatus::NotAudited,
+        Some("Miden"),
+    )
+}
 
 pub fn prepare_sha256(
     input_size: usize,
@@ -74,10 +96,154 @@ fn decode_public_values(raw: &[u8]) -> Vec<u8> {
         .collect()
 }
 
+pub fn prepare_ecdsa(
+    _input_size: usize,
+    program: &CompiledProgram<MidenAsm>,
+) -> Result<PreparedEcdsa<EreMiden>, &'static str> {
+    let vm = EreMiden::new(program.program.clone(), ProverResource::Cpu)
+        .map_err(|_| "failed to build miden prover instance")?;
+
+    let (digest, (pub_key_x, pub_key_y), signature) = utils::generate_ecdsa_k256_input();
+
+    let compressed_pk = compress_public_key(&pub_key_x, &pub_key_y)?;
+    let recovery_id = compute_recovery_id(&digest, &signature, &pub_key_x, &pub_key_y)?;
+
+    let mut signature_with_recovery = signature;
+    signature_with_recovery.push(recovery_id);
+
+    let input = build_ecdsa_input(&compressed_pk, &digest, &signature_with_recovery);
+
+    Ok(PreparedEcdsa::with_expected_values(
+        vm,
+        input,
+        program.byte_size,
+        (pub_key_x, pub_key_y),
+        digest,
+    ))
+}
+
+pub fn verify_ecdsa(
+    prepared: &PreparedEcdsa<EreMiden>,
+    proof: &ProofArtifacts,
+    _: &&CompiledProgram<MidenAsm>,
+) -> Result<(), &'static str> {
+    let public_values = prepared
+        .verify(&proof.proof)
+        .map_err(|_| "miden verify failed")?;
+    if public_values != proof.public_values {
+        return Err("public values mismatch");
+    }
+
+    let result = u64::from_le_bytes(
+        proof.public_values[..8]
+            .try_into()
+            .map_err(|_| "invalid miden output")?,
+    );
+    if result != 1 {
+        return Err("ECDSA verification failed in guest");
+    }
+    Ok(())
+}
+
+fn compress_public_key(pub_key_x: &[u8], pub_key_y: &[u8]) -> Result<Vec<u8>, &'static str> {
+    let x = FieldBytes::from(coord_array(pub_key_x)?);
+    let y = FieldBytes::from(coord_array(pub_key_y)?);
+    Ok(EncodedPoint::from_affine_coordinates(&x, &y, true)
+        .as_bytes()
+        .to_vec())
+}
+
+fn compute_recovery_id(
+    digest: &[u8],
+    signature: &[u8],
+    pub_key_x: &[u8],
+    pub_key_y: &[u8],
+) -> Result<u8, &'static str> {
+    let sig = Signature::from_slice(signature).map_err(|_| "invalid signature")?;
+    let x = FieldBytes::from(coord_array(pub_key_x)?);
+    let y = FieldBytes::from(coord_array(pub_key_y)?);
+    let point = EncodedPoint::from_affine_coordinates(&x, &y, false);
+    let expected_vk =
+        VerifyingKey::from_encoded_point(&point).map_err(|_| "invalid verifying key")?;
+
+    for id_val in 0u8..=1 {
+        let rid = RecoveryId::try_from(id_val).map_err(|_| "invalid recovery id")?;
+        if let Ok(recovered_vk) = VerifyingKey::recover_from_prehash(digest, &sig, rid)
+            && recovered_vk == expected_vk
+        {
+            return Ok(id_val);
+        }
+    }
+    Err("could not determine recovery ID")
+}
+
+fn build_ecdsa_input(compressed_pk: &[u8], digest: &[u8], signature_with_recovery: &[u8]) -> Input {
+    let mut stdin = Vec::new();
+    pack_le_words(&mut stdin, compressed_pk);
+    pack_le_words(&mut stdin, digest);
+    pack_le_words(&mut stdin, signature_with_recovery);
+    Input::new().with_stdin(stdin)
+}
+
+// Pack bytes as u32 LE values into u64 LE advice tape format, padded to word boundaries.
+fn pack_le_words(stdin: &mut Vec<u8>, data: &[u8]) {
+    let mut words: Vec<u32> = data
+        .chunks(4)
+        .map(|chunk| {
+            let mut bytes = [0u8; 4];
+            bytes[..chunk.len()].copy_from_slice(chunk);
+            u32::from_le_bytes(bytes)
+        })
+        .collect();
+
+    let words_needed = words.len().div_ceil(4) * 4;
+    words.resize(words_needed, 0);
+
+    for &w in &words {
+        stdin.extend_from_slice(&(w as u64).to_le_bytes());
+    }
+}
+
+/// Slice into array
+fn coord_array(bytes: &[u8]) -> Result<[u8; 32], &'static str> {
+    bytes.try_into().map_err(|_| "coordinate must be 32 bytes")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use ere_zkvm_interface::zkVM;
+
+    #[test]
+    fn compressed_key_is_valid_sec1() {
+        let (_digest, (pub_key_x, pub_key_y), _signature) = utils::generate_ecdsa_k256_input();
+        let compressed_pk = compress_public_key(&pub_key_x, &pub_key_y).unwrap();
+
+        assert_eq!(compressed_pk.len(), 33);
+        assert!(
+            compressed_pk[0] == 0x02 || compressed_pk[0] == 0x03,
+            "invalid prefix: 0x{:02x}",
+            compressed_pk[0]
+        );
+
+        k256::PublicKey::from_sec1_bytes(&compressed_pk).expect("not valid SEC1");
+    }
+
+    #[test]
+    fn miden_ecdsa_guest_executes() {
+        use utils::zkvm::{ECDSA_BENCH, compile_guest_program, guest_dir};
+        let guest_path = guest_dir(ECDSA_BENCH);
+        let program = compile_guest_program(&MidenAsm, &guest_path).expect("compile ecdsa guest");
+        let prepared = prepare_ecdsa(1, &program).unwrap();
+
+        let (public_values, _) = prepared
+            .vm()
+            .execute(prepared.input())
+            .expect("ecdsa guest execution must succeed");
+
+        let result = u64::from_le_bytes(public_values[..8].try_into().unwrap());
+        assert_eq!(result, 1, "ECDSA verification should return 1");
+    }
 
     #[test]
     fn miden_sha256_matches_reference_digest() {

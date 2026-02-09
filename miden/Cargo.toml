@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 ere-miden = { git = "https://github.com/eth-act/ere", rev = "66c516a24d9c3549f76b84f72365ab544299e63a" }
 bincode = { workspace = true }
+k256 = "0.13.3"
 
 # Workspace
 criterion = { workspace = true }
@@ -17,6 +18,14 @@ ere-zkvm-interface = { workspace = true }
 name = "sha256"
 harness = false
 
+[[bench]]
+name = "ecdsa"
+harness = false
+
 [[bin]]
 name = "sha256_mem_miden"
 path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "ecdsa_mem_miden"
+path = "src/bin/ecdsa_mem.rs"
