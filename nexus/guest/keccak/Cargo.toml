@@ -1,0 +1,11 @@
+[package]
+name = "nexus-keccak"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+nexus-rt = { git = "https://github.com/nexus-xyz/nexus-zkvm.git", tag = "v0.3.6" }
+
+[features]
+cycles = []
+[workspace]

@@ -15,6 +15,14 @@ utils = { path = "../utils" }
 name = "sha256"
 harness = false
 
+[[bench]]
+name = "keccak"
+harness = false
+
 [[bin]]
 name = "sha256_mem_nexus"
 path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "keccak_mem_nexus"
+path = "src/bin/keccak_mem.rs"
