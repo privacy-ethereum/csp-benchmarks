@@ -1,6 +1,6 @@
 use bincode::Options;
 use ere_risc0::{EreRisc0, compiler::RustRv32imaCustomized};
-use ere_zkvm_interface::{Input, ProverResourceType};
+use ere_zkvm_interface::{Input, ProverResource};
 use utils::harness::{AuditStatus, BenchProperties};
 use utils::zkvm::{
     CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedSha256, encode_public_key,
@@ -32,7 +32,7 @@ pub fn prepare_sha256(
     input_size: usize,
     program: &CompiledProgram<RustRv32imaCustomized>,
 ) -> PreparedSha256<EreRisc0> {
-    let vm = EreRisc0::new(program.program.clone(), ProverResourceType::Cpu)
+    let vm = EreRisc0::new(program.program.clone(), ProverResource::Cpu)
         .expect("failed to build risc0 prover instance");
 
     let (message_bytes, digest) = utils::generate_sha256_input(input_size);
@@ -46,7 +46,7 @@ pub fn prepare_ecdsa(
     _input_size: usize,
     program: &CompiledProgram<RustRv32imaCustomized>,
 ) -> PreparedEcdsa<EreRisc0> {
-    let vm = EreRisc0::new(program.program.clone(), ProverResourceType::Cpu)
+    let vm = EreRisc0::new(program.program.clone(), ProverResource::Cpu)
         .expect("failed to build risc0 prover instance");
 
     let (digest, (pub_key_x, pub_key_y), signature) = utils::generate_ecdsa_k256_input();
@@ -70,7 +70,7 @@ pub fn prepare_keccak(
     input_size: usize,
     program: &CompiledProgram<RustRv32imaCustomized>,
 ) -> PreparedKeccak<EreRisc0> {
-    let vm = EreRisc0::new(program.program.clone(), ProverResourceType::Cpu)
+    let vm = EreRisc0::new(program.program.clone(), ProverResource::Cpu)
         .expect("failed to build risc0 prover instance");
 
     let (message_bytes, digest) = utils::generate_keccak_input(input_size);

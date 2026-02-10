@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-ere-risc0 = { git = "https://github.com/eth-act/ere", rev = "aaf2efcc78fecf5f3b7d149a0042c97057a10fb6" }
+ere-risc0 = { git = "https://github.com/eth-act/ere", rev = "66c516a24d9c3549f76b84f72365ab544299e63a" }
 bincode = { workspace = true }
 
 # Workspace

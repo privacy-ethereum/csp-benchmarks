@@ -1,0 +1,13 @@
+[package]
+name = "jolt-keccak"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ere-platform-jolt = { git = "https://github.com/eth-act/ere", rev = "66c516a24d9c3549f76b84f72365ab544299e63a", features = ["guest-std"] }
+jolt-inlines-keccak256 = { git = "https://github.com/a16z/jolt", rev = "6dcd401" }
+
+[features]
+guest = []
+
+[workspace]

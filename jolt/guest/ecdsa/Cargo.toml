@@ -1,0 +1,15 @@
+[package]
+name = "jolt-ecdsa"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ere-platform-jolt = { git = "https://github.com/eth-act/ere", rev = "66c516a24d9c3549f76b84f72365ab544299e63a", features = ["guest-std"] }
+jolt-inlines-secp256k1 = { git = "https://github.com/a16z/jolt", rev = "6dcd401" }
+postcard = { version = "1.0", default-features = false, features = ["alloc"] }
+serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
+
+[features]
+guest = []
+
+[workspace]

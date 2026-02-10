@@ -1,5 +1,5 @@
 use ere_miden::{EreMiden, compiler::MidenAsm};
-use ere_zkvm_interface::{Input, ProverResourceType};
+use ere_zkvm_interface::{Input, ProverResource};
 use std::convert::TryInto;
 use utils::zkvm::{CompiledProgram, PreparedSha256, ProofArtifacts};
 
@@ -9,7 +9,7 @@ pub fn prepare_sha256(
     input_size: usize,
     program: &CompiledProgram<MidenAsm>,
 ) -> PreparedSha256<EreMiden> {
-    let vm = EreMiden::new(program.program.clone(), ProverResourceType::Cpu)
+    let vm = EreMiden::new(program.program.clone(), ProverResource::Cpu)
         .expect("failed to build miden prover instance");
 
     let (message_bytes, digest) = utils::generate_sha256_input(input_size);
