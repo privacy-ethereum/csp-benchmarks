@@ -70,6 +70,12 @@ jobs:
       - name: Format
         run: cargo fmt --all -- --check
 
+      - name: Format excluded crates
+        run: |
+          for crate in $EXCLUDED_CRATES; do
+            cd "$crate" && cargo fmt --all -- --check && cd ..
+          done
+
       - name: Clippy
         run: cargo clippy --workspace --all-targets --all-features
 

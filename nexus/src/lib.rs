@@ -29,8 +29,7 @@ pub fn prepare_sha256(
     input_size: usize,
     program: &CompiledProgram<RustRv32i>,
 ) -> PreparedSha256<EreNexus> {
-    let vm = EreNexus::new(program.program.clone(), ProverResource::Cpu)
-        .expect("failed to create EreNexus");
+    let vm = EreNexus::new(program.program.clone(), ProverResource::Cpu).unwrap();
 
     let (message_bytes, digest) = utils::generate_sha256_input(input_size);
     let input = build_input(message_bytes);
@@ -47,7 +46,7 @@ pub fn prepare_keccak(
         ProverResource::Cpu,
         NexusExtension::keccak_extensions().to_vec(),
     )
-    .expect("failed to create EreNexus with keccak extensions");
+    .unwrap();
 
     let (message_bytes, digest) = utils::generate_keccak_input(input_size);
     let input = build_input(message_bytes);
