@@ -39,7 +39,7 @@ cd barretenberg
 
 ## Benchmarking
 
-```bash
+```
 cd ../
 cargo build --release -p utils
 ./benchmark.sh

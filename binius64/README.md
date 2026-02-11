@@ -14,6 +14,6 @@ rustup override set nightly-2025-08-18-aarch64-apple-darwin
 
 ## Run the benchmarks
 
-```bash
+```
 RUSTFLAGS="-C target-cpu=native" cargo bench
 ```

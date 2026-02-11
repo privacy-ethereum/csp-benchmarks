@@ -55,6 +55,7 @@ jobs:
           all_done=true
           any_failed=false
           summary=""
+          artifact_urls=""
           while IFS= read -r wf; do
             run_json=$(gh run list --workflow "$wf" --limit 50 \
               --json databaseId,headSha,conclusion,status,displayTitle,workflowName \
@@ -68,6 +69,10 @@ jobs:
             conclusion=$(jq -r '.conclusion' <<<"$run_json")
             run_id=$(jq -r '.databaseId' <<<"$run_json")
             summary+="$wf: status=$status conclusion=$conclusion run_id=$run_id\n"
+            if [[ -n "$run_id" && "$run_id" != "null" ]]; then
+              url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${run_id}"
+              artifact_urls="${artifact_urls:+${artifact_urls},}${url}"
+            fi
             if [[ "$status" != "completed" ]]; then
               all_done=false
             elif [[ "$conclusion" != "success" ]]; then
@@ -84,6 +89,7 @@ jobs:
             echo "One or more parents failed. Proceeding to collect what is available."
           fi
           echo "proceed=true" >> "$GITHUB_OUTPUT"
+          echo "artifact_urls=${artifact_urls}" >> "$GITHUB_OUTPUT"
 
       - name: Download artifacts from each parent run
         if: ${{ steps.gate.outputs.proceed == 'true' }}
@@ -175,6 +181,10 @@ jobs:
 
       - name: Collect benchmarks
         if: ${{ steps.gate.outputs.proceed == 'true' }}
+        env:
+          COMMIT_SHA: ${{ env.SHA }}
+          WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ARTIFACT_URLS: ${{ steps.gate.outputs.artifact_urls }}
         run: |
           set -euo pipefail
           cd utils
