@@ -1,6 +1,6 @@
 use clap::Parser;
 use ere_miden::compiler::MidenAsm;
-use miden::{prepare_ecdsa, prove_ecdsa, verify_ecdsa};
+use miden::{prepare_ecdsa, prove_ecdsa};
 use utils::zkvm::ECDSA_BENCH;
 use utils::zkvm::helpers::load_compiled_program;
 
@@ -17,6 +17,5 @@ fn main() {
     let program = load_compiled_program::<MidenAsm>(ECDSA_BENCH);
 
     let prepared = prepare_ecdsa(args.input_size.unwrap_or(1), &program).expect("prepare_ecdsa");
-    let proof = prove_ecdsa(&prepared, &program);
-    verify_ecdsa(&prepared, &proof, &&program).expect("verify_ecdsa");
+    let _proof = prove_ecdsa(&prepared, &program);
 }

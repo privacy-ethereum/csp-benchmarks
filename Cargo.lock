@@ -4162,7 +4162,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 [[package]]
 name = "ere-build-utils"
 version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?rev=79fb48d6f26e2a9abefb534428f27901810f1206#79fb48d6f26e2a9abefb534428f27901810f1206"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "cargo_metadata 0.19.2",
 ]
@@ -4170,7 +4170,7 @@ dependencies = [
 [[package]]
 name = "ere-compile-utils"
 version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?rev=79fb48d6f26e2a9abefb534428f27901810f1206#79fb48d6f26e2a9abefb534428f27901810f1206"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "cargo_metadata 0.19.2",
@@ -4181,7 +4181,7 @@ dependencies = [
 [[package]]
 name = "ere-jolt"
 version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?rev=79fb48d6f26e2a9abefb534428f27901810f1206#79fb48d6f26e2a9abefb534428f27901810f1206"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "ark-serialize 0.5.0",
@@ -4190,7 +4190,9 @@ dependencies = [
  "ere-compile-utils",
  "ere-zkvm-interface",
  "jolt-core",
+ "jolt-inlines-keccak256",
  "jolt-inlines-secp256k1",
+ "jolt-inlines-sha2",
  "jolt-sdk",
  "serde",
  "tempfile",
@@ -4200,7 +4202,7 @@ dependencies = [
 [[package]]
 name = "ere-miden"
 version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?rev=79fb48d6f26e2a9abefb534428f27901810f1206#79fb48d6f26e2a9abefb534428f27901810f1206"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "ere-build-utils",
@@ -4218,7 +4220,7 @@ dependencies = [
 [[package]]
 name = "ere-openvm"
 version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?rev=79fb48d6f26e2a9abefb534428f27901810f1206#79fb48d6f26e2a9abefb534428f27901810f1206"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "ere-build-utils",
@@ -4239,7 +4241,7 @@ dependencies = [
 [[package]]
 name = "ere-risc0"
 version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?rev=79fb48d6f26e2a9abefb534428f27901810f1206#79fb48d6f26e2a9abefb534428f27901810f1206"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "bincode 2.0.1",
@@ -4258,7 +4260,7 @@ dependencies = [
 [[package]]
 name = "ere-sp1"
 version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?rev=79fb48d6f26e2a9abefb534428f27901810f1206#79fb48d6f26e2a9abefb534428f27901810f1206"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "bincode 2.0.1",
@@ -4275,7 +4277,7 @@ dependencies = [
 [[package]]
 name = "ere-zkvm-interface"
 version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?rev=79fb48d6f26e2a9abefb534428f27901810f1206#79fb48d6f26e2a9abefb534428f27901810f1206"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "auto_impl",
@@ -5969,11 +5971,12 @@ dependencies = [
 name = "jolt"
 version = "0.1.0"
 dependencies = [
- "bincode 1.3.3",
  "clap",
  "criterion",
  "ere-jolt",
  "ere-zkvm-interface",
+ "postcard",
+ "serde",
  "utils 0.1.0",
 ]
 

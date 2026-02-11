@@ -1,6 +1,6 @@
 use clap::Parser;
 use ere_miden::compiler::MidenAsm;
-use miden::{prepare_sha256, prove_sha256, verify_sha256};
+use miden::{prepare_sha256, prove_sha256};
 use utils::zkvm::SHA256_BENCH;
 use utils::zkvm::helpers::load_compiled_program;
 
@@ -17,6 +17,5 @@ fn main() {
     let program = load_compiled_program::<MidenAsm>(SHA256_BENCH);
 
     let prepared = prepare_sha256(args.input_size, &program);
-    let proof = prove_sha256(&prepared, &program);
-    verify_sha256(&prepared, &proof, &&program);
+    let _proof = prove_sha256(&prepared, &program);
 }
