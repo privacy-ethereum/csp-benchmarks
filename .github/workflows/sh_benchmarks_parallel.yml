@@ -27,7 +27,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
-  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+  GITHUB_TOKEN: ${{ secrets.GH_PAT || github.token }}
   HOMEBREW_NO_AUTO_UPDATE: "1"
   HOMEBREW_NO_ENV_HINTS: "1"
 

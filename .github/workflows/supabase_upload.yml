@@ -38,7 +38,7 @@ jobs:
           name: collected-benchmarks
           path: ./artifacts
           run-id: ${{ inputs.run_id }}
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GH_PAT || github.token }}
 
       - name: Show files
         run: ls -al ./artifacts

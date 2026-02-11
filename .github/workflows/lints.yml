@@ -13,7 +13,7 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   EXCLUDED_CRATES: "nexus cairo-m"
-  GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+  GITHUB_TOKEN: ${{ secrets.GH_PAT || github.token }}
 
 # ────────────────── 1. Warm‑up build ──────────────────
 jobs:
