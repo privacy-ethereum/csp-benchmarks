@@ -1,8 +1,8 @@
 use cairo_m_common::{InputValue, Program};
-use cairo_m_compiler::{compile_cairo, CompilerOptions};
+use cairo_m_compiler::{CompilerOptions, compile_cairo};
 use cairo_m_prover::{
-    adapter::import_from_runner_output, prover::prove_cairo_m, prover_config::REGULAR_96_BITS,
-    verifier::verify_cairo_m, Proof,
+    Proof, adapter::import_from_runner_output, prover::prove_cairo_m,
+    prover_config::REGULAR_96_BITS, verifier::verify_cairo_m,
 };
 use cairo_m_runner::run_cairo_program;
 use std::fs;
