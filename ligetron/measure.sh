@@ -5,14 +5,16 @@ set -euo pipefail
 # - STATE_JSON: path to JSON arguments for proving
 # - SIZES_JSON: output JSON path (defaults to <dir>/${TARGET}_<INPUT_SIZE>_sizes.json when run via benchmark.sh)
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-OUT_JSON="${SIZES_JSON:-}"
-
 : "${STATE_JSON:?STATE_JSON is required}"
 : "${SIZES_JSON:?SIZES_JSON is required}"
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+OUT_JSON="$SIZES_JSON"
+BASENAME="$(basename "$SIZES_JSON")"
+TARGET_NAME="${BASENAME%%_[0-9]*}"
+
 # Run one proving cycle to generate artifacts for measurement
-"$SCRIPT_DIR/sha256_prove.sh" >/dev/null 2>&1 || true
+"$SCRIPT_DIR/prove.sh" >/dev/null 2>&1 || true
 
 # In Ligetron, the prover writes a proof file named proof.data in the current working directory.
 proof_path="${PWD}/proof.data"
@@ -24,8 +26,8 @@ fi
 
 proof_size_bytes=$(stat -f %z "$proof_path" 2>/dev/null || stat -c %s "$proof_path")
 
-# Preprocessing artifacts: WASM used by the prover and the prover binary itself
-WASM_PATH="${SCRIPT_DIR}/ligero-prover/sdk/build/examples/sha256.wasm"
+# Preprocessing artifacts: WASM used by the prover
+WASM_PATH="${SCRIPT_DIR}/ligero-prover/sdk/build/examples/${TARGET_NAME}.wasm"
 wasm_size=$(stat -f %z "$WASM_PATH" 2>/dev/null || stat -c %s "$WASM_PATH")
 preprocessing_size_bytes=$(( wasm_size ))
 
@@ -37,8 +39,6 @@ json_output=$(jq -n \
 
 echo "$json_output" > "$OUT_JSON"
 jq . "$OUT_JSON" || true
-
-
 
 # === Compute and update circuit_sizes.json (Ligetron) ===
 # Perform a dummy proving run to capture constraint counts from Stage 1
@@ -54,23 +54,23 @@ if [[ -x "$PROVER_BIN" ]]; then
   ')
 
   if [[ -n "$CONSTRAINTS_SUM" ]]; then
-    # Derive input size label from SIZES_JSON filename: sha256_<SIZE>_sizes.json
-    SIZE_LABEL=$(basename "$OUT_JSON" | sed -E 's/^sha256_([^_]+)_sizes\.json$/\1/')
+    SIZE_LABEL=$(basename "$OUT_JSON" | sed -E "s/^${TARGET_NAME}_([^_]+)_sizes\\.json\$/\\1/")
     if [[ -n "$SIZE_LABEL" ]]; then
-      SYSTEM_DIR="$(cd "$(dirname "$0")" && pwd)"
-      CONSTRAINTS_JSON_PATH="${SYSTEM_DIR}/circuit_sizes.json"
+      CONSTRAINTS_JSON_PATH="${SCRIPT_DIR}/circuit_sizes.json"
 
       if [[ -f "$CONSTRAINTS_JSON_PATH" ]]; then
         UPDATED_JSON=$(jq \
+          --arg target "$TARGET_NAME" \
           --arg size_key "$SIZE_LABEL" \
           --argjson size_val "$CONSTRAINTS_SUM" \
-          '.sha256[$size_key] = $size_val | . // {sha256: {($size_key): $size_val}}' \
+          '.[$target][$size_key] = $size_val | . // {($target): {($size_key): $size_val}}' \
           "$CONSTRAINTS_JSON_PATH")
       else
         UPDATED_JSON=$(jq -n \
+          --arg target "$TARGET_NAME" \
           --arg size_key "$SIZE_LABEL" \
           --argjson size_val "$CONSTRAINTS_SUM" \
-          '{sha256: {($size_key): $size_val}}')
+          '{($target): {($size_key): $size_val}}')
       fi
 
       printf "%s\n" "$UPDATED_JSON" > "$CONSTRAINTS_JSON_PATH"

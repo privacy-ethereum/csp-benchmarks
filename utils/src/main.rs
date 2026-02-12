@@ -36,6 +36,13 @@ enum Command {
         size: usize,
     },
 
+    /// Generate inputs for poseidon2: prints hex-encoded input bytes then hex Poseidon2 hash
+    Poseidon2 {
+        /// Number of field elements (default 2)
+        #[arg(long, short = 'n', default_value_t = 2)]
+        size: usize,
+    },
+
     /// Query available sha256 input sizes from metadata
     Sizes {
         #[command(subcommand)]
@@ -90,6 +97,11 @@ fn main() {
             for elem in field_elements {
                 println!("{}", elem);
             }
+        }
+        Command::Poseidon2 { size } => {
+            let (input_bytes, digest) = utils::generate_poseidon2_input(size);
+            println!("{}", input_bytes.encode_hex::<String>());
+            println!("{}", digest.encode_hex::<String>());
         }
         Command::Sizes {
             command: SizesCommand::List { target },
