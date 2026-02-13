@@ -16,18 +16,18 @@ TARGET_NAME="${BASENAME%%_[0-9]*}"
 # Run one proving cycle to generate artifacts for measurement
 "$SCRIPT_DIR/prove.sh" >/dev/null 2>&1 || true
 
-# In Ligetron, the prover writes a proof file named proof.data in the current working directory.
-proof_path="${PWD}/proof.data"
+# In Ligetron, the prover writes a proof file named proof_data.gz in the current working directory.
+proof_path="${PWD}/proof_data.gz"
 
 if [[ ! -f "$proof_path" ]]; then
-  echo "proof.data not found for Ligero size measurement" >&2
+  echo "proof_data.gz not found for Ligero size measurement" >&2
   exit 1
 fi
 
 proof_size_bytes=$(stat -f %z "$proof_path" 2>/dev/null || stat -c %s "$proof_path")
 
 # Preprocessing artifacts: WASM used by the prover
-WASM_PATH="${SCRIPT_DIR}/ligero-prover/sdk/build/examples/${TARGET_NAME}.wasm"
+WASM_PATH="${SCRIPT_DIR}/ligero-prover/sdk/cpp/build/examples/${TARGET_NAME}.wasm"
 wasm_size=$(stat -f %z "$WASM_PATH" 2>/dev/null || stat -c %s "$WASM_PATH")
 preprocessing_size_bytes=$(( wasm_size ))
 

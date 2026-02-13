@@ -24,6 +24,7 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
   echo "This script is for macOS (Darwin) only."; exit 1
 fi
 
+
 REINSTALL=0
 for arg in "$@"; do
   case "$arg" in
@@ -73,7 +74,7 @@ export CXX="${CXX:-clang++}"
 # Build Dawn (WebGPU)
 # -----------------------
 DAWN_DIR="${TP_DIR}/dawn"
-DAWN_COMMIT="41d631c0cbcd46ddc723222fc80890f4305dbc65"
+DAWN_COMMIT="cec4482eccee45696a7c0019e750c77f101ced04"
 
 if [[ ! -d "${DAWN_DIR}" ]]; then
   step "Cloning Dawn"
@@ -149,18 +150,31 @@ ok "emsdk ready (emcmake available)"
 # Ligetron submodule
 # -----------------------
 LIGETRON_DIR="${SCRIPT_DIR}/ligero-prover"
+LIGETRON_VERSION="1.4.0"
+
 if [[ ! -d "${LIGETRON_DIR}" ]]; then
   step "Ligetron submodule not found; initializing"
   git -C "${REPO_ROOT}" submodule update --init --recursive ligetron/ligero-prover || {
     warn "Failed to init submodule. Run: git submodule update --init --recursive"; exit 1; }
 fi
-ok "Ligetron submodule ready"
+
+# Verify the submodule is at the expected version
+step "Verifying Ligetron submodule version"
+pushd "${LIGETRON_DIR}" >/dev/null
+CURRENT_TAG=$(git describe --tags --exact-match 2>/dev/null || echo "")
+if [[ "${CURRENT_TAG}" != "v${LIGETRON_VERSION}" ]]; then
+  warn "Ligetron submodule is at '${CURRENT_TAG:-untagged}', expected 'v${LIGETRON_VERSION}'"
+  warn "Run: git submodule update --init --recursive ligetron/ligero-prover"
+  exit 1
+fi
+popd >/dev/null
+ok "Ligetron submodule at v${LIGETRON_VERSION}"
 
 # -----------------------
 # Build Ligetron SDK (Web)
 # -----------------------
 step "Building Ligetron SDK with emscripten"
-pushd "${LIGETRON_DIR}/sdk" >/dev/null
+pushd "${LIGETRON_DIR}/sdk/cpp" >/dev/null
 if [[ "${REINSTALL}" == "1" ]]; then
   # Clean stale build cache
   rm -rf build

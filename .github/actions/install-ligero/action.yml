@@ -9,7 +9,11 @@ inputs:
   dawn_commit:
     description: Dawn commit to build.
     required: false
-    default: 41d631c0cbcd46ddc723222fc80890f4305dbc65
+    default: cec4482eccee45696a7c0019e750c77f101ced04
+  wabt_version:
+    description: WABT version to install.
+    required: false
+    default: "1.0.39"
   install_prefix:
     description: Where to install Dawn/WABT (used as CMAKE_PREFIX_PATH).
     required: false
@@ -20,7 +24,7 @@ outputs:
     description: Path to native build dir
     value: ${{ steps.paths.outputs.build_dir }}
   sdk_build_dir:
-    description: Path to SDK build dir
+    description: Path to SDK build dir (sdk/cpp/build)
     value: ${{ steps.paths.outputs.sdk_build_dir }}
   install_prefix:
     description: Install prefix used for dependencies
@@ -36,7 +40,7 @@ runs:
         set -euo pipefail
         LIGERO="${{ inputs.ligero_path }}"
         echo "build_dir=${LIGERO}/build" >> "$GITHUB_OUTPUT"
-        echo "sdk_build_dir=${LIGERO}/sdk/build" >> "$GITHUB_OUTPUT"
+        echo "sdk_build_dir=${LIGERO}/sdk/cpp/build" >> "$GITHUB_OUTPUT"
 
     - name: Brew deps (conditionally)
       shell: bash
@@ -46,7 +50,7 @@ runs:
       run: |
         set -euo pipefail
         NEEDS=()
-        for pkg in cmake ninja gmp mpfr libomp llvm boost nlohmann-json ccache wabt; do
+        for pkg in cmake ninja gmp mpfr libomp llvm boost nlohmann-json ccache; do
           brew list --versions "$pkg" >/dev/null 2>&1 || NEEDS+=("$pkg")
         done
         if [[ ${#NEEDS[@]} -gt 0 ]]; then
@@ -80,13 +84,13 @@ runs:
         echo "CCACHE_MAXSIZE=5G" >> $GITHUB_ENV
         ccache -s || true
 
-    # Cache ALL installed deps (Dawn + WABT) in one folder keyed by Dawn commit.
+    # Cache ALL installed deps (Dawn + WABT) in one folder keyed by Dawn commit and WABT version.
     - name: Cache deps install
       id: cache-deps
       uses: actions/cache@v4
       with:
         path: ${{ inputs.install_prefix }}
-        key: deps-macos-${{ inputs.dawn_commit }}-v1
+        key: deps-macos-dawn-${{ inputs.dawn_commit }}-wabt-${{ inputs.wabt_version }}-v1
 
     # ---------- Dawn ----------
     - name: Build & install Dawn
@@ -104,10 +108,34 @@ runs:
         mkdir -p release && cd release
         cmake -G Ninja \
               -DDAWN_FETCH_DEPENDENCIES=ON \
+              -DDAWN_BUILD_MONOLITHIC_LIBRARY=STATIC \
               -DDAWN_ENABLE_INSTALL=ON \
               -DDAWN_BUILD_TESTS=OFF \
               -DDAWN_BUILD_SAMPLES=OFF \
               -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+              -DCMAKE_INSTALL_PREFIX="${{ inputs.install_prefix }}" ..
+        cmake --build . --parallel
+        cmake --install .
+
+    # ---------- WABT ----------
+    - name: Build & install WABT
+      if: steps.cache-deps.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+        cd third_party
+        if [ ! -d wabt ]; then
+          git clone https://github.com/WebAssembly/wabt.git
+        fi
+        cd wabt
+        git fetch --all --tags
+        git checkout "${{ inputs.wabt_version }}"
+        git submodule update --init
+        mkdir -p build && cd build
+        cmake -G Ninja \
+              -DCMAKE_CXX_COMPILER=clang++ \
               -DCMAKE_C_COMPILER_LAUNCHER=ccache \
               -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
               -DCMAKE_INSTALL_PREFIX="${{ inputs.install_prefix }}" ..
@@ -138,22 +166,22 @@ runs:
       id: cache-sdk
       uses: actions/cache@v4
       with:
-        path: ${{ inputs.ligero_path }}/sdk/build
-        key: sdk-build-${{ runner.os }}-${{ hashFiles(format('{0}/sdk/CMakeLists.txt', inputs.ligero_path)) }}-${{ hashFiles(format('{0}/sdk/src/**', inputs.ligero_path)) }}
+        path: ${{ inputs.ligero_path }}/sdk/cpp/build
+        key: sdk-build-${{ runner.os }}-${{ hashFiles(format('{0}/sdk/cpp/CMakeLists.txt', inputs.ligero_path)) }}-${{ hashFiles(format('{0}/sdk/cpp/src/**', inputs.ligero_path)) }}
 
     - name: Reset SDK CMake cache (avoid stale EMSDK toolchain paths)
       shell: bash
       run: |
         set -euo pipefail
-        rm -f "${{ inputs.ligero_path }}/sdk/build/CMakeCache.txt"
-        rm -rf "${{ inputs.ligero_path }}/sdk/build/CMakeFiles"
+        rm -f "${{ inputs.ligero_path }}/sdk/cpp/build/CMakeCache.txt"
+        rm -rf "${{ inputs.ligero_path }}/sdk/cpp/build/CMakeFiles"
 
     - name: Build SDK (emscripten)
       shell: bash
       run: |
         set -euo pipefail
-        emcmake cmake -S "${{ inputs.ligero_path }}/sdk" -B "${{ inputs.ligero_path }}/sdk/build" -G Ninja
-        cmake --build "${{ inputs.ligero_path }}/sdk/build" --parallel
+        emcmake cmake -S "${{ inputs.ligero_path }}/sdk/cpp" -B "${{ inputs.ligero_path }}/sdk/cpp/build" -G Ninja
+        cmake --build "${{ inputs.ligero_path }}/sdk/cpp/build" --parallel
 
     # ---------- Build native ----------
     - name: Cache native build

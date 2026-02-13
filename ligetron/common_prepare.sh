@@ -15,7 +15,7 @@ DIG_TYPE="${2:?}"
 LEN_VALUE="${3:?}"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROGRAM_PATH="${SCRIPT_DIR}/ligero-prover/sdk/build/examples/${TARGET_NAME}.wasm"
+PROGRAM_PATH="${SCRIPT_DIR}/ligero-prover/sdk/cpp/build/examples/${TARGET_NAME}.wasm"
 SHADER_PATH="${SCRIPT_DIR}/ligero-prover/shader"
 
 GEN="$("$UTILS_BIN" "$TARGET_NAME" -n "$INPUT_SIZE")"
