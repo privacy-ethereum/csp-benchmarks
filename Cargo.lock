@@ -1058,6 +1058,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ark-secp256k1"
+version = "0.5.0"
+source = "git+https://github.com/a16z/arkworks-algebra?branch=dev%2Ftwist-shout#76bb3a4518928f1ff7f15875f940d614bb9845e6"
+dependencies = [
+ "ark-ec 0.5.0",
+ "ark-ff 0.5.0",
+ "ark-std 0.5.0",
+]
+
+[[package]]
 name = "ark-serialize"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4071,28 +4081,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
-name = "erased-serde"
-version = "0.4.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "259d404d09818dec19332e31d94558aeb442fea04c817006456c24b5460bbd4b"
-dependencies = [
- "serde",
- "serde_core",
- "typeid",
-]
-
-[[package]]
 name = "ere-build-utils"
-version = "0.1.0"
-source = "git+https://github.com/eth-act/ere?rev=aaf2efcc78fecf5f3b7d149a0042c97057a10fb6#aaf2efcc78fecf5f3b7d149a0042c97057a10fb6"
+version = "0.2.0"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "cargo_metadata 0.19.2",
 ]
 
 [[package]]
 name = "ere-compile-utils"
-version = "0.1.0"
-source = "git+https://github.com/eth-act/ere?rev=aaf2efcc78fecf5f3b7d149a0042c97057a10fb6#aaf2efcc78fecf5f3b7d149a0042c97057a10fb6"
+version = "0.2.0"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "cargo_metadata 0.19.2",
@@ -4102,8 +4101,8 @@ dependencies = [
 
 [[package]]
 name = "ere-jolt"
-version = "0.1.0"
-source = "git+https://github.com/eth-act/ere?rev=aaf2efcc78fecf5f3b7d149a0042c97057a10fb6#aaf2efcc78fecf5f3b7d149a0042c97057a10fb6"
+version = "0.2.0"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "ark-serialize 0.5.0",
@@ -4112,6 +4111,9 @@ dependencies = [
  "ere-compile-utils",
  "ere-zkvm-interface",
  "jolt-core",
+ "jolt-inlines-keccak256",
+ "jolt-inlines-secp256k1",
+ "jolt-inlines-sha2",
  "jolt-sdk",
  "serde",
  "tempfile",
@@ -4120,8 +4122,8 @@ dependencies = [
 
 [[package]]
 name = "ere-miden"
-version = "0.1.0"
-source = "git+https://github.com/eth-act/ere?rev=aaf2efcc78fecf5f3b7d149a0042c97057a10fb6#aaf2efcc78fecf5f3b7d149a0042c97057a10fb6"
+version = "0.2.0"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "ere-build-utils",
@@ -4138,8 +4140,8 @@ dependencies = [
 
 [[package]]
 name = "ere-openvm"
-version = "0.1.0"
-source = "git+https://github.com/eth-act/ere?rev=aaf2efcc78fecf5f3b7d149a0042c97057a10fb6#aaf2efcc78fecf5f3b7d149a0042c97057a10fb6"
+version = "0.2.0"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "ere-build-utils",
@@ -4159,8 +4161,8 @@ dependencies = [
 
 [[package]]
 name = "ere-risc0"
-version = "0.1.0"
-source = "git+https://github.com/eth-act/ere?rev=aaf2efcc78fecf5f3b7d149a0042c97057a10fb6#aaf2efcc78fecf5f3b7d149a0042c97057a10fb6"
+version = "0.2.0"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "bincode 2.0.1",
@@ -4178,8 +4180,8 @@ dependencies = [
 
 [[package]]
 name = "ere-sp1"
-version = "0.1.0"
-source = "git+https://github.com/eth-act/ere?rev=aaf2efcc78fecf5f3b7d149a0042c97057a10fb6#aaf2efcc78fecf5f3b7d149a0042c97057a10fb6"
+version = "0.2.0"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "bincode 2.0.1",
@@ -4195,15 +4197,14 @@ dependencies = [
 
 [[package]]
 name = "ere-zkvm-interface"
-version = "0.1.0"
-source = "git+https://github.com/eth-act/ere?rev=aaf2efcc78fecf5f3b7d149a0042c97057a10fb6#aaf2efcc78fecf5f3b7d149a0042c97057a10fb6"
+version = "0.2.0"
+source = "git+https://github.com/eth-act/ere?rev=66c516a24d9c3549f76b84f72365ab544299e63a#66c516a24d9c3549f76b84f72365ab544299e63a"
 dependencies = [
  "anyhow",
  "auto_impl",
  "bincode 2.0.1",
  "indexmap 2.12.0",
  "serde",
- "serde-untagged",
  "strum 0.27.2",
  "thiserror 2.0.17",
 ]
@@ -5897,11 +5898,12 @@ dependencies = [
 name = "jolt"
 version = "0.1.0"
 dependencies = [
- "bincode 1.3.3",
  "clap",
  "criterion",
  "ere-jolt",
  "ere-zkvm-interface",
+ "postcard",
+ "serde",
  "utils 0.1.0",
 ]
 
@@ -5969,6 +5971,23 @@ version = "0.1.0"
 source = "git+https://github.com/a16z/jolt.git?rev=6dcd401#6dcd401375efbf1a0e70079088745bacd55d4e88"
 dependencies = [
  "ctor 0.2.9",
+ "tracer",
+ "tracing",
+]
+
+[[package]]
+name = "jolt-inlines-secp256k1"
+version = "0.1.0"
+source = "git+https://github.com/a16z/jolt.git?rev=6dcd401#6dcd401375efbf1a0e70079088745bacd55d4e88"
+dependencies = [
+ "ark-ec 0.5.0",
+ "ark-ff 0.5.0",
+ "ark-secp256k1",
+ "ark-serialize 0.5.0",
+ "ctor 0.2.9",
+ "num-bigint 0.4.6",
+ "num-integer",
+ "serde",
  "tracer",
  "tracing",
 ]
@@ -11450,18 +11469,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde-untagged"
-version = "0.1.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9faf48a4a2d2693be24c6289dbe26552776eb7737074e6722891fadbe6c5058"
-dependencies = [
- "erased-serde",
- "serde",
- "serde_core",
- "typeid",
-]
-
-[[package]]
 name = "serde_arrays"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -13668,12 +13675,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6af6ae20167a9ece4bcb41af5b80f8a1f1df981f6391189ce00fd257af04126a"
 
 [[package]]
-name = "typeid"
-version = "1.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc7d623258602320d5c55d1bc22793b57daff0ec7efc270ea7d55ce1d5f5471c"
-
-[[package]]
 name = "typenum"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -13827,6 +13828,7 @@ dependencies = [
  "ark-bn254",
  "ark-ff 0.5.0",
  "bincode 1.3.3",
+ "chrono",
  "clap",
  "criterion",
  "csv",
