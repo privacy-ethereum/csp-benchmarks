@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 ere-miden = { git = "https://github.com/eth-act/ere", rev = "66c516a24d9c3549f76b84f72365ab544299e63a" }
 bincode = { workspace = true }
-k256 = "0.13.3"
+k256 = { workspace = true }
 
 # Workspace
 criterion = { workspace = true }

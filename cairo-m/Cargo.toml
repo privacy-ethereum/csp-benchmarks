@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-clap = { version = "4.5.20", features = ["derive", "env"] }
+clap = { version = "4.5", features = ["derive", "env"] }
 serde_json = { version = "1.0" }
 utils = { path = "../utils" }
 
@@ -16,7 +16,7 @@ cairo-m-compiler = { git = "https://github.com/kkrt-labs/cairo-m", rev = "79c1b1
 stwo-prover = { git = "https://github.com/starkware-libs/stwo", features = ["parallel"], rev = "ab57a1c" }
 
 [dev-dependencies]
-criterion = "0.5.1"
+criterion = "0.5"
 
 # TODO: Remove this patch when re-add the "cairo-m" as workspace member
 # patch for "cairo-m" 
