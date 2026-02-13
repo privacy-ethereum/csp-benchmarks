@@ -102,13 +102,16 @@ ok "Dawn installed"
 # Build WABT
 # -----------------------
 WABT_DIR="${TP_DIR}/wabt"
+WABT_VERSION="1.0.39"
 if [[ ! -d "${WABT_DIR}" ]]; then
   step "Cloning WABT"
   git clone https://github.com/WebAssembly/wabt.git "${WABT_DIR}"
 fi
 
-step "Building & installing WABT (clang++)"
+step "Building & installing WABT @ ${WABT_VERSION} (clang++)"
 pushd "${WABT_DIR}" >/dev/null
+git fetch --all --tags
+git checkout "${WABT_VERSION}"
 git submodule update --init
 if [[ "${REINSTALL}" == "1" ]]; then
   # Clean stale build cache
@@ -193,6 +196,6 @@ ok "Ligetron native built"
 # -----------------------
 # Run demo prover & verifier
 # -----------------------
-bash ../benchmark.sh --system-dir "${SCRIPT_DIR}"
+bash "${REPO_ROOT}/benchmark.sh" --system-dir "${SCRIPT_DIR}"
 
 ok "All done!"

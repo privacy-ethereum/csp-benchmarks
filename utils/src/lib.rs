@@ -9,6 +9,7 @@ use std::path::Path;
 
 pub mod bench;
 pub mod harness;
+pub mod ligetron;
 pub mod metadata;
 pub mod zkvm;
 
@@ -140,6 +141,17 @@ pub fn generate_ecdsa_k256_input() -> (Vec<u8>, (Vec<u8>, Vec<u8>), Vec<u8>) {
         (pub_key_x, pub_key_y),
         signature.to_bytes().to_vec(),
     )
+}
+
+pub fn generate_poseidon2_input(input_size: usize) -> (Vec<u8>, Vec<u8>) {
+    let raw_bytes: Vec<u8> = generate_poseidon_input(input_size)
+        .into_iter()
+        .flatten()
+        .collect();
+    let hash = ligetron::poseidon2::poseidon2_hash_bytes(&raw_bytes);
+    use ark_ff::{BigInteger, PrimeField};
+    let digest = hash.into_bigint().to_bytes_be();
+    (raw_bytes, digest)
 }
 
 pub fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
