@@ -120,25 +120,13 @@ ok "emsdk ready (emcmake available)"
 # Ligetron submodule
 # -----------------------
 LIGETRON_DIR="${SCRIPT_DIR}/ligero-prover"
-LIGETRON_VERSION="1.4.0"
 
 if [[ ! -d "${LIGETRON_DIR}" ]]; then
   step "Ligetron submodule not found; initializing"
   git -C "${REPO_ROOT}" submodule update --init --recursive ligetron/ligero-prover || {
     warn "Failed to init submodule. Run: git submodule update --init --recursive"; exit 1; }
 fi
-
-# Verify the submodule is at the expected version
-step "Verifying Ligetron submodule version"
-pushd "${LIGETRON_DIR}" >/dev/null
-CURRENT_TAG=$(git describe --tags --exact-match 2>/dev/null || echo "")
-if [[ "${CURRENT_TAG}" != "v${LIGETRON_VERSION}" ]]; then
-  warn "Ligetron submodule is at '${CURRENT_TAG:-untagged}', expected 'v${LIGETRON_VERSION}'"
-  warn "Run: git submodule update --init --recursive ligetron/ligero-prover"
-  exit 1
-fi
-popd >/dev/null
-ok "Ligetron submodule at v${LIGETRON_VERSION}"
+ok "Ligetron submodule ready"
 
 # -----------------------
 # Build Ligetron SDK (Web)

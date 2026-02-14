@@ -86,7 +86,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ${{ inputs.install_prefix }}
-        key: deps-macos-${{ inputs.dawn_commit }}-v1
+        key: deps-macos-dawn-${{ inputs.dawn_commit }}-v1
 
     # ---------- Dawn ----------
     - name: Build & install Dawn
