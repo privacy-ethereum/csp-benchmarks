@@ -4,9 +4,8 @@ set -euo pipefail
 # ================================
 # Ligetron macOS end-to-end setup
 # ================================
-# - Installs Homebrew deps (cmake, gmp, mpfr, libomp, llvm, boost, nlohmann-json)
+# - Installs Homebrew deps (cmake, gmp, mpfr, libomp, llvm, boost, nlohmann-json, wabt)
 # - Builds Dawn (WebGPU)
-# - Builds WABT
 # - Installs Emscripten (emsdk)
 # - Builds Ligetron SDK (emscripten)
 # - Builds Ligetron native
@@ -23,7 +22,6 @@ warn() { printf "\033[1;33m! %s\033[0m\n" "$*"; }
 if [[ "$(uname -s)" != "Darwin" ]]; then
   echo "This script is for macOS (Darwin) only."; exit 1
 fi
-
 
 REINSTALL=0
 for arg in "$@"; do
@@ -63,7 +61,7 @@ fi
 
 step "Installing build dependencies via Homebrew"
 brew update
-brew install cmake gmp mpfr libomp llvm boost nlohmann-json
+brew install cmake gmp mpfr libomp llvm boost nlohmann-json wabt
 ok "Homebrew deps installed"
 
 # Prefer Xcode clang; if you want brew llvm, uncomment exports below.
@@ -98,34 +96,6 @@ sudo cmake --install .
 popd >/dev/null
 popd >/dev/null
 ok "Dawn installed"
-
-# -----------------------
-# Build WABT
-# -----------------------
-WABT_DIR="${TP_DIR}/wabt"
-WABT_VERSION="1.0.39"
-if [[ ! -d "${WABT_DIR}" ]]; then
-  step "Cloning WABT"
-  git clone https://github.com/WebAssembly/wabt.git "${WABT_DIR}"
-fi
-
-step "Building & installing WABT @ ${WABT_VERSION} (clang++)"
-pushd "${WABT_DIR}" >/dev/null
-git fetch --all --tags
-git checkout "${WABT_VERSION}"
-git submodule update --init
-if [[ "${REINSTALL}" == "1" ]]; then
-  # Clean stale build cache
-  rm -rf build
-fi
-mkdir -p build
-pushd build >/dev/null
-cmake -DCMAKE_CXX_COMPILER="${CXX}" ..
-cmake --build . -j
-sudo cmake --install .
-popd >/dev/null
-popd >/dev/null
-ok "WABT installed"
 
 # -----------------------
 # Install Emscripten SDK

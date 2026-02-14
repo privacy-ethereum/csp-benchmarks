@@ -1,5 +1,5 @@
 name: Ligero setup & build (macOS)
-description: Install deps (Dawn, WABT, emsdk), then build ligero-prover SDK+native.
+description: Install deps (Dawn, emsdk), then build ligero-prover SDK+native.
 
 inputs:
   ligero_path:
@@ -10,10 +10,6 @@ inputs:
     description: Dawn commit to build.
     required: false
     default: cec4482eccee45696a7c0019e750c77f101ced04
-  wabt_version:
-    description: WABT version to install.
-    required: false
-    default: "1.0.39"
   install_prefix:
     description: Where to install Dawn/WABT (used as CMAKE_PREFIX_PATH).
     required: false
@@ -50,7 +46,7 @@ runs:
       run: |
         set -euo pipefail
         NEEDS=()
-        for pkg in cmake ninja gmp mpfr libomp llvm boost nlohmann-json ccache; do
+        for pkg in cmake ninja gmp mpfr libomp llvm boost nlohmann-json ccache wabt; do
           brew list --versions "$pkg" >/dev/null 2>&1 || NEEDS+=("$pkg")
         done
         if [[ ${#NEEDS[@]} -gt 0 ]]; then
@@ -84,13 +80,13 @@ runs:
         echo "CCACHE_MAXSIZE=5G" >> $GITHUB_ENV
         ccache -s || true
 
-    # Cache ALL installed deps (Dawn + WABT) in one folder keyed by Dawn commit and WABT version.
+    # Cache Dawn install folder keyed by Dawn commit.
     - name: Cache deps install
       id: cache-deps
       uses: actions/cache@v4
       with:
         path: ${{ inputs.install_prefix }}
-        key: deps-macos-dawn-${{ inputs.dawn_commit }}-wabt-${{ inputs.wabt_version }}-v1
+        key: deps-macos-${{ inputs.dawn_commit }}-v1
 
     # ---------- Dawn ----------
     - name: Build & install Dawn
@@ -113,29 +109,6 @@ runs:
               -DDAWN_BUILD_TESTS=OFF \
               -DDAWN_BUILD_SAMPLES=OFF \
               -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-              -DCMAKE_INSTALL_PREFIX="${{ inputs.install_prefix }}" ..
-        cmake --build . --parallel
-        cmake --install .
-
-    # ---------- WABT ----------
-    - name: Build & install WABT
-      if: steps.cache-deps.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        set -euo pipefail
-        cd third_party
-        if [ ! -d wabt ]; then
-          git clone https://github.com/WebAssembly/wabt.git
-        fi
-        cd wabt
-        git fetch --all --tags
-        git checkout "${{ inputs.wabt_version }}"
-        git submodule update --init
-        mkdir -p build && cd build
-        cmake -G Ninja \
-              -DCMAKE_CXX_COMPILER=clang++ \
               -DCMAKE_C_COMPILER_LAUNCHER=ccache \
               -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
               -DCMAKE_INSTALL_PREFIX="${{ inputs.install_prefix }}" ..
