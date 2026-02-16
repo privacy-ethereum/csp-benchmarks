@@ -5,10 +5,10 @@ edition = "2021"
 
 [dependencies]
 spartan2 = { git = "https://github.com/microsoft/Spartan2.git", default-features = false, rev = "80a6a26" }
-bellpepper = "0.4.0"
-bellpepper-core = "0.4.0"
-ff = { version = "0.13.0", features = ["derive"] }
-sha2 = "0.10.7"
+bellpepper = "0.4"
+bellpepper-core = "0.4"
+ff = { version = "0.13", features = ["derive"] }
+sha2 = { workspace = true }
 bincode = { workspace = true }
 utils = { workspace = true }
 clap = { workspace = true }

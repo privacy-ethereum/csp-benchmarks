@@ -17,14 +17,14 @@ mersenne31 = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" 
 mpi = { git = "https://github.com/rsmpi/rsmpi", rev = "61796831954b679cbe267c1b704ddbcb7fef3715" }
 poly_commit = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
 rand = { workspace = true }
-serdes = { git = "https://github.com/PolyhedraZK/Expander", branch = "main"}
+serdes = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
 sha2 = { workspace = true }
 transcript = { git = "https://github.com/PolyhedraZK/Expander", branch = "main" }
 utils = { workspace = true }
 paste = "1.0"
 
 [dev-dependencies]
-criterion = "0.5.1"
+criterion = { workspace = true }
 
 [[bench]]
 name = "sha256"
