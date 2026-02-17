@@ -26,8 +26,9 @@ fi
 
 proof_size_bytes=$(stat -f %z "$proof_path" 2>/dev/null || stat -c %s "$proof_path")
 
-# Preprocessing artifacts: WASM used by the prover
-WASM_PATH="${SCRIPT_DIR}/ligero-prover/sdk/cpp/build/examples/${TARGET_NAME}.wasm"
+# Preprocessing artifacts: WASM used by the prover (prefer path from STATE_JSON)
+WASM_PATH=$(jq -r '.program // empty' "$STATE_JSON")
+WASM_PATH="${WASM_PATH:-${SCRIPT_DIR}/ligero-prover/sdk/cpp/build/examples/${TARGET_NAME}.wasm}"
 wasm_size=$(stat -f %z "$WASM_PATH" 2>/dev/null || stat -c %s "$WASM_PATH")
 preprocessing_size_bytes=$(( wasm_size ))
 
