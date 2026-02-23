@@ -16,7 +16,7 @@ pub const NEXUS_PROPS: BenchProperties = BenchProperties {
     iop: Cow::Borrowed("Circle FRI"),  // https://eprint.iacr.org/2024/278.pdf
     pcs: Some(Cow::Borrowed("Circle FRI")), // https://eprint.iacr.org/2024/278.pdf
     arithm: Cow::Borrowed("AIR"),      // https://specification.nexus.xyz/
-    is_zk: true,                       // https://whitepaper.nexus.xyz/
+    is_zk: false,                      // Based on STWO which is currently not ZK
     is_zkvm: true,
     security_bits: 0, // TODO: https://github.com/privacy-ethereum/csp-benchmarks/issues/147
     is_pq: true,      // hash-based PCS
