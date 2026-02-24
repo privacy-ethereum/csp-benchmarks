@@ -298,6 +298,11 @@ jobs:
         run: |
           rustup target add riscv32im-unknown-none-elf
 
+      - name: Install target for Jolt
+        if: ${{ contains(matrix.crate, 'jolt') }}
+        run: |
+          rustup target add riscv64imac-unknown-none-elf
+
       - name: Build and copy excluded memory benchmark binary to workspace target
         if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') || contains(matrix.crate, 'rookie-numbers') }}
         run: |
