@@ -27,6 +27,7 @@ nargo compile --workspace --silence-warnings --skip-brillig-constraints-check
 cd ../..
 
 CIRCUIT_PATH="${WORKSPACE_ROOT_PATH}/target/poseidon2.json"
+bb write_vk -b "$CIRCUIT_PATH" -o "${WORKSPACE_ROOT_PATH}/target/"
 CIRCUIT_MEMBER_DIR="${WORKSPACE_ROOT_PATH}/hash/poseidon2"
 TOML_PATH="${CIRCUIT_MEMBER_DIR}/Prover_${INPUT_SIZE}.toml"
 

@@ -135,7 +135,7 @@ jobs:
         if: ${{ matrix.folder == 'barretenberg' }}
         uses: ./.github/actions/install-bb
         with:
-          version: "0.87.0"
+          version: "1.2.0"
 
       - name: Ensure jq present
         run: |
@@ -171,7 +171,7 @@ jobs:
           export BENCH_INPUT_PROFILE="$PROFILE"
           echo "Using BENCH_INPUT_PROFILE=$BENCH_INPUT_PROFILE for ${{ matrix.folder }}"
           if [[ -f ./benchmark.sh ]]; then
-            bash ./benchmark.sh --system-dir "./${{ matrix.folder }}"
+            bash ./benchmark.sh --system-dir "./${{ matrix.folder }}" --logging
           else
             echo "benchmark.sh not found in repository root" >&2
             exit 1

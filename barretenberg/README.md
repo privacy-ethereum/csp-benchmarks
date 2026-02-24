@@ -23,7 +23,7 @@ Match the CI setup from `.github/workflows/sh_benchmarks_parallel.yml` and the h
    ```bash
    curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/next/barretenberg/bbup/install | bash
    export PATH="$HOME/.bb:$PATH"
-   bbup -v 0.87.0
+   bbup -v 1.2.0
    ```
 
 ## Installation & Test Run

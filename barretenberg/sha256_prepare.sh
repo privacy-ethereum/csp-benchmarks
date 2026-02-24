@@ -31,6 +31,8 @@ nargo compile --workspace --silence-warnings --skip-brillig-constraints-check
 cd ../..
 
 CIRCUIT_PATH="${WORKSPACE_ROOT_PATH}/target/sha256.json"
+# Pre-generate vk so timed proving can reuse it.
+bb write_vk -b "$CIRCUIT_PATH" -o "${WORKSPACE_ROOT_PATH}/target/"
 
 ####   Generate input(Prover.toml)   ####
 GEN="$("$UTILS_BIN" sha256 -n ${INPUT_SIZE})"
