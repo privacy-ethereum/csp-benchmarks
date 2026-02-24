@@ -72,8 +72,8 @@ else
     fi
 fi
 
-step "Installing Barretenberg v0.87.0"
-bbup -v 0.87.0
+step "Installing Barretenberg v1.2.0"
+bbup -v 1.2.0
 
 # -----------------------
 # Run demo prover & verifier
