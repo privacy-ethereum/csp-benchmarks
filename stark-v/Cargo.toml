@@ -1,0 +1,34 @@
+[package]
+name = "stark-v"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+stark-v-sdk = { git = "https://github.com/AntoineFONDEUR/stark-v", rev = "f233611675af6f0ce56c81ed8b0cd063bc798d18" }
+bincode = { workspace = true }
+
+# Workspace
+criterion = { workspace = true }
+clap = { workspace = true }
+ere-zkvm-interface = { workspace = true }
+utils = { workspace = true }
+
+[features]
+default = ["parallel"]
+parallel = ["stark-v-sdk/parallel"]
+
+[[bench]]
+name = "sha256"
+harness = false
+
+[[bench]]
+name = "keccak"
+harness = false
+
+[[bin]]
+name = "sha256_mem_stark_v"
+path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "keccak_mem_stark_v"
+path = "src/bin/keccak_mem.rs"
