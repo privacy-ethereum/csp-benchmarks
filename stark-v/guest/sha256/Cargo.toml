@@ -1,0 +1,11 @@
+[package]
+name = "stark-v-bench-sha256"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+guest-bin = { git = "https://github.com/AntoineFONDEUR/stark-v", rev = "6cea4701ed6024dbe990573f5fbfd7f7616fd788" }
+guest-lib = { git = "https://github.com/AntoineFONDEUR/stark-v", rev = "6cea4701ed6024dbe990573f5fbfd7f7616fd788" }
+sha2 = { version = "0.10", default-features = false }
+
+[workspace]

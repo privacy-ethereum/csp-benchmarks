@@ -59,6 +59,7 @@ pub enum ProvingSystem {
     Nexus,
     Spartan2,
     RookieNumbers,
+    StarkV,
     // Extend as needed
 }
 
@@ -79,6 +80,7 @@ impl ProvingSystem {
             ProvingSystem::Nexus => "nexus",
             ProvingSystem::Spartan2 => "spartan2",
             ProvingSystem::RookieNumbers => "rookie-numbers",
+            ProvingSystem::StarkV => "stark-v",
         }
     }
 }
