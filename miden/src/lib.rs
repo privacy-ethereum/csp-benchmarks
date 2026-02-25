@@ -19,9 +19,9 @@ pub fn miden_bench_properties() -> BenchProperties {
         "AIR", // https://0xmiden.github.io/miden-vm/design/chiplets/hasher.html?highlight=AIR#air-constraints
         false, // Not using HidingFriPcs, using TwoAdicFriPcs without hiding
         true,  // zkVM
-        128, // Target security = 128 bits (bench config); https://github.com/eth-act/ere/blob/ae6baa03c157512b905bf393c0f94b6b9b3b420c/crates/zkvm/miden/src/zkvm.rs#L100
-        true, // hash-based PCS
-        true, // https://github.com/0xPolygonMiden/miden-vm/releases
+        96,    // https://github.com/0xMiden/miden-vm/blob/v0.21.0/core/src/proof.rs#L73
+        true,  // hash-based PCS
+        true,  // https://github.com/0xPolygonMiden/miden-vm/releases
         AuditStatus::NotAudited, // https://github.com/0xPolygonMiden/miden-vm
         Some("Miden"), // stack-based ISA with MAST; https://hackmd.io/@bobbinth/ry-OIBwPF
     )

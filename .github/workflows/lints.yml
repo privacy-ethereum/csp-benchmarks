@@ -52,6 +52,9 @@ jobs:
           profile: minimal
           components: llvm-tools, rustc-dev, rust-src, rustfmt, clippy
 
+      - name: Install protobuf compiler
+        run: brew install protobuf
+
       - name: Install OpenMPI
         uses: ./.github/actions/install-ompi
 

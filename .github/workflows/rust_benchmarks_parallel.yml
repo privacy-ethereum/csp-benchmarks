@@ -200,6 +200,9 @@ jobs:
           toolchain: nightly-2025-07-14
           profile: minimal
 
+      - name: Install protobuf compiler
+        run: brew install protobuf
+
       - name: Install OpenVM
         if: ${{ github.event.inputs.include_optional == true }}
         uses: ./.github/actions/install-openvm
@@ -297,6 +300,9 @@ jobs:
           toolchain: nightly-2025-07-14
           override: true
           profile: minimal
+
+      - name: Install protobuf compiler
+        run: brew install protobuf
 
       - name: Install OpenVM
         if: ${{ contains(matrix.crate, 'openvm') }}
