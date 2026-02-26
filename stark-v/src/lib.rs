@@ -87,9 +87,10 @@ pub fn load_compiled(bench_name: &str) -> CompiledProgram {
 pub fn prepare_sha256(input_size: usize, program: &CompiledProgram) -> PreparedBench {
     let vm = StarkV::new(program.program.clone());
     let (message_bytes, digest) = utils::generate_sha256_input(input_size);
+    let input = build_prefixed_input(message_bytes);
     PreparedBench {
         vm,
-        input: Input::new().with_prefixed_stdin(message_bytes),
+        input,
         compiled_size: program.byte_size,
         expected_digest: digest,
     }
@@ -98,12 +99,20 @@ pub fn prepare_sha256(input_size: usize, program: &CompiledProgram) -> PreparedB
 pub fn prepare_keccak(input_size: usize, program: &CompiledProgram) -> PreparedBench {
     let vm = StarkV::new(program.program.clone());
     let (message_bytes, digest) = utils::generate_keccak_input(input_size);
+    let input = build_prefixed_input(message_bytes);
     PreparedBench {
         vm,
-        input: Input::new().with_prefixed_stdin(message_bytes),
+        input,
         compiled_size: program.byte_size,
         expected_digest: digest,
     }
+}
+
+/// Build stark-v input with length-prefixed format.
+///
+/// The guest programs expect: [len: u32 LE][data: u8...]
+fn build_prefixed_input(data: Vec<u8>) -> Input {
+    Input::new().with_prefixed_stdin(data)
 }
 
 pub fn prove_bench(prepared: &PreparedBench, _: &CompiledProgram) -> ProofResult {
