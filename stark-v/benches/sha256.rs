@@ -5,17 +5,17 @@ use stark_v::{
 use utils::harness::ProvingSystem;
 
 utils::define_benchmark_harness!(
-    BenchTarget::Sha256,                                  // target
-    ProvingSystem::StarkV,                                // system
-    None,                                                 // feature
-    "sha256_mem_stark_v",                                 // mem_binary_name
-    stark_v_bench_properties(),                           // properties
-    { load_or_compile("sha256") },                        // shared_init
-    prepare_sha256,                                       // prepare
-    |_, _| 0,                                             // num_constraints
-    |prepared, program| prove_bench(prepared, program),   // prove
+    BenchTarget::Sha256,                                               // target
+    ProvingSystem::StarkV,                                             // system
+    None,                                                              // feature
+    "sha256_mem_stark_v",                                              // mem_binary_name
+    stark_v_bench_properties(),                                        // properties
+    { load_or_compile("sha256") },                                     // shared_init
+    prepare_sha256,                                                    // prepare
+    |_, _| 0,                                                          // num_constraints
+    |prepared, program| prove_bench(prepared, program),                // prove
     |prepared, proof, program| verify_bench(prepared, proof, program), // verify
-    |prepared, program| preprocessing_size(prepared, program), // prep_size
-    |proof, program| proof_size(proof, program),          // proof_size
-    execution_cycles                                      // execution_cycles
+    |prepared, program| preprocessing_size(prepared, program),         // prep_size
+    |proof, program| proof_size(proof, program),                       // proof_size
+    execution_cycles                                                   // execution_cycles
 );
