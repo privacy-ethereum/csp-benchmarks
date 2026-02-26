@@ -1,10 +1,7 @@
 //! Memory measurement binary for stark-v SHA256 prover.
 
 use clap::Parser;
-use stark_v::{prepare_sha256, prove_sha256};
-use stark_v_sdk::StarkVCompiler;
-use utils::zkvm::helpers::load_compiled_program;
-use utils::zkvm::SHA256_BENCH;
+use stark_v::{load_compiled, prepare_sha256, prove_bench};
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -16,7 +13,7 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let program = load_compiled_program::<StarkVCompiler>(SHA256_BENCH);
+    let program = load_compiled("sha256");
     let prepared = prepare_sha256(args.input_size, &program);
-    prove_sha256(&prepared, &());
+    prove_bench(&prepared, &program);
 }
