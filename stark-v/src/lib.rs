@@ -17,7 +17,7 @@ pub fn stark_v_bench_properties() -> BenchProperties {
         "STARK",
         Some("FRI"),
         "AIR",
-        true,
+        false, // Not ZK
         true,
         96,
         true,

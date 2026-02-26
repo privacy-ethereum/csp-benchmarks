@@ -19,7 +19,7 @@ utils::define_benchmark_harness!(
         true,                    // zkVM
         96, // https://github.com/kkrt-labs/cairo-m/blob/main/crates/prover/src/prover_config.rs#L13-L20
         true, // hash-based PCS
-        true, // https://github.com/kkrt-labs
+        false, // not actively maintained
         AuditStatus::NotAudited, // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about
         Some("Cairo ISA"), // https://github.com/kkrt-labs/cairo-m/blob/main/docs/design.md
     ),
