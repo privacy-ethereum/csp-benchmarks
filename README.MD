@@ -37,7 +37,6 @@ Our future plans include running the benchmarks in a cloud device farm (Android 
     - Ensure `cargo`, `cmake`, and a recent `clang`/`lld` are available (the helper actions under [`.github/actions/install-llvm`](./.github/actions/install-llvm) show the expected setup). Install Homebrew packages `bash`, `jq`, and `hyperfine`, plus `/usr/bin/time` for RAM measurements.
     - Install per-system toolchains as needed: OpenMPI for `polyhedra-expander`, the Ligero prover stack for `ligetron`, Noir version >=1.0.0-beta.13 for `barretenberg`, and vendor SDKs such as RISC Zero, SP1, or OpenVM. Each folder documents its own bootstrap script and the matching GitHub Action ([`install-risc0`](./.github/actions/install-risc0), [`install-sp1`](./.github/actions/install-sp1), [`install-openvm`](./.github/actions/install-openvm), etc.) can be used as a reference.
 2.  **Run the benchmarks**
-
     - Build the workspace once: `cargo build --release --workspace`.
     - For Rust crates, run
 
@@ -48,6 +47,23 @@ Our future plans include running the benchmarks in a cloud device farm (Android 
     - Alternatively, to run individual benchmarks, `cd` into the crate directory and run `BENCH_INPUT_PROFILE=full cargo bench`.
     - Use `BENCH_INPUT_PROFILE=reduced` to run with a reduced set of input sizes.
     - For non-Rust systems, build the utilities crate (`cargo build --release -p utils`) and invoke `benchmark.sh`, e.g. `BENCH_INPUT_PROFILE=full bash ./benchmark.sh --system-dir ./barretenberg --logging --quick` (see [sh_benchmarks_parallel.yml](./.github/workflows/sh_benchmarks_parallel.yml)).
+
+## Run a targeted Rust benchmark in GitHub Actions
+
+For example, to run only `risc0` / `sha256` on a self-hosted runner:
+
+1. Open **Actions** -> **Dispatch All Benchmarks (manual)** -> **Run workflow**.
+2. Set:
+   - `benchmark_crate`: `risc0`
+   - `benchmark_target`: `sha256`
+   - `prod-run`: `true`
+   - `run_non_rust`: `false` (optional, keeps this run Rust-only)
+3. Keep other inputs as needed (`run_all` and `include_optional` are ignored when `benchmark_crate` is set).
+
+Notes:
+
+- You can also run **Rust Benchmarks (parallel)** directly with `benchmark_crate=risc0`, `benchmark_target=sha256`, and `prod_run=true`.
+- If `run_non_rust=false`, the fan-in collector workflow may not auto-complete for that SHA because it waits for both Rust and Non-Rust parent workflows.
 
 ## Repository structure
 

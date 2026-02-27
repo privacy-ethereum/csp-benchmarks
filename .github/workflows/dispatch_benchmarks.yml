@@ -16,6 +16,21 @@ on:
         required: false
         default: false
         type: boolean
+      benchmark_crate:
+        description: "Run only this benchmark crate in Rust workflow (e.g. risc0)"
+        required: false
+        default: ""
+        type: string
+      benchmark_target:
+        description: "Run only this bench target in benchmark_crate (e.g. sha256)"
+        required: false
+        default: ""
+        type: string
+      run_non_rust:
+        description: "Also dispatch Non-Rust Benchmarks workflow"
+        required: false
+        default: true
+        type: boolean
       prod-run:
         description: "Run children on self-hosted runner"
         required: false
@@ -48,10 +63,24 @@ jobs:
             echo "ref=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Validate targeted benchmark inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          BENCHMARK_CRATE='${{ github.event.inputs.benchmark_crate }}'
+          BENCHMARK_TARGET='${{ github.event.inputs.benchmark_target }}'
+
+          if [[ -n "$BENCHMARK_TARGET" && -z "$BENCHMARK_CRATE" ]]; then
+            echo "benchmark_target requires benchmark_crate" >&2
+            exit 1
+          fi
+
       - name: Dispatch Rust Benchmarks (parallel)
         env:
           GH_TOKEN: ${{ github.token }}
           PROD_RUN: ${{ github.event.inputs['prod-run'] }}
+          BENCHMARK_CRATE: ${{ github.event.inputs.benchmark_crate }}
+          BENCHMARK_TARGET: ${{ github.event.inputs.benchmark_target }}
         shell: bash
         run: |
           set -euo pipefail
@@ -62,9 +91,12 @@ jobs:
             --ref "$REF" \
             -f run_all="$RUN_ALL" \
             -f include_optional="$INCLUDE_OPTIONAL" \
+            -f benchmark_crate="$BENCHMARK_CRATE" \
+            -f benchmark_target="$BENCHMARK_TARGET" \
             -f prod_run="$PROD_RUN"
 
       - name: Dispatch Non-Rust Benchmarks (parallel)
+        if: ${{ github.event.inputs.run_non_rust == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
           PROD_RUN: ${{ github.event.inputs['prod-run'] }}
