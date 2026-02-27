@@ -23,6 +23,16 @@ on:
         required: false
         default: false
         type: boolean
+      benchmark_crate:
+        description: "Run only this benchmark crate (e.g. risc0)"
+        required: false
+        default: ""
+        type: string
+      benchmark_target:
+        description: "Run only this bench target inside benchmark_crate (e.g. sha256)"
+        required: false
+        default: ""
+        type: string
       prod_run:
         description: "Run on self-hosted runner"
         required: false
@@ -68,6 +78,22 @@ jobs:
 
           RUN_ALL="${{ github.event.inputs.run_all }}"
           INCLUDE_OPTIONAL="${{ github.event.inputs.include_optional }}"
+          BENCHMARK_CRATE='${{ github.event.inputs.benchmark_crate }}'
+          BENCHMARK_TARGET='${{ github.event.inputs.benchmark_target }}'
+
+          if [[ -n "$BENCHMARK_TARGET" && -z "$BENCHMARK_CRATE" ]]; then
+            echo "benchmark_target requires benchmark_crate" >&2
+            exit 1
+          fi
+
+          if [[ -n "$BENCHMARK_CRATE" ]]; then
+            json=$(jq -cn --arg crate "$BENCHMARK_CRATE" '[$crate]')
+            echo "benchmark_crate override active: ignoring run_all, include_optional, and diff detection"
+            echo "Selected crate override: '$json'"
+            echo "crates=$json" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           # ─── Run all benches when we're merging a PR ─────────────────────
           EVENT_NAME='${{ github.event_name }}'
           if [[ "$EVENT_NAME" == "push" ]]; then
@@ -324,10 +350,17 @@ jobs:
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             PROFILE="reduced"
           fi
+          BENCHMARK_TARGET='${{ github.event.inputs.benchmark_target }}'
           export BENCH_INPUT_PROFILE="$PROFILE"
           echo "Using BENCH_INPUT_PROFILE=$BENCH_INPUT_PROFILE for ${{ matrix.crate }}"
           cd ${{ matrix.crate }}
-          cargo bench
+          if [[ -n "$BENCHMARK_TARGET" ]]; then
+            echo "Running targeted bench command: cargo bench --bench $BENCHMARK_TARGET"
+            cargo bench --bench "$BENCHMARK_TARGET"
+          else
+            echo "Running bench command: cargo bench"
+            cargo bench
+          fi
 
       - name: Copy excluded crates criterion results to workspace target
         if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') || contains(matrix.crate, 'rookie-numbers') }}
