@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::path::Path;
 use std::str::FromStr;
 
 use crate::bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics};
@@ -458,7 +459,15 @@ fn measure_ram(
     size: usize,
 ) {
     compile_binary(mem_bin_name_ref);
-    let bin_path = format!("../target/release/{}", mem_bin_name_ref);
+    let candidates = [
+        format!("../target/release/{}", mem_bin_name_ref),
+        format!("target/release/{}", mem_bin_name_ref),
+    ];
+    let bin_path = candidates
+        .iter()
+        .find(|candidate| Path::new(candidate.as_str()).exists())
+        .cloned()
+        .unwrap_or_else(|| candidates[0].clone());
     let mem_json = mem_report_filename(target_str, size, system_str, cfg.feature);
     run_measure_mem_script(&mem_json, &bin_path, size);
 }

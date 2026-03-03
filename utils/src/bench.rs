@@ -221,4 +221,16 @@ pub fn run_measure_mem_script(json_file: &str, binary_path: &str, input_size: us
         .expect("failed to execute script");
 
     println!("{}", String::from_utf8_lossy(&output.stdout));
+
+    if !output.stderr.is_empty() {
+        eprintln!("{}", String::from_utf8_lossy(&output.stderr));
+    }
+
+    assert!(
+        output.status.success(),
+        "measure_mem_avg.sh failed with status {:?} for '{}' (input_size={})",
+        output.status.code(),
+        binary_path,
+        input_size
+    );
 }
