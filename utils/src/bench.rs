@@ -5,6 +5,7 @@ use serde_with::skip_serializing_none;
 use serde_with::{DurationNanoSeconds, serde_as};
 use std::{
     fmt::Display,
+    path::PathBuf,
     process::Command,
     sync::{
         Arc,
@@ -207,10 +208,10 @@ pub fn compile_binary(binary_name: &str) {
 }
 
 pub fn run_measure_mem_script(json_file: &str, binary_path: &str, input_size: usize) {
-    let script = "../measure_mem_avg.sh";
+    let script = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../measure_mem_avg.sh");
 
     let output = Command::new("sh")
-        .arg(script)
+        .arg(&script)
         .arg("--json")
         .arg(json_file)
         .arg("--")
@@ -228,7 +229,8 @@ pub fn run_measure_mem_script(json_file: &str, binary_path: &str, input_size: us
 
     assert!(
         output.status.success(),
-        "measure_mem_avg.sh failed with status {:?} for '{}' (input_size={})",
+        "measure_mem_avg.sh ({}) failed with status {:?} for '{}' (input_size={})",
+        script.display(),
         output.status.code(),
         binary_path,
         input_size
