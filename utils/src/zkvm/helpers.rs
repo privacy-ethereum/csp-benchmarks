@@ -96,6 +96,10 @@ pub fn load_compiled_program<C: Compiler>(benchmark_name: &str) -> CompiledProgr
 }
 
 /// Load a compiled program if present, otherwise compile and persist it.
+///
+/// The cwd is saved and restored around compilation because some compiler
+/// implementations (notably Jolt's `RustRv64imacCustomized`) call
+/// `std::env::set_current_dir` and never restore it.
 pub fn load_or_compile_program<C: Compiler>(
     compiler: &C,
     benchmark_name: &str,
@@ -104,8 +108,15 @@ pub fn load_or_compile_program<C: Compiler>(
     if compiled_path.exists() {
         load_compiled_program(benchmark_name)
     } else {
+        let original_dir =
+            std::env::current_dir().expect("failed to get current working directory");
+
         let program = compile_guest_program(compiler, &guest_dir(benchmark_name))
             .expect("failed to compile guest program");
+
+        // Restore cwd in case the compiler changed it.
+        std::env::set_current_dir(&original_dir).expect("failed to restore working directory");
+
         let bytes = bincode::options()
             .serialize(&program.program)
             .expect("failed to serialize compiled program");
