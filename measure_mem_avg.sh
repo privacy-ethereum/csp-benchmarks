@@ -64,13 +64,26 @@ for i in $(seq 1 $NUM_RUNS); do
   echo " Run #$i..."
   
   # Run the command and capture both program output and measurement output
+  set +e
   output=$({ $TIME_CMD "$@" 2>&1 >/dev/null; } 2>&1)
+  cmd_status=$?
+  set -e
+
+  if (( cmd_status != 0 )); then
+    echo "  Error: benchmark command exited with status $cmd_status" >&2
+    if [[ -n "$output" ]]; then
+      echo "$output" >&2
+    fi
+    exit "$cmd_status"
+  fi
 
   # Locate the memory measurement line
   line=$(echo "$output" | awk -v lab="$MEM_LABEL" 'tolower($0) ~ tolower(lab) {print $0}')
 
   if [[ -z "$line" ]]; then
     echo "  Error: Could not locate memory info in output."
+    echo "  Raw measurement output:"
+    echo "$output"
     exit 1
   fi
 

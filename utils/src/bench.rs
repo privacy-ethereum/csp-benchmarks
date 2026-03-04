@@ -5,7 +5,6 @@ use serde_with::skip_serializing_none;
 use serde_with::{DurationNanoSeconds, serde_as};
 use std::{
     fmt::Display,
-    path::PathBuf,
     process::Command,
     sync::{
         Arc,
@@ -198,20 +197,28 @@ pub fn write_json_metrics_file(output_path: &str, metrics: &Metrics) {
 }
 
 pub fn compile_binary(binary_name: &str) {
-    let _compile_output = Command::new("cargo")
+    let compile_output = Command::new("cargo")
         .arg("build")
         .arg("--release")
         .arg("--bin")
         .arg(binary_name)
         .output()
         .expect("failed to compile");
+
+    assert!(
+        compile_output.status.success(),
+        "failed to compile memory binary '{}'\nstdout:\n{}\nstderr:\n{}",
+        binary_name,
+        String::from_utf8_lossy(&compile_output.stdout),
+        String::from_utf8_lossy(&compile_output.stderr)
+    );
 }
 
 pub fn run_measure_mem_script(json_file: &str, binary_path: &str, input_size: usize) {
-    let script = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../measure_mem_avg.sh");
+    let script = "../measure_mem_avg.sh";
 
-    let output = Command::new("sh")
-        .arg(&script)
+    let output = Command::new("bash")
+        .arg(script)
         .arg("--json")
         .arg(json_file)
         .arg("--")
@@ -229,8 +236,7 @@ pub fn run_measure_mem_script(json_file: &str, binary_path: &str, input_size: us
 
     assert!(
         output.status.success(),
-        "measure_mem_avg.sh ({}) failed with status {:?} for '{}' (input_size={})",
-        script.display(),
+        "measure_mem_avg.sh failed with status {:?} for '{}' (input_size={})",
         output.status.code(),
         binary_path,
         input_size
