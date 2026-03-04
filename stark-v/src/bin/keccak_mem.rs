@@ -1,10 +1,7 @@
 //! Memory measurement binary for stark-v Keccak prover.
 
 use clap::Parser;
-use stark_v::{prepare_keccak, prove};
-use stark_v_sdk::StarkVCompiler;
-use utils::zkvm::helpers::load_compiled_program;
-use utils::zkvm::KECCAK_BENCH;
+use stark_v::{load_compiled, prepare_keccak, prove_bench};
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -16,7 +13,7 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let program = load_compiled_program::<StarkVCompiler>(KECCAK_BENCH);
+    let program = load_compiled("keccak");
     let prepared = prepare_keccak(args.input_size, &program);
-    prove(&prepared, &());
+    prove_bench(&prepared, &program);
 }

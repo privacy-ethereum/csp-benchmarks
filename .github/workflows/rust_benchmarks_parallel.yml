@@ -173,6 +173,7 @@ jobs:
             nexus/target
             cairo-m/target
             rookie-numbers/target
+            stark-v/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
@@ -236,6 +237,9 @@ jobs:
           if echo "$CRATES" | grep -q '"rookie-numbers"'; then
             cd rookie-numbers && cargo build --release && cd ..
           fi
+          if echo "$CRATES" | grep -q '"stark-v"'; then
+            cd stark-v && cargo build --release && cd ..
+          fi
 
   bench:
     if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
@@ -264,6 +268,7 @@ jobs:
             nexus/target
             cairo-m/target
             rookie-numbers/target
+            stark-v/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
@@ -342,7 +347,7 @@ jobs:
           jolt --version
 
       - name: Build and copy excluded memory benchmark binary to workspace target
-        if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') || contains(matrix.crate, 'rookie-numbers') }}
+        if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') || contains(matrix.crate, 'rookie-numbers') || contains(matrix.crate, 'stark-v') }}
         run: |
           mkdir -p target/release
           if [ "${{ matrix.crate }}" = "nexus" ]; then
@@ -354,6 +359,10 @@ jobs:
           elif [ "${{ matrix.crate }}" = "rookie-numbers" ]; then
             cd rookie-numbers && cargo build --release --bin sha256_mem_rookie_numbers && cd ..
             cp rookie-numbers/target/release/sha256_mem_rookie_numbers target/release/
+          elif [ "${{ matrix.crate }}" = "stark-v" ]; then
+            cd stark-v && cargo build --release --bin sha256_mem_stark_v --bin keccak_mem_stark_v && cd ..
+            cp stark-v/target/release/sha256_mem_stark_v target/release/
+            cp stark-v/target/release/keccak_mem_stark_v target/release/
           fi
 
       - name: Run benches in ${{ matrix.crate }}
@@ -375,7 +384,7 @@ jobs:
           fi
 
       - name: Copy excluded crates criterion results to workspace target
-        if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') || contains(matrix.crate, 'rookie-numbers') }}
+        if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') || contains(matrix.crate, 'rookie-numbers') || contains(matrix.crate, 'stark-v') }}
         run: |
           mkdir -p target/criterion
           cp -r ${{ matrix.crate }}/target/criterion/* target/criterion/
