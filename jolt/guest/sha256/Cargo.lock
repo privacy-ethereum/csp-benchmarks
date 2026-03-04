@@ -159,6 +159,7 @@ checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
 [[package]]
 name = "ere-platform-jolt"
 version = "0.3.0"
+source = "git+https://github.com/alxkzmn/ere#e0b4af2f3f09ff48f1b6643060b05ae52f9bf750"
 dependencies = [
  "common",
  "ere-platform-trait",
@@ -169,6 +170,7 @@ dependencies = [
 [[package]]
 name = "ere-platform-trait"
 version = "0.3.0"
+source = "git+https://github.com/alxkzmn/ere#e0b4af2f3f09ff48f1b6643060b05ae52f9bf750"
 dependencies = [
  "digest",
 ]

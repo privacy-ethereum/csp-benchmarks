@@ -16,6 +16,18 @@ runs:
       run: |
         set -Eeuo pipefail
 
+        if ! command -v protoc >/dev/null 2>&1; then
+          if command -v brew >/dev/null 2>&1; then
+            brew install protobuf
+          elif command -v apt-get >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y protobuf-compiler
+          else
+            echo "protoc is required but no supported package manager was found" >&2
+            exit 1
+          fi
+        fi
+
         if [[ ! -x "$HOME/.sp1/bin/sp1up" ]]; then
           curl -fsSL --retry 5 --proto '=https' --tlsv1.2 https://sp1up.succinct.xyz | bash
         fi

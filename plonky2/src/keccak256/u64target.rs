@@ -40,16 +40,16 @@ where
     }
 
     pub fn set_witness(&self, bits: Vec<bool>, pw: &mut PartialWitness<F>) {
-        for i in 0..64 {
-            let _ = pw.set_bool_target(self.bits[i], bits[i]);
+        for (target, bit) in self.bits.iter().zip(bits.iter()).take(64) {
+            let _ = pw.set_bool_target(*target, *bit);
         }
     }
 
     pub fn constant(x: u64, builder: &mut CircuitBuilder<F, D>) -> Self {
         let mut result = vec![];
         let x_bits = u64_to_bits(x);
-        for i in 0..64 {
-            result.push(builder.constant_bool(x_bits[i]));
+        for bit in x_bits.iter().take(64) {
+            result.push(builder.constant_bool(*bit));
         }
         Self {
             bits: result,
@@ -58,8 +58,8 @@ where
     }
 
     pub fn connect(&self, other: &Self, builder: &mut CircuitBuilder<F, D>) {
-        for i in 0..64 {
-            builder.connect(self.bits[i].target, other.bits[i].target);
+        for (left, right) in self.bits.iter().zip(other.bits.iter()).take(64) {
+            builder.connect(left.target, right.target);
         }
     }
 
@@ -71,8 +71,8 @@ where
 
     pub fn xor(&self, other: &Self, builder: &mut CircuitBuilder<F, D>) -> Self {
         let mut result = vec![];
-        for i in 0..64 {
-            let xor_target = xor_circuit(self.bits[i], other.bits[i], builder);
+        for (left, right) in self.bits.iter().zip(other.bits.iter()).take(64) {
+            let xor_target = xor_circuit(*left, *right, builder);
             result.push(xor_target);
         }
         Self {
@@ -84,8 +84,8 @@ where
     pub fn xor_const(&self, other: u64, builder: &mut CircuitBuilder<F, D>) -> Self {
         let other_bits = u64_to_bits(other);
         let mut result = vec![];
-        for i in 0..64 {
-            let xor_target = xor_const_circuit(self.bits[i], other_bits[i], builder);
+        for (bit, other_bit) in self.bits.iter().zip(other_bits.iter()).take(64) {
+            let xor_target = xor_const_circuit(*bit, *other_bit, builder);
             result.push(xor_target);
         }
         Self {
@@ -101,8 +101,8 @@ where
     pub fn rotl(&self, n: usize) -> Self {
         let rotate = rotate_u64(n);
         let mut output = vec![];
-        for i in 0..64 {
-            output.push(self.bits[rotate[i]]);
+        for index in rotate.iter().take(64) {
+            output.push(self.bits[*index]);
         }
 
         Self {
@@ -113,8 +113,8 @@ where
 
     pub fn and(&self, other: &Self, builder: &mut CircuitBuilder<F, D>) -> Self {
         let mut result = vec![];
-        for i in 0..64 {
-            result.push(builder.and(self.bits[i], other.bits[i]));
+        for (left, right) in self.bits.iter().zip(other.bits.iter()).take(64) {
+            result.push(builder.and(*left, *right));
         }
         Self {
             bits: result,
@@ -124,8 +124,8 @@ where
 
     pub fn not(&self, builder: &mut CircuitBuilder<F, D>) -> Self {
         let mut result = vec![];
-        for i in 0..64 {
-            result.push(builder.not(self.bits[i]));
+        for bit in self.bits.iter().take(64) {
+            result.push(builder.not(*bit));
         }
         Self {
             bits: result,
@@ -136,14 +136,14 @@ where
     /// Calculate `self & !other`.
     pub fn and_not(&self, other: &Self, builder: &mut CircuitBuilder<F, D>) -> Self {
         let mut result = vec![];
-        for i in 0..64 {
+        for (left, right) in self.bits.iter().zip(other.bits.iter()).take(64) {
             // x(1 - y) = x - xy
             result.push(BoolTarget::new_unsafe(builder.arithmetic(
                 F::NEG_ONE,
                 F::ONE,
-                self.bits[i].target,
-                other.bits[i].target,
-                self.bits[i].target,
+                left.target,
+                right.target,
+                left.target,
             )));
         }
         Self {

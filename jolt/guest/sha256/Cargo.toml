@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ere-platform-jolt = { "https://github.com/alxkzmn/ere", default-features = false, features = ["guest-std"] }
+ere-platform-jolt = { git = "https://github.com/alxkzmn/ere", default-features = false, features = ["guest-std"] }
 jolt-inlines-sha2 = { git = "https://github.com/a16z/jolt", rev = "35d46f5" }
 
 [features]
