@@ -197,19 +197,27 @@ pub fn write_json_metrics_file(output_path: &str, metrics: &Metrics) {
 }
 
 pub fn compile_binary(binary_name: &str) {
-    let _compile_output = Command::new("cargo")
+    let compile_output = Command::new("cargo")
         .arg("build")
         .arg("--release")
         .arg("--bin")
         .arg(binary_name)
         .output()
         .expect("failed to compile");
+
+    assert!(
+        compile_output.status.success(),
+        "failed to compile memory binary '{}'\nstdout:\n{}\nstderr:\n{}",
+        binary_name,
+        String::from_utf8_lossy(&compile_output.stdout),
+        String::from_utf8_lossy(&compile_output.stderr)
+    );
 }
 
 pub fn run_measure_mem_script(json_file: &str, binary_path: &str, input_size: usize) {
     let script = "../measure_mem_avg.sh";
 
-    let output = Command::new("sh")
+    let output = Command::new("bash")
         .arg(script)
         .arg("--json")
         .arg(json_file)
@@ -221,4 +229,16 @@ pub fn run_measure_mem_script(json_file: &str, binary_path: &str, input_size: us
         .expect("failed to execute script");
 
     println!("{}", String::from_utf8_lossy(&output.stdout));
+
+    if !output.stderr.is_empty() {
+        eprintln!("{}", String::from_utf8_lossy(&output.stderr));
+    }
+
+    assert!(
+        output.status.success(),
+        "measure_mem_avg.sh failed with status {:?} for '{}' (input_size={})",
+        output.status.code(),
+        binary_path,
+        input_size
+    );
 }
