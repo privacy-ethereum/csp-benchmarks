@@ -274,37 +274,61 @@
       "system": "risc0",
       "target": "sha256",
       "input_size": 128,
-      "proof_duration": 18551662279,
-      "verify_duration": 12639625,
+      "proof_duration": 18579726892,
+      "verify_duration": 12584254,
       "cycles": 4591,
       "proof_size": 223290,
       "preprocessing_size": 300565,
       "num_constraints": 0,
-      "peak_memory": 1582276608
+      "peak_memory": 1577118924
     },
     {
       "system": "risc0",
       "target": "sha256",
       "input_size": 256,
-      "proof_duration": 18557324987,
-      "verify_duration": 12676679,
+      "proof_duration": 18575879304,
+      "verify_duration": 12507938,
       "cycles": 4735,
       "proof_size": 223290,
       "preprocessing_size": 300565,
       "num_constraints": 0,
-      "peak_memory": 1584295116
+      "peak_memory": 1581283737
     },
     {
       "system": "risc0",
       "target": "sha256",
       "input_size": 512,
-      "proof_duration": 18554362575,
-      "verify_duration": 0,
+      "proof_duration": 18576662750,
+      "verify_duration": 12617492,
       "cycles": 5023,
       "proof_size": 223290,
       "preprocessing_size": 300565,
       "num_constraints": 0,
-      "peak_memory": 1579705958
+      "peak_memory": 1581996441
+    },
+    {
+      "system": "risc0",
+      "target": "sha256",
+      "input_size": 1024,
+      "proof_duration": 18548176038,
+      "verify_duration": 12586908,
+      "cycles": 5618,
+      "proof_size": 223290,
+      "preprocessing_size": 300565,
+      "num_constraints": 0,
+      "peak_memory": 1589241446
+    },
+    {
+      "system": "risc0",
+      "target": "sha256",
+      "input_size": 2048,
+      "proof_duration": 18555438438,
+      "verify_duration": 12550154,
+      "cycles": 6834,
+      "proof_size": 223290,
+      "preprocessing_size": 300565,
+      "num_constraints": 0,
+      "peak_memory": 1592152883
     },
     {
       "system": "binius64",
