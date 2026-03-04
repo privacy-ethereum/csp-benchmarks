@@ -5,8 +5,12 @@ use crate::zkvm::traits::PreparedBenchmark;
 use bincode::Options;
 use ere_zkvm_interface::Compiler;
 use ere_zkvm_interface::zkVM;
+use std::any::type_name;
+use std::collections::hash_map::DefaultHasher;
 use std::fs;
+use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
+use std::time::SystemTime;
 
 /// Prove any benchmark using the prepared zkVM instance.
 pub fn prove<P: PreparedBenchmark, SharedState>(prepared: &P, _: &SharedState) -> ProofArtifacts {
@@ -75,17 +79,61 @@ pub fn guest_dir(benchmark_name: &str) -> PathBuf {
 }
 
 /// Compute the standard compiled program path for a benchmark.
-/// By convention we store at guest/<bench>/target/<bench>.bin
-pub fn compiled_program_path(benchmark_name: &str) -> PathBuf {
+/// By convention we store at guest/<bench>/target/<bench>_<compiler>.bin
+pub fn compiled_program_path<C: Compiler>(benchmark_name: &str) -> PathBuf {
+    let mut hasher = DefaultHasher::new();
+    type_name::<C>().hash(&mut hasher);
+    let compiler_key = format!("{:x}", hasher.finish());
+
     guest_dir(benchmark_name)
         .join("target")
-        .join(format!("{}.bin", benchmark_name))
+        .join(format!("{}_{}.bin", benchmark_name, compiler_key))
+}
+
+fn newest_guest_source_mtime(path: &std::path::Path) -> Option<SystemTime> {
+    let mut newest = None;
+    let entries = fs::read_dir(path).ok()?;
+
+    for entry in entries.flatten() {
+        let entry_path = entry.path();
+        let file_name = entry.file_name();
+
+        if file_name == "target" {
+            continue;
+        }
+
+        if entry_path.is_dir() {
+            if let Some(child_newest) = newest_guest_source_mtime(&entry_path) {
+                newest = Some(newest.map_or(child_newest, |t: SystemTime| t.max(child_newest)));
+            }
+            continue;
+        }
+
+        if let Ok(metadata) = entry.metadata()
+            && let Ok(modified) = metadata.modified()
+        {
+            newest = Some(newest.map_or(modified, |t: SystemTime| t.max(modified)));
+        }
+    }
+
+    newest
+}
+
+fn is_compiled_program_stale(compiled_path: &std::path::Path, benchmark_name: &str) -> bool {
+    let compiled_mtime = compiled_path.metadata().and_then(|m| m.modified()).ok();
+    let guest_mtime = newest_guest_source_mtime(&guest_dir(benchmark_name));
+
+    match (compiled_mtime, guest_mtime) {
+        (Some(compiled), Some(guest)) => guest > compiled,
+        (_, Some(_)) => true,
+        _ => false,
+    }
 }
 
 /// Load a compiled program, panicking if it is missing.
 /// Used by RAM measurement binaries which must never trigger compilation.
 pub fn load_compiled_program<C: Compiler>(benchmark_name: &str) -> CompiledProgram<C> {
-    let compiled_path = compiled_program_path(benchmark_name);
+    let compiled_path = compiled_program_path::<C>(benchmark_name);
     let program_bin = fs::read(&compiled_path)
         .expect("missing compiled guest; the harness should have compiled it already");
     let program: C::Program = bincode::options()
@@ -104,8 +152,8 @@ pub fn load_or_compile_program<C: Compiler>(
     compiler: &C,
     benchmark_name: &str,
 ) -> CompiledProgram<C> {
-    let compiled_path = compiled_program_path(benchmark_name);
-    if compiled_path.exists() {
+    let compiled_path = compiled_program_path::<C>(benchmark_name);
+    if compiled_path.exists() && !is_compiled_program_stale(&compiled_path, benchmark_name) {
         load_compiled_program(benchmark_name)
     } else {
         let original_dir =

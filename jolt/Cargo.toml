@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-ere-jolt = { git = "https://github.com/eth-act/ere", rev = "66c516a24d9c3549f76b84f72365ab544299e63a" }
+ere-jolt = { git = "https://github.com/alxkzmn/ere", rev = "e0b4af2", features = ["zk"] }
 postcard = { version = "1.0", features = ["alloc"] }
 
 # Workspace

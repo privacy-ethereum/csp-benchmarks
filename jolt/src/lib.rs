@@ -1,6 +1,9 @@
 use ere_jolt::{EreJolt, compiler::RustRv64imacCustomized};
+use ere_zkvm_interface::compiler::Compiler;
 use ere_zkvm_interface::{Input, ProverResource};
 use serde::Serialize;
+use std::env;
+use std::path::Path;
 use utils::harness::{AuditStatus, BenchProperties};
 use utils::zkvm::{CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedSha256};
 
@@ -8,6 +11,41 @@ pub use utils::zkvm::{
     execution_cycles, preprocessing_size, proof_size, prove, prove_ecdsa, prove_sha256,
     verify_ecdsa, verify_keccak, verify_sha256,
 };
+
+// FIXME remove if/when the toolchain conflict is resolved.
+/// Wrapper around [`RustRv64imacCustomized`] that temporarily removes the
+/// `RUSTUP_TOOLCHAIN` environment variable before compiling.
+///
+/// This workspace pins a nightly toolchain via `rust-toolchain.toml`.  When
+/// `cargo bench` (or any cargo subcommand) runs, rustup propagates
+/// `RUSTUP_TOOLCHAIN=<nightly>` to every child process.  That overrides the
+/// guest-level `rust-toolchain.toml` which pins the stable channel expected by
+/// Jolt's `jolt build` CLI (it uses `RUSTC_BOOTSTRAP=1` on stable to unlock
+/// nightly features, which doesn't work on a real nightly).
+///
+/// The workaround lives here (in csp-benchmarks) rather than in `ere` because
+/// the toolchain conflict is specific to this workspace's nightly pin.
+pub struct JoltCompiler;
+
+impl Compiler for JoltCompiler {
+    type Error = <RustRv64imacCustomized as Compiler>::Error;
+    type Program = <RustRv64imacCustomized as Compiler>::Program;
+
+    fn compile(&self, guest_directory: &Path) -> Result<Self::Program, Self::Error> {
+        // SAFETY: guest compilation is single-threaded and sequential; the
+        // variable is restored immediately after the build completes.
+        let saved = env::var("RUSTUP_TOOLCHAIN").ok();
+        unsafe { env::remove_var("RUSTUP_TOOLCHAIN") };
+
+        let result = RustRv64imacCustomized.compile(guest_directory);
+
+        if let Some(tc) = saved {
+            unsafe { env::set_var("RUSTUP_TOOLCHAIN", tc) };
+        }
+
+        result
+    }
+}
 
 pub fn jolt_bench_properties() -> BenchProperties {
     BenchProperties::new(
@@ -36,7 +74,7 @@ fn build_framed_input(data: Vec<u8>) -> Input {
 
 pub fn prepare_sha256(
     input_size: usize,
-    program: &CompiledProgram<RustRv64imacCustomized>,
+    program: &CompiledProgram<JoltCompiler>,
 ) -> PreparedSha256<EreJolt> {
     let vm = EreJolt::new(program.program.clone(), ProverResource::Cpu)
         .expect("jolt prover build failed");
@@ -49,7 +87,7 @@ pub fn prepare_sha256(
 
 pub fn prepare_keccak(
     input_size: usize,
-    program: &CompiledProgram<RustRv64imacCustomized>,
+    program: &CompiledProgram<JoltCompiler>,
 ) -> PreparedKeccak<EreJolt> {
     let vm = EreJolt::new(program.program.clone(), ProverResource::Cpu)
         .expect("jolt prover build failed");
@@ -62,7 +100,7 @@ pub fn prepare_keccak(
 
 pub fn prepare_ecdsa(
     _input_size: usize,
-    program: &CompiledProgram<RustRv64imacCustomized>,
+    program: &CompiledProgram<JoltCompiler>,
 ) -> PreparedEcdsa<EreJolt> {
     let vm = EreJolt::new(program.program.clone(), ProverResource::Cpu)
         .expect("jolt prover build failed");
