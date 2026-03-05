@@ -23,7 +23,7 @@ pub fn risc0_bench_properties() -> BenchProperties {
         96,   // 96-bit base STARK, 99-bit recursion; https://dev.risczero.com/api/security-model
         true, // STARK is PQ-safe (Groth16 compression is not); https://dev.risczero.com/api/security-model
         true, // https://github.com/risc0/risc0/releases
-        AuditStatus::Audited, // https://github.com/risc0/rz-security/tree/main/audits
+        AuditStatus::PartiallyAudited, // Latest audit in July2025: https://github.com/risc0/rz-security/tree/main/audits
         Some("RISC-V RV32IM"), // base + multiplication; https://dev.risczero.com/reference-docs/about-risc-v
     )
 }

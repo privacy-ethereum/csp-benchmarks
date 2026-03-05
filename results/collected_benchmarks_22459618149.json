@@ -195,6 +195,20 @@
       "is_maintained": true,
       "is_audited": "not_audited",
       "isa": "RISC-V RV32IM"
+    },
+    "jolt": {
+      "proving_system": "Jolt",
+      "field_curve": "Bn254",
+      "iop": "Twist & Shout",
+      "pcs": "Dory",
+      "arithm": "Jolt",
+      "is_zk": false,
+      "is_zkvm": true,
+      "security_bits": 128,
+      "is_pq": false,
+      "is_maintained": true,
+      "is_audited": "not_audited",
+      "isa": "RISC-V RV64IMAC"
     }
   },
   "measurements": [
@@ -1829,6 +1843,138 @@
       "preprocessing_size": 2059,
       "num_constraints": 0,
       "peak_memory": 4112087449
+    },
+    {
+      "system": "jolt",
+      "target": "ecdsa",
+      "input_size": 32,
+      "proof_duration": 6187881404,
+      "verify_duration": 261429162,
+      "cycles": 449768,
+      "proof_size": 89327,
+      "preprocessing_size": 1754757,
+      "num_constraints": 0,
+      "peak_memory": 3627565056
+    },
+    {
+      "system": "jolt",
+      "target": "keccak",
+      "input_size": 1024,
+      "proof_duration": 3055491408,
+      "verify_duration": 250781000,
+      "cycles": 86186,
+      "proof_size": 85902,
+      "preprocessing_size": 1738101,
+      "num_constraints": 0,
+      "peak_memory": 3574911795
+    },
+    {
+      "system": "jolt",
+      "target": "keccak",
+      "input_size": 128,
+      "proof_duration": 2239943117,
+      "verify_duration": 250868917,
+      "cycles": 34548,
+      "proof_size": 85406,
+      "preprocessing_size": 1738101,
+      "num_constraints": 0,
+      "peak_memory": 3523528294
+    },
+    {
+      "system": "jolt",
+      "target": "keccak",
+      "input_size": 2048,
+      "proof_duration": 3696457650,
+      "verify_duration": 257607079,
+      "cycles": 153136,
+      "proof_size": 88926,
+      "preprocessing_size": 1738101,
+      "num_constraints": 0,
+      "peak_memory": 3553107968
+    },
+    {
+      "system": "jolt",
+      "target": "keccak",
+      "input_size": 256,
+      "proof_duration": 2329293962,
+      "verify_duration": 250236171,
+      "cycles": 41046,
+      "proof_size": 85406,
+      "preprocessing_size": 1738101,
+      "num_constraints": 0,
+      "peak_memory": 3567529164
+    },
+    {
+      "system": "jolt",
+      "target": "keccak",
+      "input_size": 512,
+      "proof_duration": 2496694992,
+      "verify_duration": 251191129,
+      "cycles": 55454,
+      "proof_size": 85406,
+      "preprocessing_size": 1738101,
+      "num_constraints": 0,
+      "peak_memory": 3560975564
+    },
+    {
+      "system": "jolt",
+      "target": "sha256",
+      "input_size": 1024,
+      "proof_duration": 3580207042,
+      "verify_duration": 258881916,
+      "cycles": 131142,
+      "proof_size": 88926,
+      "preprocessing_size": 1737173,
+      "num_constraints": 0,
+      "peak_memory": 3563469209
+    },
+    {
+      "system": "jolt",
+      "target": "sha256",
+      "input_size": 128,
+      "proof_duration": 2353640908,
+      "verify_duration": 250541392,
+      "cycles": 44936,
+      "proof_size": 85406,
+      "preprocessing_size": 1737173,
+      "num_constraints": 0,
+      "peak_memory": 3499358617
+    },
+    {
+      "system": "jolt",
+      "target": "sha256",
+      "input_size": 2048,
+      "proof_duration": 4198514675,
+      "verify_duration": 258273167,
+      "cycles": 237740,
+      "proof_size": 88926,
+      "preprocessing_size": 1737173,
+      "num_constraints": 0,
+      "peak_memory": 3584768409
+    },
+    {
+      "system": "jolt",
+      "target": "sha256",
+      "input_size": 256,
+      "proof_duration": 2499642488,
+      "verify_duration": 251759800,
+      "cycles": 56290,
+      "proof_size": 85406,
+      "preprocessing_size": 1737173,
+      "num_constraints": 0,
+      "peak_memory": 3553902592
+    },
+    {
+      "system": "jolt",
+      "target": "sha256",
+      "input_size": 512,
+      "proof_duration": 3000527650,
+      "verify_duration": 251695233,
+      "cycles": 80602,
+      "proof_size": 85902,
+      "preprocessing_size": 1737173,
+      "num_constraints": 0,
+      "peak_memory": 3558921011
     }
   ]
 }
