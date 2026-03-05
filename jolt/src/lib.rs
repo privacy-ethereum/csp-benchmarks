@@ -54,7 +54,7 @@ pub fn jolt_bench_properties() -> BenchProperties {
         "Twist & Shout",
         Some("Dory"),
         "Jolt",
-        false,
+        true,
         true,
         128,
         false,
