@@ -827,7 +827,7 @@ dependencies = [
  "ark-poly 0.5.0 (git+https://github.com/a16z/arkworks-algebra?branch=dev%2Ftwist-shout)",
  "ark-serialize 0.5.0",
  "ark-std 0.5.0",
- "educe 0.6.0",
+ "educe",
  "fnv",
  "hashbrown 0.15.5",
  "itertools 0.13.0",
@@ -888,7 +888,7 @@ dependencies = [
  "ark-std 0.5.0",
  "arrayvec",
  "digest 0.10.7",
- "educe 0.6.0",
+ "educe",
  "itertools 0.13.0",
  "num-bigint 0.4.6",
  "num-traits",
@@ -1025,7 +1025,7 @@ dependencies = [
  "ark-ff 0.5.0",
  "ark-serialize 0.5.0",
  "ark-std 0.5.0",
- "educe 0.6.0",
+ "educe",
  "fnv",
  "hashbrown 0.15.5",
  "rayon",
@@ -1040,7 +1040,7 @@ dependencies = [
  "ark-ff 0.5.0",
  "ark-serialize 0.5.0",
  "ark-std 0.5.0",
- "educe 0.6.0",
+ "educe",
  "fnv",
  "hashbrown 0.15.5",
 ]
@@ -1055,7 +1055,7 @@ dependencies = [
  "ark-ff 0.5.0",
  "ark-relations",
  "ark-std 0.5.0",
- "educe 0.6.0",
+ "educe",
  "num-bigint 0.4.6",
  "num-integer",
  "num-traits",
@@ -1880,18 +1880,6 @@ checksum = "73cfa06eb56d71f2bb1874b101a50c3ba29fcf3ff7dd8de274e473929459863b"
 dependencies = [
  "quote",
  "syn 2.0.114",
-]
-
-[[package]]
-name = "bigdecimal"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6773ddc0eafc0e509fb60e48dff7f450f8e674a0686ae8605e8d9901bd5eefa"
-dependencies = [
- "num-bigint 0.4.6",
- "num-integer",
- "num-traits",
- "serde",
 ]
 
 [[package]]
@@ -3076,17 +3064,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "comfy-table"
-version = "7.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "958c5d6ecf1f214b4c2bbbbf6ab9523a864bd136dcf71a7e8904799acfe1ad47"
-dependencies = [
- "crossterm",
- "unicode-segmentation",
- "unicode-width 0.2.2",
-]
-
-[[package]]
 name = "common"
 version = "0.2.0"
 source = "git+https://github.com/a16z/jolt.git?rev=6dcd401#6dcd401375efbf1a0e70079088745bacd55d4e88"
@@ -3431,29 +3408,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "crossterm"
-version = "0.29.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d8b9f2e4c67f833b660cdb0a3523065869fb35570177239812ed4c905aeff87b"
-dependencies = [
- "bitflags 2.10.0",
- "crossterm_winapi",
- "document-features",
- "parking_lot",
- "rustix 1.1.3",
- "winapi",
-]
-
-[[package]]
-name = "crossterm_winapi"
-version = "0.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "acdd7c62a3665c7f6830a51635d9ac9b23ed385797f70a83bb8bafe9c572ab2b"
-dependencies = [
- "winapi",
-]
-
-[[package]]
 name = "crunchy"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3772,15 +3726,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d7a1e2f27636f116493b8b860f5546edb47c8d8f8ea73e1d2a20be88e28d1fea"
 
 [[package]]
-name = "debug-utils"
-version = "0.0.1"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
-dependencies = [
- "comfy-table",
- "stwo",
-]
-
-[[package]]
 name = "der"
 version = "0.7.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4042,15 +3987,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ccf673e0848ef09fa4aeeba78e681cf651c0c7d35f76ee38cec8e55bc32fa111"
 
 [[package]]
-name = "document-features"
-version = "0.2.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d4b8a88685455ed29a21542a33abd9cb6510b6b129abadabdcef0f4c55bc8f61"
-dependencies = [
- "litrs",
-]
-
-[[package]]
 name = "dory-derive"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4138,18 +4074,6 @@ dependencies = [
  "sha2",
  "subtle",
  "zeroize",
-]
-
-[[package]]
-name = "educe"
-version = "0.5.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e4bd92664bf78c4d3dba9b7cdafce6fa15b13ed3ed16175218196942e99168a8"
-dependencies = [
- "enum-ordinalize",
- "proc-macro2",
- "quote",
- "syn 2.0.114",
 ]
 
 [[package]]
@@ -5103,17 +5027,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0cc23270f6e1808e30a928bdc84dea0b9b4136a8bc82338574f23baf47bbd280"
 
 [[package]]
-name = "goblin"
-version = "0.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "daa0a64d21a7eb230583b4c5f4e23b7e4e57974f96620f42a7e75e08ae66d745"
-dependencies = [
- "log",
- "plain",
- "scroll",
-]
-
-[[package]]
 name = "goldilocks"
 version = "0.1.0"
 source = "git+https://github.com/PolyhedraZK/Expander?branch=main#b5af4a89036f16b4fc62157c8cc071123afdaaa6"
@@ -5148,18 +5061,6 @@ dependencies = [
  "rand_core 0.6.4",
  "rand_xorshift 0.3.0",
  "subtle",
-]
-
-[[package]]
-name = "guest-lib"
-version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
-dependencies = [
- "k256",
- "postcard",
- "serde",
- "sha2",
- "sha3",
 ]
 
 [[package]]
@@ -5423,8 +5324,6 @@ version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
 dependencies = [
- "allocator-api2",
- "equivalent",
  "foldhash 0.2.0",
  "serde",
  "serde_core",
@@ -5976,7 +5875,6 @@ checksum = "7714e70437a7dc3ac8eb7e6f8df75fd8eb422675fc7678aff7364301092b1017"
 dependencies = [
  "equivalent",
  "hashbrown 0.16.1",
- "rayon",
  "serde",
  "serde_core",
 ]
@@ -6638,12 +6536,6 @@ name = "litemap"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6373607a59f0be73a39b6fe456b8192fcc3585f602af20751600e974dd455e77"
-
-[[package]]
-name = "litrs"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11d3d7f243d5c5a8b9bb5d6dd2b1602c0cb0b9db1621bafc7ed66e35ff9fe092"
 
 [[package]]
 name = "lock_api"
@@ -9776,12 +9668,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7edddbd0b52d732b21ad9a5fab5c704c14cd949e5e9a1ec5929a24fded1b904c"
 
 [[package]]
-name = "plain"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
-
-[[package]]
 name = "plonky2"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10366,31 +10252,6 @@ dependencies = [
  "spongefish",
  "tracing",
  "whir",
-]
-
-[[package]]
-name = "prover"
-version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
-dependencies = [
- "bytemuck",
- "debug-utils",
- "itertools 0.13.0",
- "num-traits",
- "paste",
- "postcard",
- "rayon",
- "runner",
- "serde",
- "serde_json",
- "simd",
- "stwo",
- "stwo-constraint-framework",
- "stwo-macros",
- "test-log",
- "thiserror 2.0.18",
- "tracing",
- "tracing-subscriber 0.3.22",
 ]
 
 [[package]]
@@ -11226,25 +11087,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48fd7bd8a6377e15ad9d42a8ec25371b94ddc67abe7c8b9127bec79bebaaae18"
 
 [[package]]
-name = "runner"
-version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
-dependencies = [
- "clap",
- "debug-utils",
- "goblin",
- "itertools 0.13.0",
- "rustc-hash 2.1.1",
- "simd",
- "stwo",
- "stwo-constraint-framework",
- "stwo-macros",
- "thiserror 2.0.18",
- "tracing",
- "tracing-subscriber 0.3.22",
-]
-
-[[package]]
 name = "rust-embed"
 version = "8.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -11670,26 +11512,6 @@ name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
-
-[[package]]
-name = "scroll"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ab8598aa408498679922eff7fa985c25d58a90771bd6be794434c5277eab1a6"
-dependencies = [
- "scroll_derive",
-]
-
-[[package]]
-name = "scroll_derive"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1783eabc414609e28a5ba76aee5ddd52199f7107a0b24c2e9746a1ecc34a683d"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.114",
-]
 
 [[package]]
 name = "sct"
@@ -12157,14 +11979,6 @@ checksum = "77549399552de45a898a580c1b41d445bf730df867cc44e6c0233bbc4b8329de"
 dependencies = [
  "digest 0.10.7",
  "rand_core 0.6.4",
-]
-
-[[package]]
-name = "simd"
-version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
-dependencies = [
- "stwo",
 ]
 
 [[package]]
@@ -12891,98 +12705,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
 
 [[package]]
-name = "stark-v"
-version = "0.1.0"
-dependencies = [
- "bincode 1.3.3",
- "clap",
- "criterion",
- "ere-zkvm-interface",
- "stark-v-sdk",
- "utils 0.1.0",
-]
-
-[[package]]
-name = "stark-v-sdk"
-version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
-dependencies = [
- "anyhow",
- "cargo_metadata 0.19.2",
- "ere-zkvm-interface",
- "guest-lib",
- "postcard",
- "prover",
- "runner",
- "serde",
- "stwo",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "starknet-crypto"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2e2c30c01e8eb0fc913c4ee3cf676389fffc1d1182bfe5bb9670e4e72e968064"
-dependencies = [
- "crypto-bigint",
- "hex",
- "hmac",
- "num-bigint 0.4.6",
- "num-integer",
- "num-traits",
- "rfc6979",
- "sha2",
- "starknet-crypto-codegen",
- "starknet-curve",
- "starknet-ff",
- "zeroize",
-]
-
-[[package]]
-name = "starknet-crypto-codegen"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbc159a1934c7be9761c237333a57febe060ace2bc9e3b337a59a37af206d19f"
-dependencies = [
- "starknet-curve",
- "starknet-ff",
- "syn 2.0.114",
-]
-
-[[package]]
-name = "starknet-curve"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d1c383518bb312751e4be80f53e8644034aa99a0afb29d7ac41b89a997db875b"
-dependencies = [
- "starknet-ff",
-]
-
-[[package]]
-name = "starknet-ff"
-version = "0.3.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7abf1b44ec5b18d87c1ae5f54590ca9d0699ef4dd5b2ffa66fc97f24613ec585"
-dependencies = [
- "ark-ff 0.4.2",
- "bigdecimal",
- "crypto-bigint",
- "getrandom 0.2.17",
- "hex",
- "serde",
-]
-
-[[package]]
 name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
-
-[[package]]
-name = "std-shims"
-version = "1.0.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
 
 [[package]]
 name = "strength_reduce"
@@ -13077,79 +12803,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.114",
-]
-
-[[package]]
-name = "stwo"
-version = "2.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
-dependencies = [
- "blake2",
- "blake3",
- "bytemuck",
- "cfg-if",
- "dashmap",
- "educe 0.5.11",
- "fnv",
- "hashbrown 0.16.1",
- "hex",
- "indexmap 2.13.0",
- "itertools 0.13.0",
- "num-traits",
- "rand 0.8.5",
- "rayon",
- "serde",
- "starknet-crypto",
- "starknet-ff",
- "stwo-std-shims",
- "stwo-types",
- "thiserror 2.0.18",
- "tracing",
- "tracing-subscriber 0.3.22",
-]
-
-[[package]]
-name = "stwo-constraint-framework"
-version = "2.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
-dependencies = [
- "hashbrown 0.16.1",
- "itertools 0.13.0",
- "num-traits",
- "rand 0.8.5",
- "rayon",
- "stwo",
- "stwo-std-shims",
- "tracing",
-]
-
-[[package]]
-name = "stwo-macros"
-version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.114",
-]
-
-[[package]]
-name = "stwo-std-shims"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c21e2c707fb8926e6c4355a87494c29e8e46640ff4796aa8fbb74952327dfdc"
-
-[[package]]
-name = "stwo-types"
-version = "2.0.1"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
-dependencies = [
- "bytemuck",
- "num-traits",
- "rand 0.8.5",
- "rayon",
- "serde",
- "std-shims",
 ]
 
 [[package]]
@@ -13435,28 +13088,6 @@ checksum = "21bebf2b7c9e0a515f6e0f8c51dc0f8e4696391e6f1ff30379559f8365fb0df7"
 dependencies = [
  "rustix 0.38.44",
  "windows-sys 0.48.0",
-]
-
-[[package]]
-name = "test-log"
-version = "0.2.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "37d53ac171c92a39e4769491c4b4dde7022c60042254b5fc044ae409d34a24d4"
-dependencies = [
- "env_logger 0.11.8",
- "test-log-macros",
- "tracing-subscriber 0.3.22",
-]
-
-[[package]]
-name = "test-log-macros"
-version = "0.2.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be35209fd0781c5401458ab66e4f98accf63553e8fae7425503e92fdd319783b"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.114",
 ]
 
 [[package]]
