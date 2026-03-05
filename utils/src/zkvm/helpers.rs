@@ -109,10 +109,13 @@ fn newest_guest_source_mtime(path: &std::path::Path) -> Option<SystemTime> {
             continue;
         }
 
-        if let Ok(metadata) = entry.metadata()
-            && let Ok(modified) = metadata.modified()
-        {
-            newest = Some(newest.map_or(modified, |t: SystemTime| t.max(modified)));
+        // Keep this as nested `if let` instead of let-chains (`if let ... && let ...`):
+        // Nexus builds with nightly-2025-04-06, where let-chains in this position are
+        // still unstable and fail CI with E0658.
+        if let Ok(metadata) = entry.metadata() {
+            if let Ok(modified) = metadata.modified() {
+                newest = Some(newest.map_or(modified, |t: SystemTime| t.max(modified)));
+            }
         }
     }
 
