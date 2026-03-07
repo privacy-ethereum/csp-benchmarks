@@ -4,10 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ere-platform-jolt = { git = "https://github.com/eth-act/ere", rev = "66c516a24d9c3549f76b84f72365ab544299e63a", features = ["guest-std"] }
-jolt-inlines-sha2 = { git = "https://github.com/a16z/jolt", rev = "6dcd401" }
+ere-platform-jolt = { path = "../../../../ere/crates/zkvm/jolt/platform", default-features = false }
+jolt-inlines-sha2 = { git = "https://github.com/a16z/jolt", rev = "2e05fe88" }
 
 [features]
 guest = []
 
 [workspace]
+
+[patch.crates-io]
+allocative = { git = "https://github.com/facebookexperimental/allocative", rev = "85b773d85d526d068ce94724ff7a7b81203fc95e" }
+ark-ff = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }
+ark-ec = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }
+ark-serialize = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }
+ark-bn254 = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }

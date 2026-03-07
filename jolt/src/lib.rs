@@ -1,8 +1,20 @@
 use ere_jolt::{EreJolt, compiler::RustRv64imacCustomized};
 use ere_zkvm_interface::{Input, ProverResource};
 use serde::Serialize;
+use std::env;
 use utils::harness::{AuditStatus, BenchProperties};
 use utils::zkvm::{CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedSha256};
+
+// SAFETY: called once before single-threaded JoltSdk construction
+fn set_jolt_config(max_trace_length: u64, stack_size: u64, heap_size: u64) {
+    unsafe {
+        env::set_var("JOLT_MAX_TRACE_LENGTH", max_trace_length.to_string());
+        env::set_var("JOLT_STACK_SIZE", stack_size.to_string());
+        env::set_var("JOLT_HEAP_SIZE", heap_size.to_string());
+        env::set_var("JOLT_MAX_INPUT_SIZE", "4096");
+        env::set_var("JOLT_MAX_OUTPUT_SIZE", "4096");
+    }
+}
 
 pub use utils::zkvm::{
     execution_cycles, preprocessing_size, proof_size, prove, prove_ecdsa, prove_sha256,
@@ -38,6 +50,7 @@ pub fn prepare_sha256(
     input_size: usize,
     program: &CompiledProgram<RustRv64imacCustomized>,
 ) -> PreparedSha256<EreJolt> {
+    set_jolt_config(65536, 4096, 32768);
     let vm = EreJolt::new(program.program.clone(), ProverResource::Cpu)
         .expect("jolt prover build failed");
 
@@ -51,6 +64,7 @@ pub fn prepare_keccak(
     input_size: usize,
     program: &CompiledProgram<RustRv64imacCustomized>,
 ) -> PreparedKeccak<EreJolt> {
+    set_jolt_config(65536, 4096, 32768);
     let vm = EreJolt::new(program.program.clone(), ProverResource::Cpu)
         .expect("jolt prover build failed");
 
@@ -64,6 +78,7 @@ pub fn prepare_ecdsa(
     _input_size: usize,
     program: &CompiledProgram<RustRv64imacCustomized>,
 ) -> PreparedEcdsa<EreJolt> {
+    set_jolt_config(262144, 4096, 32768);
     let vm = EreJolt::new(program.program.clone(), ProverResource::Cpu)
         .expect("jolt prover build failed");
 
