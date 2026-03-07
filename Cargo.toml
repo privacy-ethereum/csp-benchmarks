@@ -21,7 +21,7 @@ anyhow = "1.0"
 bincode = "1.3"
 clap = { version = "4.5", features = ["derive", "env"] }
 criterion = "0.5"
-ere-zkvm-interface = { path = "../ere/crates/zkvm-interface" }
+ere-zkvm-interface = { git = "https://github.com/0xAndoroid/ere", rev = "de078c2" }
 env_logger = "0.10"
 hex = "0.4"
 itertools = "0.13"

@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ere-platform-jolt = { path = "../../../../ere/crates/zkvm/jolt/platform", default-features = false }
+ere-platform-jolt = { git = "https://github.com/0xAndoroid/ere", rev = "de078c2", default-features = false }
 jolt-inlines-sha2 = { git = "https://github.com/a16z/jolt", rev = "2e05fe88" }
 
 [features]

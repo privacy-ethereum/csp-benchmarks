@@ -4282,6 +4282,7 @@ dependencies = [
 [[package]]
 name = "ere-build-utils"
 version = "0.3.0"
+source = "git+https://github.com/0xAndoroid/ere?rev=de078c2#de078c2b525fff6f6c8463df7e7403c8ac414f8b"
 dependencies = [
  "cargo_metadata 0.19.2",
 ]
@@ -4300,6 +4301,7 @@ dependencies = [
 [[package]]
 name = "ere-compile-utils"
 version = "0.3.0"
+source = "git+https://github.com/0xAndoroid/ere?rev=de078c2#de078c2b525fff6f6c8463df7e7403c8ac414f8b"
 dependencies = [
  "anyhow",
  "cargo_metadata 0.19.2",
@@ -4310,6 +4312,7 @@ dependencies = [
 [[package]]
 name = "ere-jolt"
 version = "0.3.0"
+source = "git+https://github.com/0xAndoroid/ere?rev=de078c2#de078c2b525fff6f6c8463df7e7403c8ac414f8b"
 dependencies = [
  "anyhow",
  "ark-serialize 0.5.0",
@@ -4419,6 +4422,7 @@ dependencies = [
 [[package]]
 name = "ere-zkvm-interface"
 version = "0.3.0"
+source = "git+https://github.com/0xAndoroid/ere?rev=de078c2#de078c2b525fff6f6c8463df7e7403c8ac414f8b"
 dependencies = [
  "anyhow",
  "auto_impl",
