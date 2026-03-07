@@ -89,6 +89,7 @@ dependencies = [
 [[package]]
 name = "common"
 version = "0.2.0"
+source = "git+https://github.com/a16z/jolt?rev=2e05fe88#2e05fe883920054df2ee3a6df8f85c2caba77c99"
 dependencies = [
  "allocative",
  "ark-serialize",
@@ -152,6 +153,7 @@ checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
 [[package]]
 name = "ere-platform-jolt"
 version = "0.3.0"
+source = "git+https://github.com/0xAndoroid/ere?rev=de078c2#de078c2b525fff6f6c8463df7e7403c8ac414f8b"
 dependencies = [
  "common",
  "ere-platform-trait",
@@ -162,6 +164,7 @@ dependencies = [
 [[package]]
 name = "ere-platform-trait"
 version = "0.3.0"
+source = "git+https://github.com/0xAndoroid/ere?rev=de078c2#de078c2b525fff6f6c8463df7e7403c8ac414f8b"
 dependencies = [
  "digest",
 ]
@@ -179,6 +182,7 @@ dependencies = [
 [[package]]
 name = "jolt-inlines-keccak256"
 version = "0.1.0"
+source = "git+https://github.com/a16z/jolt?rev=2e05fe88#2e05fe883920054df2ee3a6df8f85c2caba77c99"
 
 [[package]]
 name = "jolt-keccak"
@@ -191,12 +195,12 @@ dependencies = [
 [[package]]
 name = "jolt-platform"
 version = "0.1.0"
-source = "git+https://github.com/a16z/jolt.git?rev=cddd96fe#cddd96fe4991d33554f5a6f9001b9ffd1bb85321"
+source = "git+https://github.com/a16z/jolt?rev=2e05fe88#2e05fe883920054df2ee3a6df8f85c2caba77c99"
 
 [[package]]
 name = "jolt-sdk"
 version = "0.1.0"
-source = "git+https://github.com/a16z/jolt.git?rev=cddd96fe#cddd96fe4991d33554f5a6f9001b9ffd1bb85321"
+source = "git+https://github.com/a16z/jolt?rev=2e05fe88#2e05fe883920054df2ee3a6df8f85c2caba77c99"
 dependencies = [
  "bytemuck",
  "cfg-if",
@@ -211,7 +215,7 @@ dependencies = [
 [[package]]
 name = "jolt-sdk-macros"
 version = "0.1.0"
-source = "git+https://github.com/a16z/jolt.git?rev=cddd96fe#cddd96fe4991d33554f5a6f9001b9ffd1bb85321"
+source = "git+https://github.com/a16z/jolt?rev=2e05fe88#2e05fe883920054df2ee3a6df8f85c2caba77c99"
 dependencies = [
  "common",
  "proc-macro2",
@@ -604,18 +608,3 @@ dependencies = [
  "zeroos-foundation",
  "zeroos-macros",
 ]
-
-[[patch.unused]]
-name = "ark-bn254"
-version = "0.5.0"
-source = "git+https://github.com/a16z/arkworks-algebra?branch=dev%2Ftwist-shout#76bb3a4518928f1ff7f15875f940d614bb9845e6"
-
-[[patch.unused]]
-name = "ark-ec"
-version = "0.5.0"
-source = "git+https://github.com/a16z/arkworks-algebra?branch=dev%2Ftwist-shout#76bb3a4518928f1ff7f15875f940d614bb9845e6"
-
-[[patch.unused]]
-name = "ark-ff"
-version = "0.5.0"
-source = "git+https://github.com/a16z/arkworks-algebra?branch=dev%2Ftwist-shout#76bb3a4518928f1ff7f15875f940d614bb9845e6"

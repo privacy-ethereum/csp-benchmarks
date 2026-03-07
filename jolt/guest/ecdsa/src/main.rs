@@ -3,11 +3,21 @@
 
 extern crate alloc;
 
-use ere_platform_jolt::{jolt, DefaultJoltMemoryConfig, JoltPlatform, Platform};
+use ere_platform_jolt::{jolt, JoltMemoryConfig, JoltPlatform, Platform};
 use jolt_inlines_secp256k1::{ecdsa_verify, Secp256k1Fr, Secp256k1Point};
 use serde::Deserialize;
 
-type Plat = JoltPlatform<DefaultJoltMemoryConfig>;
+struct BenchConfig;
+impl JoltMemoryConfig for BenchConfig {
+    const MAX_INPUT_SIZE: u64 = 4096;
+    const MAX_TRUSTED_ADVICE_SIZE: u64 = 4096;
+    const MAX_UNTRUSTED_ADVICE_SIZE: u64 = 4096;
+    const MAX_OUTPUT_SIZE: u64 = 4096;
+    const STACK_SIZE: u64 = 4096;
+    const HEAP_SIZE: u64 = 32768;
+}
+
+type Plat = JoltPlatform<BenchConfig>;
 
 #[derive(Deserialize)]
 struct EcdsaInput {

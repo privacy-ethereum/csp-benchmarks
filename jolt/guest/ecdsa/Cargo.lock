@@ -191,6 +191,7 @@ dependencies = [
 [[package]]
 name = "common"
 version = "0.2.0"
+source = "git+https://github.com/a16z/jolt?rev=2e05fe88#2e05fe883920054df2ee3a6df8f85c2caba77c99"
 dependencies = [
  "allocative",
  "ark-serialize",
@@ -292,6 +293,7 @@ dependencies = [
 [[package]]
 name = "ere-platform-jolt"
 version = "0.3.0"
+source = "git+https://github.com/0xAndoroid/ere?rev=de078c2#de078c2b525fff6f6c8463df7e7403c8ac414f8b"
 dependencies = [
  "common",
  "ere-platform-trait",
@@ -302,6 +304,7 @@ dependencies = [
 [[package]]
 name = "ere-platform-trait"
 version = "0.3.0"
+source = "git+https://github.com/0xAndoroid/ere?rev=de078c2#de078c2b525fff6f6c8463df7e7403c8ac414f8b"
 dependencies = [
  "digest",
 ]
@@ -353,6 +356,7 @@ dependencies = [
 [[package]]
 name = "jolt-inlines-secp256k1"
 version = "0.1.0"
+source = "git+https://github.com/a16z/jolt?rev=2e05fe88#2e05fe883920054df2ee3a6df8f85c2caba77c99"
 dependencies = [
  "ark-ff",
  "ark-secp256k1",
@@ -364,12 +368,12 @@ dependencies = [
 [[package]]
 name = "jolt-platform"
 version = "0.1.0"
-source = "git+https://github.com/a16z/jolt.git?rev=cddd96fe#cddd96fe4991d33554f5a6f9001b9ffd1bb85321"
+source = "git+https://github.com/a16z/jolt?rev=2e05fe88#2e05fe883920054df2ee3a6df8f85c2caba77c99"
 
 [[package]]
 name = "jolt-sdk"
 version = "0.1.0"
-source = "git+https://github.com/a16z/jolt.git?rev=cddd96fe#cddd96fe4991d33554f5a6f9001b9ffd1bb85321"
+source = "git+https://github.com/a16z/jolt?rev=2e05fe88#2e05fe883920054df2ee3a6df8f85c2caba77c99"
 dependencies = [
  "bytemuck",
  "cfg-if",
@@ -384,7 +388,7 @@ dependencies = [
 [[package]]
 name = "jolt-sdk-macros"
 version = "0.1.0"
-source = "git+https://github.com/a16z/jolt.git?rev=cddd96fe#cddd96fe4991d33554f5a6f9001b9ffd1bb85321"
+source = "git+https://github.com/a16z/jolt?rev=2e05fe88#2e05fe883920054df2ee3a6df8f85c2caba77c99"
 dependencies = [
  "common",
  "proc-macro2",
@@ -803,8 +807,3 @@ dependencies = [
  "zeroos-foundation",
  "zeroos-macros",
 ]
-
-[[patch.unused]]
-name = "ark-bn254"
-version = "0.5.0"
-source = "git+https://github.com/a16z/arkworks-algebra?branch=dev%2Ftwist-shout#76bb3a4518928f1ff7f15875f940d614bb9845e6"

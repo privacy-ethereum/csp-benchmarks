@@ -3,10 +3,20 @@
 
 extern crate alloc;
 
-use ere_platform_jolt::{jolt, DefaultJoltMemoryConfig, JoltPlatform, Platform};
+use ere_platform_jolt::{jolt, JoltMemoryConfig, JoltPlatform, Platform};
 use jolt_inlines_sha2::Sha256;
 
-type Plat = JoltPlatform<DefaultJoltMemoryConfig>;
+struct BenchConfig;
+impl JoltMemoryConfig for BenchConfig {
+    const MAX_INPUT_SIZE: u64 = 4096;
+    const MAX_TRUSTED_ADVICE_SIZE: u64 = 4096;
+    const MAX_UNTRUSTED_ADVICE_SIZE: u64 = 4096;
+    const MAX_OUTPUT_SIZE: u64 = 4096;
+    const STACK_SIZE: u64 = 4096;
+    const HEAP_SIZE: u64 = 32768;
+}
+
+type Plat = JoltPlatform<BenchConfig>;
 
 #[jolt::provable(guest_only)]
 fn main() {
