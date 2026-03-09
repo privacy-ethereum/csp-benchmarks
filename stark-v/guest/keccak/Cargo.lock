@@ -190,7 +190,7 @@ dependencies = [
 [[package]]
 name = "guest-bin"
 version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
+source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=740812dfb29bfd05e24c9e8b1ad6b211ac1b564e#740812dfb29bfd05e24c9e8b1ad6b211ac1b564e"
 dependencies = [
  "guest-lib",
  "postcard",
@@ -200,7 +200,7 @@ dependencies = [
 [[package]]
 name = "guest-lib"
 version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=6cea4701ed6024dbe990573f5fbfd7f7616fd788#6cea4701ed6024dbe990573f5fbfd7f7616fd788"
+source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=740812dfb29bfd05e24c9e8b1ad6b211ac1b564e#740812dfb29bfd05e24c9e8b1ad6b211ac1b564e"
 dependencies = [
  "k256",
  "postcard",
