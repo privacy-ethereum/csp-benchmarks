@@ -2,7 +2,7 @@
 
 use bincode::Options;
 use ere_zkvm_interface::{zkVM, Compiler, Input, Proof, ProofKind};
-use stark_v_sdk::{StarkV, StarkVCompiler, StarkVProgram};
+use stark_v_sdk::{secure_pcs_config, StarkV, StarkVCompiler, StarkVProgram};
 use std::fs;
 use std::path::PathBuf;
 use utils::harness::{AuditStatus, BenchProperties};
@@ -26,17 +26,17 @@ pub struct ProofResult {
 
 pub fn stark_v_bench_properties() -> BenchProperties {
     BenchProperties::new(
-        "STARK",
+        "Circle STARK",
         "M31",
-        "STARK",
-        Some("FRI"),
+        "Circle FRI", // https://eprint.iacr.org/2024/278.pdf
+        Some("Circle FRI"),
         "AIR",
-        false, // Not ZK
-        true,
-        96,
-        true,
-        true,
-        AuditStatus::NotAudited,
+        false,                   // Not ZK
+        true,                    // zkVM
+        96, // https://github.com/AntoineFONDEUR/stark-v/blob/740812dfb29bfd05e24c9e8b1ad6b211ac1b564e/crates/sdk/src/lib.rs#L57
+        true, // hash-based PCS
+        true, // not actively maintained
+        AuditStatus::NotAudited, // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about
         Some("RISC-V RV32IM"),
     )
 }
@@ -85,7 +85,7 @@ pub fn load_compiled(bench_name: &str) -> CompiledProgram {
 }
 
 pub fn prepare_sha256(input_size: usize, program: &CompiledProgram) -> PreparedBench {
-    let vm = StarkV::new(program.program.clone());
+    let vm = StarkV::new(program.program.clone(), secure_pcs_config());
     let (message_bytes, digest) = utils::generate_sha256_input(input_size);
     let input = build_prefixed_input(message_bytes);
     PreparedBench {
@@ -97,7 +97,7 @@ pub fn prepare_sha256(input_size: usize, program: &CompiledProgram) -> PreparedB
 }
 
 pub fn prepare_keccak(input_size: usize, program: &CompiledProgram) -> PreparedBench {
-    let vm = StarkV::new(program.program.clone());
+    let vm = StarkV::new(program.program.clone(), secure_pcs_config());
     let (message_bytes, digest) = utils::generate_keccak_input(input_size);
     let input = build_prefixed_input(message_bytes);
     PreparedBench {
