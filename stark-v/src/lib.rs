@@ -26,17 +26,17 @@ pub struct ProofResult {
 
 pub fn stark_v_bench_properties() -> BenchProperties {
     BenchProperties::new(
-        "STARK",
+        "Circle STARK",
         "M31",
-        "STARK",
-        Some("FRI"),
+        "Circle FRI", // https://eprint.iacr.org/2024/278.pdf
+        Some("Circle FRI"),
         "AIR",
-        false, // Not ZK
-        true,
-        96,
-        true,
-        true,
-        AuditStatus::NotAudited,
+        false,                   // Not ZK
+        true,                    // zkVM
+        96, // https://github.com/AntoineFONDEUR/stark-v/blob/740812dfb29bfd05e24c9e8b1ad6b211ac1b564e/crates/sdk/src/lib.rs#L57
+        true, // hash-based PCS
+        true, // not actively maintained
+        AuditStatus::NotAudited, // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about
         Some("RISC-V RV32IM"),
     )
 }
