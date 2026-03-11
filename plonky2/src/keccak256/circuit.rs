@@ -99,9 +99,9 @@ where
             let rot_c = c[(x + 1) % 5].rotl(1);
             d.push(c[(x + 4) % 5].xor(&rot_c, builder));
         }
-        for x in 0..5 {
+        for (x, dx) in d.iter().enumerate().take(5) {
             for y in 0..5 {
-                self.words[x + y * 5] = self.words[x + y * 5].xor(&d[x], builder);
+                self.words[x + y * 5] = self.words[x + y * 5].xor(dx, builder);
             }
         }
         // ρ and π steps
@@ -170,8 +170,12 @@ where
     // pad 0s
     let false_target = builder.constant_bool(false);
     let last_index = padded.len() - 1;
-    for i in input_len_in_bytes * 8 + 1..last_index {
-        builder.connect(padded[i].target, false_target.target);
+    for padded_bit in padded
+        .iter()
+        .take(last_index)
+        .skip(input_len_in_bytes * 8 + 1)
+    {
+        builder.connect(padded_bit.target, false_target.target);
     }
 
     // xor 0x80 = 0000 0001 with the last byte.
