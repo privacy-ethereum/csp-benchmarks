@@ -1,4 +1,4 @@
-use ere_sp1::{EreSP1, compiler::RustRv32imaCustomized};
+use ere_sp1::{EreSP1, compiler::RustRv64imaCustomized};
 use ere_zkvm_interface::ProverResource;
 use utils::zkvm::{CompiledProgram, PreparedSha256, build_input};
 
@@ -8,7 +8,7 @@ pub use utils::zkvm::{
 
 pub fn prepare_sha256(
     input_size: usize,
-    program: &CompiledProgram<RustRv32imaCustomized>,
+    program: &CompiledProgram<RustRv64imaCustomized>,
 ) -> PreparedSha256<EreSP1> {
     let vm = EreSP1::new(program.program.clone(), ProverResource::Cpu)
         .expect("failed to build sp1 prover instance");
