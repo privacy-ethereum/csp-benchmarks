@@ -40,16 +40,16 @@ where
     }
 
     pub fn set_witness(&self, bits: Vec<bool>, pw: &mut PartialWitness<F>) {
-        for i in 0..64 {
-            let _ = pw.set_bool_target(self.bits[i], bits[i]);
+        for (target, bit) in self.bits.iter().zip(bits.iter()).take(64) {
+            let _ = pw.set_bool_target(*target, *bit);
         }
     }
 
     pub fn constant(x: u64, builder: &mut CircuitBuilder<F, D>) -> Self {
         let mut result = vec![];
         let x_bits = u64_to_bits(x);
-        for i in 0..64 {
-            result.push(builder.constant_bool(x_bits[i]));
+        for bit in x_bits.iter().take(64) {
+            result.push(builder.constant_bool(*bit));
         }
         Self {
             bits: result,
@@ -84,8 +84,8 @@ where
     pub fn xor_const(&self, other: u64, builder: &mut CircuitBuilder<F, D>) -> Self {
         let other_bits = u64_to_bits(other);
         let mut result = vec![];
-        for i in 0..64 {
-            let xor_target = xor_const_circuit(self.bits[i], other_bits[i], builder);
+        for (bit, other_bit) in self.bits.iter().zip(other_bits.iter()).take(64) {
+            let xor_target = xor_const_circuit(*bit, *other_bit, builder);
             result.push(xor_target);
         }
         Self {
@@ -101,8 +101,8 @@ where
     pub fn rotl(&self, n: usize) -> Self {
         let rotate = rotate_u64(n);
         let mut output = vec![];
-        for i in 0..64 {
-            output.push(self.bits[rotate[i]]);
+        for index in rotate.iter().take(64) {
+            output.push(self.bits[*index]);
         }
 
         Self {

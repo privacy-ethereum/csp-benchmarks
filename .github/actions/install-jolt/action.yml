@@ -1,0 +1,17 @@
+name: "Install Jolt toolchain"
+description: "Installs the Jolt toolchain components required for benchmarks"
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        set -Eeuo pipefail
+
+        rustup toolchain install 1.88 --component rust-src
+        rustup target add riscv64imac-unknown-none-elf --toolchain 1.88
+
+        cargo install --git https://github.com/a16z/jolt.git \
+          --rev 6dcd401 jolt --locked --force
+
+        jolt --version

@@ -320,6 +320,10 @@ jobs:
         if: ${{ contains(matrix.crate, 'sp1') }}
         uses: ./.github/actions/install-sp1
 
+      - name: Install Jolt toolchain
+        if: ${{ contains(matrix.crate, 'jolt') }}
+        uses: ./.github/actions/install-jolt
+
       - name: Install LLVM and LLD for cairo-m
         if: ${{ contains(matrix.crate, 'cairo-m') }}
         uses: ./.github/actions/install-llvm
@@ -328,11 +332,6 @@ jobs:
         if: ${{ contains(matrix.crate, 'stark-v') }}
         run: |
           rustup target add riscv32im-unknown-none-elf
-
-      - name: Install target for Jolt
-        if: ${{ contains(matrix.crate, 'jolt') }}
-        run: |
-          rustup target add riscv64imac-unknown-none-elf
 
       - name: Build and copy excluded memory benchmark binary to workspace target
         if: ${{ contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') || contains(matrix.crate, 'rookie-numbers') || contains(matrix.crate, 'stark-v') }}

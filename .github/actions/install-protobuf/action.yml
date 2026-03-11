@@ -1,0 +1,26 @@
+name: "Install protobuf"
+description: "Installs protoc (protobuf compiler)"
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        set -Eeuo pipefail
+
+        if command -v protoc >/dev/null 2>&1; then
+          protoc --version
+          exit 0
+        fi
+
+        if command -v brew >/dev/null 2>&1; then
+          brew install protobuf
+        elif command -v apt-get >/dev/null 2>&1; then
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+        else
+          echo "protoc is required but no supported package manager was found" >&2
+          exit 1
+        fi
+
+        protoc --version

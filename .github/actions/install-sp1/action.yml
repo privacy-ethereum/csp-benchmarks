@@ -10,6 +10,8 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - uses: ./.github/actions/install-protobuf
+
     - shell: bash
       env:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
