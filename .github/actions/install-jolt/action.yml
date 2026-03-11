@@ -12,6 +12,6 @@ runs:
         rustup target add riscv64imac-unknown-none-elf --toolchain 1.88
 
         cargo install --git https://github.com/a16z/jolt.git \
-          --rev 35d46f5 jolt --locked --force
+          --rev 6dcd401 jolt --locked --force
 
         jolt --version
