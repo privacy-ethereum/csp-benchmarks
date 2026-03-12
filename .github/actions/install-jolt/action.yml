@@ -8,10 +8,10 @@ runs:
       run: |
         set -Eeuo pipefail
 
-        rustup toolchain install 1.88 --component rust-src
-        rustup target add riscv64imac-unknown-none-elf --toolchain 1.88
+        rustup toolchain install 1.94 --component rust-src
+        rustup target add riscv64imac-unknown-none-elf --toolchain 1.94
 
-        cargo install --git https://github.com/a16z/jolt.git \
-          --rev 6dcd401 jolt --locked --force
+        cargo +1.94 install --git https://github.com/a16z/jolt.git \
+          --rev 2e05fe88 jolt --locked --force
 
         jolt --version
