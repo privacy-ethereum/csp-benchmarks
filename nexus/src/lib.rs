@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 
-use ere_nexus::{EreNexus, compiler::RustRv32i};
+use ere_nexus::{compiler::RustRv32i, EreNexus};
 use ere_zkvm_interface::ProverResource;
 use utils::harness::{AuditStatus, BenchProperties};
-use utils::zkvm::{CompiledProgram, PreparedSha256, build_input};
+use utils::zkvm::{build_input, CompiledProgram, PreparedSha256};
 
 pub use utils::zkvm::{
     execution_cycles, preprocessing_size, proof_size, prove, prove_sha256, verify_sha256,
@@ -17,7 +17,7 @@ pub const NEXUS_PROPS: BenchProperties = BenchProperties {
     arithm: Cow::Borrowed("AIR"),      // https://specification.nexus.xyz/
     is_zk: false,                      // Based on STWO which is currently not ZK
     is_zkvm: true,
-    security_bits: 0, // TODO: https://github.com/privacy-ethereum/csp-benchmarks/issues/147
+    security_bits: 8, // https://github.com/privacy-ethereum/csp-benchmarks/issues/147
     is_pq: true,      // hash-based PCS
     is_maintained: true, // https://github.com/nexus-xyz/nexus-zkvm/releases
     is_audited: AuditStatus::NotAudited, // https://github.com/nexus-xyz/nexus-zkvm

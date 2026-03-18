@@ -2,6 +2,10 @@
 
 Howdy! Usual good software engineering practices apply. Write comments. If your codebase is written in Rust, follow standard Rust coding practices where possible, and use `cargo fmt` and `cargo clippy` to tidy up formatting.
 
+## Benchmark Eligibility
+
+- To keep benchmarks meaningful for practical deployments, we only include systems with at least 96 bits of security.
+
 ## What's Expected in the Contribution/PR
 
 Depending on whether your codebase is written in Rust or not, you should follow the corresponding instructions below.
