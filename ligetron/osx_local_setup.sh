@@ -4,7 +4,8 @@ set -euo pipefail
 # ================================
 # Ligetron macOS end-to-end setup
 # ================================
-# - Installs Homebrew deps (cmake, gmp, mpfr, libomp, llvm, boost, nlohmann-json, wabt)
+# - Installs Homebrew deps (cmake, gmp, mpfr, libomp, llvm, boost, nlohmann-json)
+# - Installs pinned WABT release (1.0.39) on macOS arm64
 # - Builds Dawn (WebGPU)
 # - Installs Emscripten (emsdk)
 # - Builds Ligetron SDK (emscripten)
@@ -42,6 +43,7 @@ ROOT_DIR="$(pwd)"
 TP_DIR="${ROOT_DIR}/third_party"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+WABT_VERSION="1.0.39"
 mkdir -p "${TP_DIR}"
 
 if [[ "${REINSTALL}" == "1" ]]; then
@@ -61,8 +63,28 @@ fi
 
 step "Installing build dependencies via Homebrew"
 brew update
-brew install cmake gmp mpfr libomp llvm boost nlohmann-json wabt
+brew install cmake gmp mpfr libomp llvm boost nlohmann-json
 ok "Homebrew deps installed"
+
+step "Installing pinned WABT ${WABT_VERSION}"
+ARCH="$(uname -m)"
+if [[ "$ARCH" == "arm64" ]]; then
+  WABT_DIR="${TP_DIR}/wabt-${WABT_VERSION}"
+  if [[ ! -x "${WABT_DIR}/bin/wat2wasm" ]] || [[ "$("${WABT_DIR}/bin/wat2wasm" --version 2>/dev/null || true)" != "${WABT_VERSION}" ]]; then
+    TMPDIR="$(mktemp -d)"
+    trap 'rm -rf "$TMPDIR"' EXIT
+    URL="https://github.com/WebAssembly/wabt/releases/download/${WABT_VERSION}/wabt-${WABT_VERSION}-macos-arm64.tar.gz"
+    curl -fsSL "$URL" -o "$TMPDIR/wabt.tar.gz"
+    rm -rf "${WABT_DIR}"
+    mkdir -p "${WABT_DIR}"
+    tar -xzf "$TMPDIR/wabt.tar.gz" --strip-components=1 -C "${WABT_DIR}"
+  fi
+  export PATH="${WABT_DIR}/bin:${PATH}"
+  ok "Pinned WABT installed (${WABT_VERSION})"
+else
+  warn "No pinned macOS WABT binary for architecture '${ARCH}'. Falling back to Homebrew wabt."
+  brew list --versions wabt >/dev/null 2>&1 || brew install wabt
+fi
 
 # Prefer Xcode clang; if you want brew llvm, uncomment exports below.
 export CC="${CC:-clang}"
@@ -121,18 +143,47 @@ ok "emsdk ready (emcmake available)"
 # -----------------------
 LIGETRON_DIR="${SCRIPT_DIR}/ligero-prover"
 
-if [[ ! -d "${LIGETRON_DIR}" ]]; then
-  step "Ligetron submodule not found; initializing"
+if [[ ! -f "${LIGETRON_DIR}/CMakeLists.txt" ]]; then
+  step "Ligetron submodule missing or incomplete; initializing/updating"
   git -C "${REPO_ROOT}" submodule update --init --recursive ligetron/ligero-prover || {
     warn "Failed to init submodule. Run: git submodule update --init --recursive"; exit 1; }
 fi
-ok "Ligetron submodule ready"
+
+if [[ ! -f "${LIGETRON_DIR}/CMakeLists.txt" ]]; then
+  warn "Ligetron submodule still missing expected files at ${LIGETRON_DIR}."
+  warn "Run: git -C ${REPO_ROOT} submodule update --init --recursive ligetron/ligero-prover"
+  exit 1
+fi
+
+SDK_DIR=""
+if [[ -f "${LIGETRON_DIR}/sdk/cpp/CMakeLists.txt" ]]; then
+  SDK_DIR="${LIGETRON_DIR}/sdk/cpp"
+elif [[ -f "${LIGETRON_DIR}/sdk/CMakeLists.txt" ]]; then
+  SDK_DIR="${LIGETRON_DIR}/sdk"
+elif [[ -f "${LIGETRON_DIR}/cpp/CMakeLists.txt" ]]; then
+  SDK_DIR="${LIGETRON_DIR}/cpp"
+else
+  warn "Could not find Ligetron SDK CMakeLists.txt (tried sdk/cpp, sdk, cpp)."
+  exit 1
+fi
+
+NATIVE_DIR=""
+if [[ -f "${LIGETRON_DIR}/CMakeLists.txt" ]]; then
+  NATIVE_DIR="${LIGETRON_DIR}"
+elif [[ -f "${LIGETRON_DIR}/native/CMakeLists.txt" ]]; then
+  NATIVE_DIR="${LIGETRON_DIR}/native"
+else
+  warn "Could not find Ligetron native CMakeLists.txt."
+  exit 1
+fi
+
+ok "Ligetron submodule ready (sdk=${SDK_DIR}, native=${NATIVE_DIR})"
 
 # -----------------------
 # Build Ligetron SDK (Web)
 # -----------------------
 step "Building Ligetron SDK with emscripten"
-pushd "${LIGETRON_DIR}/sdk/cpp" >/dev/null
+pushd "${SDK_DIR}" >/dev/null
 if [[ "${REINSTALL}" == "1" ]]; then
   # Clean stale build cache
   rm -rf build
@@ -152,7 +203,7 @@ ok "Ligetron SDK built"
 # Build Ligetron Native
 # -----------------------
 step "Building Ligetron native (Release)"
-pushd "${LIGETRON_DIR}" >/dev/null
+pushd "${NATIVE_DIR}" >/dev/null
 if [[ "${REINSTALL}" == "1" ]]; then
   # Clean stale build cache
   rm -rf build

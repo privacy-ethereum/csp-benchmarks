@@ -1,0 +1,51 @@
+name: "Install WABT"
+description: "Installs a pinned version of the WebAssembly Binary Toolkit (WABT)"
+
+inputs:
+  version:
+    description: WABT version to install.
+    required: false
+    default: "1.0.39"
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        VERSION="${{ inputs.version }}"
+        INSTALL_DIR="$HOME/.wabt"
+
+        if [[ -x "$INSTALL_DIR/bin/wat2wasm" ]] && \
+           [[ "$("$INSTALL_DIR/bin/wat2wasm" --version 2>/dev/null)" == "$VERSION" ]]; then
+          echo "WABT $VERSION already installed"
+          echo "$INSTALL_DIR/bin" >> "$GITHUB_PATH"
+          exit 0
+        fi
+
+        ARCH="$(uname -m)"
+        OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+        USE_BREW_FALLBACK=0
+        case "${OS}-${ARCH}" in
+          darwin-arm64) ASSET="wabt-${VERSION}-macos-arm64.tar.gz" ;;
+          darwin-x86_64) USE_BREW_FALLBACK=1 ;;
+          linux-x86_64) ASSET="wabt-${VERSION}-linux-x64.tar.gz" ;;
+          linux-aarch64) ASSET="wabt-${VERSION}-linux-arm64.tar.gz" ;;
+          *) echo "Unsupported platform: ${OS}-${ARCH}" >&2; exit 1 ;;
+        esac
+
+        if [[ "$USE_BREW_FALLBACK" == "1" ]]; then
+          echo "No pinned WABT binary asset for ${OS}-${ARCH}; falling back to Homebrew wabt"
+          brew list --versions wabt >/dev/null 2>&1 || { brew update; brew install wabt; }
+          BREW_PREFIX="$(brew --prefix wabt)"
+          echo "$BREW_PREFIX/bin" >> "$GITHUB_PATH"
+          exit 0
+        fi
+
+        URL="https://github.com/WebAssembly/wabt/releases/download/${VERSION}/${ASSET}"
+        echo "Installing WABT ${VERSION} from ${URL}"
+        rm -rf "$INSTALL_DIR"
+        mkdir -p "$INSTALL_DIR"
+        curl -fsSL "$URL" | tar -xz --strip-components=1 -C "$INSTALL_DIR"
+
+        echo "$INSTALL_DIR/bin" >> "$GITHUB_PATH"
