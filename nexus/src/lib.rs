@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 
-use ere_nexus::{compiler::RustRv32i, EreNexus};
+use ere_nexus::{EreNexus, compiler::RustRv32i};
 use ere_zkvm_interface::ProverResource;
 use utils::harness::{AuditStatus, BenchProperties};
-use utils::zkvm::{build_input, CompiledProgram, PreparedSha256};
+use utils::zkvm::{CompiledProgram, PreparedSha256, build_input};
 
 pub use utils::zkvm::{
     execution_cycles, preprocessing_size, proof_size, prove, prove_sha256, verify_sha256,
