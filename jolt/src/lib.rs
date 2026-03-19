@@ -50,7 +50,8 @@ pub fn prepare_sha256(
     input_size: usize,
     program: &CompiledProgram<RustRv64imacCustomized>,
 ) -> PreparedSha256<EreJolt> {
-    set_jolt_config(65536, 4096, 32768);
+    let max_trace_length = if input_size > 1024 { 131072 } else { 65536 };
+    set_jolt_config(max_trace_length, 4096, 32768);
     let vm = EreJolt::new(program.program.clone(), ProverResource::Cpu)
         .expect("jolt prover build failed");
 
