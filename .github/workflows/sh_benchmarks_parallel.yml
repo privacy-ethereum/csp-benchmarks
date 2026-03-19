@@ -118,6 +118,10 @@ jobs:
         run: |
           brew install bash
 
+      - name: Install pinned WABT (only when folder is ligetron)
+        if: ${{ matrix.folder == 'ligetron' }}
+        uses: ./.github/actions/install-wabt
+
       - name: Setup & build Ligetron (only when folder is ligetron)
         if: ${{ matrix.folder == 'ligetron' }}
         uses: ./.github/actions/install-ligero

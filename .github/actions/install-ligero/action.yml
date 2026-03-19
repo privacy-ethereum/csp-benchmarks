@@ -11,7 +11,7 @@ inputs:
     required: false
     default: cec4482eccee45696a7c0019e750c77f101ced04
   install_prefix:
-    description: Where to install Dawn/WABT (used as CMAKE_PREFIX_PATH).
+    description: Where to install Dawn (used as CMAKE_PREFIX_PATH).
     required: false
     default: ${{ github.workspace }}/.deps/install
 
@@ -46,7 +46,7 @@ runs:
       run: |
         set -euo pipefail
         NEEDS=()
-        for pkg in cmake ninja gmp mpfr libomp llvm boost nlohmann-json ccache wabt; do
+        for pkg in cmake ninja gmp mpfr libomp llvm boost nlohmann-json ccache; do
           brew list --versions "$pkg" >/dev/null 2>&1 || NEEDS+=("$pkg")
         done
         if [[ ${#NEEDS[@]} -gt 0 ]]; then
