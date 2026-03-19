@@ -19,7 +19,7 @@ on:
         default: false
         type: boolean
       include_optional:
-        description: "Include the mobile-unfriendly systems (openvm, sp1)"
+        description: "Run benchmarks of excluded systems"
         required: false
         default: false
         type: boolean
@@ -137,7 +137,7 @@ jobs:
           if [[ "$INCLUDE_OPTIONAL" != "true" ]]; then
             filtered=()
             for d in "${changed[@]}"; do
-              if [[ ! "$d" =~ ^(openvm|sp1)(/|$) ]]; then
+              if [[ ! "$d" =~ ^(openvm|sp1|nexus)(/|$) ]]; then
                 filtered+=("$d")
               fi
             done
@@ -225,7 +225,7 @@ jobs:
             cargo build --release --workspace --exclude openvm --exclude sp1
           fi
 
-      - name: Build nexus and cairo-m separately
+      - name: Build non-workspace crates separately
         run: |
           CRATES='${{ needs.detect-crates.outputs.crates }}'
           if echo "$CRATES" | grep -q '"nexus"'; then

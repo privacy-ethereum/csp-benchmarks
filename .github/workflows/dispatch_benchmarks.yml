@@ -12,7 +12,7 @@ on:
         default: true
         type: boolean
       include_optional:
-        description: "Include the mobile-unfriendly systems (openvm, sp1)"
+        description: "Run all benchmarks regardless of exclusions"
         required: false
         default: false
         type: boolean
