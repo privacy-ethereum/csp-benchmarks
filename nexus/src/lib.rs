@@ -17,7 +17,7 @@ pub const NEXUS_PROPS: BenchProperties = BenchProperties {
     arithm: Cow::Borrowed("AIR"),      // https://specification.nexus.xyz/
     is_zk: false,                      // Based on STWO which is currently not ZK
     is_zkvm: true,
-    security_bits: 0, // TODO: https://github.com/privacy-ethereum/csp-benchmarks/issues/147
+    security_bits: 8, // https://github.com/privacy-ethereum/csp-benchmarks/issues/147
     is_pq: true,      // hash-based PCS
     is_maintained: true, // https://github.com/nexus-xyz/nexus-zkvm/releases
     is_audited: AuditStatus::NotAudited, // https://github.com/nexus-xyz/nexus-zkvm

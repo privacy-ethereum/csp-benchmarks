@@ -153,7 +153,7 @@ checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
 [[package]]
 name = "ere-platform-jolt"
 version = "0.3.0"
-source = "git+https://github.com/0xAndoroid/ere?rev=de078c2#de078c2b525fff6f6c8463df7e7403c8ac414f8b"
+source = "git+https://github.com/eth-act/ere?rev=6573843#65738437e805d6001eeca94b2f40464e41759f64"
 dependencies = [
  "common",
  "ere-platform-trait",
@@ -164,7 +164,7 @@ dependencies = [
 [[package]]
 name = "ere-platform-trait"
 version = "0.3.0"
-source = "git+https://github.com/0xAndoroid/ere?rev=de078c2#de078c2b525fff6f6c8463df7e7403c8ac414f8b"
+source = "git+https://github.com/eth-act/ere?rev=6573843#65738437e805d6001eeca94b2f40464e41759f64"
 dependencies = [
  "digest",
 ]
