@@ -8,13 +8,18 @@ on:
   workflow_dispatch:
     inputs:
       sha:
-        description: "Commit SHA to collect results for (defaults to current HEAD)"
+        description: "Commit SHA to collect results for (ignored when run_id is set)"
         required: false
         type: string
       run_id:
-        description: "Optional Actions run ID to collect artifacts from directly"
+        description: "Optional Actions run ID to collect artifacts from directly, bypassing SHA selection"
         required: false
         type: string
+      prod_run:
+        description: "Run on self-hosted runner"
+        required: false
+        default: false
+        type: boolean
 
 # collapse multiple triggers for the same commit into one survivor
 concurrency:
@@ -27,7 +32,7 @@ permissions:
 
 jobs:
   collect:
-    runs-on: macos-latest
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.prod_run == true) && 'self-hosted' || 'macos-latest' }}
     env:
       HOMEBREW_NO_AUTO_UPDATE: "1"
       HOMEBREW_NO_ENV_HINTS: "1"
@@ -72,6 +77,8 @@ jobs:
             url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${TARGET_RUN_ID}"
             echo "proceed=true" >> "$GITHUB_OUTPUT"
             echo "artifact_urls=${url}" >> "$GITHUB_OUTPUT"
+            echo "selected_sha=${head_sha}" >> "$GITHUB_OUTPUT"
+            echo "selected_run_ids_json=[\"${TARGET_RUN_ID}\"]" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -114,17 +121,24 @@ jobs:
           fi
           echo "proceed=true" >> "$GITHUB_OUTPUT"
           echo "artifact_urls=${artifact_urls}" >> "$GITHUB_OUTPUT"
+          echo "selected_sha=${SHA}" >> "$GITHUB_OUTPUT"
 
       - name: Download artifacts from each parent run
         if: ${{ steps.gate.outputs.proceed == 'true' }}
+        env:
+          SELECTED_RUN_IDS_JSON: ${{ steps.gate.outputs.selected_run_ids_json || '' }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p inbox
 
-          if [[ -n "${TARGET_RUN_ID:-}" ]]; then
-            echo "Downloading artifacts for explicit run_id=$TARGET_RUN_ID into inbox/manual-run"
-            gh run download "$TARGET_RUN_ID" --dir "inbox/manual-run" || echo "No artifacts to download for run_id=$TARGET_RUN_ID. Continuing."
+          if [[ -n "${SELECTED_RUN_IDS_JSON:-}" ]]; then
+            echo "Downloading artifacts for explicit run IDs: $SELECTED_RUN_IDS_JSON"
+            while IFS= read -r RUN_ID; do
+              [[ -z "$RUN_ID" || "$RUN_ID" == "null" ]] && continue
+              echo "Downloading artifacts for explicit run_id=$RUN_ID into inbox/manual-run"
+              gh run download "$RUN_ID" --dir "inbox/manual-run" || echo "No artifacts to download for run_id=$RUN_ID. Continuing."
+            done < <(jq -r '.[]' <<<"$SELECTED_RUN_IDS_JSON")
             echo "Artifact directory structure (depth 3):"
             find inbox -maxdepth 3 -print | sed 's/^/  /'
             exit 0
@@ -215,7 +229,7 @@ jobs:
       - name: Collect benchmarks
         if: ${{ steps.gate.outputs.proceed == 'true' }}
         env:
-          COMMIT_SHA: ${{ env.SHA }}
+          COMMIT_SHA: ${{ steps.gate.outputs.selected_sha || env.SHA }}
           WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           ARTIFACT_URLS: ${{ steps.gate.outputs.artifact_urls }}
         run: |
