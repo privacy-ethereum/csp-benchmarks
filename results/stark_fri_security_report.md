@@ -26,7 +26,7 @@ The estimates below are the modified-conjecture re-estimates derived from Crites
 
 ## Method
 
-The quantitative re-estimates in this report are derived from Crites-Stewart 2025. Diamond-Gruen 2025 is used qualitatively to justify discarding the unamended capacity conjecture, but it is not used as an additional numerical penalty.
+The quantitative re-estimates in this report are derived from Crites-Stewart 2025. Diamond-Gruen 2025 is used qualitatively to justify discarding the unamended capacity conjecture, but it is not used as an additional numerical penalty. All numerical calculations in this report are reproduced by the companion script [`stark_fri_reestimate.py`](./stark_fri_reestimate.py).
 
 - [Crites-Stewart 2025, "On Reed-Solomon Proximity Gaps Conjectures" (IACR ePrint 2025/2046)](https://eprint.iacr.org/2025/2046)
   - Theorem 7.4.1 gives list-decoding capacity
@@ -394,7 +394,7 @@ $$
 - Benchmark metadata and measurements:
   - `results/collected_benchmarks_23330555957.json`
 - Report reproduction script:
-  - `results/stark_fri_reestimate.py`
+  - [`results/stark_fri_reestimate.py`](./stark_fri_reestimate.py)
 - Benchmark-local code:
   - `cairo-m/src/lib.rs`
   - `miden/src/lib.rs`
