@@ -14,15 +14,15 @@ The estimates below are the modified-conjecture re-estimates derived from Crites
 
 ## Bottom-Line Table
 
-| System           | Claimed security | Paper-based updated estimate | Delta vs claim | Assessment                                                                                                                               |
-| ---------------- | ---------------- | ---------------------------: | -------------: | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `cairo-m`        | 96               |        88.81 bits (floor 88) |          -7.19 | The modified-conjecture estimate is below the advertised 96-bit target                                                                   |
-| `miden`          | 128              |        94.33 bits (floor 94) |         -33.67 | The modified-conjecture estimate is below the advertised 128-bit target                                                                  |
-| `plonky2`        | 100              |        97.23 bits (floor 97) |          -2.77 | The modified-conjecture estimate is below the advertised 100-bit target                                                                  |
-| `provekit`       | 128              |      128.00 bits (floor 128) |           0.00 | The pinned WHIR `ConjectureList` schedule attains 128 bits under the modified mutual-correlated-agreement substitution                   |
-| `risc0`          | 96               |        92.41 bits (floor 92) |          -3.59 | The modified-conjecture estimate is below the advertised 96-bit target                                                                   |
-| `rookie-numbers` | 96               |        89.70 bits (floor 89) |          -6.30 | The modified-conjecture estimate is below the advertised 96-bit target                                                                   |
-| `stark-v`        | 96               |        89.70 bits (floor 89) |          -6.30 | The modified-conjecture estimate is below the advertised 96-bit target                                                                   |
+| System           | Claimed security | Paper-based updated estimate | Delta vs claim | Assessment                                                                                                             |
+| ---------------- | ---------------- | ---------------------------: | -------------: | ---------------------------------------------------------------------------------------------------------------------- |
+| `cairo-m`        | 96               |        88.81 bits (floor 88) |          -7.19 | The modified-conjecture estimate is below the advertised 96-bit target                                                 |
+| `miden`          | 128              |        94.33 bits (floor 94) |         -33.67 | The modified-conjecture estimate is below the advertised 128-bit target                                                |
+| `plonky2`        | 100              |        97.23 bits (floor 97) |          -2.77 | The modified-conjecture estimate is below the advertised 100-bit target                                                |
+| `provekit`       | 128              |      128.00 bits (floor 128) |           0.00 | The pinned WHIR `ConjectureList` schedule attains 128 bits under the modified mutual-correlated-agreement substitution |
+| `risc0`          | 96               |        92.41 bits (floor 92) |          -3.59 | The modified-conjecture estimate is below the advertised 96-bit target                                                 |
+| `rookie-numbers` | 96               |        89.70 bits (floor 89) |          -6.30 | The modified-conjecture estimate is below the advertised 96-bit target                                                 |
+| `stark-v`        | 96               |        89.70 bits (floor 89) |          -6.30 | The modified-conjecture estimate is below the advertised 96-bit target                                                 |
 
 ## Method
 
@@ -236,7 +236,7 @@ The overall bottleneck is therefore `128.000000` bits.
 
 ### 3. RISC Zero
 
-The metadata field in `risc0/src/lib.rs` reports `96` bits. The pinned upstream soundness commentary states that the verifier target uses the Toy Problem Conjecture, so the relevant paper-based comparison is the updated `toy_model_security()` path.
+The benchmark metadata entry for `risc0` records `96` bits, sourced from `risc0/src/lib.rs` and the pinned upstream soundness commentary. Since that commentary states that the verifier target uses the Toy Problem Conjecture, the relevant paper-based comparison is the updated `toy_model_security()` path.
 
 Local constants for the pinned configuration:
 
@@ -380,7 +380,7 @@ $$
 - `cairo-m`
   - The pinned STWO-style arithmetic yields `88.81` bits when the capacity-style query term is replaced by the Crites-Stewart 2025 q-ary entropy threshold.
 - `miden`
-  - The metadata claim is `128`.
+  - The benchmark metadata reference value is `128`.
   - Under the Crites-Stewart 2025 replacement, the benchmark configuration evaluates to `94.33` bits.
 - `plonky2`
   - The explicit "Conjectured FRI security" path evaluates to `97.23` bits under the modified conjecture.
@@ -444,6 +444,6 @@ Accordingly, `ligetron` is excluded from the main STARK / FRI re-estimation tabl
 Under the Crites-Stewart 2025-based modified-conjecture replacements above:
 
 - `provekit` attains its claimed `128` bits.
-- `cairo-m`, `miden`, `plonky2`, `risc0`, `rookie-numbers`, and `stark-v` all fall below their currently advertised benchmark targets.
+- `cairo-m`, `miden`, `plonky2`, `risc0`, `rookie-numbers`, and `stark-v` all fall below their currently advertised security values.
 
-The largest metadata-level gap is `miden`, which goes from `128` to `94.33` under the Crites-Stewart 2025-based replacement. For `risc0`, the metadata claim is `96` and the paper-based updated estimate is `92.41` bits. `plonky2` has the smallest gap, moving from `100` to `97.23`.
+The largest metadata-reference gap is `miden`, which goes from `128` to `94.33` under the Crites-Stewart 2025-based replacement. For `risc0`, the sourced metadata value is `96` and the paper-based updated estimate is `92.41` bits. `plonky2` has the smallest gap, moving from `100` to `97.23`.
