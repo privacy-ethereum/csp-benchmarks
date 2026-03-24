@@ -101,7 +101,7 @@ These applications are prime-field applications in the pinned default-CI configu
 For `cairo-m`, `miden`, `plonky2`, `rookie-numbers`, and `stark-v`, the original code paths all reduce to the usual capacity-style arithmetic:
 
 $$
-\mathrm{security}_{\mathrm{old}} = \text{pow\_bits} + \mathrm{queries} \cdot \text{log\_blowup}.
+\mathrm{security}_{\mathrm{old}} = \text{pow\textunderscore{}bits} + \mathrm{queries} \cdot \text{log\textunderscore{}blowup}.
 $$
 
 For these systems, the re-estimation keeps the actual PoW term and actual query count fixed, and replaces the original per-query FRI contribution by the q-ary-entropy threshold from the list-decoding-capacity line.
@@ -110,7 +110,7 @@ Let:
 
 $$
 \begin{aligned}
-\rho &= 2^{-\text{log\_blowup}}, \\
+\rho &= 2^{-\text{log\textunderscore{}blowup}}, \\
 H_q(x) &= \frac{x \log(q - 1) - x \log x - (1 - x)\log(1 - x)}{\log q}.
 \end{aligned}
 $$
@@ -127,7 +127,7 @@ $$
 \begin{aligned}
 \rho_{\mathrm{eff}} &= 1 - \delta^{\ast}, \\
 b_{\mathrm{query}} &= -\log_2(\rho_{\mathrm{eff}}), \\
-\mathrm{security}_{\mathrm{new}} &= \text{pow\_bits} + \mathrm{queries} \cdot b_{\mathrm{query}}.
+\mathrm{security}_{\mathrm{new}} &= \text{pow\textunderscore{}bits} + \mathrm{queries} \cdot b_{\mathrm{query}}.
 \end{aligned}
 $$
 
@@ -145,17 +145,17 @@ These are exactly the modest 3% to 9% reductions that Crites-Stewart 2025 says t
 `provekit` does not use the plain STWO-style arithmetic above. Its benchmark path pins WHIR to `SoundnessType::ConjectureList` with security level 128, starting inverse-rate exponent 1, constant-4 folding, and
 
 $$
-\text{pow\_bits} = \text{default\_max\_pow}(\text{num\_variables}, 1).
+\text{pow\textunderscore{}bits} = \text{default\textunderscore{}max\textunderscore{}pow}(\text{num\textunderscore{}variables}, 1).
 $$
 
 For the actual benchmark circuits, `results/collected_benchmarks_23330555957.json` shows `provekit` `num_constraints` between `320` and `2,375,009`. In the pinned builder this implies:
 
 $$
 \begin{aligned}
-m_0 &= \left\lceil \log_2(\text{num\_constraints}) \right\rceil \in [9,22], \\
-\text{num\_variables} &= \max\!\left(\left\lceil \log_2(4m_0) \right\rceil + 1,\ 12\right) = 12, \\
-\text{pow\_bits} &= 12 + 1 - 3 = 10, \\
-\text{protocol\_security\_level} &= 128 - 10 = 118.
+m_0 &= \left\lceil \log_2(\text{num\textunderscore{}constraints}) \right\rceil \in [9,22], \\
+\text{num\textunderscore{}variables} &= \max\!\left(\left\lceil \log_2(4m_0) \right\rceil + 1,\ 12\right) = 12, \\
+\text{pow\textunderscore{}bits} &= 12 + 1 - 3 = 10, \\
+\text{protocol\textunderscore{}security\textunderscore{}level} &= 128 - 10 = 118.
 \end{aligned}
 $$
 
@@ -251,8 +251,8 @@ $$
 
 $$
 \begin{aligned}
-\text{fri\_fold} &= 16, \\
-\text{segment\_size} &= 2^{20}, \\
+\text{fri\textunderscore{}fold} &= 16, \\
+\text{segment\textunderscore{}size} &= 2^{20}, \\
 w_{\mathrm{accum}} &= 103, \\
 w_{\mathrm{code}} &= 1, \\
 w_{\mathrm{data}} &= 211.
@@ -261,8 +261,8 @@ $$
 
 $$
 \begin{aligned}
-n_{\text{trace\_polys}} &= 315, \\
-\text{biggest\_combo} &= 6.
+n_{\text{trace\textunderscore{}polys}} &= 315, \\
+\text{biggest\textunderscore{}combo} &= 6.
 \end{aligned}
 $$
 
@@ -271,7 +271,7 @@ $$
 The local toy-model path uses:
 
 $$
-\text{fri\_error}_{\mathrm{old}} = \rho^{\mathrm{queries}}.
+\text{fri\textunderscore{}error}_{\mathrm{old}} = \rho^{\mathrm{queries}}.
 $$
 
 The paper-compatible replacement is the same q-ary-entropy adjustment used for the simple FRI systems:
@@ -280,7 +280,7 @@ $$
 \begin{aligned}
 H_q(\delta^{\ast}) &= 1 - \rho, \\
 \rho_{\mathrm{eff}} &= 1 - \delta^{\ast}, \\
-\text{fri\_error}_{\mathrm{new}} &= \rho_{\mathrm{eff}}^{\mathrm{queries}}.
+\text{fri\textunderscore{}error}_{\mathrm{new}} &= \rho_{\mathrm{eff}}^{\mathrm{queries}}.
 \end{aligned}
 $$
 
@@ -309,9 +309,9 @@ The primary toy-model estimate is `92.41` bits.
 
 $$
 \begin{aligned}
-\text{pow\_bits} &= 16, \\
+\text{pow\textunderscore{}bits} &= 16, \\
 \mathrm{queries} &= 80, \\
-\text{log\_blowup} &= 1.
+\text{log\textunderscore{}blowup} &= 1.
 \end{aligned}
 $$
 
@@ -323,9 +323,9 @@ $$
 
 $$
 \begin{aligned}
-\text{pow\_bits} &= 16, \\
+\text{pow\textunderscore{}bits} &= 16, \\
 \mathrm{queries} &= 27, \\
-\text{log\_blowup} &= 3.
+\text{log\textunderscore{}blowup} &= 3.
 \end{aligned}
 $$
 
@@ -337,9 +337,9 @@ $$
 
 $$
 \begin{aligned}
-\text{pow\_bits} &= 16, \\
+\text{pow\textunderscore{}bits} &= 16, \\
 \mathrm{queries} &= 28, \\
-\text{log\_blowup} &= 3.
+\text{log\textunderscore{}blowup} &= 3.
 \end{aligned}
 $$
 
@@ -351,9 +351,9 @@ $$
 
 $$
 \begin{aligned}
-\text{pow\_bits} &= 26, \\
+\text{pow\textunderscore{}bits} &= 26, \\
 \mathrm{queries} &= 70, \\
-\text{log\_blowup} &= 1.
+\text{log\textunderscore{}blowup} &= 1.
 \end{aligned}
 $$
 
@@ -365,9 +365,9 @@ $$
 
 $$
 \begin{aligned}
-\text{pow\_bits} &= 26, \\
+\text{pow\textunderscore{}bits} &= 26, \\
 \mathrm{queries} &= 70, \\
-\text{log\_blowup} &= 1.
+\text{log\textunderscore{}blowup} &= 1.
 \end{aligned}
 $$
 
