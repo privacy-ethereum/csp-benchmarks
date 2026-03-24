@@ -89,6 +89,8 @@ Crites-Stewart 2025's modified conjectures are applied as follows:
 - `Our Conjecture 1` from Crites-Stewart 2025
   - Used for the simple FRI-style systems' q-ary-entropy replacement of the old capacity-style per-query term.
   - Used for RISC Zero's toy-model FRI-term replacement.
+- `Our Conjecture 2`
+  - Used for correlated-agreement-threshold substitutions where the modified bound includes the explicit \(1/n\) term.
 - `Our Conjecture 3`
   - Used for ProveKit / WHIR's mutual-correlated-agreement `eta` replacement.
 
@@ -107,9 +109,10 @@ For these systems, the re-estimation keeps the actual PoW term and actual query 
 Let:
 
 $$
-\rho = 2^{-\mathrm{log\_blowup}},
-\qquad
-H_q(x) = \frac{x \log(q - 1) - x \log x - (1 - x)\log(1 - x)}{\log q}.
+\begin{aligned}
+\rho &= 2^{-\mathrm{log\_blowup}}, \\
+H_q(x) &= \frac{x \log(q - 1) - x \log x - (1 - x)\log(1 - x)}{\log q}.
+\end{aligned}
 $$
 
 Solve:
@@ -121,11 +124,11 @@ $$
 Then define:
 
 $$
-\rho_{\mathrm{eff}} = 1 - \delta^*,
-\qquad
-b_{\mathrm{query}} = -\log_2(\rho_{\mathrm{eff}}),
-\qquad
-\mathrm{security}_{\mathrm{new}} = \mathrm{pow\_bits} + \mathrm{queries} \cdot b_{\mathrm{query}}.
+\begin{aligned}
+\rho_{\mathrm{eff}} &= 1 - \delta^*, \\
+b_{\mathrm{query}} &= -\log_2(\rho_{\mathrm{eff}}), \\
+\mathrm{security}_{\mathrm{new}} &= \mathrm{pow\_bits} + \mathrm{queries} \cdot b_{\mathrm{query}}.
+\end{aligned}
 $$
 
 For the fields that appear in these default-CI benchmarks, this gives:
@@ -149,8 +152,8 @@ For the actual benchmark circuits, `results/collected_benchmarks_23330555957.jso
 
 $$
 \begin{aligned}
-m_0 &= \lceil \log_2(\mathrm{num\_constraints}) \rceil \in [9, 22], \\
-\mathrm{num\_variables} &= \max\!\bigl(\lceil \log_2(4m_0) \rceil + 1,\ 12\bigr) = 12, \\
+m_0 &= \left\lceil \log_2(\mathrm{num\_constraints}) \right\rceil \in [9,22], \\
+\mathrm{num\_variables} &= \max\!\left(\left\lceil \log_2(4m_0) \right\rceil + 1,\ 12\right) = 12, \\
 \mathrm{pow\_bits} &= 12 + 1 - 3 = 10, \\
 \mathrm{protocol\_security\_level} &= 128 - 10 = 118.
 \end{aligned}
@@ -159,11 +162,11 @@ $$
 With constant-4 folding, WHIR's pinned `ConjectureList` scheduler therefore fixes
 
 $$
-r \in \{1, 4, 7\},
-\qquad
-q = \left\lceil \frac{118}{r} \right\rceil \in \{118, 30, 17\},
-\qquad
-128 - q r \in \{10, 8, 9\}.
+\begin{aligned}
+r &\in \{1,4,7\}, \\
+q &= \left\lceil \frac{118}{r} \right\rceil \in \{118,30,17\}, \\
+128 - q r &\in \{10,8,9\}.
+\end{aligned}
 $$
 
 Crites-Stewart 2025 replaces the mutual-correlated-agreement threshold. The analysis therefore keeps the pinned WHIR schedule fixed and replaces only the conjecture-dependent distance threshold.
@@ -173,11 +176,11 @@ WHIR computes query counts from the pre-fold rate of the current round and the e
 For a WHIR stage with local inverse-rate exponent `r`, code length `n`, and old WHIR choice:
 
 $$
-\rho = 2^{-r},
-\qquad
-\eta_{\mathrm{old}} = 2^{-(r+1)},
-\qquad
-\delta_{\mathrm{old}} = 1 - \rho - \eta_{\mathrm{old}}.
+\begin{aligned}
+\rho &= 2^{-r}, \\
+\eta_{\mathrm{old}} &= 2^{-(r+1)}, \\
+\delta_{\mathrm{old}} &= 1 - \rho - \eta_{\mathrm{old}}.
+\end{aligned}
 $$
 
 Crites-Stewart 2025's modified mutual correlated agreement conjecture for prime fields is:
@@ -205,7 +208,7 @@ is then applied to the eta-dependent WHIR terms only:
 - folding proximity / sumcheck bound
 - query-combination bound
 
-The pinned query schedule is **not** changed, because WHIR's query arithmetic `q r` is not the part invalidated by Crites-Stewart 2025.
+The pinned query schedule is **not** changed, because WHIR's query arithmetic \(q \cdot r\) is not the part invalidated by Crites-Stewart 2025.
 
 #### ProveKit calculation
 
@@ -238,31 +241,29 @@ The metadata field in `risc0/src/lib.rs` reports `96` bits. The pinned upstream 
 Local constants for the pinned configuration:
 
 $$
-q = 15 \cdot 2^{27} + 1 = 2013265921,
-\qquad
-\mathrm{queries} = 50,
-\qquad
-\rho = \frac{1}{4},
-\qquad
-\eta = 0.05.
+\begin{aligned}
+q &= 15 \cdot 2^{27} + 1 = 2013265921, \\
+\mathrm{queries} &= 50, \\
+\rho &= \frac{1}{4}, \\
+\eta &= 0.05.
+\end{aligned}
 $$
 
 $$
-\mathrm{fri\_fold} = 16,
-\qquad
-\mathrm{segment\_size} = 2^{20},
-\qquad
-w_{\mathrm{accum}} = 103,
-\qquad
-w_{\mathrm{code}} = 1,
-\qquad
-w_{\mathrm{data}} = 211.
+\begin{aligned}
+\mathrm{fri\_fold} &= 16, \\
+\mathrm{segment\_size} &= 2^{20}, \\
+w_{\mathrm{accum}} &= 103, \\
+w_{\mathrm{code}} &= 1, \\
+w_{\mathrm{data}} &= 211.
+\end{aligned}
 $$
 
 $$
-n_{\mathrm{trace\_polys}} = 315,
-\qquad
-\mathrm{biggest\_combo} = 6.
+\begin{aligned}
+n_{\mathrm{trace\_polys}} &= 315, \\
+\mathrm{biggest\_combo} &= 6.
+\end{aligned}
 $$
 
 #### 3a. Toy-model update
@@ -276,19 +277,20 @@ $$
 The paper-compatible replacement is the same q-ary-entropy adjustment used for the simple FRI systems:
 
 $$
-H_q(\delta^*) = 1 - \rho,
-\qquad
-\rho_{\mathrm{eff}} = 1 - \delta^*,
-\qquad
-\mathrm{fri\_error}_{\mathrm{new}} = \rho_{\mathrm{eff}}^{\mathrm{queries}}.
+\begin{aligned}
+H_q(\delta^*) &= 1 - \rho, \\
+\rho_{\mathrm{eff}} &= 1 - \delta^*, \\
+\mathrm{fri\_error}_{\mathrm{new}} &= \rho_{\mathrm{eff}}^{\mathrm{queries}}.
+\end{aligned}
 $$
 
 For BabyBear:
 
 $$
-\delta^* = 0.722429470819,
-\qquad
-\rho_{\mathrm{eff}} = 0.277570529181.
+\begin{aligned}
+\delta^* &= 0.722429470819, \\
+\rho_{\mathrm{eff}} &= 0.277570529181.
+\end{aligned}
 $$
 
 Replacing only the FRI term and leaving the PLONK/PLOOKUP and constraint terms unchanged gives:
@@ -306,11 +308,11 @@ The primary toy-model estimate is `92.41` bits.
 - `cairo-m`
 
 $$
-\mathrm{pow\_bits} = 16,
-\qquad
-\mathrm{queries} = 80,
-\qquad
-\mathrm{log\_blowup} = 1,
+\begin{aligned}
+\mathrm{pow\_bits} &= 16, \\
+\mathrm{queries} &= 80, \\
+\mathrm{log\_blowup} &= 1.
+\end{aligned}
 $$
 
 $$
@@ -320,11 +322,11 @@ $$
 - `miden`
 
 $$
-\mathrm{pow\_bits} = 16,
-\qquad
-\mathrm{queries} = 27,
-\qquad
-\mathrm{log\_blowup} = 3,
+\begin{aligned}
+\mathrm{pow\_bits} &= 16, \\
+\mathrm{queries} &= 27, \\
+\mathrm{log\_blowup} &= 3.
+\end{aligned}
 $$
 
 $$
@@ -334,11 +336,11 @@ $$
 - `plonky2`
 
 $$
-\mathrm{pow\_bits} = 16,
-\qquad
-\mathrm{queries} = 28,
-\qquad
-\mathrm{log\_blowup} = 3,
+\begin{aligned}
+\mathrm{pow\_bits} &= 16, \\
+\mathrm{queries} &= 28, \\
+\mathrm{log\_blowup} &= 3.
+\end{aligned}
 $$
 
 $$
@@ -348,11 +350,11 @@ $$
 - `rookie-numbers`
 
 $$
-\mathrm{pow\_bits} = 26,
-\qquad
-\mathrm{queries} = 70,
-\qquad
-\mathrm{log\_blowup} = 1,
+\begin{aligned}
+\mathrm{pow\_bits} &= 26, \\
+\mathrm{queries} &= 70, \\
+\mathrm{log\_blowup} &= 1.
+\end{aligned}
 $$
 
 $$
@@ -362,11 +364,11 @@ $$
 - `stark-v`
 
 $$
-\mathrm{pow\_bits} = 26,
-\qquad
-\mathrm{queries} = 70,
-\qquad
-\mathrm{log\_blowup} = 1,
+\begin{aligned}
+\mathrm{pow\_bits} &= 26, \\
+\mathrm{queries} &= 70, \\
+\mathrm{log\_blowup} &= 1.
+\end{aligned}
 $$
 
 $$
