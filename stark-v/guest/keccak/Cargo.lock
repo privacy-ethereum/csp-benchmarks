@@ -190,7 +190,7 @@ dependencies = [
 [[package]]
 name = "guest-bin"
 version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
  "guest-lib",
  "postcard",
@@ -200,7 +200,7 @@ dependencies = [
 [[package]]
 name = "guest-lib"
 version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
  "k256",
  "postcard",
@@ -264,9 +264,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.182"
+version = "0.2.183"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6800badb6cb2082ffd7b6a67e6125bb39f18782f793520caee8cb8846be06112"
+checksum = "b5b646652bf6661599e1da8901b3b9522896f01e736bad5f723fe7a3a27f899d"
 
 [[package]]
 name = "lock_api"
@@ -301,9 +301,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.44"
+version = "1.0.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21b2ebcf727b7760c461f091f9f0f539b77b8e87f2fd88131e7f1b433b3cece4"
+checksum = "41f2619966050689382d2b44f664f4bc593e129785a36d6ee376ddf37259b924"
 dependencies = [
  "proc-macro2",
 ]

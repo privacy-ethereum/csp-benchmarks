@@ -830,7 +830,7 @@ dependencies = [
 [[package]]
 name = "debug-utils"
 version = "0.0.1"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
  "comfy-table",
  "stwo",
@@ -1033,6 +1033,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "ere-zkvm-interface"
+version = "0.3.0"
+source = "git+https://github.com/eth-act/ere?rev=6573843#65738437e805d6001eeca94b2f40464e41759f64"
+dependencies = [
+ "anyhow",
+ "auto_impl",
+ "bincode 2.0.1",
+ "indexmap 2.13.0",
+ "serde",
+ "strum",
+ "thiserror",
+]
+
+[[package]]
 name = "errno"
 version = "0.3.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1066,9 +1080,9 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
 name = "foldhash"
-version = "0.2.0"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
+checksum = "d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2"
 
 [[package]]
 name = "generic-array"
@@ -1125,7 +1139,7 @@ dependencies = [
 [[package]]
 name = "guest-lib"
 version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
  "k256",
  "postcard",
@@ -1173,6 +1187,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
 dependencies = [
  "allocator-api2",
+ "equivalent",
+ "foldhash",
+ "serde",
 ]
 
 [[package]]
@@ -1180,13 +1197,6 @@ name = "hashbrown"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
-dependencies = [
- "allocator-api2",
- "equivalent",
- "foldhash",
- "serde",
- "serde_core",
-]
 
 [[package]]
 name = "heapless"
@@ -1668,7 +1678,7 @@ dependencies = [
 [[package]]
 name = "prover"
 version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
  "bytemuck",
  "debug-utils",
@@ -1820,7 +1830,7 @@ dependencies = [
 [[package]]
 name = "runner"
 version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
  "clap",
  "debug-utils",
@@ -2082,7 +2092,7 @@ dependencies = [
 [[package]]
 name = "simd"
 version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
  "stwo",
 ]
@@ -2125,7 +2135,7 @@ dependencies = [
  "bincode 1.3.3",
  "clap",
  "criterion",
- "ere-zkvm-interface",
+ "ere-zkvm-interface 0.2.0",
  "stark-v-sdk",
  "utils",
 ]
@@ -2133,11 +2143,11 @@ dependencies = [
 [[package]]
 name = "stark-v-sdk"
 version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
  "anyhow",
  "cargo_metadata",
- "ere-zkvm-interface",
+ "ere-zkvm-interface 0.2.0",
  "guest-lib",
  "postcard",
  "prover",
@@ -2204,7 +2214,7 @@ dependencies = [
 [[package]]
 name = "std-shims"
 version = "1.0.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 
 [[package]]
 name = "strsim"
@@ -2236,7 +2246,7 @@ dependencies = [
 [[package]]
 name = "stwo"
 version = "2.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
  "blake2",
  "blake3",
@@ -2245,7 +2255,7 @@ dependencies = [
  "dashmap",
  "educe 0.5.11",
  "fnv",
- "hashbrown 0.16.1",
+ "hashbrown 0.15.5",
  "hex",
  "indexmap 2.13.0",
  "itertools 0.13.0",
@@ -2265,9 +2275,9 @@ dependencies = [
 [[package]]
 name = "stwo-constraint-framework"
 version = "2.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
- "hashbrown 0.16.1",
+ "hashbrown 0.15.5",
  "itertools 0.13.0",
  "num-traits",
  "rand",
@@ -2280,7 +2290,7 @@ dependencies = [
 [[package]]
 name = "stwo-macros"
 version = "0.1.0"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2296,7 +2306,7 @@ checksum = "5c21e2c707fb8926e6c4355a87494c29e8e46640ff4796aa8fbb74952327dfdc"
 [[package]]
 name = "stwo-types"
 version = "2.0.1"
-source = "git+https://github.com/AntoineFONDEUR/stark-v?rev=3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef#3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef"
+source = "git+https://github.com/ClementWalter/stark-v?rev=5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57#5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57"
 dependencies = [
  "bytemuck",
  "num-traits",
@@ -2565,7 +2575,7 @@ dependencies = [
  "clap",
  "criterion",
  "csv",
- "ere-zkvm-interface",
+ "ere-zkvm-interface 0.3.0",
  "glob",
  "hex",
  "human-repr",

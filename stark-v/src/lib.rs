@@ -33,7 +33,7 @@ pub fn stark_v_bench_properties() -> BenchProperties {
         "AIR",
         false,                   // Not ZK
         true,                    // zkVM
-        96, // https://github.com/AntoineFONDEUR/stark-v/blob/740812dfb29bfd05e24c9e8b1ad6b211ac1b564e/crates/sdk/src/lib.rs#L57
+        96, // https://github.com/ClementWalter/stark-v/blob/5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57/crates/sdk/src/lib.rs#L57
         true, // hash-based PCS
         true, // not actively maintained
         AuditStatus::NotAudited, // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about
