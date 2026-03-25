@@ -829,7 +829,7 @@ dependencies = [
 [[package]]
 name = "debug-utils"
 version = "0.0.1"
-source = "git+https://github.com/ClementWalter/stark-v?rev=1409577f7716551b6c97fab2d8a9d042421351f1#1409577f7716551b6c97fab2d8a9d042421351f1"
+source = "git+https://github.com/ClementWalter/stark-v?rev=0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1#0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1"
 dependencies = [
  "comfy-table",
  "stwo",
@@ -1138,7 +1138,7 @@ dependencies = [
 [[package]]
 name = "guest-lib"
 version = "0.1.0"
-source = "git+https://github.com/ClementWalter/stark-v?rev=1409577f7716551b6c97fab2d8a9d042421351f1#1409577f7716551b6c97fab2d8a9d042421351f1"
+source = "git+https://github.com/ClementWalter/stark-v?rev=0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1#0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1"
 dependencies = [
  "k256",
  "postcard",
@@ -1681,7 +1681,7 @@ dependencies = [
 [[package]]
 name = "prover"
 version = "0.1.0"
-source = "git+https://github.com/ClementWalter/stark-v?rev=1409577f7716551b6c97fab2d8a9d042421351f1#1409577f7716551b6c97fab2d8a9d042421351f1"
+source = "git+https://github.com/ClementWalter/stark-v?rev=0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1#0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1"
 dependencies = [
  "bytemuck",
  "debug-utils",
@@ -1833,7 +1833,7 @@ dependencies = [
 [[package]]
 name = "runner"
 version = "0.1.0"
-source = "git+https://github.com/ClementWalter/stark-v?rev=1409577f7716551b6c97fab2d8a9d042421351f1#1409577f7716551b6c97fab2d8a9d042421351f1"
+source = "git+https://github.com/ClementWalter/stark-v?rev=0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1#0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1"
 dependencies = [
  "clap",
  "debug-utils",
@@ -2095,7 +2095,7 @@ dependencies = [
 [[package]]
 name = "simd"
 version = "0.1.0"
-source = "git+https://github.com/ClementWalter/stark-v?rev=1409577f7716551b6c97fab2d8a9d042421351f1#1409577f7716551b6c97fab2d8a9d042421351f1"
+source = "git+https://github.com/ClementWalter/stark-v?rev=0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1#0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1"
 dependencies = [
  "stwo",
 ]
@@ -2146,7 +2146,7 @@ dependencies = [
 [[package]]
 name = "stark-v-sdk"
 version = "0.1.0"
-source = "git+https://github.com/ClementWalter/stark-v?rev=1409577f7716551b6c97fab2d8a9d042421351f1#1409577f7716551b6c97fab2d8a9d042421351f1"
+source = "git+https://github.com/ClementWalter/stark-v?rev=0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1#0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -2215,11 +2215,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "std-shims"
-version = "1.0.0"
-source = "git+https://github.com/ClementWalter/stark-v?rev=1409577f7716551b6c97fab2d8a9d042421351f1#1409577f7716551b6c97fab2d8a9d042421351f1"
-
-[[package]]
 name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2249,7 +2244,7 @@ dependencies = [
 [[package]]
 name = "stwo"
 version = "2.1.0"
-source = "git+https://github.com/ClementWalter/stark-v?rev=1409577f7716551b6c97fab2d8a9d042421351f1#1409577f7716551b6c97fab2d8a9d042421351f1"
+source = "git+https://github.com/ClementWalter/stark-v?rev=0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1#0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1"
 dependencies = [
  "blake2",
  "blake3",
@@ -2269,7 +2264,6 @@ dependencies = [
  "starknet-crypto",
  "starknet-ff",
  "stwo-std-shims",
- "stwo-types",
  "thiserror",
  "tracing",
  "tracing-subscriber",
@@ -2278,7 +2272,7 @@ dependencies = [
 [[package]]
 name = "stwo-constraint-framework"
 version = "2.1.0"
-source = "git+https://github.com/ClementWalter/stark-v?rev=1409577f7716551b6c97fab2d8a9d042421351f1#1409577f7716551b6c97fab2d8a9d042421351f1"
+source = "git+https://github.com/ClementWalter/stark-v?rev=0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1#0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1"
 dependencies = [
  "hashbrown 0.16.1",
  "itertools 0.13.0",
@@ -2293,7 +2287,7 @@ dependencies = [
 [[package]]
 name = "stwo-macros"
 version = "0.1.0"
-source = "git+https://github.com/ClementWalter/stark-v?rev=1409577f7716551b6c97fab2d8a9d042421351f1#1409577f7716551b6c97fab2d8a9d042421351f1"
+source = "git+https://github.com/ClementWalter/stark-v?rev=0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1#0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2305,19 +2299,6 @@ name = "stwo-std-shims"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5c21e2c707fb8926e6c4355a87494c29e8e46640ff4796aa8fbb74952327dfdc"
-
-[[package]]
-name = "stwo-types"
-version = "2.0.1"
-source = "git+https://github.com/ClementWalter/stark-v?rev=1409577f7716551b6c97fab2d8a9d042421351f1#1409577f7716551b6c97fab2d8a9d042421351f1"
-dependencies = [
- "bytemuck",
- "num-traits",
- "rand",
- "rayon",
- "serde",
- "std-shims",
-]
 
 [[package]]
 name = "subtle"
