@@ -33,7 +33,7 @@ pub fn stark_v_bench_properties() -> BenchProperties {
         "AIR",
         false,                   // Not ZK
         true,                    // zkVM
-        96, // https://github.com/AntoineFONDEUR/stark-v/blob/740812dfb29bfd05e24c9e8b1ad6b211ac1b564e/crates/sdk/src/lib.rs#L57
+        94, // https://github.com/ClementWalter/stark-v/blob/0bf633bc5a87b14d2e2ad4d8f30be2701849e0c1/crates/sdk/src/lib.rs#L56 — batching caps at 94 bits for trace ≤ 2^20
         true, // hash-based PCS
         true, // not actively maintained
         AuditStatus::NotAudited, // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about

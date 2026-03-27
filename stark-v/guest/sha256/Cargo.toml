@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-guest-bin = { git = "https://github.com/AntoineFONDEUR/stark-v", rev = "3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef" }
-guest-lib = { git = "https://github.com/AntoineFONDEUR/stark-v", rev = "3a3cb4cf576d7d7e8ca82815acfb31bbc10e48ef" }
+guest-bin = { git = "https://github.com/ClementWalter/stark-v", rev = "5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57" }
+guest-lib = { git = "https://github.com/ClementWalter/stark-v", rev = "5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57" }
 sha2 = { version = "0.10", default-features = false }
 
 [workspace]
