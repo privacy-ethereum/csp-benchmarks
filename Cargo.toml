@@ -13,6 +13,7 @@ members = [
     "sp1",
     "spartan2",
     "utils",
+    "zolt-bench",
 ]
 exclude = ["cairo-m", "nexus", "rookie-numbers", "stark-v"]
 

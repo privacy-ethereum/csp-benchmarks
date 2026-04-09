@@ -1,0 +1,17 @@
+[package]
+name = "zolt-bench"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { workspace = true }
+criterion = { workspace = true }
+utils = { workspace = true }
+
+[[bench]]
+name = "sha256"
+harness = false
+
+[[bin]]
+name = "sha256_mem_zolt"
+path = "src/bin/sha256_mem.rs"
