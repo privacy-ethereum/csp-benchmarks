@@ -15,7 +15,7 @@ Match the CI setup from `.github/workflows/sh_benchmarks_parallel.yml` and the h
    ```bash
    curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash
    export PATH="$HOME/.nargo/bin:$PATH"
-   ~/.nargo/bin/noirup --version 1.0.0-beta.13
+   ~/.nargo/bin/noirup --version 1.0.0-beta.19
    ```
 
 2. **Install the Barretenberg CLI**
@@ -23,7 +23,7 @@ Match the CI setup from `.github/workflows/sh_benchmarks_parallel.yml` and the h
    ```bash
    curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/next/barretenberg/bbup/install | bash
    export PATH="$HOME/.bb:$PATH"
-   bbup -v 1.2.0
+   bbup -v 5.0.0-nightly.20260324
    ```
 
 ## Installation & Test Run

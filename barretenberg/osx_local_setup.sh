@@ -44,8 +44,8 @@ else
     fi
 fi
 
-step "Installing Noir v1.0.0-beta.13"
-noirup --version 1.0.0-beta.13
+step "Installing Noir v1.0.0-beta.19"
+noirup --version 1.0.0-beta.19
 
 # -----------------------
 # Install Barretenberg(bbup)
@@ -72,8 +72,8 @@ else
     fi
 fi
 
-step "Installing Barretenberg v1.2.0"
-bbup -v 1.2.0
+step "Installing Barretenberg v5.0.0-nightly.20260324"
+bbup -v 5.0.0-nightly.20260324
 
 # -----------------------
 # Run demo prover & verifier
