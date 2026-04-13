@@ -11,10 +11,10 @@ WORKSPACE_ROOT_PATH="${SCRIPT_DIR}/circuits"
 # Update circuit to use INPUT_SIZE
 CIRCUIT_SOURCE="${WORKSPACE_ROOT_PATH}/hash/poseidon2/src/main.nr"
 if [[ -f "$CIRCUIT_SOURCE" ]]; then
-  # Replace hash_N function name and array size
+  # Replace array size and hash length argument for INPUT_SIZE
   sed -E -i.bak \
-    -e "s/hash_[0-9]+/hash_${INPUT_SIZE}/g" \
     -e "s/\[Field;[[:space:]]*[0-9]+\]/[Field; ${INPUT_SIZE}]/g" \
+    -e "s/Poseidon2::hash\(inputs,[[:space:]]*[0-9]+\)/Poseidon2::hash(inputs, ${INPUT_SIZE})/g" \
     "$CIRCUIT_SOURCE"
   rm -f "${CIRCUIT_SOURCE}.bak"
 else

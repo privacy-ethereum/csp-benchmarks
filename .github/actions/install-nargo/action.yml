@@ -5,14 +5,12 @@ inputs:
   version:
     description: Version of Nargo/Noir binaries.
     required: false
-    default: "1.0.0-beta.13"
+    default: "1.0.0-beta.19"
 
 runs:
   using: "composite"
   steps:
-    - shell: bash
-      run: |
-        curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash
-        export PATH="$HOME/.nargo/bin:$PATH"
-        ~/.nargo/bin/noirup --version ${{ inputs.version }}
-        echo "$HOME/.nargo/bin" >> $GITHUB_PATH
+    - name: Install Nargo
+      uses: noir-lang/noirup@v0.1.4
+      with:
+        toolchain: ${{ inputs.version }}
