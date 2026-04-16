@@ -6,6 +6,39 @@ Howdy! Usual good software engineering practices apply. Write comments. If your 
 
 - To keep benchmarks meaningful for practical deployments, we only include systems with at least 96 bits of security.
 
+## Reporting Issues and Review Findings
+
+This repository benchmarks external systems as submitted and integrated. We do not guarantee their correctness, security, or completeness, and we do not act as a full auditor. System maintainers remain responsible for their own codebases. If credible issues are identified, benchmark results may be annotated, revised, or excluded.
+
+### Use GitHub for reports
+
+- Submit review findings via GitHub, not via DMs or other private channels.
+- Keep technical discussion in GitHub issues and PRs so there is a durable public record of the claim, evidence, and outcome.
+- We do not act as a relay between teams. Maintainers and reviewers should interact directly in the relevant GitHub thread.
+
+### Where to report an issue
+
+The deciding factor is where the relevant code lives.
+
+- If the affected code lives in the system's own repository, file the issue there first.
+- If the affected code lives in this repository, open the issue or PR here.
+- If the issue is upstream but affects benchmark representation in this repository, open a linked tracking issue or PR here after filing upstream.
+
+Examples of issues that belong upstream:
+
+- incorrect security claims
+- soundness or zero-knowledge violations
+- protocol or implementation bugs independent of our harness
+
+Examples of issues that belong here:
+
+- circuits maintained in this repository
+- benchmark harness or integration code
+- parameterization or configuration errors in our setup
+- metadata we publish, benchmark inclusion/exclusion, or result interpretation
+
+Confirmed metadata errors may be corrected directly in this repository even when the root cause originates upstream.
+
 ## What's Expected in the Contribution/PR
 
 Depending on whether your codebase is written in Rust or not, you should follow the corresponding instructions below.
