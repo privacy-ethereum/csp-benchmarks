@@ -163,6 +163,16 @@ The root `./benchmark.sh` will invoke them in a fixed way via `hyperfine` and ou
 - You can copy the field structure from the example at `ligetron/bench_props.json`.
 - The full list of supported fields and their semantics is defined by `BenchProperties` in `utils/src/harness.rs`.
 
+#### `is_zk` policy
+
+`is_zk` is intentionally conservative.
+
+- Set `is_zk` to `true` only when the exact proof mode benchmarked in this repository has built-in zero-knowledge established by public documentation and a public formal security argument for that exact mode.
+- To claim `is_zk: true`, the contributor must provide references to public documentation and a formal security argument that cover the exact benchmarked configuration.
+- If a system has a separate wrapper mode that provides zero-knowledge, but the benchmarked native mode does not do so, set `is_zk` to `false`.
+- Set `is_zk` to `false` if the formal argument for the benchmarked mode is absent, incomplete, or qualified by official caveats.
+- When in doubt, set `is_zk` to `false`. In this repository, `false` covers both "known not zero-knowledge" and "not sufficiently established as zero-knowledge."
+
 #### API: `[target]_prepare.sh`
 
 - Required environment variables:
