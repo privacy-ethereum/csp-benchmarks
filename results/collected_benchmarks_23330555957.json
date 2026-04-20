@@ -1482,18 +1482,6 @@
     },
     {
       "system": "miden",
-      "target": "ecdsa",
-      "input_size": 32,
-      "proof_duration": 335068896,
-      "verify_duration": 1383085,
-      "cycles": 996,
-      "proof_size": 126961,
-      "preprocessing_size": 3858,
-      "num_constraints": 0,
-      "peak_memory": 56927846
-    },
-    {
-      "system": "miden",
       "target": "sha256",
       "input_size": 1024,
       "proof_duration": 31672303121,
