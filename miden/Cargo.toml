@@ -3,6 +3,9 @@ name = "miden"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+miden-ecdsa-bench = []
+
 [dependencies]
 ere-miden = { git = "https://github.com/eth-act/ere", rev = "6573843" }
 bincode = { workspace = true }
@@ -21,6 +24,7 @@ harness = false
 [[bench]]
 name = "ecdsa"
 harness = false
+required-features = ["miden-ecdsa-bench"]
 
 [[bin]]
 name = "sha256_mem_miden"
@@ -29,3 +33,4 @@ path = "src/bin/sha256_mem.rs"
 [[bin]]
 name = "ecdsa_mem_miden"
 path = "src/bin/ecdsa_mem.rs"
+required-features = ["miden-ecdsa-bench"]
