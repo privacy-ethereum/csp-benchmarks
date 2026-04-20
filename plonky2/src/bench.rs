@@ -39,7 +39,7 @@ pub fn sha256_prepare(input_size: usize) -> (CircuitData<F, C, D>, PartialWitnes
     const D: usize = 2;
     type C = PoseidonGoldilocksConfig;
     type F = <C as GenericConfig<D>>::F;
-    let mut builder = CircuitBuilder::<F, D>::new(CircuitConfig::standard_recursion_config());
+    let mut builder = CircuitBuilder::<F, D>::new(CircuitConfig::standard_recursion_zk_config());
     let targets = make_circuits(&mut builder, len as u64);
     let mut pw = PartialWitness::new();
 
@@ -64,7 +64,7 @@ pub fn poseidon_prepare(input_size: usize) -> (CircuitData<F, C, D>, PartialWitn
     use plonky2::field::types::Field;
 
     let inputs = utils::generate_poseidon_input_goldilocks(input_size);
-    let mut builder = CircuitBuilder::<F, D>::new(CircuitConfig::standard_recursion_config());
+    let mut builder = CircuitBuilder::<F, D>::new(CircuitConfig::standard_recursion_zk_config());
 
     let input_targets: Vec<_> = (0..input_size)
         .map(|_| builder.add_virtual_target())
@@ -91,7 +91,7 @@ pub fn keccak256_prepare(input_size: usize) -> (CircuitData<F, C, D>, PartialWit
     const D: usize = 2;
     type C = PoseidonGoldilocksConfig;
     type F = <C as GenericConfig<D>>::F;
-    let mut builder = CircuitBuilder::<F, D>::new(CircuitConfig::standard_recursion_config());
+    let mut builder = CircuitBuilder::<F, D>::new(CircuitConfig::standard_recursion_zk_config());
 
     let mut input_targets = vec![];
     for _ in 0..len {
