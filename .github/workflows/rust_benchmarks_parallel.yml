@@ -54,7 +54,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          lfs: true
 
       - name: Determine base‑remote and fetch it
         id: base
@@ -157,8 +156,6 @@ jobs:
     runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.prod_run == true) && 'self-hosted' || 'macos-latest' }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          lfs: true
 
       - name: Cache everything
         uses: actions/cache@v4
@@ -256,7 +253,38 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          lfs: true
+
+      - name: Download and verify circom zkeys
+        if: ${{ contains(matrix.crate, 'circom') }}
+        env:
+          ZKEYS_RELEASE_URL: https://github.com/privacy-ethereum/csp-benchmarks/releases/download/zkeys-v1
+        run: |
+          set -euo pipefail
+          mapfile -t zkeys <<'EOF'
+          circuits/keccak/keccak_1024/keccak_1024_0001.zkey
+          circuits/keccak/keccak_128/keccak_128_0001.zkey
+          circuits/keccak/keccak_2048/keccak_2048_0001.zkey
+          circuits/keccak/keccak_256/keccak_256_0001.zkey
+          circuits/keccak/keccak_512/keccak_512_0001.zkey
+          circuits/poseidon/poseidon_12/poseidon_12_0001.zkey
+          circuits/poseidon/poseidon_16/poseidon_16_0001.zkey
+          circuits/poseidon/poseidon_2/poseidon_2_0001.zkey
+          circuits/poseidon/poseidon_4/poseidon_4_0001.zkey
+          circuits/poseidon/poseidon_8/poseidon_8_0001.zkey
+          circuits/sha256/sha256_1024/sha256_1024_0001.zkey
+          circuits/sha256/sha256_128/sha256_128_0001.zkey
+          circuits/sha256/sha256_2048/sha256_2048_0001.zkey
+          circuits/sha256/sha256_256/sha256_256_0001.zkey
+          circuits/sha256/sha256_512/sha256_512_0001.zkey
+          EOF
+
+          for zkey in "${zkeys[@]}"; do
+            curl --fail --location --retry 3 --retry-all-errors \
+              "$ZKEYS_RELEASE_URL/$(basename "$zkey")" \
+              --output "circom/$zkey"
+          done
+
+          (cd circom && shasum -a 256 --check checksums.sha256)
 
       - name: Restore Cargo cache
         uses: actions/cache@v4

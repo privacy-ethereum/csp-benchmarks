@@ -28,5 +28,6 @@ third_party/
 *.sym
 *.wtns
 *.ptau
+*.zkey
 .claude
 .codex
