@@ -8,5 +8,5 @@ runs:
       run: |
         curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/next/barretenberg/bbup/install | bash
         export PATH="$HOME/.bb:$PATH"
-        bbup -v v5.0.0-nightly.20260324
+        bbup -v 5.0.0-nightly.20260324
         echo "$HOME/.bb" >> $GITHUB_PATH
