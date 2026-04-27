@@ -29,6 +29,10 @@ path = "src/bin/poseidon_mem.rs"
 name = "keccak_mem_provekit"
 path = "src/bin/keccak_mem.rs"
 
+[[bin]]
+name = "poseidon2_mem_provekit"
+path = "src/bin/poseidon2_mem.rs"
+
 [[bench]]
 name = "sha256"
 harness = false
@@ -39,6 +43,10 @@ harness = false
 
 [[bench]]
 name = "poseidon"
+harness = false
+
+[[bench]]
+name = "poseidon2"
 harness = false
 
 [[bench]]

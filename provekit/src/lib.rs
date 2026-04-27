@@ -10,10 +10,6 @@ use utils::generate_ecdsa_input;
 use utils::harness::{AuditStatus, BenchProperties};
 
 const WORKSPACE_ROOT: &str = "circuits";
-const SHA256_CIRCUIT_SUB_PATH: &str = "hash/sha256-provekit";
-const POSEIDON_CIRCUIT_SUB_PATH: &str = "hash/poseidon";
-const KECCAK_CIRCUIT_SUB_PATH: &str = "hash/keccak";
-const ECDSA_CIRCUIT_SUB_PATH: &str = "ecdsa";
 
 pub const PROVEKIT_PROPS: BenchProperties = BenchProperties {
     proving_system: Cow::Borrowed("Spartan+WHIR"), // https://github.com/worldfnd/provekit
@@ -30,13 +26,19 @@ pub const PROVEKIT_PROPS: BenchProperties = BenchProperties {
     isa: None,
 };
 
-fn compile_workspace() -> PathBuf {
-    let current_dir = std::env::current_dir().expect("Failed to get current directory");
-    let workspace_root = current_dir.join(WORKSPACE_ROOT);
+fn workspace_root() -> PathBuf {
+    std::env::current_dir()
+        .expect("Failed to get current directory")
+        .join(WORKSPACE_ROOT)
+}
+
+fn compile_package(package: &str) -> (NoirProofScheme, PathBuf) {
+    let workspace_root = workspace_root();
     let output = Command::new("nargo")
         .args([
             "compile",
-            "--workspace",
+            "--package",
+            package,
             "--silence-warnings",
             "--skip-brillig-constraints-check",
         ])
@@ -45,252 +47,106 @@ fn compile_workspace() -> PathBuf {
         .expect("Failed to run nargo compile");
     if !output.status.success() {
         panic!(
-            "Workspace compilation failed: {}",
+            "Compilation failed for {package}: {}",
             String::from_utf8_lossy(&output.stderr)
         );
     }
-    workspace_root
+    let circuit_path = workspace_root
+        .join("target")
+        .join(format!("{package}.json"));
+    let proof_scheme = NoirCompiler::from_file(&circuit_path, HashConfig::default())
+        .unwrap_or_else(|e| panic!("Failed to load proof scheme for {package}: {e}"));
+    (proof_scheme, circuit_path)
+}
+
+// Map a package name like "csp_sha256_128" to the circuit's directory under
+// `circuits/`. Upstream layout uses the same suffix as the directory name.
+fn package_dir(package: &str) -> PathBuf {
+    let suffix = package.strip_prefix("csp_").unwrap_or(package);
+    workspace_root().join(suffix)
+}
+
+fn write_prover_toml(package: &str, content: &str) -> PathBuf {
+    let dir = package_dir(package);
+    fs::create_dir_all(&dir).expect("Failed to create circuit dir");
+    let toml_path = dir.join("Prover.toml");
+    fs::write(&toml_path, content).expect("Failed to write Prover.toml");
+    toml_path
+}
+
+fn join_u8(bytes: &[u8]) -> String {
+    bytes
+        .iter()
+        .map(u8::to_string)
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
+fn join_field_strings(fields: &[String]) -> String {
+    fields
+        .iter()
+        .map(|s| format!("\"{s}\""))
+        .collect::<Vec<_>>()
+        .join(", ")
 }
 
 pub fn prepare_sha256(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
-    // 1) Rewrite circuit input length to match input_size before compiling
-    let current_dir = std::env::current_dir().expect("Failed to get current directory");
-    let workspace_root_pre = current_dir.join(WORKSPACE_ROOT);
-    let circuit_source =
-        workspace_root_pre.join("hash/sha256-provekit/sha256_var_input/src/main.nr");
+    let package = format!("csp_sha256_{input_size}");
+    let (proof_scheme, circuit_path) = compile_package(&package);
 
-    if let Ok(mut content) = fs::read_to_string(&circuit_source) {
-        // Replace only the input param length in `fn main(input: [u8; N], ...)`
-        if let Some(fn_pos) = content.find("fn main(")
-            && let Some(input_pos_rel) = content[fn_pos..].find("input: [u8;")
-        {
-            let input_pos = fn_pos + input_pos_rel + "input: [u8;".len();
-            // Skip whitespace
-            let bytes = content.as_bytes();
-            let mut start = input_pos;
-            while start < bytes.len() && bytes[start].is_ascii_whitespace() {
-                start += 1;
-            }
-            let mut end = start;
-            while end < bytes.len() && bytes[end].is_ascii_digit() {
-                end += 1;
-            }
-            if start != end {
-                content.replace_range(start..end, &input_size.to_string());
-                fs::write(&circuit_source, content).expect("Failed to update circuit input length");
-            }
-        }
-    }
-
-    // 2) Compile workspace
-    let workspace_root = compile_workspace();
-
-    // 3) Load scheme and prepare TOML matching the chosen size
-    let package_name = "sha256_var_input";
-    let circuit_path = workspace_root
-        .join("target")
-        .join(format!("{package_name}.json"));
-
-    let proof_scheme = NoirCompiler::from_file(&circuit_path, HashConfig::default())
-        .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
-
-    let dir_name = "sha256_var_input";
-    let circuit_member_dir = workspace_root.join(SHA256_CIRCUIT_SUB_PATH).join(dir_name);
-    fs::create_dir_all(&circuit_member_dir).expect("Failed to create circuit dir");
-
-    // Generate exactly `input_size` bytes of input; circuit expects fixed array with `input_size` elements
     let (data, _digest) = utils::generate_sha256_input(input_size);
-    let toml_content = format!(
-        "input = [{}]\ninput_len = {input_size}",
-        data.iter()
-            .map(u8::to_string)
-            .collect::<Vec<_>>()
-            .join(", "),
-    );
-
-    let toml_path = circuit_member_dir.join("Prover.toml");
-    fs::write(&toml_path, toml_content).expect("Failed to write Prover.toml");
-
-    (proof_scheme, toml_path, circuit_path)
-}
-
-pub fn prepare_poseidon(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
-    let current_dir = std::env::current_dir().expect("Failed to get current directory");
-    let workspace_root_pre = current_dir.join(WORKSPACE_ROOT);
-    let circuit_source = workspace_root_pre.join("hash/poseidon/src/main.nr");
-
-    if let Ok(mut content) = fs::read_to_string(&circuit_source) {
-        if let Some(import_pos) = content.find("poseidon::bn254::hash_") {
-            let start = import_pos + "poseidon::bn254::hash_".len();
-            let mut end = start;
-            while end < content.len() && content.as_bytes()[end].is_ascii_digit() {
-                end += 1;
-            }
-            if start != end {
-                content.replace_range(start..end, &input_size.to_string());
-            }
-        }
-
-        if let Some(hash_pos) = content.find("    hash_") {
-            let start = hash_pos + "    hash_".len();
-            let mut end = start;
-            while end < content.len() && content.as_bytes()[end].is_ascii_digit() {
-                end += 1;
-            }
-            if start != end {
-                content.replace_range(start..end, &input_size.to_string());
-            }
-        }
-
-        if let Some(field_pos) = content.find("[Field;") {
-            let start = field_pos + "[Field;".len();
-            let bytes = content.as_bytes();
-            let mut num_start = start;
-            while num_start < bytes.len() && bytes[num_start].is_ascii_whitespace() {
-                num_start += 1;
-            }
-            let mut end = num_start;
-            while end < bytes.len() && bytes[end].is_ascii_digit() {
-                end += 1;
-            }
-            if num_start != end {
-                content.replace_range(num_start..end, &input_size.to_string());
-            }
-        }
-
-        fs::write(&circuit_source, content).expect("Failed to update circuit");
-    }
-
-    let workspace_root = compile_workspace();
-
-    let package_name = "poseidon";
-    let circuit_path = workspace_root
-        .join("target")
-        .join(format!("{package_name}.json"));
-
-    let proof_scheme = NoirCompiler::from_file(&circuit_path, HashConfig::default())
-        .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
-
-    let circuit_member_dir = workspace_root.join(POSEIDON_CIRCUIT_SUB_PATH);
-    fs::create_dir_all(&circuit_member_dir).expect("Failed to create circuit dir");
-
-    let field_elements = utils::generate_poseidon_input_strings(input_size);
-    let toml_content = format!(
-        "inputs = [{}]",
-        field_elements
-            .iter()
-            .map(|s| format!("\"{}\"", s))
-            .collect::<Vec<_>>()
-            .join(", ")
-    );
-
-    let toml_path = circuit_member_dir.join("Prover.toml");
-    fs::write(&toml_path, toml_content).expect("Failed to write Prover.toml");
-
+    let toml = format!("input = [{}]\ninput_len = {input_size}", join_u8(&data),);
+    let toml_path = write_prover_toml(&package, &toml);
     (proof_scheme, toml_path, circuit_path)
 }
 
 pub fn prepare_keccak(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
-    let current_dir = std::env::current_dir().expect("Failed to get current directory");
-    let workspace_root_pre = current_dir.join(WORKSPACE_ROOT);
-    let circuit_source = workspace_root_pre.join("hash/keccak/src/main.nr");
-
-    if let Ok(mut content) = fs::read_to_string(&circuit_source)
-        && let Some(fn_pos) = content.find("fn main(")
-        && let Some(msg_pos_rel) = content[fn_pos..].find("msg: [u8;")
-    {
-        let msg_pos = fn_pos + msg_pos_rel + "msg: [u8;".len();
-        let bytes = content.as_bytes();
-        let mut start = msg_pos;
-        while start < bytes.len() && bytes[start].is_ascii_whitespace() {
-            start += 1;
-        }
-        let mut end = start;
-        while end < bytes.len() && bytes[end].is_ascii_digit() {
-            end += 1;
-        }
-        if start != end {
-            content.replace_range(start..end, &input_size.to_string());
-            fs::write(&circuit_source, content).expect("Failed to update circuit input length");
-        }
-    }
-
-    let workspace_root = compile_workspace();
-
-    let package_name = "keccak";
-    let circuit_path = workspace_root
-        .join("target")
-        .join(format!("{package_name}.json"));
-
-    let proof_scheme = NoirCompiler::from_file(&circuit_path, HashConfig::default())
-        .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
-
-    let circuit_member_dir = workspace_root.join(KECCAK_CIRCUIT_SUB_PATH);
-    fs::create_dir_all(&circuit_member_dir).expect("Failed to create circuit dir");
+    let package = format!("csp_keccak_{input_size}");
+    let (proof_scheme, circuit_path) = compile_package(&package);
 
     let (data, digest) = utils::generate_keccak_input(input_size);
-    let toml_content = format!(
+    let toml = format!(
         "msg = [{}]\nmessage_size = {input_size}\nresult = [{}]",
-        data.iter()
-            .map(u8::to_string)
-            .collect::<Vec<_>>()
-            .join(", "),
-        digest
-            .iter()
-            .map(u8::to_string)
-            .collect::<Vec<_>>()
-            .join(", "),
+        join_u8(&data),
+        join_u8(&digest),
     );
+    let toml_path = write_prover_toml(&package, &toml);
+    (proof_scheme, toml_path, circuit_path)
+}
 
-    let toml_path = circuit_member_dir.join("Prover.toml");
-    fs::write(&toml_path, toml_content).expect("Failed to write Prover.toml");
+pub fn prepare_poseidon(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
+    let package = format!("csp_poseidon_{input_size}");
+    let (proof_scheme, circuit_path) = compile_package(&package);
 
+    let fields = utils::generate_poseidon_input_strings(input_size);
+    let toml = format!("inputs = [{}]", join_field_strings(&fields));
+    let toml_path = write_prover_toml(&package, &toml);
+    (proof_scheme, toml_path, circuit_path)
+}
+
+pub fn prepare_poseidon2(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
+    let package = format!("csp_poseidon2_{input_size}");
+    let (proof_scheme, circuit_path) = compile_package(&package);
+
+    let fields = utils::generate_poseidon_input_strings(input_size);
+    let toml = format!("inputs = [{}]", join_field_strings(&fields));
+    let toml_path = write_prover_toml(&package, &toml);
     (proof_scheme, toml_path, circuit_path)
 }
 
 pub fn prepare_ecdsa(_: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
-    let workspace_root = compile_workspace();
-
-    let package_name = "p256_bigcurve";
-    let circuit_path = workspace_root
-        .join("target")
-        .join(format!("{package_name}.json"));
-
-    let proof_scheme = NoirCompiler::from_file(&circuit_path, HashConfig::default())
-        .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
-
-    let dir_name = "p256_bigcurve";
-    let circuit_member_dir = workspace_root.join(ECDSA_CIRCUIT_SUB_PATH).join(dir_name);
-    fs::create_dir_all(&circuit_member_dir).expect("Failed to create circuit dir");
+    let package = "csp_ecdsa_p256";
+    let (proof_scheme, circuit_path) = compile_package(package);
 
     let (digest, (pub_key_x, pub_key_y), signature) = generate_ecdsa_input();
-    let toml_content = format!(
+    let toml = format!(
         "hashed_message = [{}]\npub_key_x = [{}]\npub_key_y = [{}]\nsignature = [{}]",
-        digest
-            .iter()
-            .map(u8::to_string)
-            .collect::<Vec<_>>()
-            .join(", "),
-        pub_key_x
-            .iter()
-            .map(u8::to_string)
-            .collect::<Vec<_>>()
-            .join(", "),
-        pub_key_y
-            .iter()
-            .map(u8::to_string)
-            .collect::<Vec<_>>()
-            .join(", "),
-        signature
-            .iter()
-            .map(u8::to_string)
-            .collect::<Vec<_>>()
-            .join(", "),
+        join_u8(&digest),
+        join_u8(&pub_key_x),
+        join_u8(&pub_key_y),
+        join_u8(&signature),
     );
-
-    let toml_path = circuit_member_dir.join("Prover.toml");
-    fs::write(&toml_path, toml_content).expect("Failed to write Prover.toml");
-
+    let toml_path = write_prover_toml(package, &toml);
     (proof_scheme, toml_path, circuit_path)
 }
 
