@@ -1,6 +1,6 @@
-use provekit_common::{NoirProof, NoirProofScheme, Prover, Verifier};
+use provekit_common::{HashConfig, NoirProof, NoirProofScheme, Prover, Verifier};
 use provekit_prover::Prove;
-use provekit_r1cs_compiler::NoirProofSchemeBuilder;
+use provekit_r1cs_compiler::NoirCompiler;
 use provekit_verifier::Verify;
 use std::borrow::Cow;
 use std::fs;
@@ -91,7 +91,7 @@ pub fn prepare_sha256(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) 
         .join("target")
         .join(format!("{package_name}.json"));
 
-    let proof_scheme = NoirProofScheme::from_file(&circuit_path)
+    let proof_scheme = NoirCompiler::from_file(&circuit_path, HashConfig::default())
         .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
 
     let dir_name = "sha256_var_input";
@@ -168,7 +168,7 @@ pub fn prepare_poseidon(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf
         .join("target")
         .join(format!("{package_name}.json"));
 
-    let proof_scheme = NoirProofScheme::from_file(&circuit_path)
+    let proof_scheme = NoirCompiler::from_file(&circuit_path, HashConfig::default())
         .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
 
     let circuit_member_dir = workspace_root.join(POSEIDON_CIRCUIT_SUB_PATH);
@@ -222,7 +222,7 @@ pub fn prepare_keccak(input_size: usize) -> (NoirProofScheme, PathBuf, PathBuf) 
         .join("target")
         .join(format!("{package_name}.json"));
 
-    let proof_scheme = NoirProofScheme::from_file(&circuit_path)
+    let proof_scheme = NoirCompiler::from_file(&circuit_path, HashConfig::default())
         .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
 
     let circuit_member_dir = workspace_root.join(KECCAK_CIRCUIT_SUB_PATH);
@@ -256,7 +256,7 @@ pub fn prepare_ecdsa(_: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
         .join("target")
         .join(format!("{package_name}.json"));
 
-    let proof_scheme = NoirProofScheme::from_file(&circuit_path)
+    let proof_scheme = NoirCompiler::from_file(&circuit_path, HashConfig::default())
         .unwrap_or_else(|e| panic!("Failed to load proof scheme: {e}"));
 
     let dir_name = "p256_bigcurve";
@@ -296,7 +296,9 @@ pub fn prepare_ecdsa(_: usize) -> (NoirProofScheme, PathBuf, PathBuf) {
 
 pub fn prove(proof_scheme: &NoirProofScheme, toml_path: &Path) -> NoirProof {
     let prover = Prover::from_noir_proof_scheme(proof_scheme.clone());
-    prover.prove(toml_path).expect("Proof generation failed")
+    prover
+        .prove_with_toml(toml_path)
+        .expect("Proof generation failed")
 }
 
 /// Verify a proof with the given scheme
