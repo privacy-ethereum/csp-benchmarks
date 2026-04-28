@@ -7,7 +7,7 @@ The ProveKit benches rely on Noir tooling to compile the circuits. Install the e
 ```bash
 curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash
 export PATH="$HOME/.nargo/bin:$PATH"
-~/.nargo/bin/noirup --version 1.0.0-beta.11
+~/.nargo/bin/noirup --version 1.0.0-beta.19
 
 rustup toolchain install nightly-2025-08-18-aarch64-apple-darwin \
   --component llvm-tools rustc-dev
