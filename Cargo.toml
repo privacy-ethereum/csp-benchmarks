@@ -5,6 +5,7 @@ members = [
     "plonky2",
     "openvm",
     "provekit",
+    "provekit-groth16",
     "polyhedra-expander",
     "circom",
     "jolt",
