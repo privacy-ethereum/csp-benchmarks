@@ -1,7 +1,7 @@
 use ark_serialize::CanonicalSerialize;
 use noirc_abi::AbiVisibility;
 use provekit_common::{HashConfig, NoirProof, Verifier, noir_proof_scheme::NoirProofScheme};
-use provekit_prover::{Groth16CommitmentInfo, Groth16Prover, Prove, Prover};
+use provekit_prover::{Groth16CommitmentInfo, Groth16Prover, Prove, Prover, serialize_pkp};
 use provekit_r1cs_compiler::NoirCompiler;
 use provekit_verifier::Verify;
 use std::borrow::Cow;
@@ -94,11 +94,11 @@ pub struct GrothPrepared {
     pub prover: Prover,
     pub verifier: Verifier,
     pub toml_path: PathBuf,
-    pub pk_size: usize,
+    pub pkp_size: usize,
     pub num_constraints: usize,
 }
 
-fn build_groth16_state(scheme: NoirProofScheme) -> (Prover, Verifier, usize) {
+fn build_groth16_state(scheme: NoirProofScheme) -> (Prover, Verifier) {
     let hash_config = HashConfig::default();
     let NoirProofScheme::Noir(d) = scheme else {
         panic!("Groth16 backend requires the Noir compiler (not Mavros)");
@@ -169,8 +169,6 @@ fn build_groth16_state(scheme: NoirProofScheme) -> (Prover, Verifier, usize) {
     )
     .expect("Groth16 trusted setup failed");
 
-    let pk_size = pk.serialized_size(ark_serialize::Compress::Yes);
-
     let mut vk_bytes = Vec::new();
     vk.serialize_uncompressed(&mut vk_bytes)
         .expect("serialize Groth16 verifying key");
@@ -192,21 +190,24 @@ fn build_groth16_state(scheme: NoirProofScheme) -> (Prover, Verifier, usize) {
         groth16_vk: Some(vk_bytes),
     };
 
-    (prover, verifier, pk_size)
+    (prover, verifier)
 }
 
 fn prepared_from(package: &str, scheme: NoirProofScheme, toml: String) -> GrothPrepared {
     let toml_path = write_prover_toml(package, &toml);
-    let (prover, verifier, pk_size) = build_groth16_state(scheme);
+    let (prover, verifier) = build_groth16_state(scheme);
     let Prover::Groth16(g) = &prover else {
         unreachable!()
     };
     let num_constraints = g.r1cs.num_constraints();
+    let pkp_size = serialize_pkp(&prover)
+        .expect("serialize Prover to .pkp bytes")
+        .len();
     GrothPrepared {
         prover,
         verifier,
         toml_path,
-        pk_size,
+        pkp_size,
         num_constraints,
     }
 }
@@ -275,7 +276,7 @@ pub fn verify(prepared: &GrothPrepared, proof: &NoirProof) -> Result<(), &'stati
 }
 
 pub fn preprocessing_size(prepared: &GrothPrepared) -> usize {
-    prepared.pk_size
+    prepared.pkp_size
 }
 
 pub fn proof_size(proof: &NoirProof) -> usize {
