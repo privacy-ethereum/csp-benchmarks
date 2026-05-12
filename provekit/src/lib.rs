@@ -1,4 +1,4 @@
-use provekit_common::{HashConfig, NoirProof, NoirProofScheme, Prover, Verifier};
+use provekit_common::{HashConfig, NoirProof, NoirProofScheme, Prover, Verifier, file::serialize};
 use provekit_prover::Prove;
 use provekit_r1cs_compiler::NoirCompiler;
 use provekit_verifier::Verify;
@@ -163,8 +163,9 @@ pub fn verify(proof: &NoirProof, proof_scheme: &NoirProofScheme) -> Result<(), &
     verifier.verify(proof).map_err(|_| "Proof is not valid")
 }
 
-pub fn preprocessing_size(circuit_path: &Path) -> usize {
-    std::fs::metadata(circuit_path)
-        .map(|m| m.len())
-        .unwrap_or(0) as usize
+pub fn preprocessing_size(proof_scheme: &NoirProofScheme) -> usize {
+    let prover = Prover::from_noir_proof_scheme(proof_scheme.clone());
+    serialize(&prover)
+        .expect("serialize Prover to .pkp bytes")
+        .len()
 }
