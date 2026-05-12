@@ -1,6 +1,6 @@
 use ark_serialize::CanonicalSerialize;
 use noirc_abi::AbiVisibility;
-use provekit_common::{noir_proof_scheme::NoirProofScheme, HashConfig, NoirProof, Verifier};
+use provekit_common::{HashConfig, NoirProof, Verifier, noir_proof_scheme::NoirProofScheme};
 use provekit_prover::{Groth16CommitmentInfo, Groth16Prover, Prove, Prover};
 use provekit_r1cs_compiler::NoirCompiler;
 use provekit_verifier::Verify;
@@ -198,7 +198,9 @@ fn build_groth16_state(scheme: NoirProofScheme) -> (Prover, Verifier, usize) {
 fn prepared_from(package: &str, scheme: NoirProofScheme, toml: String) -> GrothPrepared {
     let toml_path = write_prover_toml(package, &toml);
     let (prover, verifier, pk_size) = build_groth16_state(scheme);
-    let Prover::Groth16(g) = &prover else { unreachable!() };
+    let Prover::Groth16(g) = &prover else {
+        unreachable!()
+    };
     let num_constraints = g.r1cs.num_constraints();
     GrothPrepared {
         prover,

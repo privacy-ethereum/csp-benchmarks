@@ -1,6 +1,6 @@
 use provekit_groth16_bench::{
-    num_constraints, prepare_poseidon, preprocessing_size, proof_size, prove, verify,
-    PROVEKIT_GROTH16_PROPS,
+    PROVEKIT_GROTH16_PROPS, num_constraints, prepare_poseidon, preprocessing_size, proof_size,
+    prove, verify,
 };
 use utils::harness::ProvingSystem;
 
