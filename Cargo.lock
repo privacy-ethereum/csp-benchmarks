@@ -2479,11 +2479,11 @@ dependencies = [
 [[package]]
 name = "bn254-multiplier"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 dependencies = [
- "bn254-multiplier-codegen 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
- "fp-rounding 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
- "hla 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "bn254-multiplier-codegen 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
+ "fp-rounding 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
+ "hla 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "seq-macro",
 ]
 
@@ -2501,9 +2501,9 @@ dependencies = [
 [[package]]
 name = "bn254-multiplier-codegen"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 dependencies = [
- "hla 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "hla 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
 ]
 
 [[package]]
@@ -4948,7 +4948,7 @@ dependencies = [
 [[package]]
 name = "fp-rounding"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 
 [[package]]
 name = "fp-rounding"
@@ -5713,7 +5713,7 @@ dependencies = [
 [[package]]
 name = "hla"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 dependencies = [
  "paste",
 ]
@@ -7915,11 +7915,11 @@ dependencies = [
 [[package]]
 name = "ntt"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 dependencies = [
  "ark-bn254",
  "ark-ff 0.5.0",
- "bn254-multiplier 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "bn254-multiplier 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "rayon",
 ]
 
@@ -10653,7 +10653,7 @@ dependencies = [
 [[package]]
 name = "poseidon2"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 dependencies = [
  "ark-bn254",
  "ark-ff 0.5.0",
@@ -10952,7 +10952,7 @@ dependencies = [
 [[package]]
 name = "provekit-common"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 dependencies = [
  "acir",
  "anyhow",
@@ -10969,8 +10969,8 @@ dependencies = [
  "mavros-artifacts",
  "mavros-vm",
  "noirc_abi",
- "ntt 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
- "poseidon2 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "ntt 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
+ "poseidon2 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "postcard",
  "rayon",
  "ruint",
@@ -10978,7 +10978,7 @@ dependencies = [
  "serde_json",
  "sha2 0.10.9",
  "sha3",
- "skyscraper 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "skyscraper 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "spongefish",
  "spongefish-pow",
  "tracing",
@@ -11030,7 +11030,7 @@ dependencies = [
 [[package]]
 name = "provekit-groth16"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 dependencies = [
  "anyhow",
  "ark-bn254",
@@ -11039,7 +11039,8 @@ dependencies = [
  "ark-poly 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "ark-serialize 0.5.0",
  "ark-std 0.5.0",
- "provekit-common 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "memmap2",
+ "provekit-common 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "rayon",
  "serde",
  "sha2 0.10.9",
@@ -11055,11 +11056,11 @@ dependencies = [
  "clap",
  "criterion",
  "noirc_abi",
- "provekit-common 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "provekit-common 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "provekit-groth16",
- "provekit-prover 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
- "provekit-r1cs-compiler 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
- "provekit-verifier 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "provekit-prover 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
+ "provekit-r1cs-compiler 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
+ "provekit-verifier 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "rand 0.8.5",
  "utils 0.1.0",
 ]
@@ -11067,7 +11068,7 @@ dependencies = [
 [[package]]
 name = "provekit-prover"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 dependencies = [
  "acir",
  "anyhow",
@@ -11081,12 +11082,13 @@ dependencies = [
  "bytes",
  "mavros-artifacts",
  "mavros-vm",
+ "memmap2",
  "nargo",
  "noir_artifact_cli",
  "noirc_abi",
  "num-bigint 0.4.6",
  "postcard",
- "provekit-common 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "provekit-common 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "provekit-groth16",
  "rayon",
  "serde",
@@ -11121,7 +11123,7 @@ dependencies = [
 [[package]]
 name = "provekit-r1cs-compiler"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 dependencies = [
  "acir",
  "anyhow",
@@ -11131,9 +11133,9 @@ dependencies = [
  "mavros-artifacts",
  "noirc_abi",
  "noirc_artifacts",
- "poseidon2 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "poseidon2 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "postcard",
- "provekit-common 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "provekit-common 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "serde",
  "serde_json",
  "tracing",
@@ -11165,13 +11167,13 @@ dependencies = [
 [[package]]
 name = "provekit-verifier"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 dependencies = [
  "anyhow",
  "ark-bn254",
  "ark-serialize 0.5.0",
  "ark-std 0.5.0",
- "provekit-common 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "provekit-common 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "provekit-groth16",
  "rayon",
  "tracing",
@@ -13048,12 +13050,12 @@ checksum = "85636c14b73d81f541e525f585c0a2109e6744e1565b5c1668e31c70c10ed65c"
 [[package]]
 name = "skyscraper"
 version = "0.1.0"
-source = "git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce#622c276fdea28c3c020705e2df71d20870f415ce"
+source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
 dependencies = [
  "ark-bn254",
  "ark-ff 0.5.0",
- "bn254-multiplier 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
- "fp-rounding 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=622c276fdea28c3c020705e2df71d20870f415ce)",
+ "bn254-multiplier 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
+ "fp-rounding 0.1.0 (git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435)",
  "rayon",
  "seq-macro",
  "zerocopy",

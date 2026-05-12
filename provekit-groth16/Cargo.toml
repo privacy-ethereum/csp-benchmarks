@@ -10,11 +10,11 @@ criterion = { workspace = true }
 clap = { workspace = true }
 ark-serialize = "0.5"
 noirc_abi = { git = "https://github.com/noir-lang/noir", rev = "v1.0.0-beta.19" }
-provekit-common = { git = "https://github.com/worldfnd/ProveKit", rev = "622c276fdea28c3c020705e2df71d20870f415ce" }
-provekit-r1cs-compiler = { git = "https://github.com/worldfnd/ProveKit", rev = "622c276fdea28c3c020705e2df71d20870f415ce" }
-provekit-prover = { git = "https://github.com/worldfnd/ProveKit", rev = "622c276fdea28c3c020705e2df71d20870f415ce" }
-provekit-verifier = { git = "https://github.com/worldfnd/ProveKit", rev = "622c276fdea28c3c020705e2df71d20870f415ce" }
-provekit-groth16 = { git = "https://github.com/worldfnd/ProveKit", rev = "622c276fdea28c3c020705e2df71d20870f415ce" }
+provekit-common = { git = "https://github.com/worldfnd/ProveKit", rev = "b910fe8da2b909bb84f0c48a5078101369bfb435" }
+provekit-r1cs-compiler = { git = "https://github.com/worldfnd/ProveKit", rev = "b910fe8da2b909bb84f0c48a5078101369bfb435" }
+provekit-prover = { git = "https://github.com/worldfnd/ProveKit", rev = "b910fe8da2b909bb84f0c48a5078101369bfb435" }
+provekit-verifier = { git = "https://github.com/worldfnd/ProveKit", rev = "b910fe8da2b909bb84f0c48a5078101369bfb435" }
+provekit-groth16 = { git = "https://github.com/worldfnd/ProveKit", rev = "b910fe8da2b909bb84f0c48a5078101369bfb435" }
 
 [[bin]]
 name = "sha256_mem_provekit_groth16"

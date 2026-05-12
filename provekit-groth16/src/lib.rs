@@ -1,7 +1,9 @@
 use ark_serialize::CanonicalSerialize;
 use noirc_abi::AbiVisibility;
 use provekit_common::{HashConfig, NoirProof, Verifier, noir_proof_scheme::NoirProofScheme};
-use provekit_prover::{Groth16CommitmentInfo, Groth16Prover, Prove, Prover, serialize_pkp};
+use provekit_prover::{
+    Groth16CommitmentInfo, Groth16PkSource, Groth16Prover, Prove, Prover, serialize_pkp,
+};
 use provekit_r1cs_compiler::NoirCompiler;
 use provekit_verifier::Verify;
 use std::borrow::Cow;
@@ -178,7 +180,7 @@ fn build_groth16_state(scheme: NoirProofScheme) -> (Prover, Verifier) {
         r1cs: r1cs.clone(),
         split_witness_builders,
         witness_generator,
-        groth16_pk: pk,
+        groth16_pk: Groth16PkSource::Owned(pk),
         commitment_info,
     });
 
