@@ -217,8 +217,12 @@ fn prepared_from(package: &str, scheme: NoirProofScheme, toml: String) -> GrothP
 pub fn prepare_sha256(input_size: usize) -> GrothPrepared {
     let package = format!("csp_sha256_{input_size}");
     let (scheme, _) = compile_package(&package);
-    let (data, _digest) = utils::generate_sha256_input(input_size);
-    let toml = format!("input = [{}]\ninput_len = {input_size}", join_u8(&data));
+    let (data, digest) = utils::generate_sha256_input(input_size);
+    let toml = format!(
+        "input = [{}]\ninput_len = {input_size}\nresult = [{}]",
+        join_u8(&data),
+        join_u8(&digest),
+    );
     prepared_from(&package, scheme, toml)
 }
 
