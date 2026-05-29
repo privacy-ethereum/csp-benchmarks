@@ -242,6 +242,7 @@ jobs:
     if: ${{ needs.detect-crates.outputs.crates != '' && needs.detect-crates.outputs.crates != '[]' }}
     needs: [prepare-cache, detect-crates]
     runs-on: ${{ (github.event_name == 'workflow_dispatch' && inputs.prod_run == true) && 'self-hosted' || 'macos-latest' }}
+    timeout-minutes: 720
     strategy:
       fail-fast: false
       # When dispatched with prod_run=true (self-hosted), run matrix sequentially
