@@ -1,0 +1,88 @@
+{
+  "metadata": {
+    "timestamp": "2026-05-29T15:09:14.818412+00:00",
+    "commit_sha": "a9986be407012262e0f7626b56ebeaddcaf9224b",
+    "workflow_run_url": "https://github.com/privacy-ethereum/csp-benchmarks/actions/runs/26645147168",
+    "artifact_urls": [
+      "https://github.com/privacy-ethereum/csp-benchmarks/actions/runs/26559029328"
+    ]
+  },
+  "systems": {
+    "risc0": {
+      "proving_system": "STARK",
+      "field_curve": "BabyBear",
+      "iop": "STARK",
+      "pcs": "FRI",
+      "arithm": "AIR",
+      "is_zk": false,
+      "is_zkvm": true,
+      "security_bits": 96,
+      "is_pq": true,
+      "is_maintained": true,
+      "is_audited": "partially_audited",
+      "isa": "RISC-V RV32IM"
+    }
+  },
+  "measurements": [
+    {
+      "system": "risc0",
+      "target": "sha256",
+      "input_size": 1024,
+      "proof_duration": 18537488117,
+      "verify_duration": 12606504,
+      "cycles": 5618,
+      "proof_size": 223290,
+      "preprocessing_size": 300565,
+      "num_constraints": 0,
+      "peak_memory": 1586408652
+    },
+    {
+      "system": "risc0",
+      "target": "sha256",
+      "input_size": 128,
+      "proof_duration": 18538405433,
+      "verify_duration": 12562663,
+      "cycles": 4591,
+      "proof_size": 223290,
+      "preprocessing_size": 300565,
+      "num_constraints": 0,
+      "peak_memory": 1579325849
+    },
+    {
+      "system": "risc0",
+      "target": "sha256",
+      "input_size": 2048,
+      "proof_duration": 18509746392,
+      "verify_duration": 12503542,
+      "cycles": 6834,
+      "proof_size": 223290,
+      "preprocessing_size": 300565,
+      "num_constraints": 0,
+      "peak_memory": 1591563059
+    },
+    {
+      "system": "risc0",
+      "target": "sha256",
+      "input_size": 256,
+      "proof_duration": 18510927954,
+      "verify_duration": 12556750,
+      "cycles": 4735,
+      "proof_size": 223290,
+      "preprocessing_size": 300565,
+      "num_constraints": 0,
+      "peak_memory": 1581563904
+    },
+    {
+      "system": "risc0",
+      "target": "sha256",
+      "input_size": 512,
+      "proof_duration": 18546802050,
+      "verify_duration": 12568267,
+      "cycles": 5023,
+      "proof_size": 223290,
+      "preprocessing_size": 300565,
+      "num_constraints": 0,
+      "peak_memory": 1583428403
+    }
+  ]
+}

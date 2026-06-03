@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "timestamp": "2026-05-29T15:14:21.601616+00:00",
+    "commit_sha": "30267a7d6607c60cff50f395af4e1880696faa5d",
+    "workflow_run_url": "https://github.com/privacy-ethereum/csp-benchmarks/actions/runs/26645407157",
+    "artifact_urls": [
+      "https://github.com/privacy-ethereum/csp-benchmarks/actions/runs/26623699925"
+    ]
+  },
+  "systems": {
+    "provekit-groth16": {
+      "proving_system": "Groth16+BSB22",
+      "field_curve": "Bn254",
+      "iop": "Groth16",
+      "arithm": "R1CS",
+      "is_zk": true,
+      "is_zkvm": false,
+      "security_bits": 128,
+      "is_pq": false,
+      "is_maintained": true,
+      "is_audited": "not_audited"
+    }
+  },
+  "measurements": [
+    {
+      "system": "provekit-groth16",
+      "target": "keccak",
+      "input_size": 1024,
+      "proof_duration": 4893343879,
+      "verify_duration": 46907129,
+      "proof_size": 200,
+      "preprocessing_size": 417193964,
+      "num_constraints": 822870,
+      "peak_memory": 2866505318
+    },
+    {
+      "system": "provekit-groth16",
+      "target": "keccak",
+      "input_size": 128,
+      "proof_duration": 958695963,
+      "verify_duration": 15462250,
+      "proof_size": 200,
+      "preprocessing_size": 85718813,
+      "num_constraints": 163058,
+      "peak_memory": 828035891
+    },
+    {
+      "system": "provekit-groth16",
+      "target": "keccak",
+      "input_size": 2048,
+      "proof_duration": 13893507946,
+      "verify_duration": 74926496,
+      "proof_size": 200,
+      "preprocessing_size": 800808743,
+      "num_constraints": 1575606,
+      "peak_memory": 5008015360
+    },
+    {
+      "system": "provekit-groth16",
+      "target": "keccak",
+      "input_size": 256,
+      "proof_duration": 1320755638,
+      "verify_duration": 18243383,
+      "proof_size": 200,
+      "preprocessing_size": 125033860,
+      "num_constraints": 256206,
+      "peak_memory": 1164153651
+    },
+    {
+      "system": "provekit-groth16",
+      "target": "keccak",
+      "input_size": 512,
+      "proof_duration": 2447441112,
+      "verify_duration": 28804196,
+      "proof_size": 200,
+      "preprocessing_size": 222481655,
+      "num_constraints": 445094,
+      "peak_memory": 1805225164
+    }
+  ]
+}
