@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "timestamp": "2026-05-29T15:13:13.721583+00:00",
+    "commit_sha": "a9986be407012262e0f7626b56ebeaddcaf9224b",
+    "workflow_run_url": "https://github.com/privacy-ethereum/csp-benchmarks/actions/runs/26645350513",
+    "artifact_urls": [
+      "https://github.com/privacy-ethereum/csp-benchmarks/actions/runs/26615943521"
+    ]
+  },
+  "systems": {
+    "provekit-groth16": {
+      "proving_system": "Groth16+BSB22",
+      "field_curve": "Bn254",
+      "iop": "Groth16",
+      "arithm": "R1CS",
+      "is_zk": true,
+      "is_zkvm": false,
+      "security_bits": 128,
+      "is_pq": false,
+      "is_maintained": true,
+      "is_audited": "not_audited"
+    }
+  },
+  "measurements": [
+    {
+      "system": "provekit-groth16",
+      "target": "poseidon2",
+      "input_size": 12,
+      "proof_duration": 15263740,
+      "verify_duration": 2889231,
+      "proof_size": 168,
+      "preprocessing_size": 663456,
+      "num_constraints": 479,
+      "peak_memory": 71134412
+    },
+    {
+      "system": "provekit-groth16",
+      "target": "poseidon2",
+      "input_size": 16,
+      "proof_duration": 18598525,
+      "verify_duration": 2900746,
+      "proof_size": 168,
+      "preprocessing_size": 834933,
+      "num_constraints": 556,
+      "peak_memory": 72782643
+    },
+    {
+      "system": "provekit-groth16",
+      "target": "poseidon2",
+      "input_size": 2,
+      "proof_duration": 9622504,
+      "verify_duration": 2748863,
+      "proof_size": 168,
+      "preprocessing_size": 211395,
+      "num_constraints": 231,
+      "peak_memory": 70405324
+    },
+    {
+      "system": "provekit-groth16",
+      "target": "poseidon2",
+      "input_size": 4,
+      "proof_duration": 13533307,
+      "verify_duration": 2788081,
+      "proof_size": 168,
+      "preprocessing_size": 232001,
+      "num_constraints": 529,
+      "peak_memory": 92590899
+    },
+    {
+      "system": "provekit-groth16",
+      "target": "poseidon2",
+      "input_size": 8,
+      "proof_duration": 12435796,
+      "verify_duration": 2836406,
+      "proof_size": 168,
+      "preprocessing_size": 539518,
+      "num_constraints": 363,
+      "peak_memory": 72548352
+    }
+  ]
+}

@@ -1,0 +1,393 @@
+{
+  "metadata": {
+    "timestamp": "2026-05-29T15:07:44.180519+00:00",
+    "commit_sha": "a9986be407012262e0f7626b56ebeaddcaf9224b",
+    "workflow_run_url": "https://github.com/privacy-ethereum/csp-benchmarks/actions/runs/26645071573",
+    "artifact_urls": [
+      "https://github.com/privacy-ethereum/csp-benchmarks/actions/runs/26490487851"
+    ]
+  },
+  "systems": {
+    "barretenberg": {
+      "proving_system": "UltraHonk",
+      "field_curve": "BN254",
+      "iop": "UltraHonk",
+      "pcs": "KZG",
+      "arithm": "ACIR",
+      "is_zk": true,
+      "is_zkvm": false,
+      "security_bits": 128,
+      "is_pq": false,
+      "is_maintained": true,
+      "is_audited": "not_audited"
+    },
+    "ligetron": {
+      "proving_system": "Ligero",
+      "field_curve": "Bn254",
+      "iop": "Ligero",
+      "pcs": "Ligero",
+      "arithm": "Ligero",
+      "is_zk": false,
+      "is_zkvm": true,
+      "security_bits": 128,
+      "is_pq": true,
+      "is_maintained": true,
+      "is_audited": "not_audited",
+      "isa": "WASM"
+    }
+  },
+  "measurements": [
+    {
+      "system": "barretenberg",
+      "target": "ecdsa",
+      "input_size": 32,
+      "proof_duration": 990996260,
+      "verify_duration": 18768292,
+      "proof_size": 14656,
+      "preprocessing_size": 8392052,
+      "num_constraints": 72683,
+      "peak_memory": 166091161
+    },
+    {
+      "system": "barretenberg",
+      "target": "keccak",
+      "input_size": 1024,
+      "proof_duration": 2906715934,
+      "verify_duration": 18814593,
+      "proof_size": 14656,
+      "preprocessing_size": 16993357,
+      "num_constraints": 184993,
+      "peak_memory": 442387660
+    },
+    {
+      "system": "barretenberg",
+      "target": "keccak",
+      "input_size": 128,
+      "proof_duration": 717834403,
+      "verify_duration": 18837894,
+      "proof_size": 14656,
+      "preprocessing_size": 8452402,
+      "num_constraints": 40626,
+      "peak_memory": 98743091
+    },
+    {
+      "system": "barretenberg",
+      "target": "keccak",
+      "input_size": 2048,
+      "proof_duration": 6276090133,
+      "verify_duration": 18874576,
+      "proof_size": 14656,
+      "preprocessing_size": 33937238,
+      "num_constraints": 366841,
+      "peak_memory": 867056025
+    },
+    {
+      "system": "barretenberg",
+      "target": "keccak",
+      "input_size": 256,
+      "proof_duration": 896008233,
+      "verify_duration": 18821457,
+      "proof_size": 14656,
+      "preprocessing_size": 8474226,
+      "num_constraints": 48607,
+      "peak_memory": 133201920
+    },
+    {
+      "system": "barretenberg",
+      "target": "keccak",
+      "input_size": 512,
+      "proof_duration": 1528731475,
+      "verify_duration": 18796342,
+      "proof_size": 14656,
+      "preprocessing_size": 8518211,
+      "num_constraints": 94070,
+      "peak_memory": 227449241
+    },
+    {
+      "system": "barretenberg",
+      "target": "poseidon2",
+      "input_size": 12,
+      "proof_duration": 171517890,
+      "verify_duration": 18561029,
+      "proof_size": 14656,
+      "preprocessing_size": 8410288,
+      "num_constraints": 338,
+      "peak_memory": 92987392
+    },
+    {
+      "system": "barretenberg",
+      "target": "poseidon2",
+      "input_size": 16,
+      "proof_duration": 173734262,
+      "verify_duration": 18515414,
+      "proof_size": 14656,
+      "preprocessing_size": 8410436,
+      "num_constraints": 488,
+      "peak_memory": 91894579
+    },
+    {
+      "system": "barretenberg",
+      "target": "poseidon2",
+      "input_size": 2,
+      "proof_duration": 158937956,
+      "verify_duration": 18533779,
+      "proof_size": 14656,
+      "preprocessing_size": 8410040,
+      "num_constraints": 111,
+      "peak_memory": 91455488
+    },
+    {
+      "system": "barretenberg",
+      "target": "poseidon2",
+      "input_size": 4,
+      "proof_duration": 162789540,
+      "verify_duration": 18518010,
+      "proof_size": 14656,
+      "preprocessing_size": 8410129,
+      "num_constraints": 184,
+      "peak_memory": 92985753
+    },
+    {
+      "system": "barretenberg",
+      "target": "poseidon2",
+      "input_size": 8,
+      "proof_duration": 169257249,
+      "verify_duration": 18556067,
+      "proof_size": 14656,
+      "preprocessing_size": 8410237,
+      "num_constraints": 261,
+      "peak_memory": 94104780
+    },
+    {
+      "system": "barretenberg",
+      "target": "poseidon",
+      "input_size": 12,
+      "proof_duration": 379657604,
+      "verify_duration": 18597312,
+      "proof_size": 14656,
+      "preprocessing_size": 8572923,
+      "num_constraints": 2263,
+      "peak_memory": 92823552
+    },
+    {
+      "system": "barretenberg",
+      "target": "poseidon",
+      "input_size": 16,
+      "proof_duration": 446387444,
+      "verify_duration": 18583025,
+      "proof_size": 14656,
+      "preprocessing_size": 8626103,
+      "num_constraints": 2932,
+      "peak_memory": 93693542
+    },
+    {
+      "system": "barretenberg",
+      "target": "poseidon",
+      "input_size": 2,
+      "proof_duration": 229114278,
+      "verify_duration": 18585441,
+      "proof_size": 14656,
+      "preprocessing_size": 8470743,
+      "num_constraints": 963,
+      "peak_memory": 94479974
+    },
+    {
+      "system": "barretenberg",
+      "target": "poseidon",
+      "input_size": 4,
+      "proof_duration": 260511906,
+      "verify_duration": 18600573,
+      "proof_size": 14656,
+      "preprocessing_size": 8488410,
+      "num_constraints": 1216,
+      "peak_memory": 96837632
+    },
+    {
+      "system": "barretenberg",
+      "target": "poseidon",
+      "input_size": 8,
+      "proof_duration": 303124323,
+      "verify_duration": 18622638,
+      "proof_size": 14656,
+      "preprocessing_size": 8527372,
+      "num_constraints": 1684,
+      "peak_memory": 92466380
+    },
+    {
+      "system": "barretenberg",
+      "target": "sha256",
+      "input_size": 1024,
+      "proof_duration": 1171433097,
+      "verify_duration": 18793018,
+      "proof_size": 14656,
+      "preprocessing_size": 8616446,
+      "num_constraints": 82895,
+      "peak_memory": 218665779
+    },
+    {
+      "system": "barretenberg",
+      "target": "sha256",
+      "input_size": 128,
+      "proof_duration": 610259803,
+      "verify_duration": 18910951,
+      "proof_size": 14656,
+      "preprocessing_size": 8468797,
+      "num_constraints": 36000,
+      "peak_memory": 90962329
+    },
+    {
+      "system": "barretenberg",
+      "target": "sha256",
+      "input_size": 2048,
+      "proof_duration": 2013044855,
+      "verify_duration": 18839084,
+      "proof_size": 14656,
+      "preprocessing_size": 17307090,
+      "num_constraints": 153803,
+      "peak_memory": 415814451
+    },
+    {
+      "system": "barretenberg",
+      "target": "sha256",
+      "input_size": 256,
+      "proof_duration": 656427972,
+      "verify_duration": 18863741,
+      "proof_size": 14656,
+      "preprocessing_size": 8483072,
+      "num_constraints": 36000,
+      "peak_memory": 104395571
+    },
+    {
+      "system": "barretenberg",
+      "target": "sha256",
+      "input_size": 512,
+      "proof_duration": 743285288,
+      "verify_duration": 18768438,
+      "proof_size": 14656,
+      "preprocessing_size": 8519733,
+      "num_constraints": 47441,
+      "peak_memory": 129042022
+    },
+    {
+      "system": "ligetron",
+      "target": "ecdsa",
+      "input_size": 32,
+      "proof_duration": 18197951539,
+      "verify_duration": 6053230303,
+      "proof_size": 12784920,
+      "preprocessing_size": 1354652,
+      "num_constraints": 7773895,
+      "peak_memory": 336630579
+    },
+    {
+      "system": "ligetron",
+      "target": "poseidon2",
+      "input_size": 12,
+      "proof_duration": 389675726,
+      "verify_duration": 224468638,
+      "proof_size": 3179952,
+      "preprocessing_size": 32267,
+      "num_constraints": 6185,
+      "peak_memory": 117235712
+    },
+    {
+      "system": "ligetron",
+      "target": "poseidon2",
+      "input_size": 16,
+      "proof_duration": 397468925,
+      "verify_duration": 225834041,
+      "proof_size": 3214699,
+      "preprocessing_size": 32267,
+      "num_constraints": 8065,
+      "peak_memory": 116763852
+    },
+    {
+      "system": "ligetron",
+      "target": "poseidon2",
+      "input_size": 2,
+      "proof_duration": 375577367,
+      "verify_duration": 218272149,
+      "proof_size": 3090430,
+      "preprocessing_size": 32267,
+      "num_constraints": 1485,
+      "peak_memory": 110441267
+    },
+    {
+      "system": "ligetron",
+      "target": "poseidon2",
+      "input_size": 4,
+      "proof_duration": 376335702,
+      "verify_duration": 218468915,
+      "proof_size": 3111007,
+      "preprocessing_size": 32267,
+      "num_constraints": 2425,
+      "peak_memory": 108678348
+    },
+    {
+      "system": "ligetron",
+      "target": "poseidon2",
+      "input_size": 8,
+      "proof_duration": 385119557,
+      "verify_duration": 220656699,
+      "proof_size": 3143367,
+      "preprocessing_size": 32267,
+      "num_constraints": 4305,
+      "peak_memory": 111871590
+    },
+    {
+      "system": "ligetron",
+      "target": "sha256",
+      "input_size": 1024,
+      "proof_duration": 3099875440,
+      "verify_duration": 900155735,
+      "proof_size": 5428975,
+      "preprocessing_size": 3472,
+      "num_constraints": 1232624,
+      "peak_memory": 138136780
+    },
+    {
+      "system": "ligetron",
+      "target": "sha256",
+      "input_size": 128,
+      "proof_duration": 827756592,
+      "verify_duration": 380558320,
+      "proof_size": 3676820,
+      "preprocessing_size": 3472,
+      "num_constraints": 197520,
+      "peak_memory": 132264755
+    },
+    {
+      "system": "ligetron",
+      "target": "sha256",
+      "input_size": 2048,
+      "proof_duration": 5720474774,
+      "verify_duration": 1550837211,
+      "proof_size": 7592824,
+      "preprocessing_size": 3472,
+      "num_constraints": 2415600,
+      "peak_memory": 151381606
+    },
+    {
+      "system": "ligetron",
+      "target": "sha256",
+      "input_size": 256,
+      "proof_duration": 1154031077,
+      "verify_duration": 417063517,
+      "proof_size": 3957392,
+      "preprocessing_size": 3472,
+      "num_constraints": 345392,
+      "peak_memory": 135045120
+    },
+    {
+      "system": "ligetron",
+      "target": "sha256",
+      "input_size": 512,
+      "proof_duration": 1799147217,
+      "verify_duration": 581972217,
+      "proof_size": 4393473,
+      "preprocessing_size": 3472,
+      "num_constraints": 641136,
+      "peak_memory": 138090905
+    }
+  ]
+}
