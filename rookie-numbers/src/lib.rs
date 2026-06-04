@@ -13,7 +13,7 @@ pub const ROOKIE_NUMBERS_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     arithm: Cow::Borrowed("AIR"),
     is_zk: false,
     is_zkvm: false,
-    security_bits: 96,
+    security_bits: 89, // Crites-Stewart re-estimate of secure_pcs_config().
     is_pq: true,
     is_maintained: true,
     is_audited: AuditStatus::NotAudited,

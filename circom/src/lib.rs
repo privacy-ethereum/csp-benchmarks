@@ -19,7 +19,7 @@ pub const CIRCOM_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     arithm: Cow::Borrowed("R1CS"),
     is_zk: true,
     is_zkvm: false,
-    security_bits: 128, // Bn254 curve
+    security_bits: 100, // BN254 pairing security is about 100 bits after exTNFS estimates, see https://eips.ethereum.org/assets/eip-3068/2017-334.pdf and https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-12
     is_pq: false,
     is_maintained: true,
     is_audited: AuditStatus::PartiallyAudited, // e.g., https://veridise.com/wp-content/uploads/2023/02/VAR-circom-bigint.pdf

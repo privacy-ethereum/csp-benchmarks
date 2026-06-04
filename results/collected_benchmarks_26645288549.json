@@ -15,7 +15,7 @@
       "arithm": "R1CS",
       "is_zk": true,
       "is_zkvm": false,
-      "security_bits": 128,
+      "security_bits": 100,
       "is_pq": false,
       "is_maintained": true,
       "is_audited": "not_audited"

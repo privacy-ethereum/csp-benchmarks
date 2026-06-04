@@ -23,7 +23,7 @@ pub fn risc0_bench_properties() -> BenchProperties {
         // argument proving this mode is zero-knowledge:
         // https://dev.risczero.com/api/security-model
         true,                          // zkVM
-        96,   // 96-bit base STARK, 99-bit recursion; https://dev.risczero.com/api/security-model
+        96, // RISC Zero 3.0 RISC-V prover target; local default segment_po2=20 toy model reproduces about 97 bits.
         true, // STARK is PQ-safe (Groth16 compression is not); https://dev.risczero.com/api/security-model
         true, // https://github.com/risc0/risc0/releases
         AuditStatus::PartiallyAudited, // Latest audit in July2025: https://github.com/risc0/rz-security/tree/main/audits

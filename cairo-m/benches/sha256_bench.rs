@@ -17,7 +17,7 @@ utils::define_benchmark_harness!(
         "AIR",
         false,
         true,                    // zkVM
-        96, // https://github.com/kkrt-labs/cairo-m/blob/main/crates/prover/src/prover_config.rs#L13-L20
+        88, // Crites-Stewart re-estimate of REGULAR_96_BITS; see results/stark_fri_security_report.md
         true, // hash-based PCS
         false, // not actively maintained
         AuditStatus::NotAudited, // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about

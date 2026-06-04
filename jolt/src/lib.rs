@@ -30,7 +30,7 @@ pub fn jolt_bench_properties() -> BenchProperties {
         "Jolt",
         true,
         true,
-        128,
+        100, // BN254 pairing security is about 100 bits after exTNFS estimates, see https://eips.ethereum.org/assets/eip-3068/2017-334.pdf and https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-12
         false,
         true,
         AuditStatus::NotAudited,
