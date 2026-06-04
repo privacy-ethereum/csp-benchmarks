@@ -4,9 +4,7 @@
 This script keeps the calculations used in
 results/stark_fri_security_report.md in one reproducible place.
 
-The primary outputs are the paper-based modified-conjecture re-estimates.
-For RISC Zero, the script also reproduces the upstream strict / toy-model
-numbers and the local proven floor for comparison.
+The outputs are estimates that match the benchmarked systems' configured security models.
 
 Reference map for the paper-derived substitutions:
 
@@ -15,26 +13,9 @@ Reference map for the paper-derived substitutions:
   - Theorem 7.4.1 and the displayed definition of H_q immediately below it:
     q-ary entropy / list-decoding capacity. In the pdftotext extraction used
     locally, this is the block at lines 275-282.
-  - Our Conjecture 1:
-    prime-field replacement for DEEP-FRI / list-decoding thresholds. In the
-    pdftotext extraction, this appears at lines 360-366.
-  - Our Conjecture 2:
-    prime-field replacement for correlated-agreement thresholds. In the
-    pdftotext extraction, this appears at lines 1053-1060.
-  - Our Conjecture 3:
-    prime-field replacement for WHIR mutual-correlated-agreement thresholds. In
-    the pdftotext extraction, this appears at lines 1110-1112.
   - Introduction paragraph:
     the "loss of 1 / log2 q in the error rate" summary is the paragraph at
     lines 83-86.
-
-- Diamond-Gruen 2025, "On the Distribution of the Distances of Random Words"
-  (IACR ePrint 2025/2010, https://eprint.iacr.org/2025/2010)
-  - Used only qualitatively in the report to justify rejecting the old
-    unamended capacity-style conjectures. No numeric formula in this script is
-    taken directly from that paper. The report's qualitative reference is to
-    amended Conjecture 5.1, which appears at lines 3224-3233 in the local
-    pdftotext extraction.
 
 Several helper formulas below are intentionally mirrored from pinned local code
 paths rather than from either paper. Those blocks are labeled explicitly so the
@@ -55,6 +36,7 @@ BABY_BEAR = 15 * 2**27 + 1
 BN254_SCALAR_MODULUS = int(
     "30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001", 16
 )
+LOG2_10 = math.log2(10.0)
 
 
 def h_q(delta: float, q: int) -> float:
@@ -116,6 +98,60 @@ def estimate_fri_bits(q: int, log_blowup: int, queries: int, pow_bits: int) -> d
     }
 
 
+def error_bits(error: float) -> float:
+    return -math.log2(error)
+
+
+def estimate_stark_v() -> dict:
+    # Mirrored from upstream stark-v secure_pcs_config():
+    # FriConfig::new(0, 1, 193, 4), pow_bits=16, M31^4, no lifting.
+    # The analysis comment in that upstream config targets UDR and says the
+    # batching phase, which is not strengthened by query-phase PoW, caps
+    # trace sizes <= 2^20 at 94 bits. This reproduces the same bottleneck.
+    field_size = M31**4
+    rate = 0.5
+    trace_length = 1 << 20
+    batch_size = 1051
+    queries = 193
+    pow_bits = 16
+    folding_factors = [16, 16, 16, 16, 16, 2]
+    proximity = (1.0 - rate) / 2.0
+
+    def powers_batching_error(dimension: float, num_functions: int) -> float:
+        codeword_size = dimension / rate
+        return ((proximity * codeword_size + 1.0) / field_size) * (
+            num_functions - 1
+        )
+
+    batching_bits = error_bits(powers_batching_error(trace_length, batch_size))
+
+    commit_bits = []
+    dimension = float(trace_length)
+    for folding_factor in folding_factors:
+        dimension /= folding_factor
+        commit_bits.append(
+            error_bits(powers_batching_error(dimension, folding_factor))
+        )
+
+    query_bits = error_bits(((1.0 - proximity) ** queries) / (2**pow_bits))
+    total_bits = min([batching_bits, query_bits, *commit_bits])
+
+    return {
+        "field_q": field_size,
+        "rate": rate,
+        "trace_length": trace_length,
+        "batch_size": batch_size,
+        "queries": queries,
+        "pow_bits": pow_bits,
+        "proximity": proximity,
+        "batching_bits": batching_bits,
+        "commit_bits": commit_bits,
+        "query_bits": query_bits,
+        "total_bits": total_bits,
+        "floor_bits": math.floor(total_bits),
+    }
+
+
 def ceil_log2(n: int) -> int:
     if n <= 1:
         return 0
@@ -127,6 +163,401 @@ def load_measurements(path: Path) -> list[dict]:
     return payload["measurements"]
 
 
+def field_size_bits(q: int) -> float:
+    # Mirrors whir::algebra::fields::FieldWithSize::field_size_bits for prime
+    # fields: log2(modulus) times extension degree.
+    return math.log2(q)
+
+
+def pow_difficulty_bits(requested_bits: float) -> float:
+    # Mirrors whir::protocols::proof_of_work::{threshold,difficulty}. WHIR
+    # stores a u64 threshold, so fractional difficulties are quantized.
+    if not 0.0 <= requested_bits <= 60.0:
+        raise ValueError(f"PoW difficulty out of WHIR range: {requested_bits}")
+    threshold = math.ceil(2.0 ** (64.0 - requested_bits))
+    if threshold >= 2**64 - 1:
+        threshold = 2**64 - 1
+    return 64.0 - math.log2(threshold)
+
+
+def whir_num_in_domain_queries(
+    *, unique_decoding: bool, security_target: float, rate: float
+) -> int:
+    # Mirrors whir::protocols::irs_commit::num_in_domain_queries.
+    if unique_decoding:
+        per_sample = (1.0 + rate) / 2.0
+    else:
+        per_sample = math.sqrt(rate) + math.sqrt(rate) / 20.0
+    return math.ceil(security_target / -math.log2(per_sample))
+
+
+class WhirIrsEstimate:
+    """Small mirror of whir::protocols::irs_commit::Config security math."""
+
+    def __init__(
+        self,
+        *,
+        field_bits: float,
+        security_target: float,
+        unique_decoding: bool,
+        num_vectors: int,
+        vector_size: int,
+        interleaving_depth: int,
+        rate: float,
+    ) -> None:
+        if vector_size % interleaving_depth != 0:
+            raise ValueError("WHIR vector_size must be divisible by interleaving_depth")
+        self.field_bits = field_bits
+        self.security_target = security_target
+        self.unique_decoding = unique_decoding
+        self.num_vectors = num_vectors
+        self.vector_size = vector_size
+        self.interleaving_depth = interleaving_depth
+        self.message_length = vector_size // interleaving_depth
+        self.codeword_length = math.ceil(self.message_length / rate)
+        self.rate = self.message_length / self.codeword_length
+        self.johnson_slack = 0.0 if unique_decoding else math.sqrt(self.rate) / 20.0
+
+        if unique_decoding:
+            self.out_domain_samples = 0
+        else:
+            list_size = self.list_size()
+            l_choose_2 = list_size * (list_size - 1.0) / 2.0
+            log_per_sample = self.field_bits - math.log2(vector_size - 1)
+            if log_per_sample <= 0.0:
+                raise ValueError("WHIR OOD sample calculation exceeds field capacity")
+            self.out_domain_samples = int(
+                max(
+                    1.0,
+                    math.ceil((security_target + math.log2(l_choose_2)) / log_per_sample),
+                )
+            )
+
+        self.in_domain_samples = whir_num_in_domain_queries(
+            unique_decoding=unique_decoding,
+            security_target=security_target,
+            rate=self.rate,
+        )
+
+    def list_size(self) -> float:
+        if self.unique_decoding:
+            return 1.0
+        return 1.0 / (2.0 * self.johnson_slack * math.sqrt(self.rate))
+
+    def rbr_ood_sample(self) -> float:
+        list_size = self.list_size()
+        l_choose_2 = list_size * (list_size - 1.0) / 2.0
+        log_per_sample = math.log2(self.vector_size - 1) - self.field_bits
+        return -math.log2(l_choose_2) - self.out_domain_samples * log_per_sample
+
+    def rbr_queries(self) -> float:
+        if self.unique_decoding:
+            per_sample = (1.0 + self.rate) / 2.0
+        else:
+            per_sample = math.sqrt(self.rate) + self.johnson_slack
+        return self.in_domain_samples * -math.log2(per_sample)
+
+    def rbr_soundness_fold_prox_gaps(self) -> float:
+        log_inv_rate = -math.log2(self.rate)
+        log_k = math.log2(self.message_length)
+        if self.unique_decoding:
+            error = log_k + log_inv_rate
+        else:
+            log_eta = math.log2(self.johnson_slack)
+            min_eta = -(0.5 * log_inv_rate + LOG2_10 + 1.0) - 1e-6
+            if log_eta < min_eta:
+                raise ValueError("WHIR Johnson slack is below the minimum bound")
+            error = 7.0 * LOG2_10 + 3.5 * log_inv_rate + 2.0 * log_k
+        return self.field_bits - error
+
+
+class WhirConfigEstimate:
+    """Small mirror of whir::protocols::whir::Config security_level()."""
+
+    def __init__(
+        self,
+        *,
+        field_bits: float,
+        size: int,
+        unique_decoding: bool,
+        security_level: int,
+        pow_bits: int,
+        initial_folding_factor: int,
+        folding_factor: int,
+        starting_log_inv_rate: int,
+        batch_size: int,
+    ) -> None:
+        self.field_bits = field_bits
+        self.size = size
+        self.unique_decoding = unique_decoding
+        self.security_level = float(security_level)
+        self.protocol_security_level = float(security_level - pow_bits)
+        self.initial_folding_factor = initial_folding_factor
+        self.folding_factor = folding_factor
+        self.starting_log_inv_rate = starting_log_inv_rate
+        self.batch_size = batch_size
+
+        self.initial_committer = WhirIrsEstimate(
+            field_bits=field_bits,
+            security_target=self.protocol_security_level,
+            unique_decoding=unique_decoding,
+            num_vectors=batch_size,
+            vector_size=size,
+            interleaving_depth=1 << initial_folding_factor,
+            rate=2.0 ** (-starting_log_inv_rate),
+        )
+
+        initial_prox = self.initial_committer.rbr_soundness_fold_prox_gaps()
+        initial_sumcheck = field_bits - math.log2(self.initial_committer.list_size()) - 1.0
+        self.starting_folding_pow_bits = max(
+            self.security_level - min(initial_prox, initial_sumcheck), 0.0
+        )
+        self.initial_skip_pow_bits = max(
+            self.security_level
+            - (initial_prox + math.log2(initial_folding_factor)),
+            0.0,
+        )
+
+        self.rounds: list[dict] = []
+        num_variables = int(math.log2(size))
+        log_inv_rate = starting_log_inv_rate
+        in_domain_samples = self.initial_committer.in_domain_samples
+        query_error = self.initial_committer.rbr_queries()
+        num_variables -= initial_folding_factor
+        round_index = 0
+        while num_variables >= folding_factor:
+            round_folding_factor = (
+                initial_folding_factor if round_index == 0 else folding_factor
+            )
+            next_rate = log_inv_rate + (round_folding_factor - 1)
+            irs = WhirIrsEstimate(
+                field_bits=field_bits,
+                security_target=self.protocol_security_level,
+                unique_decoding=unique_decoding,
+                num_vectors=1,
+                vector_size=1 << num_variables,
+                interleaving_depth=1 << folding_factor,
+                rate=2.0 ** (-next_rate),
+            )
+            combination_error = field_bits - (
+                math.log2(irs.out_domain_samples + in_domain_samples)
+                + math.log2(irs.list_size())
+                + 1.0
+            )
+            pow_added = max(
+                self.security_level - min(query_error, combination_error), 0.0
+            )
+            folding_pow_added = max(
+                self.security_level
+                - min(
+                    irs.rbr_soundness_fold_prox_gaps(),
+                    field_bits - (math.log2(irs.list_size()) + 1.0),
+                ),
+                0.0,
+            )
+            self.rounds.append(
+                {
+                    "num_variables": num_variables,
+                    "next_log_inv_rate": next_rate,
+                    "irs": irs,
+                    "pow_bits": pow_added,
+                    "folding_pow_bits": folding_pow_added,
+                    "combination_error": combination_error,
+                    "query_error": query_error,
+                }
+            )
+            round_index += 1
+            num_variables -= folding_factor
+            log_inv_rate = next_rate
+            in_domain_samples = irs.in_domain_samples
+            query_error = irs.rbr_queries()
+
+        self.final_sumcheck_num_rounds = num_variables
+        rbr_error = (
+            self.rounds[-1]["irs"].rbr_queries()
+            if self.rounds
+            else self.initial_committer.rbr_queries()
+        )
+        self.final_pow_bits = max(self.security_level - rbr_error, 0.0)
+        self.final_folding_pow_bits = max(
+            self.security_level - field_bits + 1.0, 0.0
+        )
+
+    def security_terms(self, *, num_vectors: int, num_linear_forms: int) -> list[tuple[str, float]]:
+        terms: list[tuple[str, float]] = []
+        if num_vectors > 1:
+            terms.append(("vector RLC", self.field_bits - math.log2(num_vectors - 1)))
+        if num_linear_forms > 1:
+            terms.append(
+                ("linear-form RLC", self.field_bits - math.log2(num_linear_forms - 1))
+            )
+
+        has_initial_constraints = (
+            num_linear_forms > 0 or self.initial_committer.out_domain_samples > 0
+        )
+        if not self.initial_committer.unique_decoding:
+            terms.append(("initial OOD", self.initial_committer.rbr_ood_sample()))
+
+        initial_prox = self.initial_committer.rbr_soundness_fold_prox_gaps()
+        if has_initial_constraints:
+            initial_sumcheck = self.field_bits - (
+                math.log2(self.initial_committer.list_size()) + 1.0
+            )
+            terms.append(
+                (
+                    "initial fold",
+                    min(initial_prox, initial_sumcheck)
+                    + pow_difficulty_bits(self.starting_folding_pow_bits),
+                )
+            )
+        else:
+            terms.append(
+                (
+                    "initial skip fold",
+                    initial_prox
+                    + math.log2(self.initial_folding_factor)
+                    + pow_difficulty_bits(self.initial_skip_pow_bits),
+                )
+            )
+
+        rbr_queries = self.initial_committer.rbr_queries()
+        old_in_domain_samples = self.initial_committer.in_domain_samples
+        for index, round_info in enumerate(self.rounds):
+            irs: WhirIrsEstimate = round_info["irs"]
+            if not irs.unique_decoding:
+                terms.append((f"round {index} OOD", irs.rbr_ood_sample()))
+
+            combination_error = self.field_bits - (
+                math.log2(irs.out_domain_samples + old_in_domain_samples)
+                + math.log2(irs.list_size())
+                + 1.0
+            )
+            terms.append(
+                (
+                    f"round {index} query",
+                    min(rbr_queries, combination_error)
+                    + pow_difficulty_bits(round_info["pow_bits"]),
+                )
+            )
+            terms.append(
+                (
+                    f"round {index} fold",
+                    min(
+                        irs.rbr_soundness_fold_prox_gaps(),
+                        self.field_bits - (math.log2(irs.list_size()) + 1.0),
+                    )
+                    + pow_difficulty_bits(round_info["folding_pow_bits"]),
+                )
+            )
+            old_in_domain_samples = irs.in_domain_samples
+            rbr_queries = irs.rbr_queries()
+
+        terms.append(
+            ("final query", rbr_queries + pow_difficulty_bits(self.final_pow_bits))
+        )
+        if self.final_sumcheck_num_rounds > 0:
+            terms.append(
+                (
+                    "final combination",
+                    self.field_bits
+                    - 1.0
+                    + pow_difficulty_bits(self.final_folding_pow_bits),
+                )
+            )
+        return terms
+
+    def security_level_bits(self, *, num_vectors: int, num_linear_forms: int) -> float:
+        terms = self.security_terms(
+            num_vectors=num_vectors, num_linear_forms=num_linear_forms
+        )
+        return min((bits for _, bits in terms), default=0.0)
+
+    def max_requested_pow_bits(self) -> float:
+        candidates = [
+            self.starting_folding_pow_bits,
+            self.initial_skip_pow_bits,
+            self.final_pow_bits,
+            self.final_folding_pow_bits,
+        ]
+        for round_info in self.rounds:
+            candidates.append(round_info["pow_bits"])
+            candidates.append(round_info["folding_pow_bits"])
+        return max(candidates)
+
+
+def provekit_whir_security_for_nv(num_variables: int) -> dict:
+    # Mirrored from pinned ProveKit r1cs-compiler/src/whir_r1cs.rs:
+    # ProtocolParameters { unique_decoding=false, security_level=128,
+    # pow_bits=10, initial_folding_factor=3, folding_factor=3,
+    # starting_log_inv_rate=2, batch_size=1 }.
+    field_bits = field_size_bits(BN254_SCALAR_MODULUS)
+    params = {
+        "field_bits": field_bits,
+        "unique_decoding": False,
+        "security_level": 128,
+        "pow_bits": 10,
+        "initial_folding_factor": 3,
+        "folding_factor": 3,
+        "starting_log_inv_rate": 2,
+    }
+    blinded = WhirConfigEstimate(size=1 << num_variables, batch_size=1, **params)
+
+    q_delta_1 = whir_num_in_domain_queries(
+        unique_decoding=False,
+        security_target=params["security_level"] - params["pow_bits"],
+        rate=2.0 ** (-params["starting_log_inv_rate"]),
+    )
+    q_delta_2 = whir_num_in_domain_queries(
+        unique_decoding=False,
+        security_target=params["security_level"],
+        rate=2.0 ** (-params["starting_log_inv_rate"]),
+    )
+    k1 = 1 << params["initial_folding_factor"]
+    k2 = 1 << params["initial_folding_factor"]
+    query_upper_bound = (
+        k1 * q_delta_1
+        + k2 * q_delta_2
+        + q_delta_1
+        + q_delta_2
+        + 4 * num_variables
+    )
+    num_blinding_variables = query_upper_bound.bit_length()
+    if num_blinding_variables >= num_variables:
+        raise ValueError(
+            "ProveKit WHIR blinding variables must be fewer than witness variables"
+        )
+
+    blinding = WhirConfigEstimate(
+        size=1 << num_blinding_variables,
+        batch_size=num_variables + 1,
+        **params,
+    )
+    blinded_terms = blinded.security_terms(
+        num_vectors=blinded.initial_committer.num_vectors, num_linear_forms=1
+    )
+    blinding_terms = blinding.security_terms(
+        num_vectors=blinding.initial_committer.num_vectors, num_linear_forms=1
+    )
+    blinded_bits = min(bits for _, bits in blinded_terms)
+    blinding_bits = min(bits for _, bits in blinding_terms)
+    return {
+        "num_variables": num_variables,
+        "num_blinding_variables": num_blinding_variables,
+        "q_delta_1": q_delta_1,
+        "q_delta_2": q_delta_2,
+        "query_upper_bound": query_upper_bound,
+        "blinded_bits": blinded_bits,
+        "blinded_bottleneck": min(blinded_terms, key=lambda item: item[1]),
+        "blinding_bits": blinding_bits,
+        "blinding_bottleneck": min(blinding_terms, key=lambda item: item[1]),
+        "max_requested_pow_bits": max(
+            blinded.max_requested_pow_bits(), blinding.max_requested_pow_bits()
+        ),
+        "total_bits": min(blinded_bits, blinding_bits),
+        "floor_bits": math.floor(min(blinded_bits, blinding_bits)),
+    }
+
+
 def estimate_provekit(json_path: Path) -> dict:
     measurements = load_measurements(json_path)
     provekit_constraints = [
@@ -136,407 +567,73 @@ def estimate_provekit(json_path: Path) -> dict:
         raise ValueError(f"no provekit measurements found in {json_path}")
 
     m0_values = [ceil_log2(c) for c in provekit_constraints]
-    nv_values = [max(ceil_log2(4 * m0) + 1, 12) for m0 in m0_values]
-    unique_nv = sorted(set(nv_values))
-    if unique_nv != [12]:
-        raise ValueError(f"unexpected provekit num_variables set: {unique_nv}")
-
-    security_level = 128
-    num_variables = 12
-    starting_log_inv_rate = 1
-    folding_factor = 4
-    field_q = BN254_SCALAR_MODULUS
-    field_bits = field_q.bit_length()
-
-    # These two lines are mirrored from pinned WHIR / ProveKit code:
-    # default_max_pow(num_variables, 1) and protocol_security_level =
-    # security_level - pow_bits. They are not formulas from either supplied
-    # paper.
-    pow_bits = num_variables + starting_log_inv_rate - 3
-    protocol_security_level = security_level - pow_bits
-
-    def paper_eta(log_inv_rate: int, code_length: int) -> dict:
-        rho = 2.0 ** (-log_inv_rate)
-        # Mirrors WHIR's local ConjectureList choice:
-        # log_eta = -(r + 1), equivalently eta_old = 2^{-(r + 1)}.
-        # This relation comes from whir/src/whir/parameters.rs, not the papers.
-        eta_old = 2.0 ** (-(log_inv_rate + 1))
-        delta_old = 1.0 - rho - eta_old
-        # Paper-driven substitution:
-        # Crites-Stewart 2025, Our Conjecture 3 says the WHIR
-        # mutual-correlated-agreement threshold becomes
-        # H_q(delta) < 1 - 1/n - rho - eta for prime fields;
-        # pdftotext lines 1110-1112.
-        #
-        # The script keeps WHIR's old boundary distance delta_old fixed and
-        # solves for the admissible replacement eta_new:
-        #   eta_new = 1 - 1/n - rho - H_q(delta_old)
-        #
-        # That algebraic rearrangement is our inference from Our Conjecture 3;
-        # the paper states the threshold condition, not this WHIR-specific
-        # "solve for eta while holding delta_old fixed" step.
-        eta_new = 1.0 - 1.0 / code_length - rho - h_q(delta_old, field_q)
-        if eta_new <= 0.0:
-            raise ValueError(
-                f"paper eta became non-positive for rate={log_inv_rate}, n={code_length}"
-            )
-        return {
-            "rho": rho,
-            "eta_old": eta_old,
-            "delta_old": delta_old,
-            "eta_new": eta_new,
-            "log_eta_new": math.log2(eta_new),
-            "code_length": code_length,
-        }
-
-    def list_size_bits(nv: int, log_inv_rate: int, log_eta: float) -> float:
-        # Mirrored exactly from WHIR's list_size_bits(ConjectureList, ...).
-        # No corresponding new formula is introduced by the papers here; the
-        # only paper-driven change is the replacement log_eta.
-        return (nv + log_inv_rate) - log_eta
-
-    def rbr_ood_sample(
-        nv: int, log_inv_rate: int, log_eta: float, ood_samples: int
-    ) -> float:
-        # Mirrored from WHIR's rbr_ood_sample. No direct paper formula; this is
-        # the local bound being re-evaluated at the paper-updated eta.
-        list_bits = list_size_bits(nv, log_inv_rate, log_eta)
-        error = 2.0 * list_bits + nv * ood_samples
-        return ood_samples * field_bits + 1.0 - error
-
-    def ood_samples(nv: int, log_inv_rate: int, log_eta: float) -> int:
-        for samples in range(1, 64):
-            if rbr_ood_sample(nv, log_inv_rate, log_eta, samples) >= security_level:
-                return samples
-        raise ValueError(
-            f"could not satisfy OOD sample requirement for nv={nv}, rate={log_inv_rate}"
-        )
-
-    def fold_prox_bits(nv: int, log_inv_rate: int, log_eta: float) -> float:
-        # Mirrored from WHIR's rbr_soundness_fold_prox_gaps for ConjectureList.
-        # Again, the paper only changes the admissible threshold via eta.
-        error = (nv + log_inv_rate) - log_eta
-        return field_bits - error
-
-    def fold_sumcheck_bits(nv: int, log_inv_rate: int, log_eta: float) -> float:
-        # Mirrored from WHIR's rbr_soundness_fold_sumcheck.
-        return field_bits - (list_size_bits(nv, log_inv_rate, log_eta) + 1.0)
-
-    def queries(log_inv_rate: int) -> int:
-        # Mirrored from WHIR's queries(ConjectureList, ...). This is code
-        # behavior, not a paper formula.
-        return math.ceil(protocol_security_level / log_inv_rate)
-
-    def rbr_queries(log_inv_rate: int, num_queries: int) -> float:
-        # Mirrored from WHIR's rbr_queries(ConjectureList, ...).
-        return num_queries * log_inv_rate
-
-    def query_combination_bits(
-        nv: int,
-        log_inv_rate: int,
-        log_eta: float,
-        num_ood_samples: int,
-        num_queries: int,
-    ) -> float:
-        # Mirrored from WHIR's rbr_soundness_queries_combination.
-        list_bits = list_size_bits(nv, log_inv_rate, log_eta)
-        log_combination = math.log2(num_ood_samples + num_queries)
-        return field_bits - (log_combination + list_bits + 1.0)
-
-    start_eta = paper_eta(
-        starting_log_inv_rate, 2 ** (num_variables + starting_log_inv_rate)
-    )
-    start_ood_samples = ood_samples(
-        num_variables, starting_log_inv_rate, start_eta["log_eta_new"]
-    )
-    start_commitment_bits = rbr_ood_sample(
-        num_variables,
-        starting_log_inv_rate,
-        start_eta["log_eta_new"],
-        start_ood_samples,
-    )
-    start_folding_bits = min(
-        fold_prox_bits(num_variables, starting_log_inv_rate, start_eta["log_eta_new"]),
-        fold_sumcheck_bits(
-            num_variables, starting_log_inv_rate, start_eta["log_eta_new"]
-        ),
-    )
-
-    round_details = []
-    current_num_variables = num_variables - folding_factor
-    current_log_inv_rate = starting_log_inv_rate
-    num_rounds = num_variables // folding_factor - 1
-    for _ in range(num_rounds):
-        next_rate = current_log_inv_rate + (folding_factor - 1)
-        code_length = 2 ** (current_num_variables + next_rate)
-        eta = paper_eta(next_rate, code_length)
-        num_queries = queries(current_log_inv_rate)
-        num_ood = ood_samples(current_num_variables, next_rate, eta["log_eta_new"])
-        query_bits = rbr_queries(current_log_inv_rate, num_queries)
-        combination_bits = query_combination_bits(
-            current_num_variables,
-            next_rate,
-            eta["log_eta_new"],
-            num_ood,
-            num_queries,
-        )
-        pow_added = max(security_level - min(query_bits, combination_bits), 0.0)
-        total_bits = min(query_bits, combination_bits) + pow_added
-        folding_bits = min(
-            fold_prox_bits(current_num_variables, next_rate, eta["log_eta_new"]),
-            fold_sumcheck_bits(current_num_variables, next_rate, eta["log_eta_new"]),
-        )
-        round_details.append(
-            {
-                "old_rate": current_log_inv_rate,
-                "next_rate": next_rate,
-                "num_variables": current_num_variables,
-                "code_length": code_length,
-                "delta_old": eta["delta_old"],
-                "eta_old": eta["eta_old"],
-                "eta_new": eta["eta_new"],
-                "log_eta_new": eta["log_eta_new"],
-                "ood_samples": num_ood,
-                "queries": num_queries,
-                "query_bits": query_bits,
-                "combination_bits": combination_bits,
-                "pow_added": pow_added,
-                "total_bits": total_bits,
-                "folding_bits": folding_bits,
-            }
-        )
-        current_num_variables -= folding_factor
-        current_log_inv_rate = next_rate
-
-    final_queries = queries(current_log_inv_rate)
-    final_query_bits = rbr_queries(current_log_inv_rate, final_queries)
-    final_pow_bits = max(security_level - final_query_bits, 0.0)
-    final_total_bits = final_query_bits + final_pow_bits
-
-    candidates = [start_commitment_bits, start_folding_bits, final_total_bits]
-    candidates.extend(round_info["total_bits"] for round_info in round_details)
-    candidates.extend(round_info["folding_bits"] for round_info in round_details)
-    total_bits = min(candidates)
+    checked_nv_min = 13
+    checked_nv_max = max(24, max(m0_values) + 3)
+    by_nv = [
+        provekit_whir_security_for_nv(nv)
+        for nv in range(checked_nv_min, checked_nv_max + 1)
+    ]
+    worst = min(by_nv, key=lambda item: item["total_bits"])
 
     return {
         "constraint_min": min(provekit_constraints),
         "constraint_max": max(provekit_constraints),
         "m0_min": min(m0_values),
         "m0_max": max(m0_values),
-        "num_variables": num_variables,
-        "pow_bits": pow_bits,
-        "protocol_security_level": protocol_security_level,
-        "field_bits": field_bits,
-        "start": {
-            "rate": starting_log_inv_rate,
-            "code_length": start_eta["code_length"],
-            "delta_old": start_eta["delta_old"],
-            "eta_old": start_eta["eta_old"],
-            "eta_new": start_eta["eta_new"],
-            "ood_samples": start_ood_samples,
-            "commitment_bits": start_commitment_bits,
-            "folding_bits": start_folding_bits,
-        },
-        "rounds": round_details,
-        "final": {
-            "rate": current_log_inv_rate,
-            "queries": final_queries,
-            "query_bits": final_query_bits,
-            "pow_bits": final_pow_bits,
-            "total_bits": final_total_bits,
-        },
-        "total_bits": total_bits,
-        "floor_bits": math.floor(total_bits),
+        "checked_nv_min": checked_nv_min,
+        "checked_nv_max": checked_nv_max,
+        "pow_bits": 10,
+        "protocol_security_level": 118,
+        "field_bits": field_size_bits(BN254_SCALAR_MODULUS),
+        "initial_folding_factor": 3,
+        "folding_factor": 3,
+        "starting_log_inv_rate": 2,
+        "worst": worst,
+        "total_bits": worst["total_bits"],
+        "floor_bits": worst["floor_bits"],
     }
 
 
 def estimate_risc0() -> dict:
-    # The local constants in this function are pinned-code parameters from
-    # risc0-zkp / risc0-zkvm / risc0-circuit-rv32im. The papers only justify
-    # the threshold substitutions below; they do not supply these circuit
-    # constants.
+    # Mirrored from the configured RISC Zero toy-model security calculation for
+    # the default benchmark segment size.
     queries = 50
     inv_rate = 4
     rho = 1.0 / inv_rate
-    eta = 0.05
-    fri_fold = 16
-    fri_min_degree = 256
-    m = 16.0
 
     w_accum = 103.0
     w_code = 1.0
     w_data = 211.0
     n_trace_polys = w_accum + w_code + w_data
     max_degree = 5.0
-    num_segment_polynomials = max_degree - 1.0
-    biggest_combo = 6.0
     ext_size = 4
     cycles = float(1 << 20)
     trace_domain_size = cycles
-    lde_domain_size = trace_domain_size * inv_rate
     ext_field_size = float(BABY_BEAR) ** ext_size
 
-    coeffs_size = int(cycles) * ext_size
-    num_folding_rounds = 0
-    coeffs_cursor = coeffs_size
-    while coeffs_cursor / ext_size > fri_min_degree:
-        coeffs_cursor /= fri_fold
-        num_folding_rounds += 1
-
     # Mirrored from local soundness.rs: permutation / lookup and plain
-    # constraint terms. These are not changed by either paper.
+    # constraint terms in the configured toy-model path.
     plonk_plookup_error = (
         w_accum / ext_size * (max_degree - 2.0) * trace_domain_size / ext_field_size
     )
     constraints_error = 1.0 / ext_field_size
-
-    def e_fri_queries(theta: float) -> float:
-        # Mirrored from local e_fri_queries(theta) = (1 - theta)^queries.
-        return (1.0 - theta) ** queries
-
-    def e_proximity_gap_proven() -> float:
-        # Mirrored from local proven() / e_proximity_gap_proven().
-        # This is not a formula from the two supplied papers; it is retained
-        # only to reproduce the local conservative floor for context.
-        return (
-            (m + 0.5) ** 7
-            / (3.0 * math.sqrt(rho) ** 3)
-            * (lde_domain_size**2 / ext_field_size)
-        )
-
-    def e_proximity_gap_conjectured() -> float:
-        # Mirrored from local conjectured_strict() / e_proximity_gap_conjectured().
-        # Crites-Stewart 2025, Our Conjecture 2 changes the admissible
-        # theta-threshold (pdftotext lines 1053-1060), but the report
-        # intentionally keeps this error-term shape unchanged.
-        first_term = 1.0 / (eta * rho)
-        second_term = (n_trace_polys * lde_domain_size) / ext_field_size
-        return first_term * second_term
-
-    def e_fri_constant(e_proximity_gap: float) -> float:
-        # Mirrored from local e_fri_constant(). No direct paper formula.
-        first_term = (n_trace_polys + num_segment_polynomials - 0.5) * e_proximity_gap
-        second_term = (
-            (2.0 * m + 1.0)
-            * (lde_domain_size + 1.0)
-            * (fri_fold * num_folding_rounds)
-            / (math.sqrt(rho) * ext_field_size)
-        )
-        return first_term + second_term
-
-    def e_ali(l_plus: float) -> float:
-        # Mirrored from local e_ali(). No direct paper formula.
-        return l_plus * n_trace_polys / ext_field_size
-
-    def e_deep(l_plus: float) -> float:
-        # Mirrored from local e_deep(). No direct paper formula.
-        h_plus = trace_domain_size + biggest_combo
-        numerator = num_segment_polynomials * (h_plus - 1.0) + (trace_domain_size - 1.0)
-        denominator = ext_field_size - trace_domain_size - lde_domain_size
-        return l_plus * numerator / denominator
-
-    def soundness_bits(theta: float, e_proximity_gap: float, l_plus: float) -> float:
-        # Standard "bits = -log2(total_error)" conversion, using the local
-        # decomposition of error terms from soundness.rs.
-        total_error = (
-            plonk_plookup_error
-            + (e_fri_constant(e_proximity_gap) + e_fri_queries(theta))
-            + e_deep(l_plus)
-            + e_ali(l_plus)
-        )
-        return abs(math.log2(total_error))
-
-    # Paper-driven toy-model update:
-    # - Crites-Stewart 2025, Theorem 7.4.1 provides the H_q capacity line;
-    #   pdftotext lines 275-282.
-    # - Crites-Stewart 2025, Our Conjecture 1 provides the prime-field H_q
-    #   replacement; pdftotext lines 360-366.
-    # - We infer delta* from H_q(delta*) = 1 - rho and then replace the local
-    #   toy-model FRI term rho^queries by rho_eff^queries with rho_eff = 1 - delta*.
-    # This "replace rho by rho_eff inside toy_model_security()" step is an
-    # inference used by the report, not a verbatim paper formula.
-    toy_delta_star = invert_h_q(1.0 - rho, BABY_BEAR)
-    toy_rho_eff = 1.0 - toy_delta_star
     toy_old_total_error = plonk_plookup_error + constraints_error + rho**queries
-    toy_new_total_error = plonk_plookup_error + constraints_error + toy_rho_eff**queries
-
-    # Local pre-paper threshold from soundness.rs:
-    # theta_old = 1 - rho - eta.
-    theta_old = 1.0 - rho - eta
-    # Paper-driven strict-path update:
-    # Crites-Stewart 2025, Our Conjecture 2 says the correlated-agreement
-    # threshold becomes delta <= 1 - H_q(delta) - 1/n - eta for prime fields;
-    # pdftotext lines 1053-1060.
-    #
-    # The script keeps the old right-hand side fixed and solves
-    # H_q(theta_new) = 1 - 1/n - rho - eta.
-    # This "solve for theta_new" step is our inference from Our Conjecture 2.
-    theta_new = invert_h_q(1.0 - 1.0 / lde_domain_size - rho - eta, BABY_BEAR)
-    rho_plus = (trace_domain_size + biggest_combo) / lde_domain_size
-    epsilon_plus_old = 1.0 - rho_plus - theta_old
-    # Paper-driven DEEP-FRI / list-decoding replacement:
-    # Crites-Stewart 2025, Our Conjecture 1 replaces the old prime-field
-    # list-decoding threshold by an H_q threshold; pdftotext lines 360-366.
-    # The local epsilon_plus term is therefore updated by replacing theta_old
-    # with H_q(theta_new). This is again an inference from the paper plus the
-    # structure of local soundness.rs.
-    epsilon_plus_new = 1.0 - rho_plus - h_q(theta_new, BABY_BEAR)
-    l_plus_old = lde_domain_size / epsilon_plus_old
-    l_plus_new = lde_domain_size / epsilon_plus_new
-
-    # Mirrored from local proven() path. Kept only to reproduce the conservative
-    # floor for context; not used as the primary paper-based estimate.
-    alpha = (1.0 + 1.0 / (2.0 * m)) * math.sqrt(rho)
-    theta_proven = 1.0 - alpha
-    m_plus = 1.0 / (biggest_combo * (alpha / math.sqrt(rho_plus) - 1.0))
-    l_plus_proven = (math.ceil(m_plus) + 0.5) / math.sqrt(rho_plus)
-
-    strict_old_bits = soundness_bits(
-        theta_old, e_proximity_gap_conjectured(), l_plus_old
-    )
-    strict_new_bits = soundness_bits(
-        theta_new, e_proximity_gap_conjectured(), l_plus_new
-    )
-    proven_bits = soundness_bits(theta_proven, e_proximity_gap_proven(), l_plus_proven)
+    toy_model_bits = abs(math.log2(toy_old_total_error))
 
     return {
         "queries": queries,
         "rho": rho,
-        "eta": eta,
         "field_q": BABY_BEAR,
         "cycles_po2": 20,
         "trace_domain_size": trace_domain_size,
-        "lde_domain_size": lde_domain_size,
         "ext_field_size": ext_field_size,
         "n_trace_polys": n_trace_polys,
         "w_accum": w_accum,
         "w_code": w_code,
         "w_data": w_data,
-        "biggest_combo": biggest_combo,
-        "num_folding_rounds": num_folding_rounds,
         "toy_model": {
-            "old_bits": abs(math.log2(toy_old_total_error)),
-            "delta_star": toy_delta_star,
-            "rho_eff": toy_rho_eff,
-            "new_bits": abs(math.log2(toy_new_total_error)),
-            "floor_bits": math.floor(abs(math.log2(toy_new_total_error))),
-        },
-        "strict": {
-            "old_theta": theta_old,
-            "new_theta": theta_new,
-            "h_q_new_theta": h_q(theta_new, BABY_BEAR),
-            "rho_plus": rho_plus,
-            "epsilon_plus_old": epsilon_plus_old,
-            "epsilon_plus_new": epsilon_plus_new,
-            "old_bits": strict_old_bits,
-            "new_bits": strict_new_bits,
-            "floor_bits": math.floor(strict_new_bits),
-        },
-        "proven_floor": {
-            "alpha": alpha,
-            "theta": theta_proven,
-            "bits": proven_bits,
-            "floor_bits": math.floor(proven_bits),
+            "bits": toy_model_bits,
+            "floor_bits": math.floor(toy_model_bits),
         },
     }
 
@@ -545,15 +642,19 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--bench-json",
-        default="results/collected_benchmarks_23330555957.json",
+        default="results/collected_benchmarks_26644954256.json",
         help="benchmark JSON artifact to read for provekit constraints",
     )
     args = parser.parse_args()
+    bench_payload = json.loads(Path(args.bench_json).read_text())
+    metadata_bits = {
+        system: props["security_bits"]
+        for system, props in bench_payload.get("systems", {}).items()
+    }
 
     fri_systems = [
         {
             "system": "cairo-m",
-            "claim": "96",
             "q": M31,
             "log_blowup": 1,
             "queries": 80,
@@ -561,7 +662,6 @@ def main() -> None:
         },
         {
             "system": "miden",
-            "claim": "128 benchmark / 96 locked",
             "q": GOLDILOCKS,
             "log_blowup": 3,
             "queries": 27,
@@ -569,7 +669,6 @@ def main() -> None:
         },
         {
             "system": "plonky2",
-            "claim": "100",
             "q": GOLDILOCKS,
             "log_blowup": 3,
             "queries": 28,
@@ -577,15 +676,6 @@ def main() -> None:
         },
         {
             "system": "rookie-numbers",
-            "claim": "96",
-            "q": M31,
-            "log_blowup": 1,
-            "queries": 70,
-            "pow_bits": 26,
-        },
-        {
-            "system": "stark-v",
-            "claim": "96",
             "q": M31,
             "log_blowup": 1,
             "queries": 70,
@@ -593,8 +683,8 @@ def main() -> None:
         },
     ]
 
-    print("Paper-based primary estimates")
-    print("| System | Claim | Estimate | Floor | Calculation |")
+    print("Applicable benchmark estimates")
+    print("| System | Metadata bits | Estimate | Floor | Calculation |")
     print("| --- | --- | ---: | ---: | --- |")
     for system in fri_systems:
         estimate = estimate_fri_bits(
@@ -608,22 +698,30 @@ def main() -> None:
             f'{estimate["bits_per_query"]:.12f}'
         )
         print(
-            f'| {system["system"]} | {system["claim"]} | '
+            f'| {system["system"]} | {metadata_bits.get(system["system"], "n/a")} | '
             f'{estimate["total_bits"]:.6f} | {estimate["floor_bits"]} | '
             f"{calculation} |"
         )
 
     provekit = estimate_provekit(Path(args.bench_json))
     print(
-        f"| provekit | 128 | {provekit['total_bits']:.6f} | "
-        f"{provekit['floor_bits']} | pinned WHIR schedule + paper H_q replacement |"
+        f"| provekit | {metadata_bits.get('provekit', 'n/a')} | {provekit['total_bits']:.6f} | "
+        f"{provekit['floor_bits']} | pinned Johnson-bound WHIR config |"
+    )
+
+    stark_v = estimate_stark_v()
+    print(
+        f"| stark-v | {metadata_bits.get('stark-v', 'n/a')} | "
+        f"{stark_v['total_bits']:.6f} | {stark_v['floor_bits']} | "
+        "upstream secure_pcs_config UDR; batching bottleneck |"
     )
 
     risc0 = estimate_risc0()
     print(
-        f"| risc0 | 96 base / 99 recursion | "
-        f"{risc0['toy_model']['new_bits']:.6f} | "
-        f"{risc0['toy_model']['floor_bits']} | toy-model FRI term with paper H_q replacement |"
+        f"| risc0 | {metadata_bits.get('risc0', 'n/a')} | "
+        f"{risc0['toy_model']['bits']:.6f} | "
+        f"{risc0['toy_model']['floor_bits']} | "
+        "RISC Zero toy-model reproduction; official target is 96 |"
     )
 
     print()
@@ -632,70 +730,71 @@ def main() -> None:
         f"- constraints range: {provekit['constraint_min']}..{provekit['constraint_max']}"
     )
     print(f"- m0 range: {provekit['m0_min']}..{provekit['m0_max']}")
-    print(f"- num_variables: {provekit['num_variables']}")
+    print(
+        f"- checked witness-variable range: {provekit['checked_nv_min']}.."
+        f"{provekit['checked_nv_max']}"
+    )
+    print(f"- field_bits: {provekit['field_bits']:.12f}")
     print(f"- pow_bits: {provekit['pow_bits']}")
     print(f"- protocol_security_level: {provekit['protocol_security_level']}")
     print(
-        "- start: "
-        f"n={provekit['start']['code_length']}, "
-        f"delta_old={provekit['start']['delta_old']:.12f}, "
-        f"eta_old={provekit['start']['eta_old']:.12f}, "
-        f"eta_paper={provekit['start']['eta_new']:.12f}, "
-        f"OOD={provekit['start']['commitment_bits']:.6f}, "
-        f"fold={provekit['start']['folding_bits']:.6f}"
-    )
-    print("- rounds:")
-    for round_info in provekit["rounds"]:
-        print(
-            "  "
-            f"old_rate={round_info['old_rate']}, next_rate={round_info['next_rate']}, "
-            f"n={round_info['code_length']}, q={round_info['queries']}, "
-            f"delta_old={round_info['delta_old']:.12f}, "
-            f"eta_paper={round_info['eta_new']:.12f}, "
-            f"query={round_info['query_bits']:.6f}, "
-            f"combination={round_info['combination_bits']:.6f}, "
-            f"pow={round_info['pow_added']:.6f}, "
-            f"total={round_info['total_bits']:.6f}, "
-            f"fold={round_info['folding_bits']:.6f}"
-        )
-    print(
-        "- final: "
-        f"rate={provekit['final']['rate']}, "
-        f"q={provekit['final']['queries']}, "
-        f"query={provekit['final']['query_bits']:.6f}, "
-        f"pow={provekit['final']['pow_bits']:.6f}, "
-        f"total={provekit['final']['total_bits']:.6f}"
+        "- WHIR params: "
+        "unique_decoding=false, starting_log_inv_rate="
+        f"{provekit['starting_log_inv_rate']}, initial_folding_factor="
+        f"{provekit['initial_folding_factor']}, folding_factor="
+        f"{provekit['folding_factor']}, batch_size=1"
     )
     print(
-        f"- paper-based estimate: {provekit['total_bits']:.6f} "
+        "- worst checked witness config: "
+        f"m={provekit['worst']['num_variables']}, "
+        f"ell={provekit['worst']['num_blinding_variables']}, "
+        f"q_delta_1={provekit['worst']['q_delta_1']}, "
+        f"q_delta_2={provekit['worst']['q_delta_2']}, "
+        f"query_upper_bound={provekit['worst']['query_upper_bound']}"
+    )
+    print(
+        "- bottlenecks: "
+        f"witness {provekit['worst']['blinded_bottleneck'][0]}="
+        f"{provekit['worst']['blinded_bottleneck'][1]:.6f}, "
+        f"blinding {provekit['worst']['blinding_bottleneck'][0]}="
+        f"{provekit['worst']['blinding_bottleneck'][1]:.6f}"
+    )
+    print(
+        f"- max requested PoW bits in checked range: "
+        f"{provekit['worst']['max_requested_pow_bits']:.6f}"
+    )
+    print(
+        f"- configured estimate: {provekit['total_bits']:.6f} "
         f"(floor {provekit['floor_bits']})"
+    )
+
+    print()
+    print("Stark-V")
+    print(
+        f"- upstream UDR batching phase: {stark_v['batching_bits']:.6f} bits "
+        f"(floor {math.floor(stark_v['batching_bits'])})"
+    )
+    print(
+        f"- upstream UDR query phase: {stark_v['query_bits']:.6f} bits "
+        f"(floor {math.floor(stark_v['query_bits'])})"
+    )
+    print(
+        "- upstream UDR commit rounds: "
+        + ", ".join(f"{bits:.6f}" for bits in stark_v["commit_bits"])
+    )
+    print(
+        f"- configured estimate: {stark_v['total_bits']:.6f} "
+        f"(floor {stark_v['floor_bits']})"
     )
 
     print()
     print("RISC Zero")
     print(
-        f"- toy-model upstream reproduction: {risc0['toy_model']['old_bits']:.6f} bits"
+        f"- configured toy-model reproduction: {risc0['toy_model']['bits']:.6f} bits"
     )
     print(
-        f"- toy-model paper-based update: {risc0['toy_model']['new_bits']:.6f} bits "
-        f"(floor {risc0['toy_model']['floor_bits']})"
-    )
-    print(f"- strict upstream reproduction: {risc0['strict']['old_bits']:.6f} bits")
-    print(
-        f"- strict paper-based update: {risc0['strict']['new_bits']:.6f} bits "
-        f"(floor {risc0['strict']['floor_bits']})"
-    )
-    print(
-        f"- proven local floor: {risc0['proven_floor']['bits']:.6f} bits "
-        f"(floor {risc0['proven_floor']['floor_bits']})"
-    )
-    print(
-        "- strict update internals: "
-        f"theta_old={risc0['strict']['old_theta']:.12f}, "
-        f"theta_new={risc0['strict']['new_theta']:.12f}, "
-        f"H_q(theta_new)={risc0['strict']['h_q_new_theta']:.12f}, "
-        f"epsilon_plus_old={risc0['strict']['epsilon_plus_old']:.12f}, "
-        f"epsilon_plus_new={risc0['strict']['epsilon_plus_new']:.12f}"
+        "- metadata target: 96 bits; the local reproduction is above that target "
+        "for the default segment_po2=20 benchmark config"
     )
 
 
