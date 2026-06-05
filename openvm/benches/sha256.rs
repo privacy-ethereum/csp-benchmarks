@@ -15,6 +15,7 @@ utils::define_benchmark_harness!(
         is_zkvm: true,
         ..Default::default()
     },
+    |_| true,
     { load_or_compile_program(&RustRv32imaCustomized, SHA256_BENCH) },
     prepare_sha256,
     |_, _| 0,

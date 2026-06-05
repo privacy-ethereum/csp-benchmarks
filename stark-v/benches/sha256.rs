@@ -10,6 +10,7 @@ utils::define_benchmark_harness!(
     None,                                                              // feature
     "sha256_mem_stark_v",                                              // mem_binary_name
     stark_v_bench_properties(),                                        // properties
+    |_| false,                                                         // uses_precompile
     { load_or_compile("sha256") },                                     // shared_init
     prepare_sha256,                                                    // prepare
     |_, _| 0,                                                          // num_constraints

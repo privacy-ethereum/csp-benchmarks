@@ -13,6 +13,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_jolt",
     jolt_bench_properties(),
+    |_| true,
     { load_or_compile_program(&RustRv64imacCustomized, SHA256_BENCH) },
     prepare_sha256,
     |_, _| 0,

@@ -20,6 +20,8 @@ Dockerfile
 rust-project.json
 tmp/
 *.json
+!*/bench_props.json
+!*/bench_flags.json
 // Ligetron proof files
 *.data
 third_party/

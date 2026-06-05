@@ -10,6 +10,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_spartan2",
     SPARTAN2_BENCH_PROPERTIES,
+    |_| false,
     |input_size| { prepare_sha256(input_size) },
     num_constraints,
     prove_sha256,

@@ -3,6 +3,7 @@ use glob::glob;
 use regex::Regex;
 use serde::Deserialize;
 use serde_json::Value;
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -57,11 +58,78 @@ struct Cli {
     /// Optional path to number of constraints file (JSON)
     #[arg(long)]
     num_constraints_file: Option<PathBuf>,
+
+    /// Optional path to benchmark flags file (JSON)
+    #[arg(long)]
+    flags: Option<PathBuf>,
 }
 
 #[derive(Deserialize)]
 struct HyperfineRecord {
     mean: f64,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct BenchFlagsFile {
+    #[serde(default)]
+    uses_precompile: BTreeMap<String, PrecompileFlagSpec>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(untagged)]
+enum PrecompileFlagSpec {
+    Bool(bool),
+    ByInputSize(InputSizePrecompileFlag),
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct InputSizePrecompileFlag {
+    #[serde(default)]
+    default: bool,
+    #[serde(default)]
+    by_input_size: BTreeMap<String, bool>,
+}
+
+impl BenchFlagsFile {
+    fn load(path: &Path) -> std::io::Result<Self> {
+        let flags = Self::from_str(&fs::read_to_string(path)?)?;
+        flags.validate()?;
+        Ok(flags)
+    }
+
+    fn from_str(s: &str) -> std::io::Result<Self> {
+        serde_json::from_str::<Self>(s).map_err(|e| io_err(&e.to_string()))
+    }
+
+    fn validate(&self) -> std::io::Result<()> {
+        for (target, spec) in &self.uses_precompile {
+            if let PrecompileFlagSpec::ByInputSize(spec) = spec {
+                for input_size in spec.by_input_size.keys() {
+                    input_size.parse::<usize>().map_err(|_| {
+                        io_err(&format!(
+                            "invalid input size key '{input_size}' for target '{target}'"
+                        ))
+                    })?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    fn uses_precompile(&self, target: &str, input_size: usize) -> bool {
+        match self.uses_precompile.get(target) {
+            Some(PrecompileFlagSpec::Bool(value)) => *value,
+            Some(PrecompileFlagSpec::ByInputSize(spec)) => spec
+                .by_input_size
+                .get(&input_size.to_string())
+                .copied()
+                .unwrap_or(spec.default),
+            None => false,
+        }
+    }
 }
 
 /// Formats hyperfine + RAM outputs into Metrics JSON and cleans up
@@ -81,6 +149,11 @@ fn main() -> std::io::Result<()> {
             .to_string_lossy()
             .to_string()
     });
+
+    let bench_flags = match &cli.flags {
+        Some(path) => BenchFlagsFile::load(path)?,
+        None => BenchFlagsFile::default(),
+    };
 
     // hyperfine files have the form: hyperfine_<target>_<size>_prover_metrics.json
     let pattern = system_dir.join("hyperfine_*_*_prover_metrics.json");
@@ -143,6 +216,7 @@ fn main() -> std::io::Result<()> {
         );
         metrics.proof_duration = to_duration_ns(prover_mean_sec);
         metrics.verify_duration = to_duration_ns(verifier_mean_sec);
+        metrics.uses_precompile = bench_flags.uses_precompile(&target, input_size);
 
         if mem_path.exists()
             && let Ok(mem_bytes) = read_peak_memory_bytes(&mem_path)
@@ -271,4 +345,66 @@ fn to_duration_ns(seconds: f64) -> Duration {
 
 fn io_err(msg: &str) -> std::io::Error {
     std::io::Error::other(msg)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn missing_flags_default_to_false() {
+        let flags = BenchFlagsFile::default();
+
+        assert!(!flags.uses_precompile("sha256", 128));
+    }
+
+    #[test]
+    fn boolean_target_shorthand_applies_to_all_input_sizes() {
+        let flags = BenchFlagsFile::from_str(
+            r#"{
+                "uses_precompile": {
+                    "sha256": true
+                }
+            }"#,
+        )
+        .unwrap();
+
+        assert!(flags.uses_precompile("sha256", 128));
+        assert!(flags.uses_precompile("sha256", 2048));
+        assert!(!flags.uses_precompile("keccak", 128));
+    }
+
+    #[test]
+    fn input_size_overrides_target_default() {
+        let flags = BenchFlagsFile::from_str(
+            r#"{
+                "uses_precompile": {
+                    "poseidon2": {
+                        "default": false,
+                        "by_input_size": {
+                            "4": true
+                        }
+                    }
+                }
+            }"#,
+        )
+        .unwrap();
+
+        assert!(!flags.uses_precompile("poseidon2", 2));
+        assert!(flags.uses_precompile("poseidon2", 4));
+        assert!(!flags.uses_precompile("poseidon2", 8));
+    }
+
+    #[test]
+    fn invalid_present_config_fails() {
+        let result = BenchFlagsFile::from_str(
+            r#"{
+                "uses_precompile": {
+                    "sha256": 1
+                }
+            }"#,
+        );
+
+        assert!(result.is_err());
+    }
 }

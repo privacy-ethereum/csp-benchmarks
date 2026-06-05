@@ -44,6 +44,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 UTILS_BIN="${SCRIPT_DIR}/target/release/utils"
 MEASURE_RAM_SCRIPT="${SCRIPT_DIR}/measure_mem_avg.sh"
 BENCH_PROPS_JSON="${SYSTEM_DIR}/bench_props.json"
+BENCH_FLAGS_JSON="${SYSTEM_DIR}/bench_flags.json"
 NUM_CONSTRAINTS="${SYSTEM_DIR}/circuit_sizes.json"
 
 if [[ ! -f "$BENCH_PROPS_JSON" ]]; then
@@ -150,7 +151,11 @@ fi
 
 if [[ -x "$FORMATTER_BIN" ]]; then
   step "Formatting hyperfine outputs into Metrics JSON"
-  "$FORMATTER_BIN" --system-dir "$SYSTEM_DIR" --properties "$BENCH_PROPS_JSON" --num-constraints-file "$NUM_CONSTRAINTS" || {
+  FORMATTER_ARGS=(--system-dir "$SYSTEM_DIR" --properties "$BENCH_PROPS_JSON" --num-constraints-file "$NUM_CONSTRAINTS")
+  if [[ -f "$BENCH_FLAGS_JSON" ]]; then
+    FORMATTER_ARGS+=(--flags "$BENCH_FLAGS_JSON")
+  fi
+  "$FORMATTER_BIN" "${FORMATTER_ARGS[@]}" || {
     echo "format_hyperfine failed" >&2
     exit 1
   }
@@ -159,5 +164,4 @@ else
 fi
 
 ok "Benchmark complete"
-
 

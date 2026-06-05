@@ -13,6 +13,7 @@ utils::define_benchmark_harness!(
     None,
     "keccak_mem_risc0",
     risc0_bench_properties(),
+    |_| true,
     { load_or_compile_program(&RustRv32imaCustomized, KECCAK_BENCH) },
     prepare_keccak,
     |_, _| 0,

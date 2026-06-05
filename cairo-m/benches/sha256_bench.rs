@@ -23,6 +23,7 @@ utils::define_benchmark_harness!(
         AuditStatus::NotAudited, // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about
         Some("Cairo ISA"), // https://github.com/kkrt-labs/cairo-m/blob/main/docs/design.md
     ),
+    |_| true,
     { compile_program() },
     |input_size, program: &Program| { prepare(input_size, program) },
     |_, _| 0,

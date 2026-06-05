@@ -45,6 +45,7 @@ struct Measurement {
     preprocessing_size: usize,
     num_constraints: usize,
     peak_memory: usize,
+    uses_precompile: bool,
 }
 
 /// Compute the unique system key from a metrics entry.
@@ -119,6 +120,7 @@ fn main() -> io::Result<()> {
             preprocessing_size: m.preprocessing_size,
             num_constraints: m.num_constraints,
             peak_memory: m.peak_memory,
+            uses_precompile: m.uses_precompile,
         });
     }
 
@@ -397,6 +399,7 @@ mod tests {
             preprocessing_size: 2048,
             num_constraints: 5000,
             peak_memory: 100000,
+            uses_precompile: true,
         }];
 
         let collected = CollectedBenchmarks {
@@ -431,6 +434,7 @@ mod tests {
         assert_eq!(measurements[0]["input_size"], 128);
         assert_eq!(measurements[0]["proof_duration"], 12345000);
         assert_eq!(measurements[0]["verify_duration"], 6789000);
+        assert_eq!(measurements[0]["uses_precompile"], true);
 
         // Verify system properties are NOT in measurements
         assert!(measurements[0].get("proving_system").is_none());

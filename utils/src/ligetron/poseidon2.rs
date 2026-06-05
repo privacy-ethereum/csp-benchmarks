@@ -26,7 +26,6 @@
 //! - **Internal MDS Matrix**: [2, 1; 1, 3]
 //! - **Round Structure**: 8 full rounds, 56 partial rounds
 //! - **S-box**: x^5 power function
-//! ```
 //!
 //! ## Performance Considerations
 //!

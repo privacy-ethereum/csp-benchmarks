@@ -218,7 +218,8 @@
       "proof_size": 200,
       "preprocessing_size": 77293281,
       "num_constraints": 143282,
-      "peak_memory": 726659891
+      "peak_memory": 726659891,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -229,7 +230,8 @@
       "proof_size": 200,
       "preprocessing_size": 417193964,
       "num_constraints": 822870,
-      "peak_memory": 2866505318
+      "peak_memory": 2866505318,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -240,7 +242,8 @@
       "proof_size": 200,
       "preprocessing_size": 85718813,
       "num_constraints": 163058,
-      "peak_memory": 828035891
+      "peak_memory": 828035891,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -251,7 +254,8 @@
       "proof_size": 200,
       "preprocessing_size": 800808743,
       "num_constraints": 1575606,
-      "peak_memory": 5008015360
+      "peak_memory": 5008015360,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -262,7 +266,8 @@
       "proof_size": 200,
       "preprocessing_size": 125033860,
       "num_constraints": 256206,
-      "peak_memory": 1164153651
+      "peak_memory": 1164153651,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -273,7 +278,8 @@
       "proof_size": 200,
       "preprocessing_size": 222481655,
       "num_constraints": 445094,
-      "peak_memory": 1805225164
+      "peak_memory": 1805225164,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -284,7 +290,8 @@
       "proof_size": 200,
       "preprocessing_size": 99099694,
       "num_constraints": 196945,
-      "peak_memory": 981363916
+      "peak_memory": 981363916,
+      "uses_precompile": true
     },
     {
       "system": "provekit-groth16",
@@ -295,7 +302,8 @@
       "proof_size": 200,
       "preprocessing_size": 23490067,
       "num_constraints": 46403,
-      "peak_memory": 281909657
+      "peak_memory": 281909657,
+      "uses_precompile": true
     },
     {
       "system": "provekit-groth16",
@@ -306,7 +314,8 @@
       "proof_size": 200,
       "preprocessing_size": 177373071,
       "num_constraints": 345404,
-      "peak_memory": 1658758758
+      "peak_memory": 1658758758,
+      "uses_precompile": true
     },
     {
       "system": "provekit-groth16",
@@ -317,7 +326,8 @@
       "proof_size": 200,
       "preprocessing_size": 36667216,
       "num_constraints": 67909,
-      "peak_memory": 431115468
+      "peak_memory": 431115468,
+      "uses_precompile": true
     },
     {
       "system": "provekit-groth16",
@@ -328,7 +338,8 @@
       "proof_size": 200,
       "preprocessing_size": 54706323,
       "num_constraints": 110921,
-      "peak_memory": 614388531
+      "peak_memory": 614388531,
+      "uses_precompile": true
     },
     {
       "system": "provekit-groth16",
@@ -339,7 +350,8 @@
       "proof_size": 168,
       "preprocessing_size": 614610,
       "num_constraints": 504,
-      "peak_memory": 92812083
+      "peak_memory": 92812083,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -350,7 +362,8 @@
       "proof_size": 168,
       "preprocessing_size": 816478,
       "num_constraints": 609,
-      "peak_memory": 98408857
+      "peak_memory": 98408857,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -361,7 +374,8 @@
       "proof_size": 168,
       "preprocessing_size": 143060,
       "num_constraints": 240,
-      "peak_memory": 96303513
+      "peak_memory": 96303513,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -372,7 +386,8 @@
       "proof_size": 168,
       "preprocessing_size": 340775,
       "num_constraints": 297,
-      "peak_memory": 99724492
+      "peak_memory": 99724492,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -383,7 +398,8 @@
       "proof_size": 168,
       "preprocessing_size": 480441,
       "num_constraints": 402,
-      "peak_memory": 95682560
+      "peak_memory": 95682560,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -394,7 +410,8 @@
       "proof_size": 168,
       "preprocessing_size": 663456,
       "num_constraints": 479,
-      "peak_memory": 71134412
+      "peak_memory": 71134412,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -405,7 +422,8 @@
       "proof_size": 168,
       "preprocessing_size": 834933,
       "num_constraints": 556,
-      "peak_memory": 72782643
+      "peak_memory": 72782643,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -416,7 +434,8 @@
       "proof_size": 168,
       "preprocessing_size": 211395,
       "num_constraints": 231,
-      "peak_memory": 70405324
+      "peak_memory": 70405324,
+      "uses_precompile": false
     },
     {
       "system": "provekit-groth16",
@@ -427,7 +446,8 @@
       "proof_size": 168,
       "preprocessing_size": 232001,
       "num_constraints": 529,
-      "peak_memory": 92590899
+      "peak_memory": 92590899,
+      "uses_precompile": true
     },
     {
       "system": "provekit-groth16",
@@ -438,7 +458,8 @@
       "proof_size": 168,
       "preprocessing_size": 539518,
       "num_constraints": 363,
-      "peak_memory": 72548352
+      "peak_memory": 72548352,
+      "uses_precompile": false
     },
     {
       "system": "risc0",
@@ -450,7 +471,8 @@
       "proof_size": 223424,
       "preprocessing_size": 430425,
       "num_constraints": 0,
-      "peak_memory": 4967807385
+      "peak_memory": 4967807385,
+      "uses_precompile": true
     },
     {
       "system": "risc0",
@@ -462,7 +484,8 @@
       "proof_size": 223290,
       "preprocessing_size": 304057,
       "num_constraints": 0,
-      "peak_memory": 4008812544
+      "peak_memory": 4008812544,
+      "uses_precompile": true
     },
     {
       "system": "risc0",
@@ -474,7 +497,8 @@
       "proof_size": 223290,
       "preprocessing_size": 304057,
       "num_constraints": 0,
-      "peak_memory": 4006192742
+      "peak_memory": 4006192742,
+      "uses_precompile": true
     },
     {
       "system": "risc0",
@@ -486,7 +510,8 @@
       "proof_size": 223290,
       "preprocessing_size": 304057,
       "num_constraints": 0,
-      "peak_memory": 4010667212
+      "peak_memory": 4010667212,
+      "uses_precompile": true
     },
     {
       "system": "risc0",
@@ -498,7 +523,8 @@
       "proof_size": 223290,
       "preprocessing_size": 304057,
       "num_constraints": 0,
-      "peak_memory": 4005847040
+      "peak_memory": 4005847040,
+      "uses_precompile": true
     },
     {
       "system": "risc0",
@@ -510,7 +536,8 @@
       "proof_size": 223290,
       "preprocessing_size": 304057,
       "num_constraints": 0,
-      "peak_memory": 4007765606
+      "peak_memory": 4007765606,
+      "uses_precompile": true
     },
     {
       "system": "risc0",
@@ -522,7 +549,8 @@
       "proof_size": 223290,
       "preprocessing_size": 300565,
       "num_constraints": 0,
-      "peak_memory": 1586408652
+      "peak_memory": 1586408652,
+      "uses_precompile": true
     },
     {
       "system": "risc0",
@@ -534,7 +562,8 @@
       "proof_size": 223290,
       "preprocessing_size": 300565,
       "num_constraints": 0,
-      "peak_memory": 1579325849
+      "peak_memory": 1579325849,
+      "uses_precompile": true
     },
     {
       "system": "risc0",
@@ -546,7 +575,8 @@
       "proof_size": 223290,
       "preprocessing_size": 300565,
       "num_constraints": 0,
-      "peak_memory": 1591563059
+      "peak_memory": 1591563059,
+      "uses_precompile": true
     },
     {
       "system": "risc0",
@@ -558,7 +588,8 @@
       "proof_size": 223290,
       "preprocessing_size": 300565,
       "num_constraints": 0,
-      "peak_memory": 1581563904
+      "peak_memory": 1581563904,
+      "uses_precompile": true
     },
     {
       "system": "risc0",
@@ -570,7 +601,8 @@
       "proof_size": 223290,
       "preprocessing_size": 300565,
       "num_constraints": 0,
-      "peak_memory": 1583428403
+      "peak_memory": 1583428403,
+      "uses_precompile": true
     },
     {
       "system": "binius64",
@@ -581,7 +613,8 @@
       "proof_size": 150688,
       "preprocessing_size": 598672,
       "num_constraints": 6914,
-      "peak_memory": 62724505
+      "peak_memory": 62724505,
+      "uses_precompile": false
     },
     {
       "system": "binius64",
@@ -592,7 +625,8 @@
       "proof_size": 76896,
       "preprocessing_size": 74867,
       "num_constraints": 862,
-      "peak_memory": 41284403
+      "peak_memory": 41284403,
+      "uses_precompile": false
     },
     {
       "system": "binius64",
@@ -603,7 +637,8 @@
       "proof_size": 159744,
       "preprocessing_size": 1194709,
       "num_constraints": 13765,
-      "peak_memory": 85837414
+      "peak_memory": 85837414,
+      "uses_precompile": false
     },
     {
       "system": "binius64",
@@ -614,7 +649,8 @@
       "proof_size": 80064,
       "preprocessing_size": 150298,
       "num_constraints": 1742,
-      "peak_memory": 44844646
+      "peak_memory": 44844646,
+      "uses_precompile": false
     },
     {
       "system": "binius64",
@@ -625,7 +661,8 @@
       "proof_size": 86304,
       "preprocessing_size": 300115,
       "num_constraints": 3475,
-      "peak_memory": 50859212
+      "peak_memory": 50859212,
+      "uses_precompile": false
     },
     {
       "system": "binius64",
@@ -636,7 +673,8 @@
       "proof_size": 184000,
       "preprocessing_size": 2159397,
       "num_constraints": 35498,
-      "peak_memory": 112484352
+      "peak_memory": 112484352,
+      "uses_precompile": false
     },
     {
       "system": "binius64",
@@ -647,7 +685,8 @@
       "proof_size": 150688,
       "preprocessing_size": 382048,
       "num_constraints": 6273,
-      "peak_memory": 54670131
+      "peak_memory": 54670131,
+      "uses_precompile": false
     },
     {
       "system": "binius64",
@@ -658,7 +697,8 @@
       "proof_size": 255808,
       "preprocessing_size": 4189990,
       "num_constraints": 68881,
-      "peak_memory": 165922406
+      "peak_memory": 165922406,
+      "uses_precompile": false
     },
     {
       "system": "binius64",
@@ -669,7 +709,8 @@
       "proof_size": 159744,
       "preprocessing_size": 636119,
       "num_constraints": 10452,
-      "peak_memory": 62829363
+      "peak_memory": 62829363,
+      "uses_precompile": false
     },
     {
       "system": "binius64",
@@ -680,7 +721,8 @@
       "proof_size": 170336,
       "preprocessing_size": 1143972,
       "num_constraints": 18803,
-      "peak_memory": 76215091
+      "peak_memory": 76215091,
+      "uses_precompile": false
     },
     {
       "system": "expander",
@@ -691,7 +733,8 @@
       "proof_size": 572412,
       "preprocessing_size": 373049,
       "num_constraints": 17189,
-      "peak_memory": 40191590
+      "peak_memory": 40191590,
+      "uses_precompile": false
     },
     {
       "system": "expander",
@@ -702,7 +745,8 @@
       "proof_size": 572412,
       "preprocessing_size": 379317,
       "num_constraints": 17489,
-      "peak_memory": 38371328
+      "peak_memory": 38371328,
+      "uses_precompile": false
     },
     {
       "system": "expander",
@@ -713,7 +757,8 @@
       "proof_size": 540528,
       "preprocessing_size": 48514,
       "num_constraints": 8368,
-      "peak_memory": 26356940
+      "peak_memory": 26356940,
+      "uses_precompile": false
     },
     {
       "system": "expander",
@@ -724,7 +769,8 @@
       "proof_size": 540528,
       "preprocessing_size": 47342,
       "num_constraints": 8320,
-      "peak_memory": 27856076
+      "peak_memory": 27856076,
+      "uses_precompile": false
     },
     {
       "system": "expander",
@@ -735,7 +781,8 @@
       "proof_size": 540528,
       "preprocessing_size": 51223,
       "num_constraints": 8394,
-      "peak_memory": 28039577
+      "peak_memory": 28039577,
+      "uses_precompile": false
     },
     {
       "system": "expander",
@@ -746,7 +793,8 @@
       "proof_size": 3031956,
       "preprocessing_size": 57726500,
       "num_constraints": 2706904,
-      "peak_memory": 4068522393
+      "peak_memory": 4068522393,
+      "uses_precompile": false
     },
     {
       "system": "expander",
@@ -757,7 +805,8 @@
       "proof_size": 1957628,
       "preprocessing_size": 9420474,
       "num_constraints": 430854,
-      "peak_memory": 948702412
+      "peak_memory": 948702412,
+      "uses_precompile": false
     },
     {
       "system": "expander",
@@ -768,7 +817,8 @@
       "proof_size": 3208096,
       "preprocessing_size": 112988418,
       "num_constraints": 5310718,
-      "peak_memory": 7496292761
+      "peak_memory": 7496292761,
+      "uses_precompile": false
     },
     {
       "system": "expander",
@@ -779,7 +829,8 @@
       "proof_size": 2078172,
       "preprocessing_size": 16315106,
       "num_constraints": 755710,
-      "peak_memory": 1385370419
+      "peak_memory": 1385370419,
+      "uses_precompile": false
     },
     {
       "system": "expander",
@@ -790,7 +841,8 @@
       "proof_size": 2892980,
       "preprocessing_size": 30104540,
       "num_constraints": 1405424,
-      "peak_memory": 2177952972
+      "peak_memory": 2177952972,
+      "uses_precompile": false
     },
     {
       "system": "stark-v",
@@ -802,7 +854,8 @@
       "proof_size": 1758997,
       "preprocessing_size": 76625,
       "num_constraints": 0,
-      "peak_memory": 2113108377
+      "peak_memory": 2113108377,
+      "uses_precompile": false
     },
     {
       "system": "stark-v",
@@ -814,7 +867,8 @@
       "proof_size": 1758231,
       "preprocessing_size": 76625,
       "num_constraints": 0,
-      "peak_memory": 1976410112
+      "peak_memory": 1976410112,
+      "uses_precompile": false
     },
     {
       "system": "stark-v",
@@ -826,7 +880,8 @@
       "proof_size": 1768146,
       "preprocessing_size": 76625,
       "num_constraints": 0,
-      "peak_memory": 2258164121
+      "peak_memory": 2258164121,
+      "uses_precompile": false
     },
     {
       "system": "stark-v",
@@ -838,7 +893,8 @@
       "proof_size": 1768795,
       "preprocessing_size": 76625,
       "num_constraints": 0,
-      "peak_memory": 2012250112
+      "peak_memory": 2012250112,
+      "uses_precompile": false
     },
     {
       "system": "stark-v",
@@ -850,7 +906,8 @@
       "proof_size": 1764654,
       "preprocessing_size": 76625,
       "num_constraints": 0,
-      "peak_memory": 2063043788
+      "peak_memory": 2063043788,
+      "uses_precompile": false
     },
     {
       "system": "stark-v",
@@ -862,7 +919,8 @@
       "proof_size": 1768973,
       "preprocessing_size": 76021,
       "num_constraints": 0,
-      "peak_memory": 2068301414
+      "peak_memory": 2068301414,
+      "uses_precompile": false
     },
     {
       "system": "stark-v",
@@ -874,7 +932,8 @@
       "proof_size": 1764450,
       "preprocessing_size": 76021,
       "num_constraints": 0,
-      "peak_memory": 1979575500
+      "peak_memory": 1979575500,
+      "uses_precompile": false
     },
     {
       "system": "stark-v",
@@ -886,7 +945,8 @@
       "proof_size": 1760342,
       "preprocessing_size": 76021,
       "num_constraints": 0,
-      "peak_memory": 2161550950
+      "peak_memory": 2161550950,
+      "uses_precompile": false
     },
     {
       "system": "stark-v",
@@ -898,7 +958,8 @@
       "proof_size": 1764486,
       "preprocessing_size": 76021,
       "num_constraints": 0,
-      "peak_memory": 2010005504
+      "peak_memory": 2010005504,
+      "uses_precompile": false
     },
     {
       "system": "stark-v",
@@ -910,7 +971,8 @@
       "proof_size": 1762319,
       "preprocessing_size": 76021,
       "num_constraints": 0,
-      "peak_memory": 2018805350
+      "peak_memory": 2018805350,
+      "uses_precompile": false
     },
     {
       "system": "spartan2",
@@ -921,7 +983,8 @@
       "proof_size": 61628,
       "preprocessing_size": 110234406,
       "num_constraints": 524288,
-      "peak_memory": 1109196800
+      "peak_memory": 1109196800,
+      "uses_precompile": false
     },
     {
       "system": "spartan2",
@@ -932,7 +995,8 @@
       "proof_size": 48604,
       "preprocessing_size": 18890502,
       "num_constraints": 131072,
-      "peak_memory": 239828992
+      "peak_memory": 239828992,
+      "uses_precompile": false
     },
     {
       "system": "spartan2",
@@ -943,7 +1007,8 @@
       "proof_size": 78700,
       "preprocessing_size": 216424998,
       "num_constraints": 1048576,
-      "peak_memory": 2049277952
+      "peak_memory": 2049277952,
+      "uses_precompile": false
     },
     {
       "system": "spartan2",
@@ -954,7 +1019,8 @@
       "proof_size": 48604,
       "preprocessing_size": 30591462,
       "num_constraints": 131072,
-      "peak_memory": 330412851
+      "peak_memory": 330412851,
+      "uses_precompile": false
     },
     {
       "system": "spartan2",
@@ -965,7 +1031,8 @@
       "proof_size": 53004,
       "preprocessing_size": 57139110,
       "num_constraints": 262144,
-      "peak_memory": 618048716
+      "peak_memory": 618048716,
+      "uses_precompile": false
     },
     {
       "system": "plonky2",
@@ -976,7 +1043,8 @@
       "proof_size": 167820,
       "preprocessing_size": 1291852144,
       "num_constraints": 109364,
-      "peak_memory": 5988003020
+      "peak_memory": 5988003020,
+      "uses_precompile": false
     },
     {
       "system": "plonky2",
@@ -987,7 +1055,8 @@
       "proof_size": 154892,
       "preprocessing_size": 321661128,
       "num_constraints": 13753,
-      "peak_memory": 1798918963
+      "peak_memory": 1798918963,
+      "uses_precompile": false
     },
     {
       "system": "plonky2",
@@ -998,7 +1067,8 @@
       "proof_size": 182248,
       "preprocessing_size": 2535577528,
       "num_constraints": 218634,
-      "peak_memory": 9836065587
+      "peak_memory": 9836065587,
+      "uses_precompile": false
     },
     {
       "system": "plonky2",
@@ -1009,7 +1079,8 @@
       "proof_size": 161292,
       "preprocessing_size": 619073496,
       "num_constraints": 27411,
-      "peak_memory": 3390509875
+      "peak_memory": 3390509875,
+      "uses_precompile": false
     },
     {
       "system": "plonky2",
@@ -1020,7 +1091,8 @@
       "proof_size": 161292,
       "preprocessing_size": 658050952,
       "num_constraints": 54729,
-      "peak_memory": 3240730624
+      "peak_memory": 3240730624,
+      "uses_precompile": false
     },
     {
       "system": "plonky2",
@@ -1031,7 +1103,8 @@
       "proof_size": 148796,
       "preprocessing_size": 164320812,
       "num_constraints": 2,
-      "peak_memory": 902119424
+      "peak_memory": 902119424,
+      "uses_precompile": true
     },
     {
       "system": "plonky2",
@@ -1042,7 +1115,8 @@
       "proof_size": 148796,
       "preprocessing_size": 164320844,
       "num_constraints": 2,
-      "peak_memory": 902232473
+      "peak_memory": 902232473,
+      "uses_precompile": true
     },
     {
       "system": "plonky2",
@@ -1053,7 +1127,8 @@
       "proof_size": 148796,
       "preprocessing_size": 164320280,
       "num_constraints": 1,
-      "peak_memory": 902314393
+      "peak_memory": 902314393,
+      "uses_precompile": true
     },
     {
       "system": "plonky2",
@@ -1064,7 +1139,8 @@
       "proof_size": 148796,
       "preprocessing_size": 164320344,
       "num_constraints": 1,
-      "peak_memory": 901503385
+      "peak_memory": 901503385,
+      "uses_precompile": true
     },
     {
       "system": "plonky2",
@@ -1075,7 +1151,8 @@
       "proof_size": 148796,
       "preprocessing_size": 164320472,
       "num_constraints": 1,
-      "peak_memory": 902209536
+      "peak_memory": 902209536,
+      "uses_precompile": true
     },
     {
       "system": "plonky2",
@@ -1086,7 +1163,8 @@
       "proof_size": 168060,
       "preprocessing_size": 1270450224,
       "num_constraints": 98977,
-      "peak_memory": 6109918003
+      "peak_memory": 6109918003,
+      "uses_precompile": false
     },
     {
       "system": "plonky2",
@@ -1097,7 +1175,8 @@
       "proof_size": 155132,
       "preprocessing_size": 326535584,
       "num_constraints": 17474,
-      "peak_memory": 1807784345
+      "peak_memory": 1807784345,
+      "uses_precompile": false
     },
     {
       "system": "plonky2",
@@ -1108,7 +1187,8 @@
       "proof_size": 182488,
       "preprocessing_size": 2485494200,
       "num_constraints": 192122,
-      "peak_memory": 9756227993
+      "peak_memory": 9756227993,
+      "uses_precompile": false
     },
     {
       "system": "plonky2",
@@ -1119,7 +1199,8 @@
       "proof_size": 161532,
       "preprocessing_size": 621541928,
       "num_constraints": 29116,
-      "peak_memory": 3388022784
+      "peak_memory": 3388022784,
+      "uses_precompile": false
     },
     {
       "system": "plonky2",
@@ -1130,7 +1211,8 @@
       "proof_size": 161532,
       "preprocessing_size": 650989736,
       "num_constraints": 52404,
-      "peak_memory": 3310139801
+      "peak_memory": 3310139801,
+      "uses_precompile": false
     },
     {
       "system": "jolt",
@@ -1142,7 +1224,8 @@
       "proof_size": 87831,
       "preprocessing_size": 47227,
       "num_constraints": 0,
-      "peak_memory": 450861465
+      "peak_memory": 450861465,
+      "uses_precompile": true
     },
     {
       "system": "jolt",
@@ -1154,7 +1237,8 @@
       "proof_size": 83766,
       "preprocessing_size": 19099,
       "num_constraints": 0,
-      "peak_memory": 150939238
+      "peak_memory": 150939238,
+      "uses_precompile": true
     },
     {
       "system": "jolt",
@@ -1166,7 +1250,8 @@
       "proof_size": 80238,
       "preprocessing_size": 19099,
       "num_constraints": 0,
-      "peak_memory": 124495462
+      "peak_memory": 124495462,
+      "uses_precompile": true
     },
     {
       "system": "jolt",
@@ -1178,7 +1263,8 @@
       "proof_size": 84198,
       "preprocessing_size": 19099,
       "num_constraints": 0,
-      "peak_memory": 227447603
+      "peak_memory": 227447603,
+      "uses_precompile": true
     },
     {
       "system": "jolt",
@@ -1190,7 +1276,8 @@
       "proof_size": 80670,
       "preprocessing_size": 19099,
       "num_constraints": 0,
-      "peak_memory": 135186022
+      "peak_memory": 135186022,
+      "uses_precompile": true
     },
     {
       "system": "jolt",
@@ -1202,7 +1289,8 @@
       "proof_size": 80670,
       "preprocessing_size": 19099,
       "num_constraints": 0,
-      "peak_memory": 142460518
+      "peak_memory": 142460518,
+      "uses_precompile": true
     },
     {
       "system": "jolt",
@@ -1214,7 +1302,8 @@
       "proof_size": 84270,
       "preprocessing_size": 17835,
       "num_constraints": 0,
-      "peak_memory": 242361958
+      "peak_memory": 242361958,
+      "uses_precompile": true
     },
     {
       "system": "jolt",
@@ -1226,7 +1315,8 @@
       "proof_size": 80742,
       "preprocessing_size": 17835,
       "num_constraints": 0,
-      "peak_memory": 203905433
+      "peak_memory": 203905433,
+      "uses_precompile": true
     },
     {
       "system": "jolt",
@@ -1238,7 +1328,8 @@
       "proof_size": 87294,
       "preprocessing_size": 17835,
       "num_constraints": 0,
-      "peak_memory": 309238169
+      "peak_memory": 309238169,
+      "uses_precompile": true
     },
     {
       "system": "jolt",
@@ -1250,7 +1341,8 @@
       "proof_size": 83838,
       "preprocessing_size": 17835,
       "num_constraints": 0,
-      "peak_memory": 201893478
+      "peak_memory": 201893478,
+      "uses_precompile": true
     },
     {
       "system": "jolt",
@@ -1262,7 +1354,8 @@
       "proof_size": 83838,
       "preprocessing_size": 17835,
       "num_constraints": 0,
-      "peak_memory": 211922124
+      "peak_memory": 211922124,
+      "uses_precompile": true
     },
     {
       "system": "rookie-numbers",
@@ -1273,7 +1366,8 @@
       "proof_size": 2108172,
       "preprocessing_size": 579212429,
       "num_constraints": 1076,
-      "peak_memory": 3663062630
+      "peak_memory": 3663062630,
+      "uses_precompile": true
     },
     {
       "system": "rookie-numbers",
@@ -1284,7 +1378,8 @@
       "proof_size": 1678188,
       "preprocessing_size": 579212429,
       "num_constraints": 1076,
-      "peak_memory": 3648662732
+      "peak_memory": 3648662732,
+      "uses_precompile": true
     },
     {
       "system": "rookie-numbers",
@@ -1295,7 +1390,8 @@
       "proof_size": 2559884,
       "preprocessing_size": 579212429,
       "num_constraints": 1076,
-      "peak_memory": 3642182860
+      "peak_memory": 3642182860,
+      "uses_precompile": true
     },
     {
       "system": "rookie-numbers",
@@ -1306,7 +1402,8 @@
       "proof_size": 1671900,
       "preprocessing_size": 579212429,
       "num_constraints": 1076,
-      "peak_memory": 3650587852
+      "peak_memory": 3650587852,
+      "uses_precompile": true
     },
     {
       "system": "rookie-numbers",
@@ -1317,7 +1414,8 @@
       "proof_size": 1598108,
       "preprocessing_size": 579212429,
       "num_constraints": 1076,
-      "peak_memory": 3682823372
+      "peak_memory": 3682823372,
+      "uses_precompile": true
     },
     {
       "system": "provekit",
@@ -1328,7 +1426,8 @@
       "proof_size": 3072656,
       "preprocessing_size": 829737,
       "num_constraints": 143282,
-      "peak_memory": 570767769
+      "peak_memory": 570767769,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1339,7 +1438,8 @@
       "proof_size": 3388368,
       "preprocessing_size": 6369013,
       "num_constraints": 822870,
-      "peak_memory": 2000561766
+      "peak_memory": 2000561766,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1350,7 +1450,8 @@
       "proof_size": 3070352,
       "preprocessing_size": 1281069,
       "num_constraints": 163058,
-      "peak_memory": 636638003
+      "peak_memory": 636638003,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1361,7 +1462,8 @@
       "proof_size": 3564176,
       "preprocessing_size": 12964933,
       "num_constraints": 1575606,
-      "peak_memory": 3622394265
+      "peak_memory": 3622394265,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1372,7 +1474,8 @@
       "proof_size": 3070096,
       "preprocessing_size": 2065353,
       "num_constraints": 256206,
-      "peak_memory": 934790758
+      "peak_memory": 934790758,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1383,7 +1486,8 @@
       "proof_size": 3227472,
       "preprocessing_size": 3567553,
       "num_constraints": 445094,
-      "peak_memory": 1318246809
+      "peak_memory": 1318246809,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1394,7 +1498,8 @@
       "proof_size": 1128008,
       "preprocessing_size": 446213,
       "num_constraints": 479,
-      "peak_memory": 71521075
+      "peak_memory": 71521075,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1405,7 +1510,8 @@
       "proof_size": 1126888,
       "preprocessing_size": 542737,
       "num_constraints": 556,
-      "peak_memory": 72543436
+      "peak_memory": 72543436,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1416,7 +1522,8 @@
       "proof_size": 1125256,
       "preprocessing_size": 110589,
       "num_constraints": 231,
-      "peak_memory": 70652723
+      "peak_memory": 70652723,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1427,7 +1534,8 @@
       "proof_size": 1126216,
       "preprocessing_size": 32425,
       "num_constraints": 529,
-      "peak_memory": 93682073
+      "peak_memory": 93682073,
+      "uses_precompile": true
     },
     {
       "system": "provekit",
@@ -1438,7 +1546,8 @@
       "proof_size": 1126664,
       "preprocessing_size": 373833,
       "num_constraints": 363,
-      "peak_memory": 72405811
+      "peak_memory": 72405811,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1449,7 +1558,8 @@
       "proof_size": 1124552,
       "preprocessing_size": 419425,
       "num_constraints": 504,
-      "peak_memory": 94035968
+      "peak_memory": 94035968,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1460,7 +1570,8 @@
       "proof_size": 1128136,
       "preprocessing_size": 549305,
       "num_constraints": 609,
-      "peak_memory": 97923891
+      "peak_memory": 97923891,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1471,7 +1582,8 @@
       "proof_size": 1128488,
       "preprocessing_size": 55081,
       "num_constraints": 240,
-      "peak_memory": 98936422
+      "peak_memory": 98936422,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1482,7 +1594,8 @@
       "proof_size": 1126088,
       "preprocessing_size": 214809,
       "num_constraints": 297,
-      "peak_memory": 98946252
+      "peak_memory": 98946252,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1493,7 +1606,8 @@
       "proof_size": 1126248,
       "preprocessing_size": 312413,
       "num_constraints": 402,
-      "peak_memory": 96955596
+      "peak_memory": 96955596,
+      "uses_precompile": false
     },
     {
       "system": "provekit",
@@ -1504,7 +1618,8 @@
       "proof_size": 3072496,
       "preprocessing_size": 1951001,
       "num_constraints": 196940,
-      "peak_memory": 849230233
+      "peak_memory": 849230233,
+      "uses_precompile": true
     },
     {
       "system": "provekit",
@@ -1515,7 +1630,8 @@
       "proof_size": 2738192,
       "preprocessing_size": 526505,
       "num_constraints": 46398,
-      "peak_memory": 234138828
+      "peak_memory": 234138828,
+      "uses_precompile": true
     },
     {
       "system": "provekit",
@@ -1526,7 +1642,8 @@
       "proof_size": 3228336,
       "preprocessing_size": 3258205,
       "num_constraints": 345399,
-      "peak_memory": 1200906240
+      "peak_memory": 1200906240,
+      "uses_precompile": true
     },
     {
       "system": "provekit",
@@ -1537,7 +1654,8 @@
       "proof_size": 2896272,
       "preprocessing_size": 755133,
       "num_constraints": 67904,
-      "peak_memory": 336401203
+      "peak_memory": 336401203,
+      "uses_precompile": true
     },
     {
       "system": "provekit",
@@ -1548,7 +1666,8 @@
       "proof_size": 2893648,
       "preprocessing_size": 1150705,
       "num_constraints": 110916,
-      "peak_memory": 538941849
+      "peak_memory": 538941849,
+      "uses_precompile": true
     },
     {
       "system": "circom",
@@ -1559,7 +1678,8 @@
       "proof_size": 1012,
       "preprocessing_size": 669935499,
       "num_constraints": 1308880,
-      "peak_memory": 1377869824
+      "peak_memory": 1377869824,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1570,7 +1690,8 @@
       "proof_size": 1013,
       "preprocessing_size": 84106528,
       "num_constraints": 163638,
-      "peak_memory": 246602137
+      "peak_memory": 246602137,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1581,7 +1702,8 @@
       "proof_size": 1004,
       "preprocessing_size": 1339459874,
       "num_constraints": 2617728,
-      "peak_memory": 2679262412
+      "peak_memory": 2679262412,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1592,7 +1714,8 @@
       "proof_size": 1013,
       "preprocessing_size": 167792168,
       "num_constraints": 327244,
-      "peak_memory": 473191219
+      "peak_memory": 473191219,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1603,7 +1726,8 @@
       "proof_size": 1009,
       "preprocessing_size": 335173253,
       "num_constraints": 654456,
-      "peak_memory": 721990451
+      "peak_memory": 721990451,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1614,7 +1738,8 @@
       "proof_size": 924,
       "preprocessing_size": 16653787,
       "num_constraints": 1613,
-      "peak_memory": 21866086
+      "peak_memory": 21866086,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1625,7 +1750,8 @@
       "proof_size": 921,
       "preprocessing_size": 22286842,
       "num_constraints": 2092,
-      "peak_memory": 24671027
+      "peak_memory": 24671027,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1636,7 +1762,8 @@
       "proof_size": 920,
       "preprocessing_size": 6114964,
       "num_constraints": 517,
-      "peak_memory": 17796300
+      "peak_memory": 17796300,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1647,7 +1774,8 @@
       "proof_size": 918,
       "preprocessing_size": 8005630,
       "num_constraints": 736,
-      "peak_memory": 18885836
+      "peak_memory": 18885836,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1658,7 +1786,8 @@
       "proof_size": 924,
       "preprocessing_size": 12159828,
       "num_constraints": 1171,
-      "peak_memory": 20175257
+      "peak_memory": 20175257,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1669,7 +1798,8 @@
       "proof_size": 1020,
       "preprocessing_size": 318401941,
       "num_constraints": 540736,
-      "peak_memory": 646456934
+      "peak_memory": 646456934,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1680,7 +1810,8 @@
       "proof_size": 1009,
       "preprocessing_size": 53497217,
       "num_constraints": 94976,
-      "peak_memory": 162257305
+      "peak_memory": 162257305,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1691,7 +1822,8 @@
       "proof_size": 1014,
       "preprocessing_size": 621150107,
       "num_constraints": 1050176,
-      "peak_memory": 1352441856
+      "peak_memory": 1352441856,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1702,7 +1834,8 @@
       "proof_size": 1013,
       "preprocessing_size": 91340739,
       "num_constraints": 158656,
-      "peak_memory": 249859276
+      "peak_memory": 249859276,
+      "uses_precompile": false
     },
     {
       "system": "circom",
@@ -1713,7 +1846,8 @@
       "proof_size": 1009,
       "preprocessing_size": 167027783,
       "num_constraints": 286016,
-      "peak_memory": 452149248
+      "peak_memory": 452149248,
+      "uses_precompile": false
     },
     {
       "system": "cairo-m",
@@ -1725,7 +1859,8 @@
       "proof_size": 1085916,
       "preprocessing_size": 492,
       "num_constraints": 0,
-      "peak_memory": 2268423782
+      "peak_memory": 2268423782,
+      "uses_precompile": true
     },
     {
       "system": "cairo-m",
@@ -1737,7 +1872,8 @@
       "proof_size": 1081220,
       "preprocessing_size": 492,
       "num_constraints": 0,
-      "peak_memory": 1872153804
+      "peak_memory": 1872153804,
+      "uses_precompile": true
     },
     {
       "system": "cairo-m",
@@ -1749,7 +1885,8 @@
       "proof_size": 1100660,
       "preprocessing_size": 492,
       "num_constraints": 0,
-      "peak_memory": 2741025177
+      "peak_memory": 2741025177,
+      "uses_precompile": true
     },
     {
       "system": "cairo-m",
@@ -1761,7 +1898,8 @@
       "proof_size": 1085384,
       "preprocessing_size": 492,
       "num_constraints": 0,
-      "peak_memory": 1908737638
+      "peak_memory": 1908737638,
+      "uses_precompile": true
     },
     {
       "system": "cairo-m",
@@ -1773,7 +1911,8 @@
       "proof_size": 1101248,
       "preprocessing_size": 492,
       "num_constraints": 0,
-      "peak_memory": 2038757785
+      "peak_memory": 2038757785,
+      "uses_precompile": true
     },
     {
       "system": "miden",
@@ -1785,7 +1924,8 @@
       "proof_size": 260157,
       "preprocessing_size": 2032,
       "num_constraints": 0,
-      "peak_memory": 5802500096
+      "peak_memory": 5802500096,
+      "uses_precompile": false
     },
     {
       "system": "miden",
@@ -1797,7 +1937,8 @@
       "proof_size": 197853,
       "preprocessing_size": 2032,
       "num_constraints": 0,
-      "peak_memory": 789677670
+      "peak_memory": 789677670,
+      "uses_precompile": false
     },
     {
       "system": "miden",
@@ -1809,7 +1950,8 @@
       "proof_size": 282653,
       "preprocessing_size": 2032,
       "num_constraints": 0,
-      "peak_memory": 11382988800
+      "peak_memory": 11382988800,
+      "uses_precompile": false
     },
     {
       "system": "miden",
@@ -1821,7 +1963,8 @@
       "proof_size": 217757,
       "preprocessing_size": 2032,
       "num_constraints": 0,
-      "peak_memory": 1577110732
+      "peak_memory": 1577110732,
+      "uses_precompile": false
     },
     {
       "system": "miden",
@@ -1833,7 +1976,8 @@
       "proof_size": 238525,
       "preprocessing_size": 2032,
       "num_constraints": 0,
-      "peak_memory": 2969511526
+      "peak_memory": 2969511526,
+      "uses_precompile": false
     },
     {
       "system": "barretenberg",
@@ -1844,7 +1988,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8392052,
       "num_constraints": 72683,
-      "peak_memory": 166091161
+      "peak_memory": 166091161,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1855,7 +2000,8 @@
       "proof_size": 14656,
       "preprocessing_size": 16993357,
       "num_constraints": 184993,
-      "peak_memory": 442387660
+      "peak_memory": 442387660,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1866,7 +2012,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8452402,
       "num_constraints": 40626,
-      "peak_memory": 98743091
+      "peak_memory": 98743091,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1877,7 +2024,8 @@
       "proof_size": 14656,
       "preprocessing_size": 33937238,
       "num_constraints": 366841,
-      "peak_memory": 867056025
+      "peak_memory": 867056025,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1888,7 +2036,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8474226,
       "num_constraints": 48607,
-      "peak_memory": 133201920
+      "peak_memory": 133201920,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1899,7 +2048,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8518211,
       "num_constraints": 94070,
-      "peak_memory": 227449241
+      "peak_memory": 227449241,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1910,7 +2060,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8410288,
       "num_constraints": 338,
-      "peak_memory": 92987392
+      "peak_memory": 92987392,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1921,7 +2072,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8410436,
       "num_constraints": 488,
-      "peak_memory": 91894579
+      "peak_memory": 91894579,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1932,7 +2084,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8410040,
       "num_constraints": 111,
-      "peak_memory": 91455488
+      "peak_memory": 91455488,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1943,7 +2096,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8410129,
       "num_constraints": 184,
-      "peak_memory": 92985753
+      "peak_memory": 92985753,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1954,7 +2108,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8410237,
       "num_constraints": 261,
-      "peak_memory": 94104780
+      "peak_memory": 94104780,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1965,7 +2120,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8572923,
       "num_constraints": 2263,
-      "peak_memory": 92823552
+      "peak_memory": 92823552,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1976,7 +2132,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8626103,
       "num_constraints": 2932,
-      "peak_memory": 93693542
+      "peak_memory": 93693542,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1987,7 +2144,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8470743,
       "num_constraints": 963,
-      "peak_memory": 94479974
+      "peak_memory": 94479974,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -1998,7 +2156,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8488410,
       "num_constraints": 1216,
-      "peak_memory": 96837632
+      "peak_memory": 96837632,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -2009,7 +2168,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8527372,
       "num_constraints": 1684,
-      "peak_memory": 92466380
+      "peak_memory": 92466380,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -2020,7 +2180,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8616446,
       "num_constraints": 82895,
-      "peak_memory": 218665779
+      "peak_memory": 218665779,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -2031,7 +2192,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8468797,
       "num_constraints": 36000,
-      "peak_memory": 90962329
+      "peak_memory": 90962329,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -2042,7 +2204,8 @@
       "proof_size": 14656,
       "preprocessing_size": 17307090,
       "num_constraints": 153803,
-      "peak_memory": 415814451
+      "peak_memory": 415814451,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -2053,7 +2216,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8483072,
       "num_constraints": 36000,
-      "peak_memory": 104395571
+      "peak_memory": 104395571,
+      "uses_precompile": true
     },
     {
       "system": "barretenberg",
@@ -2064,7 +2228,8 @@
       "proof_size": 14656,
       "preprocessing_size": 8519733,
       "num_constraints": 47441,
-      "peak_memory": 129042022
+      "peak_memory": 129042022,
+      "uses_precompile": true
     },
     {
       "system": "ligetron",
@@ -2075,7 +2240,8 @@
       "proof_size": 12784920,
       "preprocessing_size": 1354652,
       "num_constraints": 7773895,
-      "peak_memory": 336630579
+      "peak_memory": 336630579,
+      "uses_precompile": true
     },
     {
       "system": "ligetron",
@@ -2086,7 +2252,8 @@
       "proof_size": 3179952,
       "preprocessing_size": 32267,
       "num_constraints": 6185,
-      "peak_memory": 117235712
+      "peak_memory": 117235712,
+      "uses_precompile": true
     },
     {
       "system": "ligetron",
@@ -2097,7 +2264,8 @@
       "proof_size": 3214699,
       "preprocessing_size": 32267,
       "num_constraints": 8065,
-      "peak_memory": 116763852
+      "peak_memory": 116763852,
+      "uses_precompile": true
     },
     {
       "system": "ligetron",
@@ -2108,7 +2276,8 @@
       "proof_size": 3090430,
       "preprocessing_size": 32267,
       "num_constraints": 1485,
-      "peak_memory": 110441267
+      "peak_memory": 110441267,
+      "uses_precompile": true
     },
     {
       "system": "ligetron",
@@ -2119,7 +2288,8 @@
       "proof_size": 3111007,
       "preprocessing_size": 32267,
       "num_constraints": 2425,
-      "peak_memory": 108678348
+      "peak_memory": 108678348,
+      "uses_precompile": true
     },
     {
       "system": "ligetron",
@@ -2130,7 +2300,8 @@
       "proof_size": 3143367,
       "preprocessing_size": 32267,
       "num_constraints": 4305,
-      "peak_memory": 111871590
+      "peak_memory": 111871590,
+      "uses_precompile": true
     },
     {
       "system": "ligetron",
@@ -2141,7 +2312,8 @@
       "proof_size": 5428975,
       "preprocessing_size": 3472,
       "num_constraints": 1232624,
-      "peak_memory": 138136780
+      "peak_memory": 138136780,
+      "uses_precompile": true
     },
     {
       "system": "ligetron",
@@ -2152,7 +2324,8 @@
       "proof_size": 3676820,
       "preprocessing_size": 3472,
       "num_constraints": 197520,
-      "peak_memory": 132264755
+      "peak_memory": 132264755,
+      "uses_precompile": true
     },
     {
       "system": "ligetron",
@@ -2163,7 +2336,8 @@
       "proof_size": 7592824,
       "preprocessing_size": 3472,
       "num_constraints": 2415600,
-      "peak_memory": 151381606
+      "peak_memory": 151381606,
+      "uses_precompile": true
     },
     {
       "system": "ligetron",
@@ -2174,7 +2348,8 @@
       "proof_size": 3957392,
       "preprocessing_size": 3472,
       "num_constraints": 345392,
-      "peak_memory": 135045120
+      "peak_memory": 135045120,
+      "uses_precompile": true
     },
     {
       "system": "ligetron",
@@ -2185,7 +2360,8 @@
       "proof_size": 4393473,
       "preprocessing_size": 3472,
       "num_constraints": 641136,
-      "peak_memory": 138090905
+      "peak_memory": 138090905,
+      "uses_precompile": true
     }
   ]
 }
