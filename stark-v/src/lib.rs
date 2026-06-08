@@ -33,7 +33,7 @@ pub fn stark_v_bench_properties() -> BenchProperties {
         "AIR",
         false,                   // Not ZK
         true,                    // zkVM
-        94, // Upstream secure_pcs_config() UDR/soundcalc batching cap for trace <= 2^20.
+        94,   // Upstream secure_pcs_config() UDR/soundcalc batching cap for trace <= 2^20.
         true, // hash-based PCS
         true, // not actively maintained
         AuditStatus::NotAudited, // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about
