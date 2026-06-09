@@ -29,7 +29,7 @@ pub fn stark_v_bench_properties() -> BenchProperties {
         "Circle STARK",
         "M31",
         "Circle FRI", // https://eprint.iacr.org/2024/278.pdf
-        Some("Circle FRI"),
+        Some("Circle-PCS"),
         "AIR",
         false,                   // Not ZK
         true,                    // zkVM
