@@ -10,6 +10,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem",
     PLONKY2_BENCH_PROPERTIES,
+    |_| false,
     sha256_prepare,
     |(_, _, n_gates)| *n_gates,
     |(circuit_data, pw, _)| { prove(circuit_data, pw.clone()) },

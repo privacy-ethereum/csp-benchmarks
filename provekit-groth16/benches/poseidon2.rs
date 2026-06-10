@@ -10,6 +10,7 @@ utils::define_benchmark_harness!(
     None,
     "poseidon2_mem_provekit_groth16",
     PROVEKIT_GROTH16_PROPS,
+    |input_size| input_size == 4,
     prepare_poseidon2,
     |prepared| { num_constraints(prepared) },
     |prepared| { prove(prepared) },

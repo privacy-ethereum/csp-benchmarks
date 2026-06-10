@@ -29,11 +29,11 @@ pub fn stark_v_bench_properties() -> BenchProperties {
         "Circle STARK",
         "M31",
         "Circle FRI", // https://eprint.iacr.org/2024/278.pdf
-        Some("Circle FRI"),
+        Some("Circle-PCS"),
         "AIR",
         false,                   // Not ZK
         true,                    // zkVM
-        94, // Upstream secure_pcs_config() UDR/soundcalc batching cap for trace <= 2^20.
+        94,   // Upstream secure_pcs_config() UDR/soundcalc batching cap for trace <= 2^20.
         true, // hash-based PCS
         true, // not actively maintained
         AuditStatus::NotAudited, // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about

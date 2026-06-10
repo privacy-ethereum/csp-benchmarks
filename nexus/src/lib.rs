@@ -13,7 +13,7 @@ pub const NEXUS_PROPS: BenchProperties = BenchProperties {
     proving_system: Cow::Borrowed("Circle STARK"),
     field_curve: Cow::Borrowed("M31"), // 2^31 - 1; https://specification.nexus.xyz/
     iop: Cow::Borrowed("Circle FRI"),  // https://eprint.iacr.org/2024/278.pdf
-    pcs: Some(Cow::Borrowed("Circle FRI")), // https://eprint.iacr.org/2024/278.pdf
+    pcs: Some(Cow::Borrowed("Circle-PCS")), // https://eprint.iacr.org/2024/278.pdf
     arithm: Cow::Borrowed("AIR"),      // https://specification.nexus.xyz/
     is_zk: false,                      // Based on STWO which is currently not ZK
     is_zkvm: true,

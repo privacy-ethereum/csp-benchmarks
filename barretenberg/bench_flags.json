@@ -1,0 +1,9 @@
+{
+  "uses_precompile": {
+    "sha256": true,
+    "keccak": true,
+    "ecdsa": true,
+    "poseidon": true,
+    "poseidon2": true
+  }
+}

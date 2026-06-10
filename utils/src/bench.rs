@@ -88,6 +88,8 @@ pub struct Metrics {
     pub num_constraints: usize,
     #[tabled(display_with = "display_bytes")]
     pub peak_memory: usize,
+    #[serde(default)]
+    pub uses_precompile: bool,
     #[serde(flatten)]
     #[tabled(skip)]
     pub bench_properties: BenchProperties,
@@ -135,6 +137,7 @@ impl Metrics {
             preprocessing_size: 0,
             num_constraints: 0,
             peak_memory: 0,
+            uses_precompile: false,
             bench_properties,
         }
     }
@@ -212,6 +215,40 @@ pub fn compile_binary(binary_name: &str) {
         String::from_utf8_lossy(&compile_output.stdout),
         String::from_utf8_lossy(&compile_output.stderr)
     );
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn metrics_without_uses_precompile_deserialize_as_false() {
+        let json = r#"{
+            "name": "example",
+            "target": "sha256",
+            "input_size": 128,
+            "proof_duration": 0,
+            "verify_duration": 0,
+            "proof_size": 0,
+            "preprocessing_size": 0,
+            "num_constraints": 0,
+            "peak_memory": 0,
+            "proving_system": "Example",
+            "field_curve": "ExampleField",
+            "iop": "ExampleIOP",
+            "arithm": "ExampleArithm",
+            "is_zk": false,
+            "is_zkvm": false,
+            "security_bits": 96,
+            "is_pq": true,
+            "is_maintained": true,
+            "is_audited": "not_audited"
+        }"#;
+
+        let metrics: Metrics = serde_json::from_str(json).unwrap();
+
+        assert!(!metrics.uses_precompile);
+    }
 }
 
 pub fn run_measure_mem_script(json_file: &str, binary_path: &str, input_size: usize) {

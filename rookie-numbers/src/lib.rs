@@ -8,7 +8,7 @@ pub use sha256::{FriConfig, PcsConfig, MAX_PREPROCESSED_LOG_SIZE};
 pub const ROOKIE_NUMBERS_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     proving_system: Cow::Borrowed("Rookie Numbers"),
     field_curve: Cow::Borrowed("M31"),
-    iop: Cow::Borrowed("FRI"),
+    iop: Cow::Borrowed("Circle FRI"),
     pcs: Some(Cow::Borrowed("Circle-PCS")),
     arithm: Cow::Borrowed("AIR"),
     is_zk: false,

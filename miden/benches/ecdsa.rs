@@ -13,6 +13,7 @@ utils::define_benchmark_harness!(
     None,
     "ecdsa_mem_miden",
     miden_bench_properties(),
+    |_| true,
     { load_or_compile_program(&MidenAsm, ECDSA_BENCH) },
     |size, prog| prepare_ecdsa(size, prog).expect("prepare_ecdsa"),
     |_, _| 0,

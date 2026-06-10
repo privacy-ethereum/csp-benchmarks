@@ -11,6 +11,7 @@ utils::define_benchmark_harness!(
     None,
     "keccak_mem_circom",
     CIRCOM_BENCH_PROPERTIES,
+    |_| false,
     |input_size| { prepare(input_size) },
     |(_witness_fn, _input_str, zkey_path)| read_constraint_count(zkey_path),
     |(witness_fn, input_str, zkey_path)| {

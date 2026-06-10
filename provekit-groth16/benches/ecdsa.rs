@@ -10,6 +10,7 @@ utils::define_benchmark_harness!(
     None,
     "ecdsa_mem_provekit_groth16",
     PROVEKIT_GROTH16_PROPS,
+    |_| false,
     prepare_ecdsa,
     |prepared| { num_constraints(prepared) },
     |prepared| { prove(prepared) },

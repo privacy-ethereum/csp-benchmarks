@@ -10,6 +10,7 @@ utils::define_benchmark_harness!(
     None,                                                              // feature
     "keccak_mem_stark_v",                                              // mem_binary_name
     stark_v_bench_properties(),                                        // properties
+    |_| false,                                                         // uses_precompile
     { load_or_compile("keccak") },                                     // shared_init
     prepare_keccak,                                                    // prepare
     |_, _| 0,                                                          // num_constraints

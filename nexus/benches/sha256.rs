@@ -13,6 +13,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_nexus",
     NEXUS_PROPS,
+    |_| false,
     { load_or_compile_program(&RustRv32i, SHA256_BENCH) },
     prepare_sha256,
     |_, _| 0,

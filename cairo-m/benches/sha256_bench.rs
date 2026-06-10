@@ -13,7 +13,7 @@ utils::define_benchmark_harness!(
         "Circle STARK", // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#welcome-to-cairo-m
         "M31", // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#welcome-to-cairo-m
         "Circle FRI", // https://eprint.iacr.org/2024/278.pdf
-        Some("Circle FRI"), // https://eprint.iacr.org/2024/278.pdf
+        Some("Circle-PCS"), // https://eprint.iacr.org/2024/278.pdf
         "AIR",
         false,
         true,                    // zkVM
@@ -23,6 +23,7 @@ utils::define_benchmark_harness!(
         AuditStatus::NotAudited, // https://github.com/kkrt-labs/cairo-m/?tab=readme-ov-file#about
         Some("Cairo ISA"), // https://github.com/kkrt-labs/cairo-m/blob/main/docs/design.md
     ),
+    |_| true,
     { compile_program() },
     |input_size, program: &Program| { prepare(input_size, program) },
     |_, _| 0,
