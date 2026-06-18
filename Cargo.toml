@@ -9,6 +9,7 @@ members = [
     "polyhedra-expander",
     "circom",
     "jolt",
+    "leanvm",
     "miden",
     "risc0",
     "sp1",

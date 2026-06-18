@@ -1,0 +1,25 @@
+[package]
+name = "leanvm"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+utils = { workspace = true }
+
+lean_backend = { package = "backend", git = "https://github.com/leanEthereum/leanVM.git", rev = "3b246355c0128feacec4faefc8d0d46919c9714e" }
+lean_compiler = { git = "https://github.com/leanEthereum/leanVM.git", rev = "3b246355c0128feacec4faefc8d0d46919c9714e" }
+lean_prover = { git = "https://github.com/leanEthereum/leanVM.git", rev = "3b246355c0128feacec4faefc8d0d46919c9714e" }
+lean_vm = { git = "https://github.com/leanEthereum/leanVM.git", rev = "3b246355c0128feacec4faefc8d0d46919c9714e" }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[[bench]]
+name = "private_tx"
+harness = false
+
+[[bin]]
+name = "private_tx_mem_leanvm"
+path = "src/bin/private_tx_mem.rs"
