@@ -18,6 +18,14 @@ toml = "0.9"
 name = "sha256"
 harness = false
 
+[[bench]]
+name = "private_tx"
+harness = false
+
 [[bin]]
 name = "sha256_mem_openvm"
 path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "private_tx_mem_openvm"
+path = "src/bin/private_tx_mem.rs"

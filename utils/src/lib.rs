@@ -11,6 +11,7 @@ pub mod bench;
 pub mod harness;
 pub mod ligetron;
 pub mod metadata;
+pub mod private_tx;
 pub mod zkvm;
 
 use k256::ecdsa::{Signature as K256Signature, SigningKey as K256SigningKey};
@@ -18,7 +19,9 @@ use p256::ecdsa::{Signature, SigningKey, signature::hazmat::PrehashSigner};
 
 pub use harness::{BenchHarnessConfig, BenchTarget, ProvingSystem};
 
-use crate::metadata::{selected_byte_inputs, selected_field_element_inputs};
+use crate::metadata::{
+    selected_byte_inputs, selected_field_element_inputs, selected_private_tx_depths,
+};
 
 pub fn write_json<T: Serialize>(data: &T, output_path: &str) {
     let json_data = serde_json::to_string_pretty(&data).expect("Failed to serialize to JSON");
@@ -154,11 +157,16 @@ pub fn generate_poseidon2_input(input_size: usize) -> (Vec<u8>, Vec<u8>) {
     (raw_bytes, digest)
 }
 
+pub fn generate_private_tx_input(depth: usize) -> (Vec<u8>, Vec<u8>) {
+    private_tx::generate_private_tx_input(depth)
+}
+
 pub fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
     match target {
         BenchTarget::Sha256 | BenchTarget::Keccak => selected_byte_inputs(),
         BenchTarget::Ecdsa => vec![32],
         BenchTarget::Poseidon | BenchTarget::Poseidon2 => selected_field_element_inputs(),
+        BenchTarget::PrivateTx => selected_private_tx_depths(),
     }
 }
 

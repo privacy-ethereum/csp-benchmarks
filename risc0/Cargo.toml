@@ -25,6 +25,10 @@ harness = false
 name = "keccak"
 harness = false
 
+[[bench]]
+name = "private_tx"
+harness = false
+
 [[bin]]
 name = "sha256_mem_risc0"
 path = "src/bin/sha256_mem.rs"
@@ -36,3 +40,7 @@ path = "src/bin/ecdsa_mem.rs"
 [[bin]]
 name = "keccak_mem_risc0"
 path = "src/bin/keccak_mem.rs"
+
+[[bin]]
+name = "private_tx_mem_risc0"
+path = "src/bin/private_tx_mem.rs"

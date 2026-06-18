@@ -43,7 +43,14 @@ enum Command {
         size: usize,
     },
 
-    /// Query available sha256 input sizes from metadata
+    /// Generate inputs for private_tx: prints hex-encoded input bytes then public output
+    PrivateTx {
+        /// Merkle branch depth (default 32)
+        #[arg(long, short = 'd', default_value_t = 32)]
+        depth: usize,
+    },
+
+    /// Query available input sizes from metadata
     Sizes {
         #[command(subcommand)]
         command: SizesCommand,
@@ -102,6 +109,11 @@ fn main() {
             let (input_bytes, digest) = utils::generate_poseidon2_input(size);
             println!("{}", input_bytes.encode_hex::<String>());
             println!("{}", digest.encode_hex::<String>());
+        }
+        Command::PrivateTx { depth } => {
+            let (input_bytes, public_output) = utils::generate_private_tx_input(depth);
+            println!("{}", input_bytes.encode_hex::<String>());
+            println!("{}", public_output.encode_hex::<String>());
         }
         Command::Sizes {
             command: SizesCommand::List { target },

@@ -1,0 +1,10 @@
+[package]
+name = "openvm-private-tx"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+openvm = { git = "https://github.com/openvm-org/openvm.git", features = ["std"], tag = "v1.4.0" }
+private-tx-guest = { path = "../../../utils/zkvm/private-tx-guest" }
+
+[workspace]

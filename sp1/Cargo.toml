@@ -17,6 +17,14 @@ ere-zkvm-interface = { workspace = true }
 name = "sha256"
 harness = false
 
+[[bench]]
+name = "private_tx"
+harness = false
+
 [[bin]]
 name = "sha256_mem_sp1"
 path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "private_tx_mem_sp1"
+path = "src/bin/private_tx_mem.rs"

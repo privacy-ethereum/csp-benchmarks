@@ -3,7 +3,9 @@ use ere_zkvm_interface::{Input, ProverResource};
 use serde::Serialize;
 use std::env;
 use utils::harness::{AuditStatus, BenchProperties};
-use utils::zkvm::{CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedSha256};
+use utils::zkvm::{
+    CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedPrivateTx, PreparedSha256,
+};
 
 // SAFETY: called once before single-threaded JoltSdk construction
 fn set_jolt_config(max_trace_length: u64, stack_size: u64, heap_size: u64) {
@@ -17,8 +19,8 @@ fn set_jolt_config(max_trace_length: u64, stack_size: u64, heap_size: u64) {
 }
 
 pub use utils::zkvm::{
-    execution_cycles, preprocessing_size, proof_size, prove, prove_ecdsa, prove_sha256,
-    verify_ecdsa, verify_keccak, verify_sha256,
+    execution_cycles, preprocessing_size, proof_size, prove, prove_ecdsa, prove_private_tx,
+    prove_sha256, verify_ecdsa, verify_keccak, verify_private_tx, verify_sha256,
 };
 
 pub fn jolt_bench_properties() -> BenchProperties {
@@ -87,6 +89,25 @@ pub fn prepare_ecdsa(
     let input = build_ecdsa_jolt_input(&digest, &pub_key_x, &pub_key_y, &signature);
 
     PreparedEcdsa::new(vm, input, program.byte_size)
+}
+
+pub fn prepare_private_tx(
+    depth: usize,
+    program: &CompiledProgram<RustRv64imacCustomized>,
+) -> PreparedPrivateTx<EreJolt> {
+    set_jolt_config(65536, 4096, 32768);
+    let vm = EreJolt::new(program.program.clone(), ProverResource::Cpu)
+        .expect("jolt prover build failed");
+
+    let (input_bytes, expected_public_values) = utils::generate_private_tx_input(depth);
+    let input = build_framed_input(input_bytes);
+
+    PreparedPrivateTx::with_expected_public_values(
+        vm,
+        input,
+        program.byte_size,
+        expected_public_values,
+    )
 }
 
 #[derive(Serialize)]

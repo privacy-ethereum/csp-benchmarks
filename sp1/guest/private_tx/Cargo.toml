@@ -1,10 +1,10 @@
 [package]
-name = "sp1-sha256"
+name = "sp1-private-tx"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-sha2 = "0.10.9"
+private-tx-guest = { path = "../../../utils/zkvm/private-tx-guest" }
 sp1-zkvm = "6.0.1"
 
 [workspace]

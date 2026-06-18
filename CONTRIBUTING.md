@@ -57,6 +57,7 @@ Use the shared benchmark harness in the `utils` crate to register Criterion benc
 #### Input sizes:
 
 - Variable-size targets (e.g., `sha256` or `keccak`) will use pre-defined input sizes from `utils::metadata`.
+- The `private_tx` target uses Merkle branch depth as `input_size`.
 - Fixed‑size targets (e.g., ECDSA) will use a single input size value.
 
 #### `uses_precompile` flag:

@@ -159,7 +159,7 @@ fn main() -> std::io::Result<()> {
     let pattern = system_dir.join("hyperfine_*_*_prover_metrics.json");
     let pattern = pattern.to_string_lossy().into_owned();
     let re =
-        Regex::new(r"hyperfine_(?P<target>[^_]+)_(?P<size>[^_]+)_prover_metrics\.json$").unwrap();
+        Regex::new(r"hyperfine_(?P<target>.+)_(?P<size>[0-9]+)_prover_metrics\.json$").unwrap();
 
     for entry in glob(&pattern).unwrap() {
         let prover_path = match entry {

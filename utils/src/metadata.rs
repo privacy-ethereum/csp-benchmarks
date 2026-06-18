@@ -17,3 +17,13 @@ pub fn selected_field_element_inputs() -> Vec<usize> {
         _ => FIELD_ELEMENT_INPUTS_FULL.to_vec(),
     }
 }
+
+const PRIVATE_TX_DEPTHS_REDUCED: [usize; 1] = [32];
+const PRIVATE_TX_DEPTHS_FULL: [usize; 1] = [32];
+
+pub fn selected_private_tx_depths() -> Vec<usize> {
+    match std::env::var("BENCH_INPUT_PROFILE").ok().as_deref() {
+        Some("reduced") => PRIVATE_TX_DEPTHS_REDUCED.to_vec(),
+        _ => PRIVATE_TX_DEPTHS_FULL.to_vec(),
+    }
+}

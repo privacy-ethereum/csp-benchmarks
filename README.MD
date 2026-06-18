@@ -17,7 +17,7 @@ This repository provides a unified benchmarking harness for comparing proving sy
 
 ## What we benchmark
 
-We aim to benchmark the canonical circuits that correspond to typical use cases or represent typical bottlenecks in client-side ZK proving, for example SHA-256, ECDSA, Keccak etc. The planned benchmarking scope can be found in this [spreadsheet](https://docs.google.com/spreadsheets/d/1LFG-icfQf4-3YoxoR4GPdkcbAmD01mLPhiM3x4ufmnU/edit?usp=sharing).
+We aim to benchmark the canonical circuits that correspond to typical use cases or represent typical bottlenecks in client-side ZK proving, for example SHA-256, ECDSA, Keccak, and business-logic-only private transfers. The planned benchmarking scope can be found in this [spreadsheet](https://docs.google.com/spreadsheets/d/1LFG-icfQf4-3YoxoR4GPdkcbAmD01mLPhiM3x4ufmnU/edit?usp=sharing).
 
 ## How we run the benchmarks
 
@@ -44,9 +44,10 @@ Our future plans include running the benchmarks in a cloud device farm (Android 
     BENCH_INPUT_PROFILE=full cargo bench
     ```
 
-    - Alternatively, to run individual benchmarks, `cd` into the crate directory and run `BENCH_INPUT_PROFILE=full cargo bench`.
-    - Use `BENCH_INPUT_PROFILE=reduced` to run with a reduced set of input sizes.
-    - For non-Rust systems, build the utilities crate (`cargo build --release -p utils`) and invoke `benchmark.sh`, e.g. `BENCH_INPUT_PROFILE=full bash ./benchmark.sh --system-dir ./barretenberg --logging --quick` (see [sh_benchmarks_parallel.yml](./.github/workflows/sh_benchmarks_parallel.yml)).
+- Alternatively, to run individual benchmarks, `cd` into the crate directory and run `BENCH_INPUT_PROFILE=full cargo bench`.
+- Use `BENCH_INPUT_PROFILE=reduced` to run with a reduced set of input sizes.
+- For the `private_tx` target, `input_size` means Merkle branch depth.
+- For non-Rust systems, build the utilities crate (`cargo build --release -p utils`) and invoke `benchmark.sh`, e.g. `BENCH_INPUT_PROFILE=full bash ./benchmark.sh --system-dir ./barretenberg --logging --quick` (see [sh_benchmarks_parallel.yml](./.github/workflows/sh_benchmarks_parallel.yml)).
 
 ## Run a targeted Rust benchmark in GitHub Actions
 

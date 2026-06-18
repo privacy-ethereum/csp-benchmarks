@@ -1,0 +1,13 @@
+[package]
+name = "jolt-private-tx"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ere-platform-jolt = { git = "https://github.com/eth-act/ere", rev = "6573843", default-features = false }
+private-tx-guest = { path = "../../../utils/zkvm/private-tx-guest" }
+
+[features]
+guest = []
+
+[workspace]

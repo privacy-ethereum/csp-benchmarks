@@ -2,7 +2,9 @@ use std::borrow::Cow;
 use std::str::FromStr;
 
 use crate::bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics};
-use crate::metadata::{selected_byte_inputs, selected_field_element_inputs};
+use crate::metadata::{
+    selected_byte_inputs, selected_field_element_inputs, selected_private_tx_depths,
+};
 use criterion::{BatchSize, Criterion};
 
 const SAMPLE_SIZE: usize = 10;
@@ -14,6 +16,7 @@ pub enum BenchTarget {
     Keccak,
     Poseidon,
     Poseidon2,
+    PrivateTx,
 }
 
 impl BenchTarget {
@@ -24,6 +27,7 @@ impl BenchTarget {
             BenchTarget::Keccak => "keccak",
             BenchTarget::Poseidon => "poseidon",
             BenchTarget::Poseidon2 => "poseidon2",
+            BenchTarget::PrivateTx => "private_tx",
         }
     }
 }
@@ -38,6 +42,7 @@ impl FromStr for BenchTarget {
             "keccak" => Ok(BenchTarget::Keccak),
             "poseidon" => Ok(BenchTarget::Poseidon),
             "poseidon2" => Ok(BenchTarget::Poseidon2),
+            "private_tx" => Ok(BenchTarget::PrivateTx),
             _ => Err(format!("Invalid benchmark target: {}", s)),
         }
     }
@@ -258,6 +263,7 @@ fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
         BenchTarget::Sha256 | BenchTarget::Keccak => selected_byte_inputs(),
         BenchTarget::Ecdsa => vec![32],
         BenchTarget::Poseidon | BenchTarget::Poseidon2 => selected_field_element_inputs(),
+        BenchTarget::PrivateTx => selected_private_tx_depths(),
     }
 }
 
@@ -672,5 +678,8 @@ macro_rules! define_benchmark_harness {
     };
     (BenchTarget::Poseidon2, $($rest:tt)*) => {
         $crate::__define_benchmark_harness!(poseidon2, $crate::harness::BenchTarget::Poseidon2, $($rest)*);
+    };
+    (BenchTarget::PrivateTx, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(private_tx, $crate::harness::BenchTarget::PrivateTx, $($rest)*);
     };
 }

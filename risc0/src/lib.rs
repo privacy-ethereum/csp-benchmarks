@@ -3,12 +3,13 @@ use ere_risc0::{EreRisc0, compiler::RustRv32imaCustomized};
 use ere_zkvm_interface::{Input, ProverResource};
 use utils::harness::{AuditStatus, BenchProperties};
 use utils::zkvm::{
-    CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedSha256, encode_public_key,
+    CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedPrivateTx, PreparedSha256,
+    encode_public_key,
 };
 
 pub use utils::zkvm::{
-    execution_cycles, preprocessing_size, proof_size, prove, prove_ecdsa, prove_sha256,
-    verify_ecdsa, verify_keccak, verify_sha256,
+    execution_cycles, preprocessing_size, proof_size, prove, prove_ecdsa, prove_private_tx,
+    prove_sha256, verify_ecdsa, verify_keccak, verify_private_tx, verify_sha256,
 };
 
 pub fn risc0_bench_properties() -> BenchProperties {
@@ -80,6 +81,24 @@ pub fn prepare_keccak(
     let input = build_framed_input(message_bytes);
 
     PreparedKeccak::with_expected_digest(vm, input, program.byte_size, digest)
+}
+
+pub fn prepare_private_tx(
+    depth: usize,
+    program: &CompiledProgram<RustRv32imaCustomized>,
+) -> PreparedPrivateTx<EreRisc0> {
+    let vm = EreRisc0::new(program.program.clone(), ProverResource::Cpu)
+        .expect("failed to build risc0 prover instance");
+
+    let (input_bytes, expected_public_values) = utils::generate_private_tx_input(depth);
+    let input = build_framed_input(input_bytes);
+
+    PreparedPrivateTx::with_expected_public_values(
+        vm,
+        input,
+        program.byte_size,
+        expected_public_values,
+    )
 }
 
 /// Build risc0 input with length-prefixed frame format.

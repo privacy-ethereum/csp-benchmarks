@@ -16,7 +16,7 @@ pub struct PreparedBench {
     vm: StarkV,
     input: Input,
     compiled_size: usize,
-    expected_digest: Vec<u8>,
+    expected_public_values: Vec<u8>,
 }
 
 pub struct ProofResult {
@@ -92,7 +92,7 @@ pub fn prepare_sha256(input_size: usize, program: &CompiledProgram) -> PreparedB
         vm,
         input,
         compiled_size: program.byte_size,
-        expected_digest: digest,
+        expected_public_values: digest,
     }
 }
 
@@ -104,7 +104,19 @@ pub fn prepare_keccak(input_size: usize, program: &CompiledProgram) -> PreparedB
         vm,
         input,
         compiled_size: program.byte_size,
-        expected_digest: digest,
+        expected_public_values: digest,
+    }
+}
+
+pub fn prepare_private_tx(input_size: usize, program: &CompiledProgram) -> PreparedBench {
+    let vm = StarkV::new(program.program.clone(), secure_pcs_config());
+    let (input_bytes, expected_public_values) = utils::generate_private_tx_input(input_size);
+    let input = build_prefixed_input(input_bytes);
+    PreparedBench {
+        vm,
+        input,
+        compiled_size: program.byte_size,
+        expected_public_values,
     }
 }
 
@@ -129,8 +141,8 @@ pub fn prove_bench(prepared: &PreparedBench, _: &CompiledProgram) -> ProofResult
 pub fn verify_bench(prepared: &PreparedBench, proof: &ProofResult, _: &CompiledProgram) {
     prepared.vm.verify(&proof.proof).expect("verify failed");
     assert_eq!(
-        proof.public_values, prepared.expected_digest,
-        "public values do not match expected digest"
+        proof.public_values, prepared.expected_public_values,
+        "public values do not match expected output"
     );
 }
 

@@ -1,6 +1,7 @@
 use crate::zkvm::ecdsa::PreparedEcdsa;
 use crate::zkvm::hash::PreparedHash;
 use crate::zkvm::instance::{CompiledProgram, ProofArtifacts, compile_guest_program};
+use crate::zkvm::private_tx::PreparedPrivateTx;
 use crate::zkvm::traits::PreparedBenchmark;
 use bincode::Options;
 use ere_zkvm_interface::Compiler;
@@ -15,6 +16,9 @@ pub fn prove<P: PreparedBenchmark, SharedState>(prepared: &P, _: &SharedState) -
 
 /// Prove a SHA-256 benchmark
 pub use prove as prove_sha256;
+
+/// Prove a private transaction benchmark.
+pub use prove as prove_private_tx;
 
 /// Prove an ECDSA benchmark (type-specific wrapper for compatibility).
 pub fn prove_ecdsa<V: zkVM, SharedState>(
@@ -42,6 +46,15 @@ pub use verify_hash as verify_keccak;
 /// Verify an ECDSA proof with expected values checking.
 pub fn verify_ecdsa<V: zkVM, SharedState>(
     prepared: &PreparedEcdsa<V>,
+    proof: &ProofArtifacts,
+    _: &SharedState,
+) {
+    prepared.verify_with_expected(proof).expect("verify failed");
+}
+
+/// Verify a private transaction proof with public output checking.
+pub fn verify_private_tx<V: zkVM, SharedState>(
+    prepared: &PreparedPrivateTx<V>,
     proof: &ProofArtifacts,
     _: &SharedState,
 ) {
