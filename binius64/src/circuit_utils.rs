@@ -1,14 +1,9 @@
 use anyhow::{Result, ensure};
-use rand::{RngCore, SeedableRng, rngs::StdRng};
+use rand::{Rng, SeedableRng, rngs::StdRng};
 
 use binius_frontend::{CircuitBuilder, WitnessFiller};
-use binius_prover::{
-    OptimalPackedB128, Prover, hash::parallel_compression::ParallelCompressionAdaptor,
-};
-use binius_verifier::{
-    Verifier,
-    hash::{StdCompression, StdDigest},
-};
+use binius_prover::{OptimalPackedB128, zk_config::ZKProver};
+use binius_verifier::{hash::StdHashSuite, zk_config::ZKVerifier};
 
 use clap::Args;
 
@@ -39,11 +34,10 @@ pub struct Instance {
 }
 
 // Reference: https://github.com/IrreducibleOSS/binius64/blob/main/prover/examples/src/lib.rs
-pub type StdVerifier = Verifier<StdDigest, StdCompression>;
+pub type StdVerifier = ZKVerifier<StdHashSuite>;
 
 // Reference: https://github.com/IrreducibleOSS/binius64/blob/main/prover/examples/src/lib.rs
-pub type StdProver =
-    Prover<OptimalPackedB128, ParallelCompressionAdaptor<StdCompression>, StdDigest>;
+pub type StdProver = ZKProver<OptimalPackedB128, StdHashSuite>;
 
 // Reference: https://github.com/IrreducibleOSS/binius64/blob/main/prover/examples/src/lib.rs
 pub trait CircuitTrait: Sized {

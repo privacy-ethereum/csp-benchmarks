@@ -5,7 +5,7 @@ use binius_circuits::keccak::{Keccak256, N_WORDS_PER_DIGEST};
 use binius_frontend::{CircuitBuilder, Wire, WitnessFiller};
 use clap::Args;
 
-use crate::utils::{
+use crate::circuit_utils::{
     CircuitTrait, DEFAULT_HASH_MESSAGE_BYTES, determine_hash_max_bytes_from_args, zero_pad_message,
 };
 use utils::generate_keccak_input;

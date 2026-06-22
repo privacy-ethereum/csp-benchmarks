@@ -4,12 +4,10 @@ These benchmarks use official circuits from the Binius64 project: https://github
 
 ## Prerequisites
 
-Use the same toolchain as `.github/workflows/rust_benchmarks_parallel.yml`:
+Use the pinned toolchain from `rust-toolchain.toml`:
 
 ```bash
-rustup toolchain install nightly-2025-08-18-aarch64-apple-darwin \
-  --component llvm-tools rustc-dev
-rustup override set nightly-2025-08-18-aarch64-apple-darwin
+rustup toolchain install 1.95.0
 ```
 
 ## Run the benchmarks

@@ -6,22 +6,30 @@ edition = "2024"
 [lib]
 
 [dependencies]
-anyhow = { workspace = true }
-clap = { workspace = true }
-rand = { workspace = true }
-tracing = { workspace = true }
-criterion = { workspace = true }
-utils = { workspace = true }
-sha2 = { workspace = true }
-sha3 = { workspace = true }
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive", "env"] }
+rand = "0.10.1"
+tracing = "0.1"
+criterion = "0.5"
+utils = { path = "../utils" }
+sha2 = "0.10"
+sha3 = "0.12.0"
 
 tracing-profile = "0.10"
-binius-frontend = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6fe99c5" }
-binius-circuits = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6fe99c5" }
-binius-prover = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6fe99c5" }
-binius-verifier = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6fe99c5" }
-binius-core = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6fe99c5" }
-binius-utils = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6fe99c5" }
+binius-frontend = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6aa2d6d" }
+binius-circuits = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6aa2d6d" }
+binius-prover = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6aa2d6d" }
+binius-verifier = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6aa2d6d" }
+binius-core = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6aa2d6d" }
+binius-utils = { git = "https://github.com/IrreducibleOSS/binius64", rev = "6aa2d6d" }
+
+[profile.release]
+lto = "thin"
+debug = true
+
+[profile.bench]
+inherits = "release"
+debug = true
 
 [[bench]]
 name = "sha256_bench"
