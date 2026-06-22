@@ -84,6 +84,19 @@ pub fn load_compiled(bench_name: &str) -> CompiledProgram {
     }
 }
 
+/// Load a compiled guest from an explicit path (no CARGO_MANIFEST_DIR required).
+pub fn load_compiled_from_path(path: &std::path::Path) -> CompiledProgram {
+    let bytes = fs::read(path)
+        .unwrap_or_else(|e| panic!("failed to read compiled guest at {:?}: {}", path, e));
+    let program: StarkVProgram = bincode::options()
+        .deserialize(&bytes)
+        .expect("failed to deserialize compiled program");
+    CompiledProgram {
+        program,
+        byte_size: bytes.len(),
+    }
+}
+
 pub fn prepare_sha256(input_size: usize, program: &CompiledProgram) -> PreparedBench {
     let vm = StarkV::new(program.program.clone(), secure_pcs_config());
     let (message_bytes, digest) = utils::generate_sha256_input(input_size);
