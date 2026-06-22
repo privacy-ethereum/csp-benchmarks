@@ -95,6 +95,18 @@ pub fn compiled_program_path(benchmark_name: &str) -> PathBuf {
         .join(format!("{}.bin", benchmark_name))
 }
 
+/// Load a compiled program from an explicit file path.
+/// Use this in contexts where CARGO_MANIFEST_DIR is unavailable (e.g. mobile/embedded).
+pub fn load_compiled_program_from_path<C: Compiler>(path: &std::path::Path) -> CompiledProgram<C> {
+    let program_bin = fs::read(path)
+        .unwrap_or_else(|e| panic!("failed to read compiled program at {:?}: {}", path, e));
+    let program: C::Program = bincode::options()
+        .deserialize(&program_bin)
+        .expect("failed to deserialize compiled program");
+    let byte_size = program_bin.len();
+    CompiledProgram { program, byte_size }
+}
+
 /// Load a compiled program, panicking if it is missing.
 /// Used by RAM measurement binaries which must never trigger compilation.
 pub fn load_compiled_program<C: Compiler>(benchmark_name: &str) -> CompiledProgram<C> {

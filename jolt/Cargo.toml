@@ -45,3 +45,7 @@ path = "src/bin/ecdsa_mem.rs"
 [[bin]]
 name = "private_tx_mem_jolt"
 path = "src/bin/private_tx_mem.rs"
+
+[[bin]]
+name = "compile_private_tx"
+path = "src/bin/compile_private_tx.rs"

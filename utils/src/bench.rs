@@ -16,27 +16,25 @@ use std::{
 use tabled::{Table, Tabled, settings::Style};
 
 fn get_current_memory_usage() -> Result<usize, std::io::Error> {
+    #[cfg(target_os = "linux")]
     unsafe {
         let mut self_usage: libc::rusage = std::mem::zeroed();
         libc::getrusage(libc::RUSAGE_SELF, &mut self_usage);
-
         let mut child_usage: libc::rusage = std::mem::zeroed();
         libc::getrusage(libc::RUSAGE_CHILDREN, &mut child_usage);
-
-        let total_maxrss = self_usage.ru_maxrss + child_usage.ru_maxrss;
-
-        #[cfg(target_os = "linux")]
-        {
-            Ok(total_maxrss as usize * 1024)
-        }
-        #[cfg(target_os = "macos")]
-        {
-            Ok(total_maxrss as usize)
-        }
-        #[cfg(not(any(target_os = "linux", target_os = "macos")))]
-        {
-            compile_error!("This crate only supports Linux and macOS for memory measurement");
-        }
+        return Ok((self_usage.ru_maxrss + child_usage.ru_maxrss) as usize * 1024);
+    }
+    #[cfg(target_os = "macos")]
+    unsafe {
+        let mut self_usage: libc::rusage = std::mem::zeroed();
+        libc::getrusage(libc::RUSAGE_SELF, &mut self_usage);
+        let mut child_usage: libc::rusage = std::mem::zeroed();
+        libc::getrusage(libc::RUSAGE_CHILDREN, &mut child_usage);
+        return Ok((self_usage.ru_maxrss + child_usage.ru_maxrss) as usize);
+    }
+    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+    {
+        Ok(0)
     }
 }
 
