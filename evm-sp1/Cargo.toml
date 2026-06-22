@@ -1,0 +1,27 @@
+[package]
+name = "evm-sp1"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = { workspace = true }
+bincode = { workspace = true }
+clap = { workspace = true }
+evm-sp1-private-tx = { path = "private-tx-evm" }
+sp1-build = "=6.0.1"
+sp1-sdk = { version = "=6.0.1", features = ["blocking"] }
+utils = { workspace = true }
+
+[build-dependencies]
+sp1-build = "=6.0.1"
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[[bench]]
+name = "private_tx"
+harness = false
+
+[[bin]]
+name = "private_tx_mem_evm_sp1"
+path = "src/bin/private_tx_mem.rs"

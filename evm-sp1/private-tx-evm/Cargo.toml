@@ -1,0 +1,11 @@
+[package]
+name = "evm-sp1-private-tx"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+revm = { version = "38.0.0", default-features = false, features = [
+    "std",
+    "optional_balance_check",
+    "optional_fee_charge",
+] }

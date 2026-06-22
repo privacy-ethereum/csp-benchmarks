@@ -8,6 +8,7 @@ members = [
     "provekit-groth16",
     "polyhedra-expander",
     "circom",
+    "evm-sp1",
     "jolt",
     "leanvm",
     "miden",

@@ -1,0 +1,16 @@
+[package]
+name = "evm-sp1-private-tx-guest"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+evm-sp1-private-tx = { path = "../../private-tx-evm" }
+sp1-lib = { version = "=6.0.1", default-features = false }
+sp1-primitives = "=6.0.1"
+sp1-zkvm = "=6.0.1"
+
+[[bin]]
+name = "evm-sp1-private-tx"
+path = "src/main.rs"
+
+[workspace]
