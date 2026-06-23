@@ -33,11 +33,11 @@ Our future plans include running the benchmarks in a cloud device farm (Android 
 ## How you can run benchmarks locally
 
 1.  **Install the prerequisites**
-    - Install Rust via `rustup` together with the nightly toolchains used in [CI](./.github/workflows/rust_benchmarks_parallel.yml): `nightly-2025-08-18-aarch64-apple-darwin` (default) plus `nightly-2025-04-06` for crates such as `nexus` and `cairo-m`. Add the `llvm-tools`, `rustc-dev`, `rustfmt`, and `clippy` components so `cargo bench` matches the workflow in `.github/workflows/rust_benchmarks_parallel.yml`.
+    - Install Rust via `rustup` together with the toolchains used in [CI](./.github/workflows/rust_benchmarks_parallel.yml): `nightly-2025-08-18-aarch64-apple-darwin` (default), `1.95.0` for `binius64`, and `nightly-2025-04-06` for crates such as `nexus` and `cairo-m`. Add the `llvm-tools`, `rustc-dev`, `rustfmt`, and `clippy` components so `cargo bench` matches the workflow in `.github/workflows/rust_benchmarks_parallel.yml`.
     - Ensure `cargo`, `cmake`, and a recent `clang`/`lld` are available (the helper actions under [`.github/actions/install-llvm`](./.github/actions/install-llvm) show the expected setup). Install Homebrew packages `bash`, `jq`, and `hyperfine`, plus `/usr/bin/time` for RAM measurements.
     - Install per-system toolchains as needed: OpenMPI for `polyhedra-expander`, the Ligero prover stack for `ligetron`, Noir version >=1.0.0-beta.13 for `barretenberg`, and vendor SDKs such as RISC Zero, SP1, or OpenVM. Each folder documents its own bootstrap script and the matching GitHub Action ([`install-risc0`](./.github/actions/install-risc0), [`install-sp1`](./.github/actions/install-sp1), [`install-openvm`](./.github/actions/install-openvm), etc.) can be used as a reference.
 2.  **Run the benchmarks**
-    - Build the workspace once: `cargo build --release --workspace`.
+    - Build the workspace once: `cargo build --release --workspace`. Rust crates with separate Cargo roots, such as `binius64/`, `cairo-m/`, `nexus/`, `rookie-numbers/`, and `stark-v/`, build from inside their own directories.
     - For Rust crates, run
 
     ```bash
@@ -71,7 +71,7 @@ Notes:
 - `mobile/` – mobile benchmarks for Android and iOS.
 - `benchmark.sh` / `measure_mem_avg.sh` – orchestration scripts for non-Rust systems and RAM measurement.
 - `results/` – storage for published benchmark results.
-- Rust proving system and zkVM crates such as `binius64/`, `plonky2/`, `polyhedra-expander/`, `provekit/`, etc., each exposing a Criterion bench target registered through the shared harness.
+- Rust proving system and zkVM crates such as `binius64/`, `plonky2/`, `polyhedra-expander/`, `provekit/`, etc., each exposing a Criterion bench target registered through the shared harness. Some crates have separate Cargo roots and build from their own directories.
 - Non-Rust proving system folders (`barretenberg/`, `ligetron/`, etc.) that contain the shell scripts required by `benchmark.sh`.
 
 ## Result format & metrics

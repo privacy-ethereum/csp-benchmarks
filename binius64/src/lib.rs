@@ -1,59 +1,42 @@
 use std::borrow::Cow;
 
-use ::utils::harness::{AuditStatus, BenchProperties};
 use anyhow::Result;
 use binius_core::{Word, constraint_system::ConstraintSystem};
 use binius_frontend::{Circuit, CircuitBuilder};
-use binius_prover::{
-    KeyCollection, OptimalPackedB128, Prover,
-    hash::{
-        ParallelDigest,
-        parallel_compression::{ParallelCompressionAdaptor, ParallelPseudoCompression},
-    },
-};
+use binius_prover::zk_config::ZKProver;
 use binius_verifier::{
-    Verifier,
     config::StdChallenger,
-    hash::{PseudoCompressionFunction, StdCompression},
+    hash::StdHashSuite,
     transcript::{ProverTranscript, VerifierTranscript},
+    zk_config::ZKVerifier,
 };
-use sha2::digest::{Digest, FixedOutputReset, Output, core_api::BlockSizeUser};
+use utils::harness::{AuditStatus, BenchProperties};
 
-use crate::utils::{CircuitTrait, StdProver, StdVerifier};
+use crate::circuit_utils::{CircuitTrait, StdProver, StdVerifier};
 
+pub mod circuit_utils;
 pub mod circuits;
-pub mod utils;
 
 pub const BINIUS64_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     proving_system: Cow::Borrowed("Binius64"),
     field_curve: Cow::Borrowed("GHASH binary field"), // https://www.binius.xyz/basics/binius64-vs-v0
-    iop: Cow::Borrowed("Binius64"),
-    pcs: Some(Cow::Borrowed("Binius64")),
+    iop: Cow::Borrowed("Binius64 + Spartan"),
+    pcs: Some(Cow::Borrowed("BaseFold")),
     arithm: Cow::Borrowed("Binius64"),
-    is_zk: false, // https://www.irreducible.com/posts/announcing-binius64
+    is_zk: true, // Exact benchmark path uses upstream ZKProver/ZKVerifier.
     is_zkvm: false,
-    security_bits: 96, // https://github.com/IrreducibleOSS/binius64/blob/main/verifier/verifier/src/verify.rs#L40
-    is_pq: true,       // hash-based PCS
+    // Upstream Binius and Spartan ZK verifier paths both set SECURITY_BITS = 96.
+    security_bits: 96,
+    is_pq: true, // BaseFold/FRI with hash-based Merkle commitments.
     is_maintained: true,
     is_audited: AuditStatus::NotAudited,
     isa: None,
 };
 
-/// Setup the prover and verifier and use SHA256 for Merkle tree compression.
-/// Providing the `key_collection` skips expensive key collection building.
-fn setup(
-    cs: ConstraintSystem,
-    log_inv_rate: usize,
-    key_collection: Option<KeyCollection>,
-) -> Result<(StdVerifier, StdProver)> {
-    let parallel_compression = ParallelCompressionAdaptor::new(StdCompression::default());
-    let compression = parallel_compression.compression().clone();
-    let verifier = Verifier::setup(cs, log_inv_rate, compression)?;
-    let prover = if let Some(key_collection) = key_collection {
-        Prover::setup_with_key_collection(verifier.clone(), parallel_compression, key_collection)?
-    } else {
-        Prover::setup(verifier.clone(), parallel_compression)?
-    };
+/// Setup the ZK prover and verifier and use SHA256 for Merkle tree compression.
+fn setup(cs: ConstraintSystem, log_inv_rate: usize) -> Result<(StdVerifier, StdProver)> {
+    let verifier = ZKVerifier::<StdHashSuite>::setup(cs, log_inv_rate)?;
+    let prover = ZKProver::setup(verifier.clone())?;
     Ok((verifier, prover))
 }
 
@@ -75,23 +58,16 @@ pub fn prepare<CT: CircuitTrait>(
     let cs = compiled_circuit.constraint_system().clone();
 
     // Using SHA256 compression for Merkle tree
-    let (verifier, prover) = setup(cs.clone(), log_inv_rate as usize, None)?;
+    let (verifier, prover) = setup(cs.clone(), log_inv_rate as usize)?;
     Ok((verifier, prover, cs, circuit, compiled_circuit, input_size))
 }
 
-pub fn prove<D, C, PC, CT>(
-    prover: &Prover<OptimalPackedB128, PC, D>,
+pub fn prove<CT: CircuitTrait>(
+    prover: &StdProver,
     compiled_circuit: &Circuit,
     circuit: &CT,
     instance: CT::Instance,
-) -> Result<(Vec<u8>, Vec<Word>)>
-where
-    D: ParallelDigest + Digest + BlockSizeUser,
-    D::Digest: BlockSizeUser + FixedOutputReset,
-    C: PseudoCompressionFunction<Output<D>, 2>,
-    PC: ParallelPseudoCompression<Output<D::Digest>, 2>,
-    CT: CircuitTrait,
-{
+) -> Result<(Vec<u8>, Vec<Word>)> {
     // Population of the input to the witness and then evaluating the circuit.
     let mut filler = compiled_circuit.new_witness_filler();
     circuit.populate_witness(instance, &mut filler)?; // input population
@@ -103,20 +79,15 @@ where
     // Prove
     let challenger = StdChallenger::default();
     let mut prover_transcript = ProverTranscript::new(challenger);
-    prover.prove(witness, &mut prover_transcript)?;
+    let mut rng = rand::rng();
+    prover.prove(witness, &mut rng, &mut prover_transcript)?;
 
     let proof = prover_transcript.finalize();
 
     Ok((proof, pub_witness))
 }
 
-pub fn verify<D, C, PC>(verifier: &Verifier<D, C>, pub_witness: &[Word], proof: &[u8]) -> Result<()>
-where
-    D: ParallelDigest + Digest + BlockSizeUser,
-    D::Digest: BlockSizeUser + FixedOutputReset,
-    C: PseudoCompressionFunction<Output<D>, 2>,
-    PC: ParallelPseudoCompression<Output<D::Digest>, 2>,
-{
+pub fn verify(verifier: &StdVerifier, pub_witness: &[Word], proof: &[u8]) -> Result<()> {
     let challenger = StdChallenger::default();
     let mut verifier_transcript = VerifierTranscript::new(challenger, proof.to_vec());
     verifier.verify(pub_witness, &mut verifier_transcript)?;

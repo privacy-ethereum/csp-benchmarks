@@ -9,7 +9,7 @@ use clap::Args;
 
 use std::array;
 
-use crate::utils::{
+use crate::circuit_utils::{
     CircuitTrait, DEFAULT_HASH_MESSAGE_BYTES, determine_hash_max_bytes_from_args, zero_pad_message,
 };
 use utils::generate_sha256_input;

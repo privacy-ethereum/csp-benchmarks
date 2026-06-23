@@ -27,7 +27,7 @@ BENCH_INPUT_PROFILE=reduced cargo bench -p <crate>
 
 ### Gotcha: excluded crates
 
-`cairo-m/` and `nexus/` are excluded from the workspace. If you touch them, build/lint from inside each directory.
+`binius64/`, `cairo-m/`, `nexus/`, `rookie-numbers/`, and `stark-v/` are excluded from the workspace. If you touch them, build/lint from inside each directory.
 
 ## Non-Rust benchmarks
 
@@ -67,12 +67,13 @@ See `CONTRIBUTING.md` for comprehensive guidelines on adding benchmarks.
 Before reporting completion:
 
 1. Run `cargo build --workspace` successfully
-   - **Note**: Some crates (`cairo-m`, `nexus`) are excluded from the workspace. Build them separately:
+   - **Note**: Some crates (`binius64`, `cairo-m`, `nexus`, `rookie-numbers`, `stark-v`) are excluded from the workspace. Build them separately:
      ```bash
+     cd binius64 && cargo build && cd ..
      cd cairo-m && cargo build && cd ..
      cd nexus && cargo build && cd ..
      ```
 2. Run `cargo clippy --workspace --all-targets --all-features` with no errors
-   - For excluded crates: `cd cairo-m && cargo clippy --all-targets --all-features && cd ..` (and same for nexus)
+   - For excluded crates: `cd binius64 && cargo clippy --all-targets --all-features && cd ..` (and same for `cairo-m`, `nexus`, `rookie-numbers`, and `stark-v`)
 3. Run `cargo fmt --all -- --check`
 4. Test benchmark with `BENCH_INPUT_PROFILE=reduced`

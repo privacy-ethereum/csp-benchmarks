@@ -1189,15 +1189,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "array-util"
-version = "1.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e509844de8f09b90a2c3444684a2b6695f4071360e13d2fda0af9f749cc2ed6"
-dependencies = [
- "arrayvec",
-]
-
-[[package]]
 name = "arraydeque"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1999,266 +1990,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "binius-circuits"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-core",
- "binius-frontend",
- "hex-literal 1.1.0",
- "num-bigint 0.4.6",
- "num-integer",
- "rand 0.9.2",
- "sha2 0.10.9",
- "sha3",
-]
-
-[[package]]
-name = "binius-core"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-utils",
- "bytemuck",
- "bytes",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "binius-field"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-utils",
- "bytemuck",
- "cfg-if",
- "derive_more 0.99.20",
- "rand 0.9.2",
- "seq-macro",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "binius-frontend"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-core",
- "cranelift-entity",
- "hex-literal 1.1.0",
- "num-bigint 0.4.6",
- "petgraph 0.8.3",
- "rand 0.9.2",
- "rustc-hash 2.1.1",
- "serde",
- "serde_json",
- "smallvec",
-]
-
-[[package]]
-name = "binius-hash"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-field",
- "binius-math",
- "binius-transcript",
- "binius-utils",
- "bytemuck",
- "bytes",
- "digest 0.10.7",
- "itertools 0.14.0",
- "sha2 0.10.9",
- "thiserror 2.0.18",
- "tracing",
-]
-
-[[package]]
-name = "binius-iop"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-field",
- "binius-hash",
- "binius-ip",
- "binius-math",
- "binius-transcript",
- "binius-utils",
- "bytes",
- "digest 0.10.7",
- "getset",
- "itertools 0.14.0",
- "thiserror 2.0.18",
- "tracing",
-]
-
-[[package]]
-name = "binius-iop-prover"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-field",
- "binius-hash",
- "binius-iop",
- "binius-ip",
- "binius-ip-prover",
- "binius-math",
- "binius-transcript",
- "binius-utils",
- "bytes",
- "derive_more 0.99.20",
- "digest 0.10.7",
- "getset",
- "itertools 0.14.0",
- "rand 0.9.2",
- "thiserror 2.0.18",
- "tracing",
-]
-
-[[package]]
-name = "binius-ip"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-field",
- "binius-math",
- "binius-transcript",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "binius-ip-prover"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-field",
- "binius-ip",
- "binius-math",
- "binius-transcript",
- "binius-utils",
- "either",
- "itertools 0.14.0",
- "thiserror 2.0.18",
- "tracing",
-]
-
-[[package]]
-name = "binius-math"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-field",
- "binius-utils",
- "bytemuck",
- "getset",
- "itertools 0.14.0",
- "rand 0.9.2",
- "thiserror 2.0.18",
- "tracing",
- "uninit",
-]
-
-[[package]]
-name = "binius-prover"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-core",
- "binius-field",
- "binius-hash",
- "binius-iop-prover",
- "binius-ip-prover",
- "binius-math",
- "binius-transcript",
- "binius-utils",
- "binius-verifier",
- "bytemuck",
- "bytes",
- "derive_more 0.99.20",
- "digest 0.10.7",
- "either",
- "getset",
- "itertools 0.14.0",
- "rand 0.9.2",
- "thiserror 2.0.18",
- "tracing",
-]
-
-[[package]]
-name = "binius-transcript"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "auto_impl",
- "binius-field",
- "binius-utils",
- "bytes",
- "digest 0.10.7",
- "thiserror 2.0.18",
- "tracing",
-]
-
-[[package]]
-name = "binius-utils"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "array-util",
- "bytemuck",
- "bytes",
- "cfg-if",
- "generic-array 0.14.7",
- "itertools 0.14.0",
- "rand 0.9.2",
- "rayon",
- "thiserror 2.0.18",
- "trait-set",
-]
-
-[[package]]
-name = "binius-verifier"
-version = "0.1.0"
-source = "git+https://github.com/IrreducibleOSS/binius64?rev=6fe99c5#6fe99c56617b81e97f529dc6763eafd99d576ba5"
-dependencies = [
- "binius-core",
- "binius-field",
- "binius-hash",
- "binius-iop",
- "binius-ip",
- "binius-math",
- "binius-transcript",
- "binius-utils",
- "bytemuck",
- "bytes",
- "digest 0.10.7",
- "getset",
- "itertools 0.14.0",
- "thiserror 2.0.18",
- "tracing",
-]
-
-[[package]]
-name = "binius64"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "binius-circuits",
- "binius-core",
- "binius-frontend",
- "binius-prover",
- "binius-utils",
- "binius-verifier",
- "clap",
- "criterion",
- "rand 0.8.5",
- "sha2 0.10.9",
- "sha3",
- "tracing",
- "tracing-profile",
- "utils 0.1.0",
-]
-
-[[package]]
 name = "bit-set"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2910,7 +2641,7 @@ dependencies = [
  "ark-serialize 0.5.0",
  "ark-std 0.5.0",
  "byteorder",
- "hex-literal 0.4.1",
+ "hex-literal",
  "num",
  "num-bigint 0.4.6",
  "num-traits",
@@ -3236,12 +2967,6 @@ dependencies = [
 
 [[package]]
 name = "convert_case"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6245d59a3e82a7fc217c5828a6692dbc6dfb63a0c8c90495621f7b9d79704a0e"
-
-[[package]]
-name = "convert_case"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "633458d4ef8c78b72454de2d54fd6ab2e60f9e02be22f3c6104cdc8a4e0fceb9"
@@ -3332,21 +3057,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b2a41393f66f16b0823bb79094d54ac5fbd34ab292ddafb9a0456ac9f87d201"
 dependencies = [
  "libc",
-]
-
-[[package]]
-name = "cranelift-bitset"
-version = "0.121.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ebb6f5d0df5bd0d02c63ec48e8f2e38a176b123f59e084f22caf89a0d0593e7e"
-
-[[package]]
-name = "cranelift-entity"
-version = "0.121.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee832f8329fa87c5df6c1d64a8506a58031e6f8a190d9b21b1900272a4dbb47d"
-dependencies = [
- "cranelift-bitset",
 ]
 
 [[package]]
@@ -3970,19 +3680,6 @@ dependencies = [
 
 [[package]]
 name = "derive_more"
-version = "0.99.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6edb4b64a43d977b8e99788fe3a04d483834fba1215a7e02caa415b626497f7f"
-dependencies = [
- "convert_case 0.4.0",
- "proc-macro2",
- "quote",
- "rustc_version 0.4.1",
- "syn 2.0.114",
-]
-
-[[package]]
-name = "derive_more"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4a9b99b9cbbe49445b21764dc0625032a89b145a2642e67603e1c936f5458d05"
@@ -4017,7 +3714,7 @@ version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "799a97264921d8623a957f6c3b9011f3b5492f557bbb7a5a19b7fa6d06ba8dcb"
 dependencies = [
- "convert_case 0.10.0",
+ "convert_case",
  "proc-macro2",
  "quote",
  "rustc_version 0.4.1",
@@ -5696,12 +5393,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
 
 [[package]]
-name = "hex-literal"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e712f64ec3850b98572bffac52e2c6f282b29fe6c5fa6d42334b30be438d95c1"
-
-[[package]]
 name = "hkdf"
 version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6809,12 +6500,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "linear-map"
-version = "1.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfae20f6b19ad527b550c223fddc3077a547fc70cda94b9b566575423fd303ee"
-
-[[package]]
 name = "linked_list_allocator"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7655,18 +7340,6 @@ dependencies = [
  "cfg-if",
  "libc",
  "memoffset 0.6.5",
-]
-
-[[package]]
-name = "nix"
-version = "0.29.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71e2746dc3a24dd78b3cfcb7be93368c6de9963d30f43a6a73998a9cf4b17b46"
-dependencies = [
- "bitflags 2.10.0",
- "cfg-if",
- "cfg_aliases",
- "libc",
 ]
 
 [[package]]
@@ -8609,7 +8282,7 @@ dependencies = [
  "derive-new 0.6.0",
  "derive_more 1.0.0",
  "halo2curves-axiom",
- "hex-literal 0.4.1",
+ "hex-literal",
  "lazy_static",
  "num-bigint 0.4.6",
  "num-traits",
@@ -8900,7 +8573,7 @@ source = "git+https://github.com/openvm-org/openvm.git?tag=v1.4.3#e8feb93717200e
 dependencies = [
  "blstrs",
  "halo2curves-axiom",
- "hex-literal 0.4.1",
+ "hex-literal",
  "itertools 0.14.0",
  "lazy_static",
  "num-bigint 0.4.6",
@@ -11863,7 +11536,7 @@ dependencies = [
  "cfg-if",
  "digest 0.10.7",
  "hex",
- "hex-literal 0.4.1",
+ "hex-literal",
  "metal",
  "paste",
  "rand_core 0.9.5",
@@ -12972,7 +12645,7 @@ checksum = "ba8593196da75d9dc4f69349682bd4c2099f8cde114257d1ef7ef1b33d1aba54"
 dependencies = [
  "cfg-if",
  "libc",
- "nix 0.23.2",
+ "nix",
  "rand 0.8.5",
  "win-sys",
 ]
@@ -15248,20 +14921,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tracing-profile"
-version = "0.10.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c509ff1014226f573c309a63a856b6d4515c993880ba57d20ae56f402698da88"
-dependencies = [
- "cfg-if",
- "linear-map",
- "nix 0.29.0",
- "thiserror 2.0.18",
- "tracing",
- "tracing-subscriber 0.3.22",
-]
-
-[[package]]
 name = "tracing-serde"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -15300,17 +14959,6 @@ dependencies = [
  "tracing-core",
  "tracing-log",
  "tracing-serde",
-]
-
-[[package]]
-name = "trait-set"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b79e2e9c9ab44c6d7c20d5976961b47e8f49ac199154daa514b77cd1ab536625"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
 ]
 
 [[package]]
@@ -15538,12 +15186,6 @@ name = "unicode-xid"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
-
-[[package]]
-name = "uninit"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "359fdaaabedff944f100847f2e0ea88918d8012fe64baf5b54c191ad010168c9"
 
 [[package]]
 name = "universal-hash"
@@ -15984,7 +15626,7 @@ dependencies = [
  "derive-where",
  "digest 0.10.7",
  "hex",
- "hex-literal 0.4.1",
+ "hex-literal",
  "ordered-float 5.3.0",
  "rayon",
  "serde",

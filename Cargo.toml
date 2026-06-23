@@ -1,7 +1,6 @@
 [workspace]
 resolver = "3"
 members = [
-    "binius64",
     "plonky2",
     "openvm",
     "provekit",
@@ -15,7 +14,17 @@ members = [
     "spartan2",
     "utils",
 ]
-exclude = ["cairo-m", "nexus", "rookie-numbers", "stark-v"]
+exclude = [
+    # TODO: Move binius64 back into the workspace once worldfnd/ProveKit updates
+    # its outdated keccak dependency. It currently pins keccak 0.2.0-rc.2, while
+    # latest Binius pulls sha3 0.12 -> keccak 0.2.0, so one workspace resolver
+    # cannot satisfy both versions.
+    "binius64",
+    "cairo-m",
+    "nexus",
+    "rookie-numbers",
+    "stark-v",
+]
 
 [workspace.dependencies]
 anyhow = "1.0"

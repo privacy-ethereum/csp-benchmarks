@@ -373,10 +373,10 @@ mod tests {
         let props = BenchProperties {
             proving_system: Cow::Owned("Binius64".into()),
             field_curve: Cow::Owned("GHASH binary field".into()),
-            iop: Cow::Owned("Binius64".into()),
-            pcs: Some(Cow::Owned("Binius64".into())),
+            iop: Cow::Owned("Binius64 + Spartan".into()),
+            pcs: Some(Cow::Owned("BaseFold".into())),
             arithm: Cow::Owned("Binius64".into()),
-            is_zk: false,
+            is_zk: true,
             is_zkvm: false,
             security_bits: 96,
             is_pq: true,
