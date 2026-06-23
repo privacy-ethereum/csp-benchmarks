@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use anyhow::Result;
-use binius_core::{constraint_system::ConstraintSystem, Word};
+use binius_core::{Word, constraint_system::ConstraintSystem};
 use binius_frontend::{Circuit, CircuitBuilder};
 use binius_prover::zk_config::ZKProver;
 use binius_verifier::{
