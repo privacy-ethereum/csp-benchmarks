@@ -3,7 +3,8 @@ use std::str::FromStr;
 
 use crate::bench::{Metrics, compile_binary, run_measure_mem_script, write_json_metrics};
 use crate::metadata::{
-    selected_byte_inputs, selected_field_element_inputs, selected_private_tx_depths,
+    selected_byte_inputs, selected_constant_overhead_inputs, selected_field_element_inputs,
+    selected_hash_counts, selected_merkle_branch_counts, selected_private_tx_depths,
 };
 use criterion::{BatchSize, Criterion};
 
@@ -17,6 +18,16 @@ pub enum BenchTarget {
     Poseidon,
     Poseidon2,
     PrivateTx,
+    ConstantOverhead,
+    MerkleFake,
+    HashSha256,
+    MerkleSha256,
+    HashKeccak,
+    MerkleKeccak,
+    HashBlake3,
+    MerkleBlake3,
+    HashPoseidon16,
+    MerklePoseidon16,
 }
 
 impl BenchTarget {
@@ -28,6 +39,16 @@ impl BenchTarget {
             BenchTarget::Poseidon => "poseidon",
             BenchTarget::Poseidon2 => "poseidon2",
             BenchTarget::PrivateTx => "private_tx",
+            BenchTarget::ConstantOverhead => "constant_overhead",
+            BenchTarget::MerkleFake => "merkle_fake",
+            BenchTarget::HashSha256 => "hash_sha256",
+            BenchTarget::MerkleSha256 => "merkle_sha256",
+            BenchTarget::HashKeccak => "hash_keccak",
+            BenchTarget::MerkleKeccak => "merkle_keccak",
+            BenchTarget::HashBlake3 => "hash_blake3",
+            BenchTarget::MerkleBlake3 => "merkle_blake3",
+            BenchTarget::HashPoseidon16 => "hash_poseidon16",
+            BenchTarget::MerklePoseidon16 => "merkle_poseidon16",
         }
     }
 }
@@ -43,6 +64,16 @@ impl FromStr for BenchTarget {
             "poseidon" => Ok(BenchTarget::Poseidon),
             "poseidon2" => Ok(BenchTarget::Poseidon2),
             "private_tx" => Ok(BenchTarget::PrivateTx),
+            "constant_overhead" => Ok(BenchTarget::ConstantOverhead),
+            "merkle_fake" => Ok(BenchTarget::MerkleFake),
+            "hash_sha256" => Ok(BenchTarget::HashSha256),
+            "merkle_sha256" => Ok(BenchTarget::MerkleSha256),
+            "hash_keccak" => Ok(BenchTarget::HashKeccak),
+            "merkle_keccak" => Ok(BenchTarget::MerkleKeccak),
+            "hash_blake3" => Ok(BenchTarget::HashBlake3),
+            "merkle_blake3" => Ok(BenchTarget::MerkleBlake3),
+            "hash_poseidon16" => Ok(BenchTarget::HashPoseidon16),
+            "merkle_poseidon16" => Ok(BenchTarget::MerklePoseidon16),
             _ => Err(format!("Invalid benchmark target: {}", s)),
         }
     }
@@ -268,6 +299,16 @@ fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
         BenchTarget::Ecdsa => vec![32],
         BenchTarget::Poseidon | BenchTarget::Poseidon2 => selected_field_element_inputs(),
         BenchTarget::PrivateTx => selected_private_tx_depths(),
+        BenchTarget::ConstantOverhead => selected_constant_overhead_inputs(),
+        BenchTarget::HashSha256
+        | BenchTarget::HashKeccak
+        | BenchTarget::HashBlake3
+        | BenchTarget::HashPoseidon16 => selected_hash_counts(),
+        BenchTarget::MerkleFake
+        | BenchTarget::MerkleSha256
+        | BenchTarget::MerkleKeccak
+        | BenchTarget::MerkleBlake3
+        | BenchTarget::MerklePoseidon16 => selected_merkle_branch_counts(),
     }
 }
 
@@ -685,5 +726,35 @@ macro_rules! define_benchmark_harness {
     };
     (BenchTarget::PrivateTx, $($rest:tt)*) => {
         $crate::__define_benchmark_harness!(private_tx, $crate::harness::BenchTarget::PrivateTx, $($rest)*);
+    };
+    (BenchTarget::ConstantOverhead, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(constant_overhead, $crate::harness::BenchTarget::ConstantOverhead, $($rest)*);
+    };
+    (BenchTarget::MerkleFake, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(merkle_fake, $crate::harness::BenchTarget::MerkleFake, $($rest)*);
+    };
+    (BenchTarget::HashSha256, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(hash_sha256, $crate::harness::BenchTarget::HashSha256, $($rest)*);
+    };
+    (BenchTarget::MerkleSha256, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(merkle_sha256, $crate::harness::BenchTarget::MerkleSha256, $($rest)*);
+    };
+    (BenchTarget::HashKeccak, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(hash_keccak, $crate::harness::BenchTarget::HashKeccak, $($rest)*);
+    };
+    (BenchTarget::MerkleKeccak, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(merkle_keccak, $crate::harness::BenchTarget::MerkleKeccak, $($rest)*);
+    };
+    (BenchTarget::HashBlake3, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(hash_blake3, $crate::harness::BenchTarget::HashBlake3, $($rest)*);
+    };
+    (BenchTarget::MerkleBlake3, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(merkle_blake3, $crate::harness::BenchTarget::MerkleBlake3, $($rest)*);
+    };
+    (BenchTarget::HashPoseidon16, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(hash_poseidon16, $crate::harness::BenchTarget::HashPoseidon16, $($rest)*);
+    };
+    (BenchTarget::MerklePoseidon16, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(merkle_poseidon16, $crate::harness::BenchTarget::MerklePoseidon16, $($rest)*);
     };
 }

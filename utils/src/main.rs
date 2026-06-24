@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use hex::ToHex;
 use utils::BenchTarget;
+use utils::targeted::ByteHashKind;
 
 /// CLI to generate benchmark inputs and query available sizes
 #[derive(Parser, Debug)]
@@ -48,6 +49,58 @@ enum Command {
         /// Merkle branch depth (default 32)
         #[arg(long, short = 'd', default_value_t = 32)]
         depth: usize,
+    },
+
+    /// Generate inputs for constant_overhead: prints hex input then public output
+    ConstantOverhead,
+
+    /// Generate inputs for hash_sha256: prints hex input then expected folded digest
+    HashSha256 {
+        /// Number of 2-to-1 hashes (default 128)
+        #[arg(long, short = 'n', default_value_t = 128)]
+        count: usize,
+    },
+
+    /// Generate inputs for hash_keccak: prints hex input then expected folded digest
+    HashKeccak {
+        /// Number of 2-to-1 hashes (default 128)
+        #[arg(long, short = 'n', default_value_t = 128)]
+        count: usize,
+    },
+
+    /// Generate inputs for hash_blake3: prints hex input then expected folded digest
+    HashBlake3 {
+        /// Number of 2-to-1 hashes (default 128)
+        #[arg(long, short = 'n', default_value_t = 128)]
+        count: usize,
+    },
+
+    /// Generate inputs for merkle_fake: prints hex input then expected folded roots
+    MerkleFake {
+        /// Number of depth-32 Merkle branches (default 4)
+        #[arg(long, short = 'n', default_value_t = 4)]
+        branches: usize,
+    },
+
+    /// Generate inputs for merkle_sha256: prints hex input then expected folded roots
+    MerkleSha256 {
+        /// Number of depth-32 Merkle branches (default 4)
+        #[arg(long, short = 'n', default_value_t = 4)]
+        branches: usize,
+    },
+
+    /// Generate inputs for merkle_keccak: prints hex input then expected folded roots
+    MerkleKeccak {
+        /// Number of depth-32 Merkle branches (default 4)
+        #[arg(long, short = 'n', default_value_t = 4)]
+        branches: usize,
+    },
+
+    /// Generate inputs for merkle_blake3: prints hex input then expected folded roots
+    MerkleBlake3 {
+        /// Number of depth-32 Merkle branches (default 4)
+        #[arg(long, short = 'n', default_value_t = 4)]
+        branches: usize,
     },
 
     /// Query available input sizes from metadata
@@ -115,6 +168,35 @@ fn main() {
             println!("{}", input_bytes.encode_hex::<String>());
             println!("{}", public_output.encode_hex::<String>());
         }
+        Command::ConstantOverhead => {
+            let (input_bytes, public_output) = utils::targeted::generate_constant_overhead_input();
+            println!("{}", input_bytes.encode_hex::<String>());
+            println!("{}", public_output.encode_hex::<String>());
+        }
+        Command::HashSha256 { count } => {
+            print_hash_count(ByteHashKind::Sha256, count);
+        }
+        Command::HashKeccak { count } => {
+            print_hash_count(ByteHashKind::Keccak, count);
+        }
+        Command::HashBlake3 { count } => {
+            print_hash_count(ByteHashKind::Blake3, count);
+        }
+        Command::MerkleFake { branches } => {
+            let (input_bytes, public_output) =
+                utils::targeted::generate_fake_merkle_input(branches);
+            println!("{}", input_bytes.encode_hex::<String>());
+            println!("{}", public_output.encode_hex::<String>());
+        }
+        Command::MerkleSha256 { branches } => {
+            print_real_merkle(ByteHashKind::Sha256, branches);
+        }
+        Command::MerkleKeccak { branches } => {
+            print_real_merkle(ByteHashKind::Keccak, branches);
+        }
+        Command::MerkleBlake3 { branches } => {
+            print_real_merkle(ByteHashKind::Blake3, branches);
+        }
         Command::Sizes {
             command: SizesCommand::List { target },
         } => {
@@ -139,4 +221,16 @@ fn main() {
             }
         }
     }
+}
+
+fn print_hash_count(kind: ByteHashKind, count: usize) {
+    let (input_bytes, public_output) = utils::targeted::generate_hash_count_input(kind, count);
+    println!("{}", input_bytes.encode_hex::<String>());
+    println!("{}", public_output.encode_hex::<String>());
+}
+
+fn print_real_merkle(kind: ByteHashKind, branches: usize) {
+    let (input_bytes, public_output) = utils::targeted::generate_real_merkle_input(kind, branches);
+    println!("{}", input_bytes.encode_hex::<String>());
+    println!("{}", public_output.encode_hex::<String>());
 }

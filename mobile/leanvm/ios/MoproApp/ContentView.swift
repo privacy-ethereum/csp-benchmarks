@@ -55,15 +55,20 @@ extension ContentView {
       let result = leanvmProvePrivateTx(inputSize: depth)
 
       var proveMs: String = "?"
+      var samplesMs: String = "?"
       for part in result.split(separator: ",") {
         let kv = part.split(separator: "=", maxSplits: 1)
         if kv.count == 2 && kv[0] == "prove_time_ms" {
           proveMs = String(kv[1])
         }
+        if kv.count == 2 && kv[0] == "samples_ms" {
+          samplesMs = String(kv[1])
+        }
       }
 
       DispatchQueue.main.async {
-        textViewText += "  prove: \(proveMs) ms\n"
+        textViewText += "  prove mean: \(proveMs) ms\n"
+        textViewText += "  samples: \(samplesMs)\n"
         isProveButtonEnabled = true
       }
     }

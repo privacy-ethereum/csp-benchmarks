@@ -15,6 +15,7 @@ libc = "0.2"
 glob = "0.3"
 rand = { workspace = true }
 sha2 = { workspace = true }
+blake3 = { workspace = true }
 clap = { workspace = true }
 hex = { workspace = true }
 regex = "1"
@@ -24,6 +25,7 @@ ere-zkvm-interface = { workspace = true }
 p256 = "0.13"
 k256 = { workspace = true }
 sha3.workspace = true
+targeted-guest = { path = "zkvm/targeted-guest" }
 num-bigint = "0.4"
 chrono = "0.4"
 ark-ff = "0.5"

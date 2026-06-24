@@ -5,9 +5,9 @@ pub use error::MoproError;
 #[cfg(not(target_arch = "wasm32"))]
 mopro_ffi::app!();
 
-/// Runs the LeanVM private-transaction benchmark and returns prove time in milliseconds.
+/// Runs the LeanVM private-transaction benchmark and returns 10 prove samples in milliseconds.
 /// Matches CI: prepare is setup (not timed), only prove is measured.
-/// Returns "prove_time_ms=<N>"
+/// Returns comma-separated summary fields, including all raw samples.
 #[cfg_attr(feature = "uniffi", uniffi::export)]
 pub fn leanvm_prove_private_tx(input_size: u64) -> String {
     // LeanVM's WHIR prover uses deep recursion; 64 MB stack prevents overflow on iOS.
@@ -21,18 +21,27 @@ pub fn leanvm_prove_private_tx(input_size: u64) -> String {
 
 fn leanvm_prove_private_tx_inner(input_size: u64) -> String {
     use leanvm_bench::{compile_private_tx, prepare_private_tx, prove_private_tx};
-    use std::time::Instant;
+    use std::time::{Duration, Instant};
+    use utils::mobile_stats::{format_prove_ms_summary, MOBILE_BREAK_SECS, MOBILE_SAMPLE_COUNT};
 
     // compile_private_tx uses include_str! — no CARGO_MANIFEST_DIR needed
     let bytecode = compile_private_tx();
-    // prepare is setup (not timed), matching CI's iter_batched harness
-    let prepared = prepare_private_tx(input_size as usize, &bytecode);
+    let mut samples = Vec::with_capacity(MOBILE_SAMPLE_COUNT);
+    for sample in 0..MOBILE_SAMPLE_COUNT {
+        let prepared = prepare_private_tx(input_size as usize, &bytecode);
 
-    let start = Instant::now();
-    prove_private_tx(&prepared, &());
-    let prove_time_ms = start.elapsed().as_millis();
+        let start = Instant::now();
+        prove_private_tx(&prepared, &());
+        let prove_time_ms = start.elapsed().as_millis();
+        println!("sample_{}_prove_time_ms: {}", sample + 1, prove_time_ms);
+        samples.push(prove_time_ms);
 
-    println!("prove_time_ms: {}", prove_time_ms);
+        if sample + 1 != MOBILE_SAMPLE_COUNT {
+            std::thread::sleep(Duration::from_secs(MOBILE_BREAK_SECS));
+        }
+    }
 
-    format!("prove_time_ms={}", prove_time_ms)
+    let summary = format_prove_ms_summary(&samples);
+    println!("{}", summary);
+    summary
 }

@@ -1,0 +1,11 @@
+[package]
+name = "stark-v-bench-merkle-fake"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+guest-bin = { git = "https://github.com/ClementWalter/stark-v", rev = "5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57" }
+guest-lib = { git = "https://github.com/ClementWalter/stark-v", rev = "5a2e9d6e888fc8953bf50b59aeb3d8bcdc0d9d57" }
+targeted-guest = { path = "../../../utils/zkvm/targeted-guest" }
+
+[workspace]

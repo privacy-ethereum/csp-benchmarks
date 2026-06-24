@@ -11,7 +11,9 @@ pub mod bench;
 pub mod harness;
 pub mod ligetron;
 pub mod metadata;
+pub mod mobile_stats;
 pub mod private_tx;
+pub mod targeted;
 pub mod zkvm;
 
 use k256::ecdsa::{Signature as K256Signature, SigningKey as K256SigningKey};
@@ -20,7 +22,8 @@ use p256::ecdsa::{Signature, SigningKey, signature::hazmat::PrehashSigner};
 pub use harness::{BenchHarnessConfig, BenchTarget, ProvingSystem};
 
 use crate::metadata::{
-    selected_byte_inputs, selected_field_element_inputs, selected_private_tx_depths,
+    selected_byte_inputs, selected_constant_overhead_inputs, selected_field_element_inputs,
+    selected_hash_counts, selected_merkle_branch_counts, selected_private_tx_depths,
 };
 
 pub fn write_json<T: Serialize>(data: &T, output_path: &str) {
@@ -167,6 +170,16 @@ pub fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
         BenchTarget::Ecdsa => vec![32],
         BenchTarget::Poseidon | BenchTarget::Poseidon2 => selected_field_element_inputs(),
         BenchTarget::PrivateTx => selected_private_tx_depths(),
+        BenchTarget::ConstantOverhead => selected_constant_overhead_inputs(),
+        BenchTarget::HashSha256
+        | BenchTarget::HashKeccak
+        | BenchTarget::HashBlake3
+        | BenchTarget::HashPoseidon16 => selected_hash_counts(),
+        BenchTarget::MerkleFake
+        | BenchTarget::MerkleSha256
+        | BenchTarget::MerkleKeccak
+        | BenchTarget::MerkleBlake3
+        | BenchTarget::MerklePoseidon16 => selected_merkle_branch_counts(),
     }
 }
 

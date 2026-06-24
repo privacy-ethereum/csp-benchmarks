@@ -3,8 +3,10 @@ use ere_zkvm_interface::{Input, ProverResource};
 use serde::Serialize;
 use std::env;
 use utils::harness::{AuditStatus, BenchProperties};
+use utils::targeted::ByteHashKind;
 use utils::zkvm::{
     CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedPrivateTx, PreparedSha256,
+    PreparedTargeted,
 };
 
 // SAFETY: called once before single-threaded JoltSdk construction
@@ -108,6 +110,115 @@ pub fn prepare_private_tx(
         program.byte_size,
         expected_public_values,
     )
+}
+
+pub fn prepare_constant_overhead(
+    _input_size: usize,
+    program: &CompiledProgram<RustRv64imacCustomized>,
+) -> PreparedTargeted<EreJolt> {
+    set_targeted_jolt_config(1);
+    prepare_targeted(program, utils::targeted::generate_constant_overhead_input())
+}
+
+pub fn prepare_merkle_fake(
+    branch_count: usize,
+    program: &CompiledProgram<RustRv64imacCustomized>,
+) -> PreparedTargeted<EreJolt> {
+    set_targeted_jolt_config(branch_count * 32);
+    prepare_targeted(
+        program,
+        utils::targeted::generate_fake_merkle_input(branch_count),
+    )
+}
+
+pub fn prepare_hash_sha256(
+    hash_count: usize,
+    program: &CompiledProgram<RustRv64imacCustomized>,
+) -> PreparedTargeted<EreJolt> {
+    set_targeted_jolt_config(hash_count);
+    prepare_targeted(
+        program,
+        utils::targeted::generate_hash_count_input(ByteHashKind::Sha256, hash_count),
+    )
+}
+
+pub fn prepare_merkle_sha256(
+    branch_count: usize,
+    program: &CompiledProgram<RustRv64imacCustomized>,
+) -> PreparedTargeted<EreJolt> {
+    set_targeted_jolt_config(branch_count * 32);
+    prepare_targeted(
+        program,
+        utils::targeted::generate_real_merkle_input(ByteHashKind::Sha256, branch_count),
+    )
+}
+
+pub fn prepare_hash_keccak(
+    hash_count: usize,
+    program: &CompiledProgram<RustRv64imacCustomized>,
+) -> PreparedTargeted<EreJolt> {
+    set_targeted_jolt_config(hash_count);
+    prepare_targeted(
+        program,
+        utils::targeted::generate_hash_count_input(ByteHashKind::Keccak, hash_count),
+    )
+}
+
+pub fn prepare_merkle_keccak(
+    branch_count: usize,
+    program: &CompiledProgram<RustRv64imacCustomized>,
+) -> PreparedTargeted<EreJolt> {
+    set_targeted_jolt_config(branch_count * 32);
+    prepare_targeted(
+        program,
+        utils::targeted::generate_real_merkle_input(ByteHashKind::Keccak, branch_count),
+    )
+}
+
+pub fn prepare_hash_blake3(
+    hash_count: usize,
+    program: &CompiledProgram<RustRv64imacCustomized>,
+) -> PreparedTargeted<EreJolt> {
+    set_targeted_jolt_config(hash_count);
+    prepare_targeted(
+        program,
+        utils::targeted::generate_hash_count_input(ByteHashKind::Blake3, hash_count),
+    )
+}
+
+pub fn prepare_merkle_blake3(
+    branch_count: usize,
+    program: &CompiledProgram<RustRv64imacCustomized>,
+) -> PreparedTargeted<EreJolt> {
+    set_targeted_jolt_config(branch_count * 32);
+    prepare_targeted(
+        program,
+        utils::targeted::generate_real_merkle_input(ByteHashKind::Blake3, branch_count),
+    )
+}
+
+fn set_targeted_jolt_config(work_units: usize) {
+    let max_trace_length = if work_units > 1024 {
+        16_777_216
+    } else if work_units > 128 {
+        8_388_608
+    } else {
+        1_048_576
+    };
+    set_jolt_config(max_trace_length, 65_536, 1_048_576);
+}
+
+fn prepare_targeted(
+    program: &CompiledProgram<RustRv64imacCustomized>,
+    generated: (Vec<u8>, Vec<u8>),
+) -> PreparedTargeted<EreJolt> {
+    let vm = EreJolt::new(program.program.clone(), ProverResource::Cpu)
+        .expect("jolt prover build failed");
+
+    let (input_bytes, expected_public_values) = generated;
+    let input = build_framed_input(input_bytes);
+
+    PreparedTargeted::with_expected_digest(vm, input, program.byte_size, expected_public_values)
 }
 
 #[derive(Serialize)]

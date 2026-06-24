@@ -375,10 +375,25 @@ jobs:
             cd rookie-numbers && cargo build --release --bin sha256_mem_rookie_numbers && cd ..
             cp rookie-numbers/target/release/sha256_mem_rookie_numbers target/release/
           elif [ "${{ matrix.crate }}" = "stark-v" ]; then
-            cd stark-v && cargo build --release --bin sha256_mem_stark_v --bin keccak_mem_stark_v --bin private_tx_mem_stark_v && cd ..
+            cd stark-v && cargo build --release \
+              --bin sha256_mem_stark_v \
+              --bin keccak_mem_stark_v \
+              --bin private_tx_mem_stark_v \
+              --bin constant_overhead_mem_stark_v \
+              --bin merkle_fake_mem_stark_v \
+              --bin hash_sha256_mem_stark_v \
+              --bin merkle_sha256_mem_stark_v \
+              --bin hash_keccak_mem_stark_v \
+              --bin merkle_keccak_mem_stark_v && cd ..
             cp stark-v/target/release/sha256_mem_stark_v target/release/
             cp stark-v/target/release/keccak_mem_stark_v target/release/
             cp stark-v/target/release/private_tx_mem_stark_v target/release/
+            cp stark-v/target/release/constant_overhead_mem_stark_v target/release/
+            cp stark-v/target/release/merkle_fake_mem_stark_v target/release/
+            cp stark-v/target/release/hash_sha256_mem_stark_v target/release/
+            cp stark-v/target/release/merkle_sha256_mem_stark_v target/release/
+            cp stark-v/target/release/hash_keccak_mem_stark_v target/release/
+            cp stark-v/target/release/merkle_keccak_mem_stark_v target/release/
           fi
 
       - name: Run benches in ${{ matrix.crate }}

@@ -6,6 +6,7 @@ use stark_v_sdk::{secure_pcs_config, StarkV, StarkVCompiler, StarkVProgram};
 use std::fs;
 use std::path::PathBuf;
 use utils::harness::{AuditStatus, BenchProperties};
+use utils::targeted::ByteHashKind;
 
 pub struct CompiledProgram {
     pub program: StarkVProgram,
@@ -124,6 +125,57 @@ pub fn prepare_keccak(input_size: usize, program: &CompiledProgram) -> PreparedB
 pub fn prepare_private_tx(input_size: usize, program: &CompiledProgram) -> PreparedBench {
     let vm = StarkV::new(program.program.clone(), secure_pcs_config());
     let (input_bytes, expected_public_values) = utils::generate_private_tx_input(input_size);
+    let input = build_prefixed_input(input_bytes);
+    PreparedBench {
+        vm,
+        input,
+        compiled_size: program.byte_size,
+        expected_public_values,
+    }
+}
+
+pub fn prepare_constant_overhead(_input_size: usize, program: &CompiledProgram) -> PreparedBench {
+    prepare_targeted(program, utils::targeted::generate_constant_overhead_input())
+}
+
+pub fn prepare_merkle_fake(input_size: usize, program: &CompiledProgram) -> PreparedBench {
+    prepare_targeted(
+        program,
+        utils::targeted::generate_fake_merkle_input(input_size),
+    )
+}
+
+pub fn prepare_hash_sha256(input_size: usize, program: &CompiledProgram) -> PreparedBench {
+    prepare_targeted(
+        program,
+        utils::targeted::generate_hash_count_input(ByteHashKind::Sha256, input_size),
+    )
+}
+
+pub fn prepare_merkle_sha256(input_size: usize, program: &CompiledProgram) -> PreparedBench {
+    prepare_targeted(
+        program,
+        utils::targeted::generate_real_merkle_input(ByteHashKind::Sha256, input_size),
+    )
+}
+
+pub fn prepare_hash_keccak(input_size: usize, program: &CompiledProgram) -> PreparedBench {
+    prepare_targeted(
+        program,
+        utils::targeted::generate_hash_count_input(ByteHashKind::Keccak, input_size),
+    )
+}
+
+pub fn prepare_merkle_keccak(input_size: usize, program: &CompiledProgram) -> PreparedBench {
+    prepare_targeted(
+        program,
+        utils::targeted::generate_real_merkle_input(ByteHashKind::Keccak, input_size),
+    )
+}
+
+fn prepare_targeted(program: &CompiledProgram, generated: (Vec<u8>, Vec<u8>)) -> PreparedBench {
+    let vm = StarkV::new(program.program.clone(), secure_pcs_config());
+    let (input_bytes, expected_public_values) = generated;
     let input = build_prefixed_input(input_bytes);
     PreparedBench {
         vm,

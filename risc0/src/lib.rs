@@ -2,9 +2,10 @@ use bincode::Options;
 use ere_risc0::{EreRisc0, compiler::RustRv32imaCustomized};
 use ere_zkvm_interface::{Input, ProverResource};
 use utils::harness::{AuditStatus, BenchProperties};
+use utils::targeted::ByteHashKind;
 use utils::zkvm::{
     CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedPrivateTx, PreparedSha256,
-    encode_public_key,
+    PreparedTargeted, encode_public_key,
 };
 
 pub use utils::zkvm::{
@@ -99,6 +100,76 @@ pub fn prepare_private_tx(
         program.byte_size,
         expected_public_values,
     )
+}
+
+pub fn prepare_constant_overhead(
+    _input_size: usize,
+    program: &CompiledProgram<RustRv32imaCustomized>,
+) -> PreparedTargeted<EreRisc0> {
+    prepare_targeted(program, utils::targeted::generate_constant_overhead_input())
+}
+
+pub fn prepare_merkle_fake(
+    branch_count: usize,
+    program: &CompiledProgram<RustRv32imaCustomized>,
+) -> PreparedTargeted<EreRisc0> {
+    prepare_targeted(
+        program,
+        utils::targeted::generate_fake_merkle_input(branch_count),
+    )
+}
+
+pub fn prepare_hash_sha256(
+    hash_count: usize,
+    program: &CompiledProgram<RustRv32imaCustomized>,
+) -> PreparedTargeted<EreRisc0> {
+    prepare_targeted(
+        program,
+        utils::targeted::generate_hash_count_input(ByteHashKind::Sha256, hash_count),
+    )
+}
+
+pub fn prepare_merkle_sha256(
+    branch_count: usize,
+    program: &CompiledProgram<RustRv32imaCustomized>,
+) -> PreparedTargeted<EreRisc0> {
+    prepare_targeted(
+        program,
+        utils::targeted::generate_real_merkle_input(ByteHashKind::Sha256, branch_count),
+    )
+}
+
+pub fn prepare_hash_keccak(
+    hash_count: usize,
+    program: &CompiledProgram<RustRv32imaCustomized>,
+) -> PreparedTargeted<EreRisc0> {
+    prepare_targeted(
+        program,
+        utils::targeted::generate_hash_count_input(ByteHashKind::Keccak, hash_count),
+    )
+}
+
+pub fn prepare_merkle_keccak(
+    branch_count: usize,
+    program: &CompiledProgram<RustRv32imaCustomized>,
+) -> PreparedTargeted<EreRisc0> {
+    prepare_targeted(
+        program,
+        utils::targeted::generate_real_merkle_input(ByteHashKind::Keccak, branch_count),
+    )
+}
+
+fn prepare_targeted(
+    program: &CompiledProgram<RustRv32imaCustomized>,
+    generated: (Vec<u8>, Vec<u8>),
+) -> PreparedTargeted<EreRisc0> {
+    let vm = EreRisc0::new(program.program.clone(), ProverResource::Cpu)
+        .expect("failed to build risc0 prover instance");
+
+    let (input_bytes, expected_public_values) = generated;
+    let input = build_framed_input(input_bytes);
+
+    PreparedTargeted::with_expected_digest(vm, input, program.byte_size, expected_public_values)
 }
 
 /// Build risc0 input with length-prefixed frame format.

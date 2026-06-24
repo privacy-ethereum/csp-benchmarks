@@ -2670,6 +2670,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "targeted-guest"
+version = "0.1.0"
+
+[[package]]
 name = "tempfile"
 version = "3.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3127,6 +3131,7 @@ dependencies = [
  "ark-bn254",
  "ark-ff 0.5.0",
  "bincode 1.3.3",
+ "blake3",
  "chrono",
  "clap",
  "criterion",
@@ -3147,6 +3152,7 @@ dependencies = [
  "sha2",
  "sha3",
  "tabled",
+ "targeted-guest",
 ]
 
 [[package]]

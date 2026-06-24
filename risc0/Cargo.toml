@@ -29,6 +29,30 @@ harness = false
 name = "private_tx"
 harness = false
 
+[[bench]]
+name = "constant_overhead"
+harness = false
+
+[[bench]]
+name = "merkle_fake"
+harness = false
+
+[[bench]]
+name = "hash_sha256"
+harness = false
+
+[[bench]]
+name = "merkle_sha256"
+harness = false
+
+[[bench]]
+name = "hash_keccak"
+harness = false
+
+[[bench]]
+name = "merkle_keccak"
+harness = false
+
 [[bin]]
 name = "sha256_mem_risc0"
 path = "src/bin/sha256_mem.rs"
@@ -44,3 +68,27 @@ path = "src/bin/keccak_mem.rs"
 [[bin]]
 name = "private_tx_mem_risc0"
 path = "src/bin/private_tx_mem.rs"
+
+[[bin]]
+name = "constant_overhead_mem_risc0"
+path = "src/bin/constant_overhead_mem.rs"
+
+[[bin]]
+name = "merkle_fake_mem_risc0"
+path = "src/bin/merkle_fake_mem.rs"
+
+[[bin]]
+name = "hash_sha256_mem_risc0"
+path = "src/bin/hash_sha256_mem.rs"
+
+[[bin]]
+name = "merkle_sha256_mem_risc0"
+path = "src/bin/merkle_sha256_mem.rs"
+
+[[bin]]
+name = "hash_keccak_mem_risc0"
+path = "src/bin/hash_keccak_mem.rs"
+
+[[bin]]
+name = "merkle_keccak_mem_risc0"
+path = "src/bin/merkle_keccak_mem.rs"

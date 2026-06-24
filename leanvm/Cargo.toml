@@ -20,6 +20,38 @@ criterion = { workspace = true }
 name = "private_tx"
 harness = false
 
+[[bench]]
+name = "constant_overhead"
+harness = false
+
+[[bench]]
+name = "merkle_fake"
+harness = false
+
+[[bench]]
+name = "hash_poseidon16"
+harness = false
+
+[[bench]]
+name = "merkle_poseidon16"
+harness = false
+
 [[bin]]
 name = "private_tx_mem_leanvm"
 path = "src/bin/private_tx_mem.rs"
+
+[[bin]]
+name = "constant_overhead_mem_leanvm"
+path = "src/bin/constant_overhead_mem.rs"
+
+[[bin]]
+name = "merkle_fake_mem_leanvm"
+path = "src/bin/merkle_fake_mem.rs"
+
+[[bin]]
+name = "hash_poseidon16_mem_leanvm"
+path = "src/bin/hash_poseidon16_mem.rs"
+
+[[bin]]
+name = "merkle_poseidon16_mem_leanvm"
+path = "src/bin/merkle_poseidon16_mem.rs"
