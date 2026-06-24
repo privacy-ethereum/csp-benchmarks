@@ -7,21 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-2A2376232F553BFF00D4B3B4 /* cubic_circuit.pk in Resources */ = {isa = PBXBuildFile; fileRef = 2A2376202F553BFF00D4B3B4 /* cubic_circuit.pk */; };
-		2A2376242F553BFF00D4B3B4 /* cubic_circuit.vk in Resources */ = {isa = PBXBuildFile; fileRef = 2A2376222F553BFF00D4B3B4 /* cubic_circuit.vk */; };
-		2A2376252F553BFF00D4B3B4 /* cubic_circuit.r1cs in Resources */ = {isa = PBXBuildFile; fileRef = 2A2376212F553BFF00D4B3B4 /* cubic_circuit.r1cs */; };
-		2A4190692DF1CCE6004F1A4F /* noir_multiplier2.json in Resources */ = {isa = PBXBuildFile; fileRef = 2A4190682DF1CCE6004F1A4F /* noir_multiplier2.json */; };
-		2A41906B2DF1CCED004F1A4F /* noir_multiplier2.srs in Resources */ = {isa = PBXBuildFile; fileRef = 2A41906A2DF1CCED004F1A4F /* noir_multiplier2.srs */; };
-		2A59922F2CC7750200135402 /* multiplier2_final.zkey in Resources */ = {isa = PBXBuildFile; fileRef = 2A59922E2CC7750200135402 /* multiplier2_final.zkey */; };
-		2A5992332CC7750C00135402 /* plonk_fibonacci_vk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 2A5992322CC7750C00135402 /* plonk_fibonacci_vk.bin */; };
-		2A5992342CC7750C00135402 /* plonk_fibonacci_srs.bin in Resources */ = {isa = PBXBuildFile; fileRef = 2A5992312CC7750C00135402 /* plonk_fibonacci_srs.bin */; };
-		2A5992352CC7750C00135402 /* plonk_fibonacci_pk.bin in Resources */ = {isa = PBXBuildFile; fileRef = 2A5992302CC7750C00135402 /* plonk_fibonacci_pk.bin */; };
 		2A5992392CC77A7E00135402 /* MoproBindings.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A5992372CC77A7E00135402 /* MoproBindings.xcframework */; };
 		2A59923A2CC77A7E00135402 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5992362CC77A7E00135402 /* mopro.swift */; };
-		2A6489512E8BA1F1004450F0 /* multiplier2_wc_final.zkey in Resources */ = {isa = PBXBuildFile; fileRef = 2A6489502E8BA1F1004450F0 /* multiplier2_wc_final.zkey */; };
-		E11808962E5CBDB000B8B284 /* noir_multiplier2.vk in Resources */ = {isa = PBXBuildFile; fileRef = E11808952E5CBDB000B8B284 /* noir_multiplier2.vk */; };
-		E11808972E5CBDB000B8B284 /* noir_multiplier2.vk in Resources */ = {isa = PBXBuildFile; fileRef = E11808952E5CBDB000B8B284 /* noir_multiplier2.vk */; };
-		E11808982E5CBDB000B8B284 /* noir_multiplier2.vk in Resources */ = {isa = PBXBuildFile; fileRef = E11808952E5CBDB000B8B284 /* noir_multiplier2.vk */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,22 +29,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2A2376202F553BFF00D4B3B4 /* cubic_circuit.pk */ = {isa = PBXFileReference; lastKnownFileType = file; path = cubic_circuit.pk; sourceTree = "<group>"; };
-		2A2376212F553BFF00D4B3B4 /* cubic_circuit.r1cs */ = {isa = PBXFileReference; lastKnownFileType = file; path = cubic_circuit.r1cs; sourceTree = "<group>"; };
-		2A2376222F553BFF00D4B3B4 /* cubic_circuit.vk */ = {isa = PBXFileReference; lastKnownFileType = file; path = cubic_circuit.vk; sourceTree = "<group>"; };
-		2A4190682DF1CCE6004F1A4F /* noir_multiplier2.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = noir_multiplier2.json; sourceTree = "<group>"; };
-		2A41906A2DF1CCED004F1A4F /* noir_multiplier2.srs */ = {isa = PBXFileReference; lastKnownFileType = file; path = noir_multiplier2.srs; sourceTree = "<group>"; };
 2A5991EC2CC7722900135402 /* MoproApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoproApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A5991FC2CC7722A00135402 /* MoproAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoproAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A5992062CC7722A00135402 /* MoproAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoproAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2A59922E2CC7750200135402 /* multiplier2_final.zkey */ = {isa = PBXFileReference; lastKnownFileType = file; path = multiplier2_final.zkey; sourceTree = "<group>"; };
-		2A5992302CC7750C00135402 /* plonk_fibonacci_pk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = plonk_fibonacci_pk.bin; sourceTree = "<group>"; };
-		2A5992312CC7750C00135402 /* plonk_fibonacci_srs.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = plonk_fibonacci_srs.bin; sourceTree = "<group>"; };
-		2A5992322CC7750C00135402 /* plonk_fibonacci_vk.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = plonk_fibonacci_vk.bin; sourceTree = "<group>"; };
 		2A5992362CC77A7E00135402 /* mopro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro.swift; sourceTree = "<group>"; };
 		2A5992372CC77A7E00135402 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
-		2A6489502E8BA1F1004450F0 /* multiplier2_wc_final.zkey */ = {isa = PBXFileReference; lastKnownFileType = file; path = multiplier2_wc_final.zkey; sourceTree = "<group>"; };
-		E11808952E5CBDB000B8B284 /* noir_multiplier2.vk */ = {isa = PBXFileReference; lastKnownFileType = file; path = noir_multiplier2.vk; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -112,17 +88,6 @@
 				2A5992092CC7722A00135402 /* MoproAppUITests */,
 				2A5991ED2CC7722900135402 /* Products */,
 				2A5992382CC77A7E00135402 /* MoproiOSBindings */,
-		2A59922E2CC7750200135402 /* multiplier2_final.zkey */,
-				2A5992302CC7750C00135402 /* plonk_fibonacci_pk.bin */,
-				2A5992312CC7750C00135402 /* plonk_fibonacci_srs.bin */,
-				2A5992322CC7750C00135402 /* plonk_fibonacci_vk.bin */,
-				2A4190682DF1CCE6004F1A4F /* noir_multiplier2.json */,
-				2A41906A2DF1CCED004F1A4F /* noir_multiplier2.srs */,
-				E11808952E5CBDB000B8B284 /* noir_multiplier2.vk */,
-				2A6489502E8BA1F1004450F0 /* multiplier2_wc_final.zkey */,
-				2A2376202F553BFF00D4B3B4 /* cubic_circuit.pk */,
-				2A2376212F553BFF00D4B3B4 /* cubic_circuit.r1cs */,
-				2A2376222F553BFF00D4B3B4 /* cubic_circuit.vk */,
 			);
 			sourceTree = "<group>";
 		};
@@ -265,17 +230,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A5992332CC7750C00135402 /* plonk_fibonacci_vk.bin in Resources */,
-				E11808972E5CBDB000B8B284 /* noir_multiplier2.vk in Resources */,
-				2A5992342CC7750C00135402 /* plonk_fibonacci_srs.bin in Resources */,
-				2A41906B2DF1CCED004F1A4F /* noir_multiplier2.srs in Resources */,
-				2A5992352CC7750C00135402 /* plonk_fibonacci_pk.bin in Resources */,
-				2A59922F2CC7750200135402 /* multiplier2_final.zkey in Resources */,
-				2A6489512E8BA1F1004450F0 /* multiplier2_wc_final.zkey in Resources */,
-				2A4190692DF1CCE6004F1A4F /* noir_multiplier2.json in Resources */,
-				2A2376232F553BFF00D4B3B4 /* cubic_circuit.pk in Resources */,
-				2A2376242F553BFF00D4B3B4 /* cubic_circuit.vk in Resources */,
-				2A2376252F553BFF00D4B3B4 /* cubic_circuit.r1cs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,7 +237,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E11808982E5CBDB000B8B284 /* noir_multiplier2.vk in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,7 +244,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E11808962E5CBDB000B8B284 /* noir_multiplier2.vk in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

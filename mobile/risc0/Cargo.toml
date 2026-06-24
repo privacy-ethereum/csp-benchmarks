@@ -9,17 +9,14 @@ edition = "2021"
 [lib]
 crate-type = ["lib", "cdylib", "staticlib"]
 
-# Adapters for different proof systems
 [features]
 default = ["uniffi"]
 uniffi = ["mopro-ffi/uniffi"]
-flutter = ["mopro-ffi/flutter"]
-wasm = ["mopro-ffi/wasm"]
+wasm = []
 
 [dependencies]
 mopro-ffi = { version = "=0.3.6" }
 thiserror = "2.0.12"
-anyhow = "1.0.99"
 risc0-bench = { path = "../../risc0", package = "risc0" }
 utils = { path = "../../utils" }
 ere-risc0 = { git = "https://github.com/eth-act/ere", rev = "6573843", features = ["metal"] }
@@ -31,29 +28,3 @@ ark-ec = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist
 ark-serialize = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }
 ark-bn254 = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }
 allocative = { git = "https://github.com/facebookexperimental/allocative", rev = "85b773d85d526d068ce94724ff7a7b81203fc95e" }
-
-# CIRCOM_DEPENDENCIES
-# HALO2_DEPENDENCIES
-# NOIR_DEPENDENCIES
-# GNARK_DEPENDENCIES
-
-[build-dependencies]
-# CIRCOM_BUILD_DEPENDENCIES
-# HALO2_BUILD_DEPENDENCIES
-# NOIR_BUILD_DEPENDENCIES
-# GNARK_BUILD_DEPENDENCIES
-
-[dev-dependencies]
-mopro-ffi = { version = "=0.3.6", features = ["uniffi-tests"] }
-
-# CIRCOM_DEV_DEPENDENCIES
-# HALO2_DEV_DEPENDENCIES
-# NOIR_DEV_DEPENDENCIES
-# GNARK_DEV_DEPENDENCIES
-
-[target.wasm32-unknown-unknown.dependencies]
-mopro-ffi = { version = "=0.3.6", features = ["wasm"] }
-wasm-bindgen = "0.2"
-serde-wasm-bindgen = "0.6"
-
-    
