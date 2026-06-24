@@ -1,3 +1,0 @@
-import Testing
-
-struct MoproAppTests {}

@@ -1,6 +1,6 @@
 use clap::Parser;
 use ere_jolt::compiler::RustRv64imacCustomized;
-use jolt::{prepare_merkle_fake, prove_sha256};
+use jolt::{prepare_merkle_fake, prove_targeted};
 use utils::zkvm::MERKLE_FAKE_BENCH;
 use utils::zkvm::helpers::load_compiled_program;
 
@@ -14,5 +14,5 @@ fn main() {
     let args = Args::parse();
     let program = load_compiled_program::<RustRv64imacCustomized>(MERKLE_FAKE_BENCH);
     let prepared = prepare_merkle_fake(args.input_size, &program);
-    prove_sha256(&prepared, &());
+    prove_targeted(&prepared, &());
 }

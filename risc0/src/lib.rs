@@ -10,7 +10,8 @@ use utils::zkvm::{
 
 pub use utils::zkvm::{
     execution_cycles, preprocessing_size, proof_size, prove, prove_ecdsa, prove_private_tx,
-    prove_sha256, verify_ecdsa, verify_keccak, verify_private_tx, verify_sha256,
+    prove_sha256, prove_targeted, verify_ecdsa, verify_keccak, verify_private_tx, verify_sha256,
+    verify_targeted,
 };
 
 pub fn risc0_bench_properties() -> BenchProperties {

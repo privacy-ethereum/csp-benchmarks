@@ -92,3 +92,7 @@ path = "src/bin/hash_keccak_mem.rs"
 [[bin]]
 name = "merkle_keccak_mem_risc0"
 path = "src/bin/merkle_keccak_mem.rs"
+
+[[bin]]
+name = "compile_mobile_guests_risc0"
+path = "src/bin/compile_mobile_guests.rs"

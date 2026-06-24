@@ -4,30 +4,55 @@
 //
 import SwiftUI
 
+private struct BenchmarkOption: Identifiable, Hashable {
+  let id: String
+  let label: String
+  let defaultInputSize: String
+  let resourceName: String
+}
+
 struct ContentView: View {
   @State private var textViewText = ""
   @State private var isProveButtonEnabled = true
-  @State private var merkleDepth: String = "32"
+  @State private var selectedBenchmark = "private_tx"
+  @State private var inputSize: String = "32"
+
+  private static let benchmarks = [
+    BenchmarkOption(id: "private_tx", label: "private_tx", defaultInputSize: "32", resourceName: "private_tx"),
+    BenchmarkOption(id: "constant_overhead", label: "constant_overhead", defaultInputSize: "1", resourceName: "constant_overhead"),
+    BenchmarkOption(id: "merkle_fake", label: "merkle_fake", defaultInputSize: "4", resourceName: "merkle_fake"),
+    BenchmarkOption(id: "hash_sha256", label: "hash_sha256", defaultInputSize: "128", resourceName: "hash_sha256"),
+    BenchmarkOption(id: "merkle_sha256", label: "merkle_sha256", defaultInputSize: "4", resourceName: "merkle_sha256"),
+    BenchmarkOption(id: "hash_keccak", label: "hash_keccak", defaultInputSize: "128", resourceName: "hash_keccak"),
+    BenchmarkOption(id: "merkle_keccak", label: "merkle_keccak", defaultInputSize: "4", resourceName: "merkle_keccak"),
+  ]
 
   var body: some View {
     VStack(spacing: 16) {
-      Text("RISC0 Private TX Benchmark")
+      Text("RISC0 Benchmarks")
         .font(.headline)
 
+      Picker("Benchmark", selection: $selectedBenchmark) {
+        ForEach(Self.benchmarks) { benchmark in
+          Text(benchmark.label).tag(benchmark.id)
+        }
+      }
+      .pickerStyle(.menu)
+
       HStack {
-        Text("Merkle depth:")
-        TextField("depth", text: $merkleDepth)
+        Text("Input size:")
+        TextField("input_size", text: $inputSize)
           #if canImport(UIKit)
           .keyboardType(.numberPad)
           #endif
           .textFieldStyle(.roundedBorder)
-          .frame(width: 80)
+          .frame(width: 100)
       }
 
-      Button("Prove RISC0 Private TX", action: runRisc0ProveAction)
+      Button("Run RISC0 Benchmark", action: runRisc0ProveAction)
         .disabled(!isProveButtonEnabled)
         .buttonStyle(.borderedProminent)
-        .accessibilityIdentifier("proveRisc0PrivateTx")
+        .accessibilityIdentifier("runRisc0Benchmark")
 
       ScrollView {
         Text(textViewText)
@@ -43,41 +68,68 @@ struct ContentView: View {
 
 extension ContentView {
   func runRisc0ProveAction() {
-    guard let depth = UInt64(merkleDepth), depth > 0 else {
-      textViewText += "Invalid Merkle depth.\n"
+    guard let size = UInt64(inputSize), size > 0 else {
+      textViewText += "Invalid input_size.\n"
       return
     }
 
+    let benchmark = selectedOption()
     isProveButtonEnabled = false
-    textViewText += "Running RISC0 private TX proof (depth=\(depth))...\n"
+    textViewText += "Running RISC0 \(benchmark.id) (input_size=\(size))...\n"
 
     DispatchQueue.global(qos: .userInitiated).async {
-      guard let binPath = Bundle.main.path(forResource: "private_tx", ofType: "bin") else {
+      guard let binPath = Bundle.main.path(forResource: benchmark.resourceName, ofType: "bin") else {
         DispatchQueue.main.async {
-          textViewText += "Error: private_tx.bin not found in app bundle.\n"
+          textViewText += "Error: \(benchmark.resourceName).bin not found in app bundle.\n"
           isProveButtonEnabled = true
         }
         return
       }
-      let result = risc0ProvePrivateTx(inputSize: depth, compiledProgramPath: binPath)
 
-      var proveMs: String = "?"
-      var samplesMs: String = "?"
-      for part in result.split(separator: ",") {
-        let kv = part.split(separator: "=", maxSplits: 1)
-        if kv.count == 2 && kv[0] == "prove_time_ms" {
-          proveMs = String(kv[1])
-        }
-        if kv.count == 2 && kv[0] == "samples_ms" {
-          samplesMs = String(kv[1])
-        }
+      let result: String
+      switch benchmark.id {
+      case "private_tx":
+        result = risc0ProvePrivateTx(inputSize: size, compiledProgramPath: binPath)
+      case "constant_overhead":
+        result = risc0ProveConstantOverhead(inputSize: size, compiledProgramPath: binPath)
+      case "merkle_fake":
+        result = risc0ProveMerkleFake(inputSize: size, compiledProgramPath: binPath)
+      case "hash_sha256":
+        result = risc0ProveHashSha256(inputSize: size, compiledProgramPath: binPath)
+      case "merkle_sha256":
+        result = risc0ProveMerkleSha256(inputSize: size, compiledProgramPath: binPath)
+      case "hash_keccak":
+        result = risc0ProveHashKeccak(inputSize: size, compiledProgramPath: binPath)
+      case "merkle_keccak":
+        result = risc0ProveMerkleKeccak(inputSize: size, compiledProgramPath: binPath)
+      default:
+        result = "error=unknown_benchmark"
       }
 
+      let summary = parseBenchmarkSummary(result)
       DispatchQueue.main.async {
-        textViewText += "  prove mean: \(proveMs) ms\n"
-        textViewText += "  samples: \(samplesMs)\n"
+        textViewText += "  prove mean: \(summary["prove_time_ms"] ?? "?") ms\n"
+        textViewText += "  median: \(summary["prove_time_median_ms"] ?? "?") ms\n"
+        textViewText += "  min/max: \(summary["prove_time_min_ms"] ?? "?") / \(summary["prove_time_max_ms"] ?? "?") ms\n"
+        textViewText += "  stddev: \(summary["prove_time_stddev_ms"] ?? "?") ms\n"
+        textViewText += "  samples: \(summary["samples_ms"] ?? "?")\n"
         isProveButtonEnabled = true
       }
     }
+  }
+
+  private func selectedOption() -> BenchmarkOption {
+    Self.benchmarks.first { $0.id == selectedBenchmark } ?? Self.benchmarks[0]
+  }
+
+  private func parseBenchmarkSummary(_ result: String) -> [String: String] {
+    var fields: [String: String] = [:]
+    for part in result.split(separator: ",") {
+      let kv = part.split(separator: "=", maxSplits: 1)
+      if kv.count == 2 {
+        fields[String(kv[0])] = String(kv[1])
+      }
+    }
+    return fields
   }
 }

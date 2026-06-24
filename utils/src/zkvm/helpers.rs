@@ -14,6 +14,9 @@ pub fn prove<P: PreparedBenchmark, SharedState>(prepared: &P, _: &SharedState) -
     prepared.prove().expect("prove failed")
 }
 
+/// Prove a targeted benchmark.
+pub use prove as prove_targeted;
+
 /// Prove a SHA-256 benchmark
 pub use prove as prove_sha256;
 
@@ -36,6 +39,9 @@ pub fn verify_hash<V: zkVM, SharedState>(
 ) {
     prepared.verify_with_digest(proof).expect("verify failed");
 }
+
+/// Verify a targeted proof with digest checking.
+pub use verify_hash as verify_targeted;
 
 /// Verify a SHA-256 proof with digest checking.
 pub use verify_hash as verify_sha256;

@@ -113,3 +113,7 @@ path = "src/bin/hash_blake3_mem.rs"
 [[bin]]
 name = "merkle_blake3_mem_jolt"
 path = "src/bin/merkle_blake3_mem.rs"
+
+[[bin]]
+name = "compile_mobile_guests_jolt"
+path = "src/bin/compile_mobile_guests.rs"

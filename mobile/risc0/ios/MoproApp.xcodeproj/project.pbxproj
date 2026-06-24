@@ -11,27 +11,8 @@
 		2A59923A2CC77A7E00135402 /* mopro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5992362CC77A7E00135402 /* mopro.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		2A5991FD2CC7722A00135402 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2A5991E42CC7722900135402 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2A5991EB2CC7722900135402;
-			remoteInfo = MoproApp;
-		};
-		2A5992072CC7722A00135402 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2A5991E42CC7722900135402 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2A5991EB2CC7722900135402;
-			remoteInfo = MoproApp;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		2A5991EC2CC7722900135402 /* MoproApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoproApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2A5991FC2CC7722A00135402 /* MoproAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoproAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2A5992062CC7722A00135402 /* MoproAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoproAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A5992362CC77A7E00135402 /* mopro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mopro.swift; sourceTree = "<group>"; };
 		2A5992372CC77A7E00135402 /* MoproBindings.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MoproBindings.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -40,16 +21,6 @@
 		2A5991EE2CC7722900135402 /* MoproApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MoproApp;
-			sourceTree = "<group>";
-		};
-		2A5991FF2CC7722A00135402 /* MoproAppTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MoproAppTests;
-			sourceTree = "<group>";
-		};
-		2A5992092CC7722A00135402 /* MoproAppUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MoproAppUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -63,20 +34,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2A5991F92CC7722A00135402 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2A5992032CC7722A00135402 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -84,8 +41,6 @@
 			isa = PBXGroup;
 			children = (
 				2A5991EE2CC7722900135402 /* MoproApp */,
-				2A5991FF2CC7722A00135402 /* MoproAppTests */,
-				2A5992092CC7722A00135402 /* MoproAppUITests */,
 				2A5991ED2CC7722900135402 /* Products */,
 				2A5992382CC77A7E00135402 /* MoproiOSBindings */,
 			);
@@ -95,8 +50,6 @@
 			isa = PBXGroup;
 			children = (
 				2A5991EC2CC7722900135402 /* MoproApp.app */,
-				2A5991FC2CC7722A00135402 /* MoproAppTests.xctest */,
-				2A5992062CC7722A00135402 /* MoproAppUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -107,7 +60,7 @@
 				2A5992362CC77A7E00135402 /* mopro.swift */,
 				2A5992372CC77A7E00135402 /* MoproBindings.xcframework */,
 			);
-			path = MoproiOSBindings;
+			path = ../MoproiOSBindings;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -135,52 +88,6 @@
 			productReference = 2A5991EC2CC7722900135402 /* MoproApp.app */;
 			productType = "com.apple.product-type.application";
 		};
-		2A5991FB2CC7722A00135402 /* MoproAppTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2A5992132CC7722A00135402 /* Build configuration list for PBXNativeTarget "MoproAppTests" */;
-			buildPhases = (
-				2A5991F82CC7722A00135402 /* Sources */,
-				2A5991F92CC7722A00135402 /* Frameworks */,
-				2A5991FA2CC7722A00135402 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				2A5991FE2CC7722A00135402 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				2A5991FF2CC7722A00135402 /* MoproAppTests */,
-			);
-			name = MoproAppTests;
-			packageProductDependencies = (
-			);
-			productName = MoproAppTests;
-			productReference = 2A5991FC2CC7722A00135402 /* MoproAppTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		2A5992052CC7722A00135402 /* MoproAppUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2A5992162CC7722A00135402 /* Build configuration list for PBXNativeTarget "MoproAppUITests" */;
-			buildPhases = (
-				2A5992022CC7722A00135402 /* Sources */,
-				2A5992032CC7722A00135402 /* Frameworks */,
-				2A5992042CC7722A00135402 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				2A5992082CC7722A00135402 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				2A5992092CC7722A00135402 /* MoproAppUITests */,
-			);
-			name = MoproAppUITests;
-			packageProductDependencies = (
-			);
-			productName = MoproAppUITests;
-			productReference = 2A5992062CC7722A00135402 /* MoproAppUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -193,14 +100,6 @@
 				TargetAttributes = {
 					2A5991EB2CC7722900135402 = {
 						CreatedOnToolsVersion = 16.0;
-					};
-					2A5991FB2CC7722A00135402 = {
-						CreatedOnToolsVersion = 16.0;
-						TestTargetID = 2A5991EB2CC7722900135402;
-					};
-					2A5992052CC7722A00135402 = {
-						CreatedOnToolsVersion = 16.0;
-						TestTargetID = 2A5991EB2CC7722900135402;
 					};
 				};
 			};
@@ -219,28 +118,12 @@
 			projectRoot = "";
 			targets = (
 				2A5991EB2CC7722900135402 /* MoproApp */,
-				2A5991FB2CC7722A00135402 /* MoproAppTests */,
-				2A5992052CC7722A00135402 /* MoproAppUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		2A5991EA2CC7722900135402 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2A5991FA2CC7722A00135402 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2A5992042CC7722A00135402 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -258,34 +141,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2A5991F82CC7722A00135402 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2A5992022CC7722A00135402 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		2A5991FE2CC7722A00135402 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2A5991EB2CC7722900135402 /* MoproApp */;
-			targetProxy = 2A5991FD2CC7722A00135402 /* PBXContainerItemProxy */;
-		};
-		2A5992082CC7722A00135402 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2A5991EB2CC7722900135402 /* MoproApp */;
-			targetProxy = 2A5992072CC7722A00135402 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		2A59920E2CC7722A00135402 /* Debug */ = {
@@ -418,8 +274,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = N3ESL929H7;
 				ENABLE_PREVIEWS = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/MoproiOSBindings/MoproBindings.xcframework/ios-arm64-simulator/Headers/risc0_mobile";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../MoproiOSBindings/MoproBindings.xcframework/ios-arm64-simulator/Headers/risc0_mobile";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -430,7 +287,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				OTHER_SWIFT_FLAGS = "-Xcc -fmodule-map-file=$(SRCROOT)/MoproiOSBindings/MoproBindings.xcframework/ios-arm64-simulator/Headers/risc0_mobile/module.modulemap";
+				OTHER_SWIFT_FLAGS = "-Xcc -fmodule-map-file=$(SRCROOT)/../MoproiOSBindings/MoproBindings.xcframework/ios-arm64-simulator/Headers/risc0_mobile/module.modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -448,8 +305,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = N3ESL929H7;
 				ENABLE_PREVIEWS = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/MoproiOSBindings/MoproBindings.xcframework/ios-arm64-simulator/Headers/risc0_mobile";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../MoproiOSBindings/MoproBindings.xcframework/ios-arm64-simulator/Headers/risc0_mobile";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -460,80 +318,12 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				OTHER_SWIFT_FLAGS = "-Xcc -fmodule-map-file=$(SRCROOT)/MoproiOSBindings/MoproBindings.xcframework/ios-arm64-simulator/Headers/risc0_mobile/module.modulemap";
+				OTHER_SWIFT_FLAGS = "-Xcc -fmodule-map-file=$(SRCROOT)/../MoproiOSBindings/MoproBindings.xcframework/ios-arm64-simulator/Headers/risc0_mobile/module.modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		2A5992142CC7722A00135402 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproAppTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MoproApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MoproApp";
-			};
-			name = Debug;
-		};
-		2A5992152CC7722A00135402 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproAppTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MoproApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MoproApp";
-			};
-			name = Release;
-		};
-		2A5992172CC7722A00135402 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproAppUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MoproApp;
-			};
-			name = Debug;
-		};
-		2A5992182CC7722A00135402 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = mopro.MoproAppUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = MoproApp;
 			};
 			name = Release;
 		};
@@ -554,24 +344,6 @@
 			buildConfigurations = (
 				2A5992112CC7722A00135402 /* Debug */,
 				2A5992122CC7722A00135402 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		2A5992132CC7722A00135402 /* Build configuration list for PBXNativeTarget "MoproAppTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2A5992142CC7722A00135402 /* Debug */,
-				2A5992152CC7722A00135402 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		2A5992162CC7722A00135402 /* Build configuration list for PBXNativeTarget "MoproAppUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2A5992172CC7722A00135402 /* Debug */,
-				2A5992182CC7722A00135402 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
