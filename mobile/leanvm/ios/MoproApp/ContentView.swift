@@ -22,6 +22,8 @@ struct ContentView: View {
     BenchmarkOption(id: "merkle_fake", label: "merkle_fake", defaultInputSize: "4"),
     BenchmarkOption(id: "hash_poseidon16", label: "hash_poseidon16", defaultInputSize: "128"),
     BenchmarkOption(id: "merkle_poseidon16", label: "merkle_poseidon16", defaultInputSize: "4"),
+    BenchmarkOption(id: "hash_blake3", label: "hash_blake3", defaultInputSize: "128"),
+    BenchmarkOption(id: "merkle_blake3", label: "merkle_blake3", defaultInputSize: "4"),
   ]
 
   var body: some View {
@@ -87,6 +89,10 @@ extension ContentView {
         result = leanvmProveHashPoseidon16(inputSize: size)
       case "merkle_poseidon16":
         result = leanvmProveMerklePoseidon16(inputSize: size)
+      case "hash_blake3":
+        result = leanvmProveHashBlake3(inputSize: size)
+      case "merkle_blake3":
+        result = leanvmProveMerkleBlake3(inputSize: size)
       default:
         result = "error=unknown_benchmark"
       }

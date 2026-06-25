@@ -5,6 +5,8 @@ pub use error::MoproError;
 #[cfg(not(target_arch = "wasm32"))]
 mopro_ffi::app!();
 
+static BLAKE3_INLINE_INIT: std::sync::Once = std::sync::Once::new();
+
 #[derive(Clone, Copy)]
 enum JoltMobileBench {
     PrivateTx,
@@ -133,6 +135,17 @@ fn run_jolt_on_prover_thread(
         .expect("prover thread panicked")
 }
 
+fn ensure_blake3_inlines_registered() {
+    BLAKE3_INLINE_INIT.call_once(|| {
+        if let Err(error) = jolt_inlines_blake3::init_inlines() {
+            assert!(
+                error.contains("already registered"),
+                "failed to register Jolt BLAKE3 inlines: {error}"
+            );
+        }
+    });
+}
+
 fn jolt_prove_inner(
     input_size: u64,
     compiled_program_path: String,
@@ -198,12 +211,14 @@ fn jolt_prove_inner(
                 start.elapsed().as_millis()
             }
             JoltMobileBench::HashBlake3 => {
+                ensure_blake3_inlines_registered();
                 let prepared = prepare_hash_blake3(input_size as usize, &program);
                 let start = Instant::now();
                 prove_targeted(&prepared, &());
                 start.elapsed().as_millis()
             }
             JoltMobileBench::MerkleBlake3 => {
+                ensure_blake3_inlines_registered();
                 let prepared = prepare_merkle_blake3(input_size as usize, &program);
                 let start = Instant::now();
                 prove_targeted(&prepared, &());

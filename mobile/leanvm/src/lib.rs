@@ -12,6 +12,8 @@ enum LeanvmMobileBench {
     MerkleFake,
     HashPoseidon16,
     MerklePoseidon16,
+    HashBlake3,
+    MerkleBlake3,
 }
 
 /// Runs the LeanVM private-transaction benchmark and returns 10 prove samples in milliseconds.
@@ -40,6 +42,16 @@ pub fn leanvm_prove_merkle_poseidon16(input_size: u64) -> String {
     run_leanvm_on_prover_thread(input_size, LeanvmMobileBench::MerklePoseidon16)
 }
 
+#[cfg_attr(feature = "uniffi", uniffi::export)]
+pub fn leanvm_prove_hash_blake3(input_size: u64) -> String {
+    run_leanvm_on_prover_thread(input_size, LeanvmMobileBench::HashBlake3)
+}
+
+#[cfg_attr(feature = "uniffi", uniffi::export)]
+pub fn leanvm_prove_merkle_blake3(input_size: u64) -> String {
+    run_leanvm_on_prover_thread(input_size, LeanvmMobileBench::MerkleBlake3)
+}
+
 fn run_leanvm_on_prover_thread(input_size: u64, bench: LeanvmMobileBench) -> String {
     // LeanVM's WHIR prover uses deep recursion; 64 MB stack prevents overflow on iOS.
     std::thread::Builder::new()
@@ -52,10 +64,11 @@ fn run_leanvm_on_prover_thread(input_size: u64, bench: LeanvmMobileBench) -> Str
 
 fn leanvm_prove_inner(input_size: u64, bench: LeanvmMobileBench) -> String {
     use leanvm_bench::{
-        compile_constant_overhead, compile_hash_poseidon16, compile_merkle_fake,
-        compile_merkle_poseidon16, compile_private_tx, prepare_constant_overhead,
-        prepare_hash_poseidon16, prepare_merkle_fake, prepare_merkle_poseidon16,
-        prepare_private_tx, prove_lean_bench,
+        compile_constant_overhead, compile_hash_blake3, compile_hash_poseidon16,
+        compile_merkle_blake3, compile_merkle_fake, compile_merkle_poseidon16, compile_private_tx,
+        prepare_constant_overhead, prepare_hash_blake3, prepare_hash_poseidon16,
+        prepare_merkle_blake3, prepare_merkle_fake, prepare_merkle_poseidon16, prepare_private_tx,
+        prove_lean_bench,
     };
     use std::time::{Duration, Instant};
     use utils::mobile_stats::{format_prove_ms_summary, MOBILE_BREAK_SECS, MOBILE_SAMPLE_COUNT};
@@ -122,6 +135,20 @@ fn leanvm_prove_inner(input_size: u64, bench: LeanvmMobileBench) -> String {
             run_samples!(
                 "merkle_poseidon16",
                 prepare_merkle_poseidon16(input_size as usize, &bytecodes)
+            )
+        }
+        LeanvmMobileBench::HashBlake3 => {
+            let bytecodes = compile_hash_blake3();
+            run_samples!(
+                "hash_blake3",
+                prepare_hash_blake3(input_size as usize, &bytecodes)
+            )
+        }
+        LeanvmMobileBench::MerkleBlake3 => {
+            let bytecodes = compile_merkle_blake3();
+            run_samples!(
+                "merkle_blake3",
+                prepare_merkle_blake3(input_size as usize, &bytecodes)
             )
         }
     }

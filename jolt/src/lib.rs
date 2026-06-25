@@ -1,5 +1,6 @@
 use ere_jolt::{EreJolt, compiler::RustRv64imacCustomized};
 use ere_zkvm_interface::{Input, ProverResource};
+use jolt_inlines_blake3 as _;
 use serde::Serialize;
 use std::env;
 use utils::harness::{AuditStatus, BenchProperties};

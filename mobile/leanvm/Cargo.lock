@@ -41,7 +41,7 @@ dependencies = [
 [[package]]
 name = "air"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "field",
  "poly",
@@ -340,7 +340,7 @@ checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
 [[package]]
 name = "backend"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "air",
  "fiat-shamir",
@@ -350,7 +350,7 @@ dependencies = [
  "poly",
  "sumcheck",
  "symetric",
- "utils 0.1.0 (git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e)",
+ "utils 0.1.0 (git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile)",
  "whir",
  "zk-alloc",
 ]
@@ -1006,26 +1006,26 @@ dependencies = [
 [[package]]
 name = "fiat-shamir"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "field",
  "koala-bear",
  "parallel",
  "serde",
  "symetric",
- "utils 0.1.0 (git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e)",
+ "utils 0.1.0 (git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile)",
 ]
 
 [[package]]
 name = "field"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "parallel",
  "paste",
  "rand 0.10.1",
  "serde",
- "utils 0.1.0 (git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e)",
+ "utils 0.1.0 (git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile)",
 ]
 
 [[package]]
@@ -1397,13 +1397,13 @@ dependencies = [
 [[package]]
 name = "koala-bear"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "field",
  "paste",
  "rand 0.10.1",
  "serde",
- "utils 0.1.0 (git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e)",
+ "utils 0.1.0 (git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile)",
 ]
 
 [[package]]
@@ -1415,7 +1415,7 @@ checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 [[package]]
 name = "lean_compiler"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "backend",
  "include_dir",
@@ -1429,7 +1429,7 @@ dependencies = [
 [[package]]
 name = "lean_prover"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "backend",
  "lean_compiler",
@@ -1444,7 +1444,7 @@ dependencies = [
 [[package]]
 name = "lean_vm"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "backend",
  "tracing",
@@ -1659,7 +1659,7 @@ dependencies = [
 [[package]]
 name = "parallel"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "system-info",
 ]
@@ -1753,14 +1753,14 @@ checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 [[package]]
 name = "poly"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "field",
  "parallel",
  "rand 0.10.1",
  "serde",
  "system-info",
- "utils 0.1.0 (git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e)",
+ "utils 0.1.0 (git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile)",
  "zk-alloc",
 ]
 
@@ -2308,7 +2308,7 @@ dependencies = [
 [[package]]
 name = "sub_protocols"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "backend",
  "lean_vm",
@@ -2324,7 +2324,7 @@ checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 [[package]]
 name = "sumcheck"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "air",
  "fiat-shamir",
@@ -2338,7 +2338,7 @@ dependencies = [
 [[package]]
 name = "symetric"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "field",
  "koala-bear",
@@ -2371,7 +2371,7 @@ dependencies = [
 [[package]]
 name = "system-info"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "libc",
 ]
@@ -2864,7 +2864,7 @@ dependencies = [
 [[package]]
 name = "utils"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "parallel",
  "serde",
@@ -2968,7 +2968,7 @@ dependencies = [
 [[package]]
 name = "whir"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "fiat-shamir",
  "field",
@@ -2980,7 +2980,7 @@ dependencies = [
  "symetric",
  "system-info",
  "tracing",
- "utils 0.1.0 (git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e)",
+ "utils 0.1.0 (git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile)",
  "zk-alloc",
 ]
 
@@ -3101,7 +3101,7 @@ checksum = "0592e1c9d151f854e6fd382574c3a0855250e1d9b2f99d9281c6e6391af352f1"
 [[package]]
 name = "xmss"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "backend",
  "postcard",
@@ -3152,7 +3152,7 @@ dependencies = [
 [[package]]
 name = "zk-alloc"
 version = "0.1.0"
-source = "git+https://github.com/leanEthereum/leanVM.git?rev=3b246355c0128feacec4faefc8d0d46919c9714e#3b246355c0128feacec4faefc8d0d46919c9714e"
+source = "git+https://github.com/alxkzmn/leanVM.git?branch=blake3-precompile#7ec7d81c77c5f80a7ceb6271a8536e210d0d5d73"
 dependencies = [
  "libc",
  "parallel",

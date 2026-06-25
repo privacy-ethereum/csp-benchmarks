@@ -9,30 +9,6 @@ def assert_amount(amount):
     return
 
 
-@inline
-def fake_amount(branch: Const):
-    group = div_floor(branch, 4)
-    rem = branch % 4
-    if rem == 0:
-        return 70 + group
-    elif rem == 1:
-        return 50 + group
-    elif rem == 2:
-        return 80 + group
-    else:
-        return 40 + group
-
-
-@inline
-def fake_owner(branch: Const):
-    return 10000 + branch
-
-
-@inline
-def fake_sibling(branch: Const, level: Const):
-    return 1 + ((branch * 97 + level * 131) % 10000)
-
-
 def main():
     bits = Array(BRANCH_COUNT * DEPTH)
     hint_witness("merkle_fake_bits", bits)
@@ -46,11 +22,20 @@ def main():
     group_outputs: Mut = 0
 
     for branch in unroll(0, BRANCH_COUNT):
-        amount = fake_amount(branch)
-        assert_amount(amount)
-        acc: Mut = fake_owner(branch) + amount
-
+        group = div_floor(branch, 4)
         rem = branch % 4
+        amount: Mut = 0
+        if rem == 0:
+            amount = 70 + group
+        elif rem == 1:
+            amount = 50 + group
+        elif rem == 2:
+            amount = 80 + group
+        else:
+            amount = 40 + group
+        assert_amount(amount)
+        acc: Mut = 10000 + branch + amount
+
         if rem == 0:
             group_inputs += amount
         elif rem == 1:
@@ -68,7 +53,7 @@ def main():
         for level in unroll(0, DEPTH):
             bit = bits[branch * DEPTH + level]
             assert bit * (bit - 1) == 0
-            sibling = fake_sibling(branch, level)
+            sibling = 1 + ((branch * 97 + level * 131) % 10000)
             if bit == 1:
                 acc = sibling + acc
             else:

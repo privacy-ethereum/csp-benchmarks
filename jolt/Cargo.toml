@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 ere-jolt = { git = "https://github.com/eth-act/ere", rev = "6573843" }
+jolt-inlines-blake3 = { git = "https://github.com/a16z/jolt", rev = "2e05fe88", features = ["host"] }
 postcard = { version = "1.0", features = ["alloc"] }
 
 # Workspace

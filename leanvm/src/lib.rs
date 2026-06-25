@@ -9,7 +9,10 @@ use lean_prover::{
     prove_execution::{ExecutionProof, prove_execution},
     verify_execution::verify_execution,
 };
-use lean_vm::{Bytecode, ExecutionWitness, F, Hints, PUBLIC_INPUT_LEN, try_execute_bytecode};
+use lean_vm::{
+    Bytecode, ExecutionWitness, F, Hints, PUBLIC_INPUT_LEN, blake3_hash_64_u16,
+    try_execute_bytecode,
+};
 use utils::harness::{AuditStatus, BenchProperties};
 use utils::private_tx::{
     PRIVATE_TX_INPUT_COUNT, PrivateTxInput, evaluate_private_tx, generate_private_tx_case,
@@ -26,8 +29,15 @@ const CONSTANT_OVERHEAD_PROGRAM: &str = include_str!("../guest/constant_overhead
 const MERKLE_FAKE_PROGRAM: &str = include_str!("../guest/merkle_fake/main.py");
 const HASH_POSEIDON16_PROGRAM: &str = include_str!("../guest/hash_poseidon16/main.py");
 const MERKLE_POSEIDON16_PROGRAM: &str = include_str!("../guest/merkle_poseidon16/main.py");
+const HASH_BLAKE3_PROGRAM: &str = include_str!("../guest/hash_blake3/main.py");
+const MERKLE_BLAKE3_PROGRAM: &str = include_str!("../guest/merkle_blake3/main.py");
 const POSEIDON16_DIGEST_LEN: usize = 8;
 const POSEIDON16_INPUT_LEN: usize = 16;
+const BLAKE3_DIGEST_BYTES: usize = 32;
+const BLAKE3_PAIR_BYTES: usize = 64;
+const BLAKE3_DIGEST_LIMBS: usize = 16;
+const BLAKE3_PAIR_LIMBS: usize = 32;
+const BLAKE3_PUBLIC_CELLS: usize = 8;
 const LEAN_HASH_COUNTS: [usize; 2] = [128, 2048];
 const LEAN_BRANCH_COUNTS: [usize; 2] = [4, 32];
 
@@ -36,12 +46,19 @@ static PROVER_SETUP: Once = Once::new();
 pub type PrivateTxProof = ExecutionProof;
 pub type LeanProof = ExecutionProof;
 
+#[derive(Clone, Copy)]
+enum OutputEncoding {
+    I64Cells,
+    U32Cells,
+}
+
 pub struct PreparedLean<'a> {
     bytecode: &'a Bytecode,
     public_input: [F; PUBLIC_INPUT_LEN],
     witness: ExecutionWitness,
     expected_output: Vec<u8>,
     output_field_count: usize,
+    output_encoding: OutputEncoding,
 }
 
 pub type PreparedPrivateTx<'a> = PreparedLean<'a>;
@@ -117,6 +134,22 @@ pub fn compile_merkle_poseidon16() -> BTreeMap<usize, Bytecode> {
     )
 }
 
+pub fn compile_hash_blake3() -> BTreeMap<usize, Bytecode> {
+    compile_sized_programs(
+        HASH_BLAKE3_PROGRAM,
+        "HASH_COUNT_PLACEHOLDER",
+        &LEAN_HASH_COUNTS,
+    )
+}
+
+pub fn compile_merkle_blake3() -> BTreeMap<usize, Bytecode> {
+    compile_sized_programs(
+        MERKLE_BLAKE3_PROGRAM,
+        "BRANCH_COUNT_PLACEHOLDER",
+        &LEAN_BRANCH_COUNTS,
+    )
+}
+
 fn compile_sized_programs(
     template: &str,
     placeholder: &str,
@@ -144,13 +177,14 @@ pub fn prepare_constant_overhead(_input_size: usize, bytecode: &Bytecode) -> Pre
     let mut public_input = [F::ZERO; PUBLIC_INPUT_LEN];
     public_input[0] = F::from_u64(4);
     let witness = build_single_label_witness(bytecode, "constant_overhead", &[F::from_u64(2)]);
-    let expected_output = public_input_output_bytes(&public_input, 1);
+    let expected_output = public_input_output_bytes(&public_input, 1, OutputEncoding::I64Cells);
     PreparedLean {
         bytecode,
         public_input,
         witness,
         expected_output,
         output_field_count: 1,
+        output_encoding: OutputEncoding::I64Cells,
     }
 }
 
@@ -172,6 +206,7 @@ pub fn prepare_merkle_fake(
         witness,
         expected_output,
         output_field_count: 4,
+        output_encoding: OutputEncoding::I64Cells,
     }
 }
 
@@ -193,6 +228,24 @@ pub fn prepare_merkle_poseidon16(
     prepare_poseidon16_fields(bytecode, "merkle_poseidon16", witness_fields, output_fields)
 }
 
+pub fn prepare_hash_blake3(
+    hash_count: usize,
+    bytecodes: &BTreeMap<usize, Bytecode>,
+) -> PreparedLean<'_> {
+    let bytecode = sized_bytecode(bytecodes, hash_count, "hash_blake3");
+    let (witness_fields, output_fields) = blake3_hash_case(hash_count);
+    prepare_blake3_fields(bytecode, "blake3_inputs", witness_fields, output_fields)
+}
+
+pub fn prepare_merkle_blake3(
+    branch_count: usize,
+    bytecodes: &BTreeMap<usize, Bytecode>,
+) -> PreparedLean<'_> {
+    let bytecode = sized_bytecode(bytecodes, branch_count, "merkle_blake3");
+    let (witness_fields, output_fields) = blake3_merkle_case(branch_count);
+    prepare_blake3_fields(bytecode, "merkle_blake3", witness_fields, output_fields)
+}
+
 fn prepare_poseidon16_fields<'a>(
     bytecode: &'a Bytecode,
     label: &'static str,
@@ -202,13 +255,39 @@ fn prepare_poseidon16_fields<'a>(
     let mut public_input = [F::ZERO; PUBLIC_INPUT_LEN];
     public_input[..POSEIDON16_DIGEST_LEN].copy_from_slice(&output_fields);
     let witness = build_single_label_witness(bytecode, label, &witness_fields);
-    let expected_output = public_input_output_bytes(&public_input, POSEIDON16_DIGEST_LEN);
+    let expected_output = public_input_output_bytes(
+        &public_input,
+        POSEIDON16_DIGEST_LEN,
+        OutputEncoding::I64Cells,
+    );
     PreparedLean {
         bytecode,
         public_input,
         witness,
         expected_output,
         output_field_count: POSEIDON16_DIGEST_LEN,
+        output_encoding: OutputEncoding::I64Cells,
+    }
+}
+
+fn prepare_blake3_fields<'a>(
+    bytecode: &'a Bytecode,
+    label: &'static str,
+    witness_fields: Vec<F>,
+    output_fields: [F; BLAKE3_PUBLIC_CELLS],
+) -> PreparedLean<'a> {
+    let mut public_input = [F::ZERO; PUBLIC_INPUT_LEN];
+    public_input[..BLAKE3_PUBLIC_CELLS].copy_from_slice(&output_fields);
+    let witness = build_single_label_witness(bytecode, label, &witness_fields);
+    let expected_output =
+        public_input_output_bytes(&public_input, BLAKE3_PUBLIC_CELLS, OutputEncoding::U32Cells);
+    PreparedLean {
+        bytecode,
+        public_input,
+        witness,
+        expected_output,
+        output_field_count: BLAKE3_PUBLIC_CELLS,
+        output_encoding: OutputEncoding::U32Cells,
     }
 }
 
@@ -250,8 +329,11 @@ pub fn verify_lean_bench<SharedState>(
         proof.proof.clone(),
     )
     .expect("verify failed");
-    let actual_output =
-        public_input_output_bytes(&prepared.public_input, prepared.output_field_count);
+    let actual_output = public_input_output_bytes(
+        &prepared.public_input,
+        prepared.output_field_count,
+        prepared.output_encoding,
+    );
     assert_eq!(
         actual_output.as_slice(),
         prepared.expected_output(),
@@ -311,13 +393,18 @@ fn prepare_private_tx_input_unchecked<'a>(
 ) -> anyhow::Result<PreparedPrivateTx<'a>> {
     let public_input = public_input_from_claims(input)?;
     let witness = build_witness(input, bytecode)?;
-    let expected_output = public_input_output_bytes(&public_input, PRIVATE_TX_FIELD_OUTPUTS);
+    let expected_output = public_input_output_bytes(
+        &public_input,
+        PRIVATE_TX_FIELD_OUTPUTS,
+        OutputEncoding::I64Cells,
+    );
     Ok(PreparedPrivateTx {
         bytecode,
         public_input,
         witness,
         expected_output,
         output_field_count: PRIVATE_TX_FIELD_OUTPUTS,
+        output_encoding: OutputEncoding::I64Cells,
     })
 }
 
@@ -382,11 +469,28 @@ fn public_input_from_claims(input: &PrivateTxInput) -> anyhow::Result<[F; PUBLIC
     Ok(public_input)
 }
 
-fn public_input_output_bytes(public_input: &[F; PUBLIC_INPUT_LEN], field_count: usize) -> Vec<u8> {
-    let mut output = vec![0u8; field_count * 8];
+fn public_input_output_bytes(
+    public_input: &[F; PUBLIC_INPUT_LEN],
+    field_count: usize,
+    encoding: OutputEncoding,
+) -> Vec<u8> {
+    let cell_bytes = match encoding {
+        OutputEncoding::I64Cells => 8,
+        OutputEncoding::U32Cells => 4,
+    };
+    let mut output = vec![0u8; field_count * cell_bytes];
     for i in 0..field_count {
-        let value = i64::from(public_input[i].as_canonical_u32());
-        output[i * 8..(i + 1) * 8].copy_from_slice(&value.to_le_bytes());
+        let offset = i * cell_bytes;
+        match encoding {
+            OutputEncoding::I64Cells => {
+                let value = i64::from(public_input[i].as_canonical_u32());
+                output[offset..offset + cell_bytes].copy_from_slice(&value.to_le_bytes());
+            }
+            OutputEncoding::U32Cells => {
+                let value = public_input[i].as_canonical_u32();
+                output[offset..offset + cell_bytes].copy_from_slice(&value.to_le_bytes());
+            }
+        }
     }
     output
 }
@@ -476,6 +580,130 @@ fn poseidon16_merkle_case(branch_count: usize) -> (Vec<F>, [F; POSEIDON16_DIGEST
     (witness, folded)
 }
 
+fn blake3_hash_case(hash_count: usize) -> (Vec<F>, [F; BLAKE3_PUBLIC_CELLS]) {
+    let mut witness = Vec::with_capacity(hash_count * BLAKE3_PAIR_LIMBS);
+    let mut folded = [F::ZERO; BLAKE3_PUBLIC_CELLS];
+
+    for index in 0..hash_count {
+        let pair = hash_pair_input(index as u64);
+        let input_limbs = pair_bytes_to_u16_fields(&pair);
+        witness.extend_from_slice(&input_limbs);
+
+        let output = blake3_hash_64_u16(bytes_to_u32_words(&pair));
+        fold_blake3_digest(&mut folded, &output);
+    }
+
+    (witness, folded)
+}
+
+fn blake3_merkle_case(branch_count: usize) -> (Vec<F>, [F; BLAKE3_PUBLIC_CELLS]) {
+    let branch_cells = BLAKE3_DIGEST_LIMBS + MERKLE_DEPTH + MERKLE_DEPTH * BLAKE3_DIGEST_LIMBS;
+    let mut witness = Vec::with_capacity(branch_count * branch_cells);
+    let mut folded = [F::ZERO; BLAKE3_PUBLIC_CELLS];
+
+    for branch in 0..branch_count {
+        let mut acc = deterministic_digest_bytes(0x4c45_4146, branch as u64, 0);
+        witness.extend_from_slice(&digest_bytes_to_u16_fields(&acc));
+
+        let path = path_index(branch as u64);
+        for level in 0..MERKLE_DEPTH {
+            witness.push(F::from_u64((path >> level) & 1));
+        }
+
+        let mut siblings = [[0u8; BLAKE3_DIGEST_BYTES]; MERKLE_DEPTH];
+        for (level, sibling) in siblings.iter_mut().enumerate() {
+            *sibling = deterministic_digest_bytes(0x5349_424c, branch as u64, level as u64);
+            witness.extend_from_slice(&digest_bytes_to_u16_fields(sibling));
+        }
+
+        for (level, sibling) in siblings.iter().enumerate() {
+            let mut pair = [0u8; BLAKE3_PAIR_BYTES];
+            if ((path >> level) & 1) == 1 {
+                pair[..BLAKE3_DIGEST_BYTES].copy_from_slice(sibling);
+                pair[BLAKE3_DIGEST_BYTES..].copy_from_slice(&acc);
+            } else {
+                pair[..BLAKE3_DIGEST_BYTES].copy_from_slice(&acc);
+                pair[BLAKE3_DIGEST_BYTES..].copy_from_slice(sibling);
+            }
+
+            let output = blake3_hash_64_u16(bytes_to_u32_words(&pair));
+            u16_limbs_to_bytes(&output, &mut acc);
+        }
+
+        let root_limbs = digest_bytes_to_u16_limbs(&acc);
+        fold_blake3_digest(&mut folded, &root_limbs);
+    }
+
+    (witness, folded)
+}
+
+fn fold_blake3_digest(folded: &mut [F; BLAKE3_PUBLIC_CELLS], digest: &[u16; BLAKE3_DIGEST_LIMBS]) {
+    // LeanVM exposes 8 public cells, so bind each 32-byte digest as 8 field cells
+    // by folding the low/high u16 limbs of each digest word.
+    for cell in 0..BLAKE3_PUBLIC_CELLS {
+        folded[cell] = folded[cell]
+            + F::from_u16(digest[cell])
+            + F::from_u16(digest[cell + BLAKE3_PUBLIC_CELLS]);
+    }
+}
+
+fn hash_pair_input(index: u64) -> [u8; BLAKE3_PAIR_BYTES] {
+    let mut pair = [0u8; BLAKE3_PAIR_BYTES];
+    let left = deterministic_digest_bytes(0x4841_5348, index, 0);
+    let right = deterministic_digest_bytes(0x5041_4952, index, 1);
+    pair[..BLAKE3_DIGEST_BYTES].copy_from_slice(&left);
+    pair[BLAKE3_DIGEST_BYTES..].copy_from_slice(&right);
+    pair
+}
+
+fn deterministic_digest_bytes(domain: u64, index: u64, offset: u64) -> [u8; BLAKE3_DIGEST_BYTES] {
+    let mut state = domain
+        ^ index.wrapping_mul(0x9e37_79b9_7f4a_7c15)
+        ^ offset.wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    let mut out = [0u8; BLAKE3_DIGEST_BYTES];
+    for chunk in out.chunks_exact_mut(8) {
+        let word = splitmix64(&mut state);
+        chunk.copy_from_slice(&word.to_le_bytes());
+    }
+    out
+}
+
+fn pair_bytes_to_u16_fields(bytes: &[u8; BLAKE3_PAIR_BYTES]) -> Vec<F> {
+    bytes
+        .chunks_exact(2)
+        .map(|bytes| F::from_u16(u16::from_le_bytes(bytes.try_into().unwrap())))
+        .collect()
+}
+
+fn digest_bytes_to_u16_fields(bytes: &[u8; BLAKE3_DIGEST_BYTES]) -> Vec<F> {
+    digest_bytes_to_u16_limbs(bytes)
+        .into_iter()
+        .map(F::from_u16)
+        .collect()
+}
+
+fn digest_bytes_to_u16_limbs(bytes: &[u8; BLAKE3_DIGEST_BYTES]) -> [u16; BLAKE3_DIGEST_LIMBS] {
+    let mut limbs = [0u16; BLAKE3_DIGEST_LIMBS];
+    for (limb, bytes) in limbs.iter_mut().zip(bytes.chunks_exact(2)) {
+        *limb = u16::from_le_bytes(bytes.try_into().unwrap());
+    }
+    limbs
+}
+
+fn bytes_to_u32_words(bytes: &[u8; BLAKE3_PAIR_BYTES]) -> [u32; BLAKE3_PAIR_BYTES / 4] {
+    let mut words = [0u32; BLAKE3_PAIR_BYTES / 4];
+    for (word, bytes) in words.iter_mut().zip(bytes.chunks_exact(4)) {
+        *word = u32::from_le_bytes(bytes.try_into().unwrap());
+    }
+    words
+}
+
+fn u16_limbs_to_bytes(limbs: &[u16; BLAKE3_DIGEST_LIMBS], out: &mut [u8; BLAKE3_DIGEST_BYTES]) {
+    for (limb, bytes) in limbs.iter().zip(out.chunks_exact_mut(2)) {
+        bytes.copy_from_slice(&limb.to_le_bytes());
+    }
+}
+
 fn poseidon16_input(domain: u64, index: u64, offset: u64) -> [F; POSEIDON16_INPUT_LEN] {
     let mut input = [F::ZERO; POSEIDON16_INPUT_LEN];
     for (cell, value) in input.iter_mut().enumerate() {
@@ -532,8 +760,12 @@ mod tests {
 
         assert_eq!(prepared.expected_output(), expected.as_slice());
         assert_eq!(
-            public_input_output_bytes(prepared.public_input(), prepared.output_field_count())
-                .as_slice(),
+            public_input_output_bytes(
+                prepared.public_input(),
+                prepared.output_field_count(),
+                prepared.output_encoding,
+            )
+            .as_slice(),
             expected.as_slice()
         );
     }
@@ -568,7 +800,57 @@ mod tests {
 
         assert!(result.n_cycles() > 0);
         assert_eq!(
-            public_input_output_bytes(prepared.public_input(), prepared.output_field_count()),
+            public_input_output_bytes(
+                prepared.public_input(),
+                prepared.output_field_count(),
+                prepared.output_encoding,
+            ),
+            prepared.expected_output()
+        );
+    }
+
+    #[test]
+    fn blake3_hash_public_input_matches_reference() {
+        let programs = compile_hash_blake3();
+        let prepared = prepare_hash_blake3(128, &programs);
+        let result = try_execute_bytecode(
+            prepared.bytecode(),
+            prepared.public_input(),
+            prepared.witness(),
+            false,
+        )
+        .unwrap();
+
+        assert!(result.n_cycles() > 0);
+        assert_eq!(
+            public_input_output_bytes(
+                prepared.public_input(),
+                prepared.output_field_count(),
+                prepared.output_encoding,
+            ),
+            prepared.expected_output()
+        );
+    }
+
+    #[test]
+    fn blake3_merkle_public_input_matches_reference() {
+        let programs = compile_merkle_blake3();
+        let prepared = prepare_merkle_blake3(4, &programs);
+        let result = try_execute_bytecode(
+            prepared.bytecode(),
+            prepared.public_input(),
+            prepared.witness(),
+            false,
+        )
+        .unwrap();
+
+        assert!(result.n_cycles() > 0);
+        assert_eq!(
+            public_input_output_bytes(
+                prepared.public_input(),
+                prepared.output_field_count(),
+                prepared.output_encoding,
+            ),
             prepared.expected_output()
         );
     }

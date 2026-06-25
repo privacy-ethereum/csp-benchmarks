@@ -20,6 +20,7 @@ thiserror = "2.0.12"
 jolt-bench = { path = "../../jolt", package = "jolt" }
 utils = { path = "../../utils" }
 ere-jolt = { git = "https://github.com/eth-act/ere", rev = "6573843" }
+jolt-inlines-blake3 = { git = "https://github.com/a16z/jolt", rev = "2e05fe88", features = ["host"] }
 
 [patch.crates-io]
 ark-ff = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }

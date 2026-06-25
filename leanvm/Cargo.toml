@@ -8,10 +8,10 @@ anyhow = { workspace = true }
 clap = { workspace = true }
 utils = { workspace = true }
 
-lean_backend = { package = "backend", git = "https://github.com/leanEthereum/leanVM.git", rev = "3b246355c0128feacec4faefc8d0d46919c9714e" }
-lean_compiler = { git = "https://github.com/leanEthereum/leanVM.git", rev = "3b246355c0128feacec4faefc8d0d46919c9714e" }
-lean_prover = { git = "https://github.com/leanEthereum/leanVM.git", rev = "3b246355c0128feacec4faefc8d0d46919c9714e" }
-lean_vm = { git = "https://github.com/leanEthereum/leanVM.git", rev = "3b246355c0128feacec4faefc8d0d46919c9714e" }
+lean_backend = { package = "backend", git = "https://github.com/alxkzmn/leanVM.git", branch = "blake3-precompile" }
+lean_compiler = { git = "https://github.com/alxkzmn/leanVM.git", branch = "blake3-precompile" }
+lean_prover = { git = "https://github.com/alxkzmn/leanVM.git", branch = "blake3-precompile" }
+lean_vm = { git = "https://github.com/alxkzmn/leanVM.git", branch = "blake3-precompile" }
 
 [dev-dependencies]
 criterion = { workspace = true }
@@ -36,6 +36,14 @@ harness = false
 name = "merkle_poseidon16"
 harness = false
 
+[[bench]]
+name = "hash_blake3"
+harness = false
+
+[[bench]]
+name = "merkle_blake3"
+harness = false
+
 [[bin]]
 name = "private_tx_mem_leanvm"
 path = "src/bin/private_tx_mem.rs"
@@ -55,3 +63,11 @@ path = "src/bin/hash_poseidon16_mem.rs"
 [[bin]]
 name = "merkle_poseidon16_mem_leanvm"
 path = "src/bin/merkle_poseidon16_mem.rs"
+
+[[bin]]
+name = "hash_blake3_mem_leanvm"
+path = "src/bin/hash_blake3_mem.rs"
+
+[[bin]]
+name = "merkle_blake3_mem_leanvm"
+path = "src/bin/merkle_blake3_mem.rs"

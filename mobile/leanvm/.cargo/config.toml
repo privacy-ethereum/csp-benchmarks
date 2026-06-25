@@ -1,2 +1,5 @@
 [unstable]
 build-std = ["panic_abort", "std"]
+
+[env]
+IPHONEOS_DEPLOYMENT_TARGET = "15.8"
