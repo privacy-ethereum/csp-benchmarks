@@ -11,27 +11,6 @@ OUT_JSON="${SIZES_JSON:-}"
 : "${STATE_JSON:?STATE_JSON is required}"
 : "${SIZES_JSON:?SIZES_JSON is required}"
 
-# Barretenberg CRS directory
-BB_CRS_DIR="${HOME}/.bb-crs"
-
-# Clear the CRS cache directory
-bb_clear_crs() {
-  if [[ -d "$BB_CRS_DIR" ]]; then
-    rm -rf "$BB_CRS_DIR"
-    echo "Cleared CRS cache: $BB_CRS_DIR" >&2
-  fi
-}
-
-# Measure total size of CRS files in bytes
-# Returns 0 if directory doesn't exist
-bb_measure_crs_size() {
-  if [[ -d "$BB_CRS_DIR" ]]; then
-    du -sk "$BB_CRS_DIR" 2>/dev/null | awk '{print $1 * 1024}'
-  else
-    echo "0"
-  fi
-}
-
 bb_write_sizes_and_constraints() {
   # Args:
   #   $1 = target name (e.g., sha256, ecdsa)
@@ -39,13 +18,11 @@ bb_write_sizes_and_constraints() {
   #   $3 = STATE_JSON path
   #   $4 = OUT_JSON path
   #   $5 = SYSTEM_DIR (directory containing system scripts)
-  #   $6 = CRS size in bytes
   local TARGET_NAME="$1"
   local ARTIFACT_BASENAME="$2"
   local STATE_JSON_PATH="$3"
   local OUT_JSON_PATH="$4"
   local SYSTEM_DIR="$5"
-  local CRS_SIZE_BYTES="${6:-0}"
 
   local WORKSPACE_ROOT_PATH proof_path proof_size_bytes CIRCUIT_PATH circuit_size preprocessing_size_bytes
 
@@ -61,7 +38,10 @@ bb_write_sizes_and_constraints() {
 
   CIRCUIT_PATH=$(jq -r '."circuit-path"' "$STATE_JSON_PATH")
   circuit_size=$(stat -f %z "$CIRCUIT_PATH" 2>/dev/null || stat -c %s "$CIRCUIT_PATH")
-  preprocessing_size_bytes=$(( circuit_size + CRS_SIZE_BYTES ))
+  # Barretenberg builds the UltraHonk ProverInstance in RAM during bb prove.
+  # Peak RAM/prove time capture that cost; the persisted circuit-specific artifact
+  # beside the prover binary is the compiled ACIR bytecode.
+  preprocessing_size_bytes=$circuit_size
 
   local json_output
   json_output=$(jq -n \
@@ -117,7 +97,5 @@ bb_write_sizes_and_constraints() {
 
 BENCHMARK_NAME=$(jq -r '."benchmark-name"' "$STATE_JSON")
 
-bb_clear_crs
 "$SCRIPT_DIR/prove.sh" >/dev/null 2>&1 || true
-CRS_SIZE=$(bb_measure_crs_size)
-bb_write_sizes_and_constraints "$BENCHMARK_NAME" "${BENCHMARK_NAME}.json" "$STATE_JSON" "$OUT_JSON" "$SCRIPT_DIR" "$CRS_SIZE"
+bb_write_sizes_and_constraints "$BENCHMARK_NAME" "${BENCHMARK_NAME}.json" "$STATE_JSON" "$OUT_JSON" "$SCRIPT_DIR"

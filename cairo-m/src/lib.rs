@@ -1,8 +1,8 @@
 use cairo_m_common::{InputValue, Program};
-use cairo_m_compiler::{CompilerOptions, compile_cairo};
+use cairo_m_compiler::{compile_cairo, CompilerOptions};
 use cairo_m_prover::{
-    Proof, adapter::import_from_runner_output, prover::prove_cairo_m,
-    prover_config::REGULAR_96_BITS, verifier::verify_cairo_m,
+    adapter::import_from_runner_output, prover::prove_cairo_m, prover_config::REGULAR_96_BITS,
+    verifier::verify_cairo_m, Proof,
 };
 use cairo_m_runner::run_cairo_program;
 use std::fs;
@@ -20,6 +20,12 @@ pub fn compile_program() -> Program {
     let output =
         compile_cairo(source_text, source_path, options).expect("Failed to compile sha256.cm");
     (*output.program).clone()
+}
+
+pub fn program_size(program: &Program) -> usize {
+    bincode::serde::encode_to_vec(program, bincode::config::standard())
+        .expect("failed to serialize Cairo-M program")
+        .len()
 }
 
 /// Prepares a message for the Cairo-M SHA256 function by padding it and
