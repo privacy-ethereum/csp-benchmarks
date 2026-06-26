@@ -43,7 +43,7 @@ permissions:
 
 jobs:
   dispatch:
-    runs-on: macos-latest
+    runs-on: ${{ inputs['prod-run'] && 'self-hosted' || 'macos-latest' }}
     steps:
       - name: Install gh
         env:
