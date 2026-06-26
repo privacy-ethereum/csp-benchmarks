@@ -7,7 +7,7 @@ use utils::harness::ProvingSystem;
 utils::define_benchmark_harness!(
     BenchTarget::Sha256,
     ProvingSystem::Flock,
-    Some("compressions"),
+    None,
     "sha256_mem_flock",
     FLOCK_BENCH_PROPERTIES,
     |_| false,

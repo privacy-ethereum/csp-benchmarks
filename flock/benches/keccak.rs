@@ -7,7 +7,7 @@ use utils::harness::ProvingSystem;
 utils::define_benchmark_harness!(
     BenchTarget::Keccak,
     ProvingSystem::Flock,
-    Some("permutations"),
+    None,
     "keccak_mem_flock",
     FLOCK_BENCH_PROPERTIES,
     |_| false,

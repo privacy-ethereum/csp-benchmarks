@@ -9,7 +9,6 @@ bincode = { workspace = true }
 clap = { workspace = true }
 criterion = { workspace = true }
 flock-prover = { git = "https://github.com/succinctlabs/flock", rev = "73f72028161eaf5cae42c9a054fbfc3f1464fc12" }
-rand = { workspace = true }
 serde = { workspace = true }
 utils = { workspace = true }
 

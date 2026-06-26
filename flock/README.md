@@ -1,27 +1,35 @@
 # Flock Benchmarks
 
-This crate integrates Flock's SHA-256 compression and Keccak-f1600 permutation
-proof paths into the shared benchmark harness.
+This crate integrates SHA-256 and Keccak-256 full hash proof paths built on
+Flock's upstream hash cores into the shared benchmark harness.
 
-The shared harness passes the canonical byte-size values used by the other
-systems. This crate maps those byte sizes to the number of internal hash
-operations a full hash would execute, then adds one extra operation to simulate
-fixed padding and wrapper overhead:
+The shared harness passes the canonical byte size values used by the other
+systems.
 
-- SHA-256 operations: `ceil((input_size + 1 + 8) / 64) + 1`
-- Keccak-256 operations: `floor(input_size / 136) + 1 + 1`
+SHA-256 uses a full hash wrapper assembled from Flock's upstream fast batched
+compression layout: one compression per outer slot, upstream fused witness
+generation, and the upstream fixed `K_LOG`. The wrapper adds separate checks for
+SHA padding and length constants, chaining values between compressions, and
+public digest openings.
 
-The extra `+1` is a conservative over-approximation: one full core is more work
-than the true padding-specific constraint overhead, but keeps the benchmark from
-under-modeling fixed costs.
+Keccak-256 uses Flock's upstream Keccak-f1600 permutation walker, with an added
+sponge relation layer over the same fast batched core layout: one permutation
+per outer slot, upstream fused witness generation, and the upstream fixed
+`K_LOG`. The wrapper constrains capacity carryover, fixed padding bits, and the
+final padded block, then opens the packed cells in the final state that contain
+the digest. Because Flock's state layout is contiguous by lane, those public
+openings can reveal additional bits from the final state in the same cells. Flock
+is recorded as non-ZK in the benchmark metadata, so this is acceptable for these
+rows.
 
-Flock exposes these as R1CS proofs for the underlying SHA-256 compression blocks
-or Keccak-f1600 permutations. The benchmark rows are tagged as `compressions`
-for SHA-256 and `permutations` for Keccak.
+The reported `preprocessing_size` is the serialized public Flock setup artifact:
+hash kind, setup shape derived from the byte input, PCS params, statement
+digest, and the upstream `BlockR1cs` layout. For SHA-256 this includes the
+materialized sparse R1CS matrices. For Keccak-256, upstream Flock uses a
+hardcoded permutation lincheck walker with an empty R1CS matrix stub, so the
+serialized setup is smaller than a system that serializes all Keccak constraints
+as table data.
 
-Important limitation: this path proves independent cores. It does not bind the
-SHA-256 chaining value from one compression block to the next, does not bind
-Keccak sponge state across rate blocks, and exposes no public digest. These rows
-therefore measure internal core proving throughput at the byte-derived operation
-count; they should not be interpreted as proving message-to-digest soundness for
-a full hash verifier.
+The reported `num_constraints` is bit level R1CS row count over Flock's binary
+field. This is the unit Flock exposes, but it is not directly comparable to
+word level constraint counts reported by systems such as Binius64.

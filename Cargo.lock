@@ -4560,7 +4560,6 @@ dependencies = [
  "clap",
  "criterion",
  "flock-prover",
- "rand 0.8.5",
  "serde",
  "utils 0.1.0",
 ]
