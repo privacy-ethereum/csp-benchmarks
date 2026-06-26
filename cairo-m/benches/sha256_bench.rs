@@ -1,4 +1,4 @@
-use cairo_m::{compile_program, prepare, prove, verify};
+use cairo_m::{compile_program, prepare, program_size, prove, verify};
 use cairo_m_common::{InputValue, Program};
 use cairo_m_prover::{adapter::import_from_runner_output, public_data::PublicData};
 use cairo_m_runner::run_cairo_program;
@@ -31,7 +31,7 @@ utils::define_benchmark_harness!(
         prove(program, (entrypoint_name, runner_inputs))
     },
     |_, proof, _| { verify(proof) },
-    |(compiled_program, _), _| { compiled_program.len() },
+    |(compiled_program, _), _| { program_size(compiled_program) },
     |proof, _| proof.stark_proof.size_estimate(),
     |(program, (entrypoint_name, runner_inputs)): &(Program, (String, Vec<InputValue>))| {
         // Run/Execute the program
