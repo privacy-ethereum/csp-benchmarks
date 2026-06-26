@@ -1857,7 +1857,7 @@
       "verify_duration": 10759217,
       "cycles": 325276,
       "proof_size": 1085916,
-      "preprocessing_size": 492,
+      "preprocessing_size": 8017,
       "num_constraints": 0,
       "peak_memory": 2268423782,
       "uses_precompile": true
@@ -1870,7 +1870,7 @@
       "verify_duration": 9537733,
       "cycles": 57414,
       "proof_size": 1081220,
-      "preprocessing_size": 492,
+      "preprocessing_size": 8017,
       "num_constraints": 0,
       "peak_memory": 1872153804,
       "uses_precompile": true
@@ -1883,7 +1883,7 @@
       "verify_duration": 10987363,
       "cycles": 631404,
       "proof_size": 1100660,
-      "preprocessing_size": 492,
+      "preprocessing_size": 8017,
       "num_constraints": 0,
       "peak_memory": 2741025177,
       "uses_precompile": true
@@ -1896,7 +1896,7 @@
       "verify_duration": 9910167,
       "cycles": 95680,
       "proof_size": 1085384,
-      "preprocessing_size": 492,
+      "preprocessing_size": 8017,
       "num_constraints": 0,
       "peak_memory": 1908737638,
       "uses_precompile": true
@@ -1909,7 +1909,7 @@
       "verify_duration": 9948846,
       "cycles": 172212,
       "proof_size": 1101248,
-      "preprocessing_size": 492,
+      "preprocessing_size": 8017,
       "num_constraints": 0,
       "peak_memory": 2038757785,
       "uses_precompile": true
@@ -1986,7 +1986,7 @@
       "proof_duration": 990996260,
       "verify_duration": 18768292,
       "proof_size": 14656,
-      "preprocessing_size": 8392052,
+      "preprocessing_size": 3422,
       "num_constraints": 72683,
       "peak_memory": 166091161,
       "uses_precompile": true
@@ -1998,7 +1998,7 @@
       "proof_duration": 2906715934,
       "verify_duration": 18814593,
       "proof_size": 14656,
-      "preprocessing_size": 16993357,
+      "preprocessing_size": 216121,
       "num_constraints": 184993,
       "peak_memory": 442387660,
       "uses_precompile": true
@@ -2010,7 +2010,7 @@
       "proof_duration": 717834403,
       "verify_duration": 18837894,
       "proof_size": 14656,
-      "preprocessing_size": 8452402,
+      "preprocessing_size": 63774,
       "num_constraints": 40626,
       "peak_memory": 98743091,
       "uses_precompile": true
@@ -2022,7 +2022,7 @@
       "proof_duration": 6276090133,
       "verify_duration": 18874576,
       "proof_size": 14656,
-      "preprocessing_size": 33937238,
+      "preprocessing_size": 382786,
       "num_constraints": 366841,
       "peak_memory": 867056025,
       "uses_precompile": true
@@ -2034,7 +2034,7 @@
       "proof_duration": 896008233,
       "verify_duration": 18821457,
       "proof_size": 14656,
-      "preprocessing_size": 8474226,
+      "preprocessing_size": 85598,
       "num_constraints": 48607,
       "peak_memory": 133201920,
       "uses_precompile": true
@@ -2046,7 +2046,7 @@
       "proof_duration": 1528731475,
       "verify_duration": 18796342,
       "proof_size": 14656,
-      "preprocessing_size": 8518211,
+      "preprocessing_size": 129583,
       "num_constraints": 94070,
       "peak_memory": 227449241,
       "uses_precompile": true
@@ -2058,7 +2058,7 @@
       "proof_duration": 171517890,
       "verify_duration": 18561029,
       "proof_size": 14656,
-      "preprocessing_size": 8410288,
+      "preprocessing_size": 21660,
       "num_constraints": 338,
       "peak_memory": 92987392,
       "uses_precompile": true
@@ -2070,7 +2070,7 @@
       "proof_duration": 173734262,
       "verify_duration": 18515414,
       "proof_size": 14656,
-      "preprocessing_size": 8410436,
+      "preprocessing_size": 21808,
       "num_constraints": 488,
       "peak_memory": 91894579,
       "uses_precompile": true
@@ -2082,7 +2082,7 @@
       "proof_duration": 158937956,
       "verify_duration": 18533779,
       "proof_size": 14656,
-      "preprocessing_size": 8410040,
+      "preprocessing_size": 21412,
       "num_constraints": 111,
       "peak_memory": 91455488,
       "uses_precompile": true
@@ -2094,7 +2094,7 @@
       "proof_duration": 162789540,
       "verify_duration": 18518010,
       "proof_size": 14656,
-      "preprocessing_size": 8410129,
+      "preprocessing_size": 21501,
       "num_constraints": 184,
       "peak_memory": 92985753,
       "uses_precompile": true
@@ -2106,7 +2106,7 @@
       "proof_duration": 169257249,
       "verify_duration": 18556067,
       "proof_size": 14656,
-      "preprocessing_size": 8410237,
+      "preprocessing_size": 21609,
       "num_constraints": 261,
       "peak_memory": 94104780,
       "uses_precompile": true
@@ -2118,7 +2118,7 @@
       "proof_duration": 379657604,
       "verify_duration": 18597312,
       "proof_size": 14656,
-      "preprocessing_size": 8572923,
+      "preprocessing_size": 184299,
       "num_constraints": 2263,
       "peak_memory": 92823552,
       "uses_precompile": true
@@ -2130,7 +2130,7 @@
       "proof_duration": 446387444,
       "verify_duration": 18583025,
       "proof_size": 14656,
-      "preprocessing_size": 8626103,
+      "preprocessing_size": 237479,
       "num_constraints": 2932,
       "peak_memory": 93693542,
       "uses_precompile": true
@@ -2142,7 +2142,7 @@
       "proof_duration": 229114278,
       "verify_duration": 18585441,
       "proof_size": 14656,
-      "preprocessing_size": 8470743,
+      "preprocessing_size": 82119,
       "num_constraints": 963,
       "peak_memory": 94479974,
       "uses_precompile": true
@@ -2154,7 +2154,7 @@
       "proof_duration": 260511906,
       "verify_duration": 18600573,
       "proof_size": 14656,
-      "preprocessing_size": 8488410,
+      "preprocessing_size": 99786,
       "num_constraints": 1216,
       "peak_memory": 96837632,
       "uses_precompile": true
@@ -2166,7 +2166,7 @@
       "proof_duration": 303124323,
       "verify_duration": 18622638,
       "proof_size": 14656,
-      "preprocessing_size": 8527372,
+      "preprocessing_size": 138748,
       "num_constraints": 1684,
       "peak_memory": 92466380,
       "uses_precompile": true
@@ -2178,7 +2178,7 @@
       "proof_duration": 1171433097,
       "verify_duration": 18793018,
       "proof_size": 14656,
-      "preprocessing_size": 8616446,
+      "preprocessing_size": 227818,
       "num_constraints": 82895,
       "peak_memory": 218665779,
       "uses_precompile": true
@@ -2190,7 +2190,7 @@
       "proof_duration": 610259803,
       "verify_duration": 18910951,
       "proof_size": 14656,
-      "preprocessing_size": 8468797,
+      "preprocessing_size": 80169,
       "num_constraints": 36000,
       "peak_memory": 90962329,
       "uses_precompile": true
@@ -2202,7 +2202,7 @@
       "proof_duration": 2013044855,
       "verify_duration": 18839084,
       "proof_size": 14656,
-      "preprocessing_size": 17307090,
+      "preprocessing_size": 529854,
       "num_constraints": 153803,
       "peak_memory": 415814451,
       "uses_precompile": true
@@ -2214,7 +2214,7 @@
       "proof_duration": 656427972,
       "verify_duration": 18863741,
       "proof_size": 14656,
-      "preprocessing_size": 8483072,
+      "preprocessing_size": 94444,
       "num_constraints": 36000,
       "peak_memory": 104395571,
       "uses_precompile": true
@@ -2226,7 +2226,7 @@
       "proof_duration": 743285288,
       "verify_duration": 18768438,
       "proof_size": 14656,
-      "preprocessing_size": 8519733,
+      "preprocessing_size": 131105,
       "num_constraints": 47441,
       "peak_memory": 129042022,
       "uses_precompile": true
