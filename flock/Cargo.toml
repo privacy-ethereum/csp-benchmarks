@@ -1,0 +1,30 @@
+[package]
+name = "flock"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = { workspace = true }
+bincode = { workspace = true }
+clap = { workspace = true }
+criterion = { workspace = true }
+flock-prover = { git = "https://github.com/succinctlabs/flock", rev = "73f72028161eaf5cae42c9a054fbfc3f1464fc12" }
+rand = { workspace = true }
+serde = { workspace = true }
+utils = { workspace = true }
+
+[[bench]]
+name = "sha256"
+harness = false
+
+[[bench]]
+name = "keccak"
+harness = false
+
+[[bin]]
+name = "sha256_mem_flock"
+path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "keccak_mem_flock"
+path = "src/bin/keccak_mem.rs"
