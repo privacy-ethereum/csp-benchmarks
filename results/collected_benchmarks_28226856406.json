@@ -1,0 +1,147 @@
+{
+  "metadata": {
+    "timestamp": "2026-06-26T08:34:15.720337+00:00",
+    "commit_sha": "1c2b715d944e0b07c279c25a1dd467ace2f5b72c",
+    "workflow_run_url": "https://github.com/privacy-ethereum/csp-benchmarks/actions/runs/28226856406",
+    "artifact_urls": [
+      "https://github.com/privacy-ethereum/csp-benchmarks/actions/runs/28162488793"
+    ]
+  },
+  "systems": {
+    "binius64": {
+      "proving_system": "Binius64",
+      "field_curve": "GHASH binary field",
+      "iop": "Binius64 + Spartan",
+      "pcs": "BaseFold",
+      "arithm": "Binius64",
+      "is_zk": true,
+      "is_zkvm": false,
+      "security_bits": 96,
+      "is_pq": true,
+      "is_maintained": true,
+      "is_audited": "not_audited"
+    }
+  },
+  "measurements": [
+    {
+      "system": "binius64",
+      "target": "keccak",
+      "input_size": 1024,
+      "proof_duration": 49763232,
+      "verify_duration": 42267283,
+      "proof_size": 402256,
+      "preprocessing_size": 596296,
+      "num_constraints": 6914,
+      "peak_memory": 154433945,
+      "uses_precompile": false
+    },
+    {
+      "system": "binius64",
+      "target": "keccak",
+      "input_size": 128,
+      "proof_duration": 42307489,
+      "verify_duration": 29276541,
+      "proof_size": 379792,
+      "preprocessing_size": 73499,
+      "num_constraints": 862,
+      "peak_memory": 127834521,
+      "uses_precompile": false
+    },
+    {
+      "system": "binius64",
+      "target": "keccak",
+      "input_size": 2048,
+      "proof_duration": 54651697,
+      "verify_duration": 48423818,
+      "proof_size": 409744,
+      "preprocessing_size": 1191181,
+      "num_constraints": 13765,
+      "peak_memory": 168824012,
+      "uses_precompile": false
+    },
+    {
+      "system": "binius64",
+      "target": "keccak",
+      "input_size": 256,
+      "proof_duration": 44550412,
+      "verify_duration": 34807627,
+      "proof_size": 387280,
+      "preprocessing_size": 148786,
+      "num_constraints": 1742,
+      "peak_memory": 135058227,
+      "uses_precompile": false
+    },
+    {
+      "system": "binius64",
+      "target": "keccak",
+      "input_size": 512,
+      "proof_duration": 47217128,
+      "verify_duration": 37296123,
+      "proof_size": 394768,
+      "preprocessing_size": 298315,
+      "num_constraints": 3475,
+      "peak_memory": 143920332,
+      "uses_precompile": false
+    },
+    {
+      "system": "binius64",
+      "target": "sha256",
+      "input_size": 1024,
+      "proof_duration": 58673061,
+      "verify_duration": 49711661,
+      "proof_size": 417232,
+      "preprocessing_size": 2030202,
+      "num_constraints": 16946,
+      "peak_memory": 203359846,
+      "uses_precompile": false
+    },
+    {
+      "system": "binius64",
+      "target": "sha256",
+      "input_size": 128,
+      "proof_duration": 46475476,
+      "verify_duration": 38009989,
+      "proof_size": 394768,
+      "preprocessing_size": 357361,
+      "num_constraints": 2997,
+      "peak_memory": 142658764,
+      "uses_precompile": false
+    },
+    {
+      "system": "binius64",
+      "target": "sha256",
+      "input_size": 2048,
+      "proof_duration": 67297351,
+      "verify_duration": 59230433,
+      "proof_size": 424720,
+      "preprocessing_size": 3941080,
+      "num_constraints": 32870,
+      "peak_memory": 260415488,
+      "uses_precompile": false
+    },
+    {
+      "system": "binius64",
+      "target": "sha256",
+      "input_size": 256,
+      "proof_duration": 49274158,
+      "verify_duration": 40658266,
+      "proof_size": 402256,
+      "preprocessing_size": 596948,
+      "num_constraints": 4994,
+      "peak_memory": 152520294,
+      "uses_precompile": false
+    },
+    {
+      "system": "binius64",
+      "target": "sha256",
+      "input_size": 512,
+      "proof_duration": 52554960,
+      "verify_duration": 44717963,
+      "proof_size": 409744,
+      "preprocessing_size": 1074213,
+      "num_constraints": 8981,
+      "peak_memory": 168289894,
+      "uses_precompile": false
+    }
+  ]
+}
