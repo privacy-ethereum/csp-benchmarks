@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/check-rust-fmt-stop.sh\"",
+            "timeout": 120,
+            "statusMessage": "Checking Rust formatting before Codex stops"
+          }
+        ]
+      }
+    ]
+  }
+}
