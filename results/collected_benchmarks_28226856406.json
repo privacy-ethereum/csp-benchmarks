@@ -10,7 +10,7 @@
   "systems": {
     "binius64": {
       "proving_system": "Binius64",
-      "field_curve": "GHASH binary field",
+      "field_curve": "F2^128",
       "iop": "Binius64 + Spartan",
       "pcs": "BaseFold",
       "arithm": "Binius64",
