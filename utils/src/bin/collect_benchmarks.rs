@@ -372,7 +372,7 @@ mod tests {
     fn test_collected_benchmarks_structure() {
         let props = BenchProperties {
             proving_system: Cow::Owned("Binius64".into()),
-            field_curve: Cow::Owned("GHASH binary field".into()),
+            field_curve: Cow::Owned("F2^128".into()),
             iop: Cow::Owned("Binius64 + Spartan".into()),
             pcs: Some(Cow::Owned("BaseFold".into())),
             arithm: Cow::Owned("Binius64".into()),

@@ -19,7 +19,7 @@ pub mod circuits;
 
 pub const BINIUS64_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     proving_system: Cow::Borrowed("Binius64"),
-    field_curve: Cow::Borrowed("GHASH binary field"), // https://www.binius.xyz/basics/binius64-vs-v0
+    field_curve: Cow::Borrowed("F2^128"),
     iop: Cow::Borrowed("Binius64 + Spartan"),
     pcs: Some(Cow::Borrowed("BaseFold")),
     arithm: Cow::Borrowed("Binius64"),
@@ -27,7 +27,7 @@ pub const BINIUS64_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     is_zkvm: false,
     // Upstream Binius and Spartan ZK verifier paths both set SECURITY_BITS = 96.
     security_bits: 96,
-    is_pq: true, // BaseFold/FRI with hash-based Merkle commitments.
+    is_pq: true, // BaseFold with hash-based Merkle commitments.
     is_maintained: true,
     is_audited: AuditStatus::NotAudited,
     isa: None,
