@@ -13,7 +13,7 @@ utils::define_benchmark_harness!(
     None,
     "keccak_mem_jolt",
     jolt_bench_properties(),
-    |_| true,
+    |_| Some(utils::bench::Acceleration::Inline),
     { load_or_compile_program(&RustRv64imacCustomized, KECCAK_BENCH) },
     prepare_keccak,
     |_, _| 0,

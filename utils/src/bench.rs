@@ -15,6 +15,22 @@ use std::{
 };
 use tabled::{Table, Tabled, settings::Style};
 
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum Acceleration {
+    Precompile,
+    Inline,
+}
+
+impl Display for Acceleration {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Precompile => f.write_str("precompile"),
+            Self::Inline => f.write_str("inline"),
+        }
+    }
+}
+
 fn get_current_memory_usage() -> Result<usize, std::io::Error> {
     unsafe {
         let mut self_usage: libc::rusage = std::mem::zeroed();
@@ -88,8 +104,8 @@ pub struct Metrics {
     pub num_constraints: usize,
     #[tabled(display_with = "display_bytes")]
     pub peak_memory: usize,
-    #[serde(default)]
-    pub uses_precompile: bool,
+    #[tabled(display_with = "display_acceleration")]
+    pub acceleration: Option<Acceleration>,
     #[serde(flatten)]
     #[tabled(skip)]
     pub bench_properties: BenchProperties,
@@ -117,6 +133,12 @@ fn display_cycles(cycles: &Option<u64>) -> String {
     }
 }
 
+fn display_acceleration(acceleration: &Option<Acceleration>) -> String {
+    acceleration
+        .map(|acceleration| acceleration.to_string())
+        .unwrap_or_else(|| "-".to_string())
+}
+
 impl Metrics {
     pub fn new(
         name: String,
@@ -137,7 +159,7 @@ impl Metrics {
             preprocessing_size: 0,
             num_constraints: 0,
             peak_memory: 0,
-            uses_precompile: false,
+            acceleration: None,
             bench_properties,
         }
     }
@@ -175,7 +197,7 @@ pub fn write_csv(out_path: &str, results: &[Metrics]) {
     println!("{table}");
 }
 
-fn metrics_filename(target: &str, size: usize, system: &str, feat: Option<&str>) -> String {
+pub fn metrics_filename(target: &str, size: usize, system: &str, feat: Option<&str>) -> String {
     match feat {
         Some(f) if !f.is_empty() => format!("{}_{}_{}_{}_metrics.json", target, size, system, f),
         _ => format!("{}_{}_{}_metrics.json", target, size, system),
@@ -222,7 +244,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn metrics_without_uses_precompile_deserialize_as_false() {
+    fn metrics_without_acceleration_deserialize_as_none() {
         let json = r#"{
             "name": "example",
             "target": "sha256",
@@ -247,7 +269,21 @@ mod tests {
 
         let metrics: Metrics = serde_json::from_str(json).unwrap();
 
-        assert!(!metrics.uses_precompile);
+        assert_eq!(metrics.acceleration, None);
+    }
+
+    #[test]
+    fn acceleration_variants_serialize_as_json_enum_values() {
+        assert_eq!(
+            serde_json::to_string(&Acceleration::Precompile).unwrap(),
+            r#""precompile""#
+        );
+        assert_eq!(Acceleration::Precompile.to_string(), "precompile");
+        assert_eq!(
+            serde_json::to_string(&Acceleration::Inline).unwrap(),
+            r#""inline""#
+        );
+        assert_eq!(Acceleration::Inline.to_string(), "inline");
     }
 }
 

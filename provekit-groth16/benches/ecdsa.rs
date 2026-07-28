@@ -7,10 +7,10 @@ use utils::harness::ProvingSystem;
 utils::define_benchmark_harness!(
     BenchTarget::Ecdsa,
     ProvingSystem::ProvekitGroth16,
-    None,
+    Some("secp256r1"),
     "ecdsa_mem_provekit_groth16",
     PROVEKIT_GROTH16_PROPS,
-    |_| false,
+    |_| None,
     prepare_ecdsa,
     |prepared| { num_constraints(prepared) },
     |prepared| { prove(prepared) },

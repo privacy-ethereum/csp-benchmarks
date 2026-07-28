@@ -12,7 +12,7 @@ utils::define_benchmark_harness!(
     None,
     "keccak_mem_binius64",
     BINIUS64_BENCH_PROPERTIES,
-    |_| false,
+    |_| None,
     |input_size| {
         prepare::<KeccakCircuit>(
             input_size,

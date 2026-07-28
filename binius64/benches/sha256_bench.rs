@@ -11,7 +11,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_binius64",
     BINIUS64_BENCH_PROPERTIES,
-    |_| false,
+    |_| None,
     |input_size| {
         prepare::<Sha256Circuit>(
             input_size,

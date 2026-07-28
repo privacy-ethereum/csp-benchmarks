@@ -3,11 +3,11 @@ use glob::glob;
 use serde::Serialize;
 use serde_json::Value;
 use serde_with::{DurationNanoSeconds, serde_as, skip_serializing_none};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, btree_map::Entry};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use std::{env, fs, io};
-use utils::bench::Metrics;
+use utils::bench::{Acceleration, Metrics};
 use utils::harness::BenchProperties;
 
 /// Top-level output structure for collected benchmark results.
@@ -34,6 +34,7 @@ struct Metadata {
 #[derive(Serialize)]
 struct Measurement {
     system: String,
+    feat: Option<String>,
     target: String,
     input_size: usize,
     #[serde_as(as = "DurationNanoSeconds")]
@@ -45,15 +46,7 @@ struct Measurement {
     preprocessing_size: usize,
     num_constraints: usize,
     peak_memory: usize,
-    uses_precompile: bool,
-}
-
-/// Compute the unique system key from a metrics entry.
-fn system_key(name: &str, feat: &Option<String>) -> String {
-    match feat {
-        Some(f) if !f.is_empty() => format!("{}_{}", name, f),
-        _ => name.to_string(),
-    }
+    acceleration: Option<Acceleration>,
 }
 
 /// Build [`Metadata`] from environment variables, if available.
@@ -71,6 +64,43 @@ fn build_metadata() -> Metadata {
         workflow_run_url,
         artifact_urls,
     }
+}
+
+fn collect_metrics(
+    all_metrics: Vec<Metrics>,
+) -> io::Result<(BTreeMap<String, BenchProperties>, Vec<Measurement>)> {
+    let mut systems = BTreeMap::new();
+    let mut measurements = Vec::new();
+    for m in all_metrics {
+        let key = m.name.clone();
+        match systems.entry(key.clone()) {
+            Entry::Vacant(entry) => {
+                entry.insert(m.bench_properties.clone());
+            }
+            Entry::Occupied(entry) if entry.get() != &m.bench_properties => {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    format!("conflicting benchmark properties for system '{key}'"),
+                ));
+            }
+            Entry::Occupied(_) => {}
+        }
+        measurements.push(Measurement {
+            system: key,
+            feat: m.feat,
+            target: m.target,
+            input_size: m.input_size,
+            proof_duration: m.proof_duration,
+            verify_duration: m.verify_duration,
+            cycles: m.cycles,
+            proof_size: m.proof_size,
+            preprocessing_size: m.preprocessing_size,
+            num_constraints: m.num_constraints,
+            peak_memory: m.peak_memory,
+            acceleration: m.acceleration,
+        });
+    }
+    Ok((systems, measurements))
 }
 
 /// Collect all JSON files in subdirectories of the workspace directory
@@ -104,25 +134,7 @@ fn main() -> io::Result<()> {
         }
     }
 
-    let mut systems = BTreeMap::new();
-    let mut measurements = Vec::new();
-    for m in all_metrics {
-        let key = system_key(&m.name, &m.feat);
-        systems.entry(key.clone()).or_insert(m.bench_properties);
-        measurements.push(Measurement {
-            system: key,
-            target: m.target,
-            input_size: m.input_size,
-            proof_duration: m.proof_duration,
-            verify_duration: m.verify_duration,
-            cycles: m.cycles,
-            proof_size: m.proof_size,
-            preprocessing_size: m.preprocessing_size,
-            num_constraints: m.num_constraints,
-            peak_memory: m.peak_memory,
-            uses_precompile: m.uses_precompile,
-        });
-    }
+    let (systems, measurements) = collect_metrics(all_metrics)?;
 
     let collected = CollectedBenchmarks {
         metadata: build_metadata(),
@@ -351,24 +363,6 @@ mod tests {
     use utils::harness::AuditStatus;
 
     #[test]
-    fn test_system_key_no_feat() {
-        assert_eq!(system_key("binius64", &None), "binius64");
-    }
-
-    #[test]
-    fn test_system_key_empty_feat() {
-        assert_eq!(system_key("binius64", &Some(String::new())), "binius64");
-    }
-
-    #[test]
-    fn test_system_key_with_feat() {
-        assert_eq!(
-            system_key("circom", &Some("groth16".to_string())),
-            "circom_groth16"
-        );
-    }
-
-    #[test]
     fn test_collected_benchmarks_structure() {
         let props = BenchProperties {
             proving_system: Cow::Owned("Binius64".into()),
@@ -385,22 +379,22 @@ mod tests {
             isa: None,
         };
 
-        let mut systems = BTreeMap::new();
-        systems.insert("binius64".to_string(), props);
+        let mut metric = Metrics::new(
+            "binius64".to_string(),
+            Some("example-feature".to_string()),
+            "sha256".to_string(),
+            128,
+            props,
+        );
+        metric.proof_duration = Duration::from_nanos(12345000);
+        metric.verify_duration = Duration::from_nanos(6789000);
+        metric.proof_size = 1024;
+        metric.preprocessing_size = 2048;
+        metric.num_constraints = 5000;
+        metric.peak_memory = 100000;
+        metric.acceleration = Some(Acceleration::Precompile);
 
-        let measurements = vec![Measurement {
-            system: "binius64".to_string(),
-            target: "sha256".to_string(),
-            input_size: 128,
-            proof_duration: Duration::from_nanos(12345000),
-            verify_duration: Duration::from_nanos(6789000),
-            cycles: None,
-            proof_size: 1024,
-            preprocessing_size: 2048,
-            num_constraints: 5000,
-            peak_memory: 100000,
-            uses_precompile: true,
-        }];
+        let (systems, measurements) = collect_metrics(vec![metric]).unwrap();
 
         let collected = CollectedBenchmarks {
             metadata: Metadata {
@@ -430,11 +424,12 @@ mod tests {
         let measurements = parsed["measurements"].as_array().unwrap();
         assert_eq!(measurements.len(), 1);
         assert_eq!(measurements[0]["system"], "binius64");
+        assert_eq!(measurements[0]["feat"], "example-feature");
         assert_eq!(measurements[0]["target"], "sha256");
         assert_eq!(measurements[0]["input_size"], 128);
         assert_eq!(measurements[0]["proof_duration"], 12345000);
         assert_eq!(measurements[0]["verify_duration"], 6789000);
-        assert_eq!(measurements[0]["uses_precompile"], true);
+        assert_eq!(measurements[0]["acceleration"], "precompile");
 
         // Verify system properties are NOT in measurements
         assert!(measurements[0].get("proving_system").is_none());
@@ -443,6 +438,34 @@ mod tests {
 
         // Verify cycles is not serialized when None
         assert!(measurements[0].get("cycles").is_none());
+    }
+
+    #[test]
+    fn conflicting_properties_for_the_same_system_fail_collection() {
+        let first = Metrics::new(
+            "example".to_string(),
+            Some("first-feature".to_string()),
+            "sha256".to_string(),
+            128,
+            BenchProperties::default(),
+        );
+        let mut conflicting_properties = BenchProperties::default();
+        conflicting_properties.security_bits = 128;
+        let second = Metrics::new(
+            "example".to_string(),
+            Some("second-feature".to_string()),
+            "sha256".to_string(),
+            128,
+            conflicting_properties,
+        );
+
+        let error = collect_metrics(vec![first, second]).err().unwrap();
+
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+        assert_eq!(
+            error.to_string(),
+            "conflicting benchmark properties for system 'example'"
+        );
     }
 
     #[test]

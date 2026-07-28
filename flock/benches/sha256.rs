@@ -10,7 +10,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_flock",
     FLOCK_BENCH_PROPERTIES,
-    |_| false,
+    |_| None,
     prepare_sha256,
     num_constraints_sha256,
     prove_sha256,

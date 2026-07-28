@@ -10,10 +10,10 @@ use utils::zkvm::helpers::load_or_compile_program;
 utils::define_benchmark_harness!(
     BenchTarget::Ecdsa,
     ProvingSystem::Miden,
-    None,
+    Some("secp256k1"),
     "ecdsa_mem_miden",
     miden_bench_properties(),
-    |_| true,
+    |_| Some(utils::bench::Acceleration::Precompile),
     { load_or_compile_program(&MidenAsm, ECDSA_BENCH) },
     |size, prog| prepare_ecdsa(size, prog).expect("prepare_ecdsa"),
     |_, _| 0,

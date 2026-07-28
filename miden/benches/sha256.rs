@@ -13,7 +13,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_miden",
     miden_bench_properties(),
-    |_| false,
+    |_| None,
     { load_or_compile_program(&MidenAsm, SHA256_BENCH) },
     prepare_sha256,
     |_, _| 0,

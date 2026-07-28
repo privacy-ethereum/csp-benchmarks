@@ -32,8 +32,7 @@
       "proof_size": 516644,
       "preprocessing_size": 2097337,
       "num_constraints": 340480,
-      "peak_memory": 23701094,
-      "uses_precompile": false
+      "peak_memory": 23701094
     },
     {
       "system": "flock",
@@ -44,8 +43,7 @@
       "proof_size": 514772,
       "preprocessing_size": 2097337,
       "num_constraints": 340480,
-      "peak_memory": 23509401,
-      "uses_precompile": false
+      "peak_memory": 23509401
     },
     {
       "system": "flock",
@@ -56,8 +54,7 @@
       "proof_size": 530308,
       "preprocessing_size": 2097337,
       "num_constraints": 680960,
-      "peak_memory": 27585740,
-      "uses_precompile": false
+      "peak_memory": 27585740
     },
     {
       "system": "flock",
@@ -68,8 +65,7 @@
       "proof_size": 515220,
       "preprocessing_size": 2097337,
       "num_constraints": 340480,
-      "peak_memory": 23609344,
-      "uses_precompile": false
+      "peak_memory": 23609344
     },
     {
       "system": "flock",
@@ -80,8 +76,7 @@
       "proof_size": 515652,
       "preprocessing_size": 2097337,
       "num_constraints": 340480,
-      "peak_memory": 23612620,
-      "uses_precompile": false
+      "peak_memory": 23612620
     },
     {
       "system": "flock",
@@ -92,8 +87,7 @@
       "proof_size": 526484,
       "preprocessing_size": 11442425,
       "num_constraints": 1004832,
-      "peak_memory": 53410201,
-      "uses_precompile": false
+      "peak_memory": 53410201
     },
     {
       "system": "flock",
@@ -104,8 +98,7 @@
       "proof_size": 389876,
       "preprocessing_size": 11442425,
       "num_constraints": 251208,
-      "peak_memory": 47510323,
-      "uses_precompile": false
+      "peak_memory": 47510323
     },
     {
       "system": "flock",
@@ -116,8 +109,7 @@
       "proof_size": 538036,
       "preprocessing_size": 11442425,
       "num_constraints": 2009664,
-      "peak_memory": 53533081,
-      "uses_precompile": false
+      "peak_memory": 53533081
     },
     {
       "system": "flock",
@@ -128,8 +120,7 @@
       "proof_size": 389844,
       "preprocessing_size": 11442425,
       "num_constraints": 251208,
-      "peak_memory": 47484108,
-      "uses_precompile": false
+      "peak_memory": 47484108
     },
     {
       "system": "flock",
@@ -140,8 +131,7 @@
       "proof_size": 514964,
       "preprocessing_size": 11442425,
       "num_constraints": 502416,
-      "peak_memory": 49831936,
-      "uses_precompile": false
+      "peak_memory": 49831936
     }
   ]
 }

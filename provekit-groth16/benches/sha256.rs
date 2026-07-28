@@ -10,7 +10,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_provekit_groth16",
     PROVEKIT_GROTH16_PROPS,
-    |_| true,
+    |_| Some(utils::bench::Acceleration::Precompile),
     prepare_sha256,
     |prepared| { num_constraints(prepared) },
     |prepared| { prove(prepared) },

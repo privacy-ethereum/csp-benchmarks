@@ -7,7 +7,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_provekit",
     PROVEKIT_PROPS,
-    |_| true,
+    |_| Some(utils::bench::Acceleration::Precompile),
     prepare_sha256,
     |(proof_scheme, _, _)| { proof_scheme.r1cs().num_constraints() },
     |(proof_scheme, toml_path, _)| { prove(proof_scheme, toml_path) },

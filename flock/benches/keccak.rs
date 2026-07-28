@@ -10,7 +10,7 @@ utils::define_benchmark_harness!(
     None,
     "keccak_mem_flock",
     FLOCK_BENCH_PROPERTIES,
-    |_| false,
+    |_| None,
     prepare_keccak,
     num_constraints_keccak,
     prove_keccak,

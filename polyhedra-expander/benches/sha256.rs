@@ -9,7 +9,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_expander",
     EXPANDER_BENCH_PROPERTIES,
-    |_| false,
+    |_| None,
     {
         let universe = MPIConfig::init().expect("Failed to initialize MPI");
         let world = universe.world();
