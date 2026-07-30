@@ -11807,9 +11807,9 @@ dependencies = [
 
 [[package]]
 name = "rust-rapidsnark"
-version = "0.1.3"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17fc46ed31873e6fbc16e2ca37f1b26458ef3f2e72fef8ddf6f166af889a5baa"
+checksum = "355c2f67dcea0b10be06f7acf90fdf7fabcc57e65afa53c931ade15b9b426449"
 dependencies = [
  "anyhow",
  "cc",
