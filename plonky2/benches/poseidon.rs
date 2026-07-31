@@ -13,7 +13,7 @@ utils::define_benchmark_harness!(
     None,
     "poseidon_mem_plonky2",
     PLONKY2_BENCH_PROPERTIES,
-    |_| true,
+    |_| Some(utils::bench::Acceleration::Precompile),
     poseidon_prepare,
     |(_, _, n_gates)| *n_gates,
     |(circuit_data, pw, _)| { prove(circuit_data, pw.clone()) },

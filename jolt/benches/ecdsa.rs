@@ -10,10 +10,10 @@ use utils::zkvm::helpers::load_or_compile_program;
 utils::define_benchmark_harness!(
     BenchTarget::Ecdsa,
     ProvingSystem::Jolt,
-    None,
+    Some("secp256k1"),
     "ecdsa_mem_jolt",
     jolt_bench_properties(),
-    |_| true,
+    |_| Some(utils::bench::Acceleration::Inline),
     { load_or_compile_program(&RustRv64imacCustomized, ECDSA_BENCH) },
     prepare_ecdsa,
     |_, _| 0,

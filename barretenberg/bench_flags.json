@@ -1,9 +1,12 @@
 {
-  "uses_precompile": {
-    "sha256": true,
-    "keccak": true,
-    "ecdsa": true,
-    "poseidon": true,
-    "poseidon2": true
+  "feat": {
+    "ecdsa": "secp256r1"
+  },
+  "acceleration": {
+    "sha256": "precompile",
+    "keccak": "precompile",
+    "ecdsa": "precompile",
+    "poseidon": "precompile",
+    "poseidon2": "precompile"
   }
 }

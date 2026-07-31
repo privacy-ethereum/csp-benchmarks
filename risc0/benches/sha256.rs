@@ -13,7 +13,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_risc0",
     risc0_bench_properties(),
-    |_| true,
+    |_| Some(utils::bench::Acceleration::Precompile),
     { load_or_compile_program(&RustRv32imaCustomized, SHA256_BENCH) },
     prepare_sha256,
     |_, _| 0,

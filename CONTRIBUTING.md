@@ -51,7 +51,7 @@ Use the shared benchmark harness in the `utils` crate to register Criterion benc
 
 #### What you write:
 
-- A one-line set of settings passed to a macro: the target (e.g., `BenchTarget::Sha256`), the proving system (e.g., `ProvingSystem::Plonky2`), an optional feature tag (`None` or `Some("feature")`), a unique memory-measurement binary name (e.g., `"sha256_mem_plonky2"`), the system metadata, and a `|input_size| -> bool` closure for `uses_precompile`.
+- A one-line set of settings passed to a macro: the target (e.g., `BenchTarget::Sha256`), the proving system (e.g., `ProvingSystem::Plonky2`), an optional feature tag (`None` or `Some("feature")`), a unique memory-measurement binary name (e.g., `"sha256_mem_plonky2"`), the system metadata, and a `|input_size| -> Option<Acceleration>` closure.
 - Six small closures that perform the corresponding operations with your proving system: `prepare`, `num_constraints`, `prove`, `verify`, `preprocessing_size`, `proof_size`.
 
 #### Input sizes:
@@ -59,13 +59,13 @@ Use the shared benchmark harness in the `utils` crate to register Criterion benc
 - Variable-size targets (e.g., `sha256` or `keccak`) will use pre-defined input sizes from `utils::metadata`.
 - Fixed‑size targets (e.g., ECDSA) will use a single input size value.
 
-#### `uses_precompile` flag:
+#### `acceleration` field:
 
-- Set `uses_precompile` with the macro closure immediately after your benchmark properties.
-- Return `true` when the measured benchmark uses a precompile, blackbox function, system-specific builtin, or native accelerated primitive for that input size.
-- Return `false` for fully explicit circuit or VM implementations.
-- Use the `input_size` argument for mixed cases where the circuit/guest uses precompiles only for certain inputs.
-- The boundary is the developer-facing API. Return `false` when the operation is expressed through the system's normal DSL, API or VM programming language surface and expands into ordinary constraints or instructions. Return `true` when the benchmark calls a target-specific primitive, builtin, or prover path for the operation itself, even if that path is internally implemented as AIR, constraints, or VM components.
+- Set `acceleration` with the macro closure immediately after your benchmark properties.
+- Return `Some(Acceleration::Precompile)` when the operation is proved using a dedicated implementation instead of the system's ordinary instructions or constraints.
+- Return `Some(Acceleration::Inline)` when the operation is proved using specialized VM instructions that replace a longer sequence of ordinary VM instructions.
+- Return `None` for fully explicit circuit or VM implementations.
+- Use the `input_size` argument for mixed cases where only some inputs use acceleration.
 
 #### RAM usage measurement:
 
@@ -84,7 +84,7 @@ utils::define_benchmark_harness!(
     None,                           // optional feature tag
     "sha256_mem_binius64",         // memory-measurement binary name
     BINIUS64_BENCH_PROPERTIES,      // system metadata
-    |_| false,                      // uses_precompile
+    |_| None,                       // acceleration
     |input_size| { /* return prepared context for input_size */ },
     |prepared| { /* return number of constraints/gates as usize */ 0 },
     |prepared| { /* build and return proof */ },
@@ -107,7 +107,7 @@ utils::define_benchmark_harness!(
     None,                       // optional feature tag
     "sha256_mem_expander",     // memory-measurement binary name
     EXPANDER_BENCH_PROPERTIES,  // system metadata
-    |_| false,                  // uses_precompile
+    |_| None,                   // acceleration
     // Initialize shared state once (e.g., MPI universe/world)
     {
         let mpi_config = MPIConfig::init().expect("Failed to initialize MPI");
@@ -187,36 +187,40 @@ The root `./benchmark.sh` will invoke them in a fixed way via `hyperfine` and ou
 
 ### 5) Add benchmark flags to `bench_flags.json`
 
-Non-Rust systems may include an optional `bench_flags.json` file next to `bench_props.json`. This file is how contributors set per-benchmark `uses_precompile` values.
+Non-Rust systems may include an optional `bench_flags.json` file next to `bench_props.json`. This file is how contributors set per-benchmark feature tags and acceleration values.
 
-`uses_precompile` is a boolean. Set it to `true` when the measured workload uses a precompile, blackbox function, system-specific builtin, or native accelerated primitive; set it to `false` for fully explicit implementations.
+Use `feat` for a measurement variant that shares a target name, such as the curve used by an ECDSA benchmark.
+Adding a `feat` entry also adds `_[feature]` to that target's metrics filename.
 
-The boundary is the developer-facing API. Use `false` when the operation is expressed through the system's normal DSL, API or VM programming language surface and expands into ordinary constraints or instructions. Use `true` when the benchmark calls a target-specific primitive, builtin, or prover path for the operation itself, even if that path is internally implemented as AIR, constraints, or VM components.
+`acceleration` is an enum with two values: `"precompile"` and `"inline"`. Omit the target when its implementation is fully explicit.
 
 Example with both target-wide and input-size-specific values:
 
 ```json
 {
-  "uses_precompile": {
-    "sha256": true,
-    "keccak": true,
-    "ecdsa": true,
-    "poseidon": true,
+  "feat": {
+    "ecdsa": "secp256r1"
+  },
+  "acceleration": {
+    "sha256": "precompile",
+    "keccak": "precompile",
+    "ecdsa": "precompile",
+    "poseidon": "precompile",
     "poseidon2": {
-      "default": false,
       "by_input_size": {
-        "4": true
+        "4": "precompile"
       }
     }
   }
 }
 ```
 
-- A target value may be a boolean or an object.
-- `default` is optional and defaults to `false`.
+- A target value may be `"precompile"`, `"inline"`, or an object.
+- `default` is optional and defaults to no acceleration.
 - `by_input_size` keys are decimal input-size strings.
 - `by_input_size` overrides the target `default`.
-- Missing `bench_flags.json` means every measurement defaults to `uses_precompile: false`.
+- Missing `feat` entries omit the feature tag.
+- Missing `bench_flags.json` means feature tags and acceleration values are omitted.
 
 #### API: `[target]_prepare.sh`
 
@@ -294,7 +298,7 @@ https://github.com/privacy-ethereum/csp-benchmarks/blob/3ee2706d3dba930669fd8136
   - Call your `[target]_measure.sh` to capture proof and preprocessing sizes.
   - Post-process `hyperfine` outputs into a `[target]_[size]_[system]_..._metrics.json` file.
   - Require `circuit_sizes.json` (generated by your measure scripts) and read it to embed the constraints/gates counts into the Metrics JSONs.
-  - Read optional `bench_flags.json` and embed `uses_precompile` into the Metrics JSONs.
+  - Read optional `bench_flags.json` and embed `feat` and `acceleration` into the Metrics JSONs.
 - Ensure your `[target]_prove.sh` script performs a "lean" proof so memory is measured accurately.
 - Ensure all four scripts are executable (`chmod +x`).
 
@@ -330,8 +334,8 @@ BENCH_INPUT_PROFILE=full sh ./benchmark.sh --system-dir ./barretenberg --logging
 
 ### 7) File naming recap for non-Rust systems
 
-- Metrics: `[target]_[size]_[proving_system]_metrics.json`
-- Memory report (created by our wrapper): `[target]_[size]_[proving_system]_mem_report.json`
+- Metrics: `[target]_[size]_[proving_system]_[optional_feature]_metrics.json`
+- Memory report (created by our wrapper): `[target]_[size]_mem_report.json` — transient; its `peak_memory` is folded into the metrics JSON and the file is then removed.
 - Sizes (produced by your `[target]_measure.sh`): contains `proof_size` and `preprocessing_size` as shown above
 - Benchmark flags (optional): `bench_flags.json`
 

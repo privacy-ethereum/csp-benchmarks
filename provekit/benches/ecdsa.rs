@@ -4,10 +4,10 @@ use utils::harness::ProvingSystem;
 utils::define_benchmark_harness!(
     BenchTarget::Ecdsa,
     ProvingSystem::Provekit,
-    None,
+    Some("secp256r1"),
     "ecdsa_mem_provekit",
     PROVEKIT_PROPS,
-    |_| false,
+    |_| None,
     prepare_ecdsa,
     |(proof_scheme, _, _)| { proof_scheme.r1cs().num_constraints() },
     |(proof_scheme, toml_path, _)| { prove(proof_scheme, toml_path) },

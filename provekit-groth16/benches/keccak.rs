@@ -10,7 +10,7 @@ utils::define_benchmark_harness!(
     None,
     "keccak_mem_provekit_groth16",
     PROVEKIT_GROTH16_PROPS,
-    |_| false,
+    |_| None,
     prepare_keccak,
     |prepared| { num_constraints(prepared) },
     |prepared| { prove(prepared) },

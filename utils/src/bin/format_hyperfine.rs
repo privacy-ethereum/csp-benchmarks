@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
-use utils::bench::Metrics;
+use utils::bench::{Acceleration, Metrics};
 use utils::harness::BenchProperties;
 
 #[derive(clap::Args, Debug, Clone, Default)]
@@ -73,23 +73,25 @@ struct HyperfineRecord {
 #[serde(deny_unknown_fields)]
 struct BenchFlagsFile {
     #[serde(default)]
-    uses_precompile: BTreeMap<String, PrecompileFlagSpec>,
+    feat: BTreeMap<String, String>,
+    #[serde(default)]
+    acceleration: BTreeMap<String, AccelerationFlagSpec>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(untagged)]
-enum PrecompileFlagSpec {
-    Bool(bool),
-    ByInputSize(InputSizePrecompileFlag),
+enum AccelerationFlagSpec {
+    Kind(Acceleration),
+    ByInputSize(InputSizeAccelerationFlag),
 }
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
-struct InputSizePrecompileFlag {
+struct InputSizeAccelerationFlag {
     #[serde(default)]
-    default: bool,
+    default: Option<Acceleration>,
     #[serde(default)]
-    by_input_size: BTreeMap<String, bool>,
+    by_input_size: BTreeMap<String, Option<Acceleration>>,
 }
 
 impl BenchFlagsFile {
@@ -104,8 +106,16 @@ impl BenchFlagsFile {
     }
 
     fn validate(&self) -> std::io::Result<()> {
-        for (target, spec) in &self.uses_precompile {
-            if let PrecompileFlagSpec::ByInputSize(spec) = spec {
+        for (target, feat) in &self.feat {
+            if feat.trim().is_empty() {
+                return Err(io_err(&format!(
+                    "feature tag for target '{target}' must not be empty"
+                )));
+            }
+        }
+
+        for (target, spec) in &self.acceleration {
+            if let AccelerationFlagSpec::ByInputSize(spec) = spec {
                 for input_size in spec.by_input_size.keys() {
                     input_size.parse::<usize>().map_err(|_| {
                         io_err(&format!(
@@ -119,15 +129,19 @@ impl BenchFlagsFile {
         Ok(())
     }
 
-    fn uses_precompile(&self, target: &str, input_size: usize) -> bool {
-        match self.uses_precompile.get(target) {
-            Some(PrecompileFlagSpec::Bool(value)) => *value,
-            Some(PrecompileFlagSpec::ByInputSize(spec)) => spec
+    fn feat(&self, target: &str) -> Option<&str> {
+        self.feat.get(target).map(String::as_str)
+    }
+
+    fn acceleration(&self, target: &str, input_size: usize) -> Option<Acceleration> {
+        match self.acceleration.get(target) {
+            Some(AccelerationFlagSpec::Kind(acceleration)) => Some(*acceleration),
+            Some(AccelerationFlagSpec::ByInputSize(spec)) => spec
                 .by_input_size
                 .get(&input_size.to_string())
                 .copied()
                 .unwrap_or(spec.default),
-            None => false,
+            None => None,
         }
     }
 }
@@ -194,10 +208,12 @@ fn main() -> std::io::Result<()> {
         let verifier_mean_sec = read_hyperfine_mean_seconds(&verifier_path)?;
         println!("Reading verifier time from {}", verifier_path.display());
 
-        let feat = match cli.feature.as_deref() {
-            Some(f) if !f.is_empty() => Some(f.to_string()),
-            _ => None,
-        };
+        let feat = cli
+            .feature
+            .as_deref()
+            .filter(|f| !f.is_empty())
+            .or_else(|| bench_flags.feat(&target))
+            .map(str::to_string);
 
         let bench_properties = match &cli.properties {
             Some(p) => load_properties_json(p)?,
@@ -216,7 +232,7 @@ fn main() -> std::io::Result<()> {
         );
         metrics.proof_duration = to_duration_ns(prover_mean_sec);
         metrics.verify_duration = to_duration_ns(verifier_mean_sec);
-        metrics.uses_precompile = bench_flags.uses_precompile(&target, input_size);
+        metrics.acceleration = bench_flags.acceleration(&target, input_size);
 
         if mem_path.exists()
             && let Ok(mem_bytes) = read_peak_memory_bytes(&mem_path)
@@ -251,8 +267,11 @@ fn main() -> std::io::Result<()> {
             }
         }
 
-        let out_file = system_dir.join(format!(
-            "{target}_{input_size}_{proving_system}_metrics.json"
+        let out_file = system_dir.join(utils::bench::metrics_filename(
+            &target,
+            input_size,
+            &proving_system,
+            metrics.feat.as_deref(),
         ));
         utils::bench::write_json_metrics_file(out_file.to_str().unwrap(), &metrics);
 
@@ -352,37 +371,59 @@ mod tests {
     use super::*;
 
     #[test]
-    fn missing_flags_default_to_false() {
+    fn missing_flags_default_to_no_acceleration() {
         let flags = BenchFlagsFile::default();
 
-        assert!(!flags.uses_precompile("sha256", 128));
+        assert_eq!(flags.acceleration("sha256", 128), None);
+        assert_eq!(flags.feat("sha256"), None);
     }
 
     #[test]
-    fn boolean_target_shorthand_applies_to_all_input_sizes() {
+    fn target_feature_is_reported() {
         let flags = BenchFlagsFile::from_str(
             r#"{
-                "uses_precompile": {
-                    "sha256": true
+                "feat": {
+                    "ecdsa": "secp256r1"
                 }
             }"#,
         )
         .unwrap();
 
-        assert!(flags.uses_precompile("sha256", 128));
-        assert!(flags.uses_precompile("sha256", 2048));
-        assert!(!flags.uses_precompile("keccak", 128));
+        flags.validate().unwrap();
+        assert_eq!(flags.feat("ecdsa"), Some("secp256r1"));
+        assert_eq!(flags.feat("sha256"), None);
+    }
+
+    #[test]
+    fn target_acceleration_applies_to_all_input_sizes() {
+        let flags = BenchFlagsFile::from_str(
+            r#"{
+                "acceleration": {
+                    "sha256": "inline"
+                }
+            }"#,
+        )
+        .unwrap();
+
+        assert_eq!(
+            flags.acceleration("sha256", 128),
+            Some(Acceleration::Inline)
+        );
+        assert_eq!(
+            flags.acceleration("sha256", 2048),
+            Some(Acceleration::Inline)
+        );
+        assert_eq!(flags.acceleration("keccak", 128), None);
     }
 
     #[test]
     fn input_size_overrides_target_default() {
         let flags = BenchFlagsFile::from_str(
             r#"{
-                "uses_precompile": {
+                "acceleration": {
                     "poseidon2": {
-                        "default": false,
                         "by_input_size": {
-                            "4": true
+                            "4": "precompile"
                         }
                     }
                 }
@@ -390,21 +431,38 @@ mod tests {
         )
         .unwrap();
 
-        assert!(!flags.uses_precompile("poseidon2", 2));
-        assert!(flags.uses_precompile("poseidon2", 4));
-        assert!(!flags.uses_precompile("poseidon2", 8));
+        assert_eq!(flags.acceleration("poseidon2", 2), None);
+        assert_eq!(
+            flags.acceleration("poseidon2", 4),
+            Some(Acceleration::Precompile)
+        );
+        assert_eq!(flags.acceleration("poseidon2", 8), None);
     }
 
     #[test]
     fn invalid_present_config_fails() {
         let result = BenchFlagsFile::from_str(
             r#"{
-                "uses_precompile": {
-                    "sha256": 1
+                "acceleration": {
+                    "sha256": true
                 }
             }"#,
         );
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn empty_feature_fails_validation() {
+        let flags = BenchFlagsFile::from_str(
+            r#"{
+                "feat": {
+                    "ecdsa": ""
+                }
+            }"#,
+        )
+        .unwrap();
+
+        assert!(flags.validate().is_err());
     }
 }

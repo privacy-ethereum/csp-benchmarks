@@ -7,7 +7,7 @@ utils::define_benchmark_harness!(
     None,
     "poseidon2_mem_provekit",
     PROVEKIT_PROPS,
-    |input_size| input_size == 4,
+    |input_size| (input_size == 4).then_some(utils::bench::Acceleration::Precompile),
     prepare_poseidon2,
     |(proof_scheme, _, _)| { proof_scheme.r1cs().num_constraints() },
     |(proof_scheme, toml_path, _)| { prove(proof_scheme, toml_path) },

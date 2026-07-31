@@ -12,7 +12,7 @@ utils::define_benchmark_harness!(
     None,
     "sha256_mem_rookie_numbers",
     ROOKIE_NUMBERS_BENCH_PROPERTIES,
-    |_| true,
+    |_| Some(utils::bench::Acceleration::Precompile),
     // Shared state: preprocess once with MAX_PREPROCESSED_LOG_SIZE
     { preprocess_sha256(MAX_PREPROCESSED_LOG_SIZE, secure_pcs_config()) },
     // prepare: |input_size, &preprocessed| -> PreparedContext

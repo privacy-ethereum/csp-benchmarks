@@ -32,8 +32,7 @@
       "proof_size": 402256,
       "preprocessing_size": 596296,
       "num_constraints": 6914,
-      "peak_memory": 154433945,
-      "uses_precompile": false
+      "peak_memory": 154433945
     },
     {
       "system": "binius64",
@@ -44,8 +43,7 @@
       "proof_size": 379792,
       "preprocessing_size": 73499,
       "num_constraints": 862,
-      "peak_memory": 127834521,
-      "uses_precompile": false
+      "peak_memory": 127834521
     },
     {
       "system": "binius64",
@@ -56,8 +54,7 @@
       "proof_size": 409744,
       "preprocessing_size": 1191181,
       "num_constraints": 13765,
-      "peak_memory": 168824012,
-      "uses_precompile": false
+      "peak_memory": 168824012
     },
     {
       "system": "binius64",
@@ -68,8 +65,7 @@
       "proof_size": 387280,
       "preprocessing_size": 148786,
       "num_constraints": 1742,
-      "peak_memory": 135058227,
-      "uses_precompile": false
+      "peak_memory": 135058227
     },
     {
       "system": "binius64",
@@ -80,8 +76,7 @@
       "proof_size": 394768,
       "preprocessing_size": 298315,
       "num_constraints": 3475,
-      "peak_memory": 143920332,
-      "uses_precompile": false
+      "peak_memory": 143920332
     },
     {
       "system": "binius64",
@@ -92,8 +87,7 @@
       "proof_size": 417232,
       "preprocessing_size": 2030202,
       "num_constraints": 16946,
-      "peak_memory": 203359846,
-      "uses_precompile": false
+      "peak_memory": 203359846
     },
     {
       "system": "binius64",
@@ -104,8 +98,7 @@
       "proof_size": 394768,
       "preprocessing_size": 357361,
       "num_constraints": 2997,
-      "peak_memory": 142658764,
-      "uses_precompile": false
+      "peak_memory": 142658764
     },
     {
       "system": "binius64",
@@ -116,8 +109,7 @@
       "proof_size": 424720,
       "preprocessing_size": 3941080,
       "num_constraints": 32870,
-      "peak_memory": 260415488,
-      "uses_precompile": false
+      "peak_memory": 260415488
     },
     {
       "system": "binius64",
@@ -128,8 +120,7 @@
       "proof_size": 402256,
       "preprocessing_size": 596948,
       "num_constraints": 4994,
-      "peak_memory": 152520294,
-      "uses_precompile": false
+      "peak_memory": 152520294
     },
     {
       "system": "binius64",
@@ -140,8 +131,7 @@
       "proof_size": 409744,
       "preprocessing_size": 1074213,
       "num_constraints": 8981,
-      "peak_memory": 168289894,
-      "uses_precompile": false
+      "peak_memory": 168289894
     }
   ]
 }
