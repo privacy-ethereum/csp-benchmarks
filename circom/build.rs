@@ -50,6 +50,9 @@ fn main() {
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_1024");
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_2048");
 
+    // ECDSA circuit (secp256k1, fake-GLV + width-12 comb)
+    witnesscalc_adapter::build_and_link("./circuits/ecdsa/ecdsa_32");
+
     // Keccak circuits
     witnesscalc_adapter::build_and_link("./circuits/keccak/keccak_128");
     witnesscalc_adapter::build_and_link("./circuits/keccak/keccak_256");
