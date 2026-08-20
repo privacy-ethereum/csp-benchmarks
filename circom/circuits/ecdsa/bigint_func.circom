@@ -447,9 +447,13 @@ function mod_inv(n, k, a, p) {
 // Inverse of a mod p by binary extended GCD, for odd p and 0 < a < p.
 //
 // u and v start at a and p, with coefficients x1 and x2 maintained so that
-// x1 * a == u and x2 * a == -v hold mod p. A step halves whichever of u, v is
-// even, and when both are odd it replaces the larger by the difference, which
-// is even and so is halved next. Every halving drops one bit from
+// x1 * a == u and x2 * a == v hold mod p; x2 starts at 0 beside v == p, which
+// is 0 mod p, and both coefficients keep the same sign as their partner. Either
+// exit therefore yields the inverse directly, with no negation.
+//
+// A step halves whichever of u, v is even, and when both are odd it replaces
+// the larger by the difference, which is even and so is halved next. Every
+// halving drops one bit from
 // bits(u) + bits(v), which starts at 2 * n * k, and no two subtractions run
 // back to back, so the loop ends within 4 * n * k steps with one of u, v equal
 // to 1; the coefficient beside that one is the inverse. That is the bound the
