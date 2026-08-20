@@ -1,9 +1,10 @@
 use ere_jolt::{EreJolt, compiler::RustRv64imacCustomized};
 use ere_zkvm_interface::{Input, ProverResource};
+use jolt_inlines_blake3 as _;
 use serde::Serialize;
 use std::env;
 use utils::harness::{AuditStatus, BenchProperties};
-use utils::zkvm::{CompiledProgram, PreparedEcdsa, PreparedKeccak, PreparedSha256};
+use utils::zkvm::{CompiledProgram, PreparedBlake3, PreparedEcdsa, PreparedKeccak, PreparedSha256};
 
 // SAFETY: called once before single-threaded JoltSdk construction
 fn set_jolt_config(max_trace_length: u64, stack_size: u64, heap_size: u64) {
@@ -17,8 +18,8 @@ fn set_jolt_config(max_trace_length: u64, stack_size: u64, heap_size: u64) {
 }
 
 pub use utils::zkvm::{
-    execution_cycles, preprocessing_size, proof_size, prove, prove_ecdsa, prove_sha256,
-    verify_ecdsa, verify_keccak, verify_sha256,
+    execution_cycles, preprocessing_size, proof_size, prove, prove_blake3, prove_ecdsa,
+    prove_sha256, verify_blake3, verify_ecdsa, verify_keccak, verify_sha256,
 };
 
 pub fn jolt_bench_properties() -> BenchProperties {
@@ -59,6 +60,22 @@ pub fn prepare_sha256(
     let input = build_framed_input(message_bytes);
 
     PreparedSha256::with_expected_digest(vm, input, program.byte_size, digest)
+}
+
+pub fn prepare_blake3(
+    input_size: usize,
+    program: &CompiledProgram<RustRv64imacCustomized>,
+) -> PreparedBlake3<EreJolt> {
+    // The pinned Dory verifier requires this cap even when the execution trace is shorter.
+    let max_trace_length = 131072;
+    set_jolt_config(max_trace_length, 4096, 32768);
+    let vm = EreJolt::new(program.program.clone(), ProverResource::Cpu)
+        .expect("jolt prover build failed");
+
+    let (message_bytes, digest) = utils::generate_blake3_input(input_size);
+    let input = build_framed_input(message_bytes);
+
+    PreparedBlake3::with_expected_digest(vm, input, program.byte_size, digest)
 }
 
 pub fn prepare_keccak(
@@ -135,4 +152,43 @@ fn build_ecdsa_jolt_input(
 
     let serialized = postcard::to_allocvec(&ecdsa_input).expect("failed to serialize ECDSA input");
     build_framed_input(serialized)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ere_zkvm_interface::zkVM;
+    use utils::zkvm::BLAKE3_BENCH;
+    use utils::zkvm::helpers::load_or_compile_program;
+
+    #[test]
+    #[ignore = "compiles and executes the Jolt guest toolchain"]
+    fn blake3_guest_matches_reference() {
+        let program = load_or_compile_program(&RustRv64imacCustomized, BLAKE3_BENCH);
+
+        for input_size in [128, 2048] {
+            let prepared = prepare_blake3(input_size, &program);
+            let (public_values, _) = prepared
+                .vm()
+                .execute(prepared.input())
+                .expect("Jolt BLAKE3 guest execution must succeed");
+            assert_eq!(
+                public_values,
+                prepared.expected_digest().expect("expected digest")
+            );
+        }
+
+        let prepared = prepare_blake3(128, &program);
+        let proof = prove_blake3(&prepared, &program);
+        verify_blake3(&prepared, &proof, &(&program));
+    }
+
+    #[test]
+    #[ignore = "proves the largest Jolt BLAKE3 benchmark input"]
+    fn blake3_2048_proof_roundtrip() {
+        let program = load_or_compile_program(&RustRv64imacCustomized, BLAKE3_BENCH);
+        let prepared = prepare_blake3(2048, &program);
+        let proof = prove_blake3(&prepared, &program);
+        verify_blake3(&prepared, &proof, &(&program));
+    }
 }

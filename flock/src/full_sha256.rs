@@ -107,6 +107,7 @@ pub fn prove(setup: &FullSha256Setup, transcript_domain: &[u8]) -> FullSha256Pro
     let fold = ChainFold::new(&sha2::CHAIN_LAYOUT, tau_pos);
     let (in_vals, out_vals) = flock_prover::r1cs_hashes::chain_common::fold_in_out(
         &sha2::CHAIN_LAYOUT,
+        setup.r1cs.layout,
         &core.z_packed,
         &fold,
     );
@@ -114,6 +115,7 @@ pub fn prove(setup: &FullSha256Setup, transcript_domain: &[u8]) -> FullSha256Pro
         flock_prover::chain::prove_chain_shift(&in_vals, &out_vals, &mut challenger);
     let chain_claim = flock_prover::r1cs_hashes::chain_common::assemble_chain_claim(
         &sha2::CHAIN_LAYOUT,
+        setup.r1cs.layout,
         &fold,
         &chain_claims,
     );

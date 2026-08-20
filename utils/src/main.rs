@@ -26,6 +26,13 @@ enum Command {
         size: usize,
     },
 
+    /// Generate inputs for BLAKE3-256: prints hex-encoded message bytes then hex digest
+    Blake3 {
+        /// Input size in bytes (default 128)
+        #[arg(long, short = 'n', default_value_t = 128)]
+        size: usize,
+    },
+
     /// Generate inputs for ecdsa: prints hex-encoded hashed message, public key, and signature
     Ecdsa,
 
@@ -82,6 +89,11 @@ fn main() {
         }
         Command::Keccak { size } => {
             let (message_bytes, digest) = utils::generate_keccak_input(size);
+            println!("{}", message_bytes.encode_hex::<String>());
+            println!("{}", digest.encode_hex::<String>());
+        }
+        Command::Blake3 { size } => {
+            let (message_bytes, digest) = utils::generate_blake3_input(size);
             println!("{}", message_bytes.encode_hex::<String>());
             println!("{}", digest.encode_hex::<String>());
         }

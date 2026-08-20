@@ -22,6 +22,10 @@ name = "sha256"
 harness = false
 
 [[bench]]
+name = "blake3"
+harness = false
+
+[[bench]]
 name = "ecdsa"
 harness = false
 required-features = ["miden-ecdsa-bench"]
@@ -29,6 +33,10 @@ required-features = ["miden-ecdsa-bench"]
 [[bin]]
 name = "sha256_mem_miden"
 path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "blake3_mem_miden"
+path = "src/bin/blake3_mem.rs"
 
 [[bin]]
 name = "ecdsa_mem_miden"
