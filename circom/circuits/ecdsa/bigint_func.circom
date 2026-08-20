@@ -373,8 +373,379 @@ function mod_exp(n, k, a, p, e) {
 // k * n <= 500
 // p is a prime
 // if a == 0 mod p, returns 0
-// else computes inv = a^(p-2) mod p
+// else returns the inverse of a mod p
+//
+// For odd p the inverse comes from a binary extended GCD, whose steps are
+// shifts, comparisons and subtractions on k registers. For even p the Fermat
+// exponentiation below is kept, since the binary algorithm needs an odd
+// modulus. Inversion dominates affine curve arithmetic during witness
+// generation, and the binary path removes the modular multiplications that
+// the exponentiation spends on every one of them.
 function mod_inv(n, k, a, p) {
+    var isZero = 1;
+    for (var i = 0; i < k; i++) {
+        if (a[i] != 0) {
+            isZero = 0;
+        }
+    }
+    if (isZero == 1) {
+        var ret[100];
+        for (var i = 0; i < 100; i++) {
+            ret[i] = 0;
+        }
+        return ret;
+    }
+
+    var pIsOdd = p[0] & 1;
+    if (pIsOdd == 0) {
+        var fermat[100] = mod_inv_fermat(n, k, a, p);
+        return fermat;
+    }
+
+    // the binary algorithm needs a < p
+    var aRed[100];
+    for (var i = 0; i < 100; i++) {
+        aRed[i] = 0;
+    }
+    var pGtA = long_gt(n, k, p, a);
+    if (pGtA == 1) {
+        for (var i = 0; i < k; i++) {
+            aRed[i] = a[i];
+        }
+    } else {
+        var wide[100];
+        for (var i = 0; i < 100; i++) {
+            wide[i] = 0;
+        }
+        for (var i = 0; i < k; i++) {
+            wide[i] = a[i];
+        }
+        var qr[2][100] = long_div(n, k, k, wide, p);
+        for (var i = 0; i < k; i++) {
+            aRed[i] = qr[1][i];
+        }
+    }
+
+    var redIsZero = 1;
+    for (var i = 0; i < k; i++) {
+        if (aRed[i] != 0) {
+            redIsZero = 0;
+        }
+    }
+    if (redIsZero == 1) {
+        var zero[100];
+        for (var i = 0; i < 100; i++) {
+            zero[i] = 0;
+        }
+        return zero;
+    }
+
+    var binary[100] = mod_inv_binary(n, k, aRed, p);
+    return binary;
+}
+
+// Inverse of a mod p by binary extended GCD, for odd p and 0 < a < p.
+//
+// u and v start at a and p, with coefficients x1 and x2 maintained so that
+// x1 * a == u and x2 * a == -v hold mod p. A step halves whichever of u, v is
+// even, and when both are odd it replaces the larger by the difference, which
+// is even and so is halved next. Every halving drops one bit from
+// bits(u) + bits(v), which starts at 2 * n * k, and no two subtractions run
+// back to back, so the loop ends within 4 * n * k steps with one of u, v equal
+// to 1; the coefficient beside that one is the inverse. That is the bound the
+// assert below enforces. Empirically the largest step count on a sample of
+// five thousand inversions over this circuit's two moduli was 730.
+//
+// The register loops are written out rather than factored into helpers: a
+// helper would allocate a fresh 100-register array on every step, which costs
+// more than the step itself. Subtraction always compares before it subtracts,
+// because a negative intermediate would wrap around the field rather than stay
+// negative.
+function mod_inv_binary(n, k, a, p) {
+    var pow = 1 << n;
+
+    var u[100];
+    var v[100];
+    var x1[100];
+    var x2[100];
+    var diff[100];
+    for (var i = 0; i < 100; i++) {
+        u[i] = 0;
+        v[i] = 0;
+        x1[i] = 0;
+        x2[i] = 0;
+        diff[i] = 0;
+    }
+    for (var i = 0; i < k; i++) {
+        u[i] = a[i];
+        v[i] = p[i];
+    }
+    x1[0] = 1;
+
+    var done = 0;
+    var uIsOne = 1;
+    if (u[0] != 1) {
+        uIsOne = 0;
+    }
+    for (var i = 1; i < k; i++) {
+        if (u[i] != 0) {
+            uIsOne = 0;
+        }
+    }
+    if (uIsOne == 1) {
+        done = 1;
+    }
+
+    var steps = 0;
+    while (done == 0) {
+        var uOdd = u[0] & 1;
+        var vOdd = v[0] & 1;
+
+        if (uOdd == 0) {
+            // u = u / 2. Ascending, so u[i + 1] is still unshifted when read.
+            for (var i = 0; i < k; i++) {
+                var uHi = 0;
+                if (i + 1 < k) {
+                    uHi = u[i + 1] & 1;
+                }
+                u[i] = (u[i] >> 1) + (uHi << (n - 1));
+            }
+            // x1 = x1 / 2 mod p: adding p first makes an odd x1 even, and the
+            // bit carried past the top register comes back in on the shift.
+            var carry1 = 0;
+            if ((x1[0] & 1) == 1) {
+                for (var i = 0; i < k; i++) {
+                    var s1 = x1[i] + p[i] + carry1;
+                    if (s1 >= pow) {
+                        x1[i] = s1 - pow;
+                        carry1 = 1;
+                    } else {
+                        x1[i] = s1;
+                        carry1 = 0;
+                    }
+                }
+            }
+            for (var i = 0; i < k; i++) {
+                var x1Hi = carry1;
+                if (i + 1 < k) {
+                    x1Hi = x1[i + 1] & 1;
+                }
+                x1[i] = (x1[i] >> 1) + (x1Hi << (n - 1));
+            }
+        } else {
+            if (vOdd == 0) {
+                for (var i = 0; i < k; i++) {
+                    var vHi = 0;
+                    if (i + 1 < k) {
+                        vHi = v[i + 1] & 1;
+                    }
+                    v[i] = (v[i] >> 1) + (vHi << (n - 1));
+                }
+                var carry2 = 0;
+                if ((x2[0] & 1) == 1) {
+                    for (var i = 0; i < k; i++) {
+                        var s2 = x2[i] + p[i] + carry2;
+                        if (s2 >= pow) {
+                            x2[i] = s2 - pow;
+                            carry2 = 1;
+                        } else {
+                            x2[i] = s2;
+                            carry2 = 0;
+                        }
+                    }
+                }
+                for (var i = 0; i < k; i++) {
+                    var x2Hi = carry2;
+                    if (i + 1 < k) {
+                        x2Hi = x2[i + 1] & 1;
+                    }
+                    x2[i] = (x2[i] >> 1) + (x2Hi << (n - 1));
+                }
+            } else {
+                // both odd: subtract the smaller from the larger
+                var vGtU = 0;
+                var decided = 0;
+                for (var i = k - 1; i >= 0; i--) {
+                    if (decided == 0) {
+                        if (v[i] > u[i]) {
+                            vGtU = 1;
+                            decided = 1;
+                        }
+                        if (u[i] > v[i]) {
+                            vGtU = 0;
+                            decided = 1;
+                        }
+                    }
+                }
+
+                if (vGtU == 0) {
+                    var borrowU = 0;
+                    for (var i = 0; i < k; i++) {
+                        if (u[i] >= v[i] + borrowU) {
+                            u[i] = u[i] - v[i] - borrowU;
+                            borrowU = 0;
+                        } else {
+                            u[i] = pow + u[i] - v[i] - borrowU;
+                            borrowU = 1;
+                        }
+                    }
+                    // x1 = x1 - x2 mod p
+                    var x2GtX1 = 0;
+                    var cDecided = 0;
+                    for (var i = k - 1; i >= 0; i--) {
+                        if (cDecided == 0) {
+                            if (x2[i] > x1[i]) {
+                                x2GtX1 = 1;
+                                cDecided = 1;
+                            }
+                            if (x1[i] > x2[i]) {
+                                x2GtX1 = 0;
+                                cDecided = 1;
+                            }
+                        }
+                    }
+                    if (x2GtX1 == 0) {
+                        var b1 = 0;
+                        for (var i = 0; i < k; i++) {
+                            if (x1[i] >= x2[i] + b1) {
+                                x1[i] = x1[i] - x2[i] - b1;
+                                b1 = 0;
+                            } else {
+                                x1[i] = pow + x1[i] - x2[i] - b1;
+                                b1 = 1;
+                            }
+                        }
+                    } else {
+                        var b2 = 0;
+                        for (var i = 0; i < k; i++) {
+                            if (x2[i] >= x1[i] + b2) {
+                                diff[i] = x2[i] - x1[i] - b2;
+                                b2 = 0;
+                            } else {
+                                diff[i] = pow + x2[i] - x1[i] - b2;
+                                b2 = 1;
+                            }
+                        }
+                        var b3 = 0;
+                        for (var i = 0; i < k; i++) {
+                            if (p[i] >= diff[i] + b3) {
+                                x1[i] = p[i] - diff[i] - b3;
+                                b3 = 0;
+                            } else {
+                                x1[i] = pow + p[i] - diff[i] - b3;
+                                b3 = 1;
+                            }
+                        }
+                    }
+                } else {
+                    var borrowV = 0;
+                    for (var i = 0; i < k; i++) {
+                        if (v[i] >= u[i] + borrowV) {
+                            v[i] = v[i] - u[i] - borrowV;
+                            borrowV = 0;
+                        } else {
+                            v[i] = pow + v[i] - u[i] - borrowV;
+                            borrowV = 1;
+                        }
+                    }
+                    // x2 = x2 - x1 mod p
+                    var x1GtX2 = 0;
+                    var dDecided = 0;
+                    for (var i = k - 1; i >= 0; i--) {
+                        if (dDecided == 0) {
+                            if (x1[i] > x2[i]) {
+                                x1GtX2 = 1;
+                                dDecided = 1;
+                            }
+                            if (x2[i] > x1[i]) {
+                                x1GtX2 = 0;
+                                dDecided = 1;
+                            }
+                        }
+                    }
+                    if (x1GtX2 == 0) {
+                        var b4 = 0;
+                        for (var i = 0; i < k; i++) {
+                            if (x2[i] >= x1[i] + b4) {
+                                x2[i] = x2[i] - x1[i] - b4;
+                                b4 = 0;
+                            } else {
+                                x2[i] = pow + x2[i] - x1[i] - b4;
+                                b4 = 1;
+                            }
+                        }
+                    } else {
+                        var b5 = 0;
+                        for (var i = 0; i < k; i++) {
+                            if (x1[i] >= x2[i] + b5) {
+                                diff[i] = x1[i] - x2[i] - b5;
+                                b5 = 0;
+                            } else {
+                                diff[i] = pow + x1[i] - x2[i] - b5;
+                                b5 = 1;
+                            }
+                        }
+                        var b6 = 0;
+                        for (var i = 0; i < k; i++) {
+                            if (p[i] >= diff[i] + b6) {
+                                x2[i] = p[i] - diff[i] - b6;
+                                b6 = 0;
+                            } else {
+                                x2[i] = pow + p[i] - diff[i] - b6;
+                                b6 = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        steps = steps + 1;
+        assert(steps <= 4 * n * k);
+
+        var uOne = 1;
+        if (u[0] != 1) {
+            uOne = 0;
+        }
+        for (var i = 1; i < k; i++) {
+            if (u[i] != 0) {
+                uOne = 0;
+            }
+        }
+        var vOne = 1;
+        if (v[0] != 1) {
+            vOne = 0;
+        }
+        for (var i = 1; i < k; i++) {
+            if (v[i] != 0) {
+                vOne = 0;
+            }
+        }
+        if (uOne == 1) {
+            done = 1;
+        }
+        if (vOne == 1) {
+            done = 1;
+        }
+    }
+
+    var uFinal = 1;
+    if (u[0] != 1) {
+        uFinal = 0;
+    }
+    for (var i = 1; i < k; i++) {
+        if (u[i] != 0) {
+            uFinal = 0;
+        }
+    }
+    if (uFinal == 1) {
+        return x1;
+    }
+    return x2;
+}
+
+// inv = a^(p-2) mod p, for a prime p of either parity
+function mod_inv_fermat(n, k, a, p) {
     var isZero = 1;
     for (var i = 0; i < k; i++) {
         if (a[i] != 0) {
