@@ -16,6 +16,9 @@ pub fn prove<P: PreparedBenchmark, SharedState>(prepared: &P, _: &SharedState) -
 /// Prove a SHA-256 benchmark
 pub use prove as prove_sha256;
 
+/// Prove a BLAKE3 benchmark.
+pub use prove as prove_blake3;
+
 /// Prove an ECDSA benchmark (type-specific wrapper for compatibility).
 pub fn prove_ecdsa<V: zkVM, SharedState>(
     prepared: &PreparedEcdsa<V>,
@@ -35,6 +38,9 @@ pub fn verify_hash<V: zkVM, SharedState>(
 
 /// Verify a SHA-256 proof with digest checking.
 pub use verify_hash as verify_sha256;
+
+/// Verify a BLAKE3 proof with digest checking.
+pub use verify_hash as verify_blake3;
 
 /// Verify a Keccak proof with digest checking.
 pub use verify_hash as verify_keccak;

@@ -188,7 +188,7 @@ jobs:
       - name: Install Binius toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.95.0
+          toolchain: 1.97.1
           profile: minimal
           components: rustfmt, clippy
 
@@ -326,7 +326,7 @@ jobs:
         if: ${{ contains(matrix.crate, 'binius64') }}
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.95.0
+          toolchain: 1.97.1
           profile: minimal
 
       - name: Install excluded crates toolchain
@@ -385,9 +385,10 @@ jobs:
         run: |
           mkdir -p target/release
           if [ "${{ matrix.crate }}" = "binius64" ]; then
-            cd binius64 && RUSTFLAGS="-C target-cpu=native" cargo build --release --bin sha256_mem_binius64 --bin keccak_mem_binius64 && cd ..
+            cd binius64 && RUSTFLAGS="-C target-cpu=native" cargo build --release --bin sha256_mem_binius64 --bin keccak_mem_binius64 --bin blake3_mem_binius64 && cd ..
             cp binius64/target/release/sha256_mem_binius64 target/release/
             cp binius64/target/release/keccak_mem_binius64 target/release/
+            cp binius64/target/release/blake3_mem_binius64 target/release/
           elif [ "${{ matrix.crate }}" = "nexus" ]; then
             cd nexus && cargo build --release --bin sha256_mem_nexus && cd ..
             cp nexus/target/release/sha256_mem_nexus target/release/
@@ -398,9 +399,10 @@ jobs:
             cd rookie-numbers && cargo build --release --bin sha256_mem_rookie_numbers && cd ..
             cp rookie-numbers/target/release/sha256_mem_rookie_numbers target/release/
           elif [ "${{ matrix.crate }}" = "stark-v" ]; then
-            cd stark-v && cargo build --release --bin sha256_mem_stark_v --bin keccak_mem_stark_v && cd ..
+            cd stark-v && cargo build --release --bin sha256_mem_stark_v --bin keccak_mem_stark_v --bin blake3_mem_stark_v && cd ..
             cp stark-v/target/release/sha256_mem_stark_v target/release/
             cp stark-v/target/release/keccak_mem_stark_v target/release/
+            cp stark-v/target/release/blake3_mem_stark_v target/release/
           fi
 
       - name: Run benches in ${{ matrix.crate }}

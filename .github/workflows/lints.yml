@@ -53,7 +53,7 @@ jobs:
       - name: Install Binius toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.95.0
+          toolchain: 1.97.1
           profile: minimal
           components: rustfmt, clippy
 
@@ -84,6 +84,9 @@ jobs:
 
       - name: Format
         run: cargo fmt --all -- --check
+
+      - name: Check generated Miden BLAKE3 programs
+        run: python3 miden/guest/blake3/generate_programs.py --check
 
       - name: Format excluded crates
         run: |

@@ -22,7 +22,12 @@ utils::define_benchmark_harness!(
         )
         .expect("Failed to prepare keccak circuit for prove/verify")
     },
-    |(_, _, cs, _, _, _)| { cs.n_and_constraints() + cs.n_mul_constraints() },
+    |(_, _, cs, _, _, _)| {
+        cs.n_zero_constraints()
+            + cs.n_and_constraints()
+            + cs.n_imul_constraints()
+            + cs.n_bmul_constraints()
+    },
     |(_verifier, prover, _cs, keccak_circuit, compiled_circuit, input_size)| {
         binius64::prove::<KeccakCircuit>(prover, compiled_circuit, keccak_circuit, *input_size)
             .expect("Failed to prove keccak circuit")

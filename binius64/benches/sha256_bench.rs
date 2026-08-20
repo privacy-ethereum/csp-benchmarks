@@ -22,7 +22,12 @@ utils::define_benchmark_harness!(
         )
         .expect("Failed to prepare sha256 circuit for prove/verify")
     },
-    |(_, _, cs, _, _, _)| { cs.n_and_constraints() + cs.n_mul_constraints() },
+    |(_, _, cs, _, _, _)| {
+        cs.n_zero_constraints()
+            + cs.n_and_constraints()
+            + cs.n_imul_constraints()
+            + cs.n_bmul_constraints()
+    },
     |(_verifier, prover, _cs, sha256_circuit, compiled_circuit, input_size)| {
         binius64::prove::<Sha256Circuit>(prover, compiled_circuit, sha256_circuit, *input_size)
             .expect("Failed to prove sha256 circuit")

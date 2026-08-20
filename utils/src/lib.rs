@@ -53,6 +53,16 @@ pub fn generate_keccak_input(input_size: usize) -> (Vec<u8>, Vec<u8>) {
     (message_bytes, digest_bytes)
 }
 
+/// Generate a deterministic random message of `input_size` bytes and its BLAKE3-256 digest.
+pub fn generate_blake3_input(input_size: usize) -> (Vec<u8>, Vec<u8>) {
+    let mut message_bytes = vec![0u8; input_size];
+    let mut rng = StdRng::seed_from_u64(input_size as u64);
+    rng.fill_bytes(&mut message_bytes);
+
+    let digest_bytes = blake3::hash(&message_bytes).as_bytes().to_vec();
+    (message_bytes, digest_bytes)
+}
+
 pub fn generate_poseidon_input(input_size: usize) -> Vec<[u8; 32]> {
     let mut rng = StdRng::seed_from_u64(input_size as u64);
 
@@ -156,7 +166,7 @@ pub fn generate_poseidon2_input(input_size: usize) -> (Vec<u8>, Vec<u8>) {
 
 pub fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
     match target {
-        BenchTarget::Sha256 | BenchTarget::Keccak => selected_byte_inputs(),
+        BenchTarget::Sha256 | BenchTarget::Keccak | BenchTarget::Blake3 => selected_byte_inputs(),
         BenchTarget::Ecdsa => vec![32],
         BenchTarget::Poseidon | BenchTarget::Poseidon2 => selected_field_element_inputs(),
     }
@@ -226,5 +236,15 @@ mod tests {
         let input1 = generate_ecdsa_k256_input();
         let input2 = generate_ecdsa_k256_input();
         assert_eq!(input1, input2);
+    }
+
+    #[test]
+    fn blake3_input_is_deterministic_and_matches_reference() {
+        let (message, digest) = generate_blake3_input(2048);
+        let (message_again, digest_again) = generate_blake3_input(2048);
+
+        assert_eq!(message, message_again);
+        assert_eq!(digest, digest_again);
+        assert_eq!(digest, blake3::hash(&message).as_bytes());
     }
 }

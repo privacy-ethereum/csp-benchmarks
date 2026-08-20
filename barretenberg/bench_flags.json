@@ -4,6 +4,7 @@
   },
   "acceleration": {
     "sha256": "precompile",
+    "blake3": "precompile",
     "keccak": "precompile",
     "ecdsa": "precompile",
     "poseidon": "precompile",
