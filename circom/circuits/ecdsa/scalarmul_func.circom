@@ -46,6 +46,40 @@ function get_gy64() {
     return ret;
 }
 
+// a mod p, for a of K registers.
+//
+// The helpers below reduce with a single conditional subtraction, which is
+// correct only for operands already below p. The affine formulas this file
+// replaced reduced by division on every operation and so accepted anything, so
+// the input point is brought into range here rather than assumed to be.
+function sm_reduce(N, K, a, p) {
+    var out[100];
+    for (var i = 0; i < 100; i++) {
+        out[i] = 0;
+    }
+
+    var pGtA = long_gt(N, K, p, a);
+    if (pGtA == 1) {
+        for (var i = 0; i < K; i++) {
+            out[i] = a[i];
+        }
+        return out;
+    }
+
+    var wide[100];
+    for (var i = 0; i < 100; i++) {
+        wide[i] = 0;
+    }
+    for (var i = 0; i < K; i++) {
+        wide[i] = a[i];
+    }
+    var qr[2][100] = long_div(N, K, K, wide, p);
+    for (var i = 0; i < K; i++) {
+        out[i] = qr[1][i];
+    }
+    return out;
+}
+
 // 1 when every register of a below k is zero
 function sm_is_zero(K, a) {
     var isZero = 1;
@@ -271,6 +305,8 @@ function sm_jac_madd(N, K, X1, Y1, Z1, x2, y2, p) {
 // out[0] = x, out[1] = y, out[2][0] = 1 when the result is the point at infinity
 function secp256k1_scalarmul_func(N, K, scalar, x, y) {
     var p[100] = get_secp256k1_prime(N, K);
+    var px[100] = sm_reduce(N, K, x, p);
+    var py[100] = sm_reduce(N, K, y, p);
 
     var accX[100]; var accY[100]; var accZ[100];
     for (var i = 0; i < 100; i++) {
@@ -290,11 +326,11 @@ function secp256k1_scalarmul_func(N, K, scalar, x, y) {
                         accX[i] = 0; accY[i] = 0; accZ[i] = 0;
                     }
                     for (var i = 0; i < K; i++) {
-                        accX[i] = x[i]; accY[i] = y[i];
+                        accX[i] = px[i]; accY[i] = py[i];
                     }
                     accZ[0] = 1;
                 } else {
-                    var a[3][100] = sm_jac_madd(N, K, accX, accY, accZ, x, y, p);
+                    var a[3][100] = sm_jac_madd(N, K, accX, accY, accZ, px, py, p);
                     accX = a[0]; accY = a[1]; accZ = a[2];
                 }
             }
