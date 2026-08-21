@@ -1,29 +1,26 @@
 //! Building the circuit input for one secp256k1 signature.
 //!
 //! Kept apart from the ecdsa module because none of this needs the prover or
-//! the generated witness bindings: it is arithmetic plus the lattice hint, and
-//! it is the part that has to agree exactly with the JavaScript reference the
-//! circuit was witness-tested against.
+//! the generated witness bindings: it is the public half of a signature,
+//! re-encoded into the circuit's limb layout.
+//!
+//! The circuit derives its own witness values — the inverse of `s`, the `y`
+//! coordinate of `R`, and the lattice hint — so nothing here has to agree with
+//! them. What the prover must still respect are the circuit's preconditions
+//! (`R.x == r`, `r != ([u1]G).x`, a hint that fits in 64 bits); those are
+//! checked in the tests below rather than on every proving run.
 
 use k256::elliptic_curve::PrimeField;
 use k256::elliptic_curve::ops::Reduce;
-use k256::elliptic_curve::point::AffineCoordinates;
-use k256::elliptic_curve::sec1::{FromEncodedPoint, ToEncodedPoint};
-use k256::{AffinePoint, EncodedPoint, FieldBytes, ProjectivePoint, Scalar, U256};
-use num_bigint::BigInt;
-use num_traits::Signed;
+use k256::{FieldBytes, Scalar, U256};
 use std::collections::HashMap;
 
 /// Number of 64-bit limbs a 256-bit value is split into for the circuit.
 pub const LIMBS: usize = 4;
 
-/// Everything the circuit reads: the public signature data, plus the witness
-/// values it would otherwise have to compute (`sinv`, `Ry`) and the lattice
-/// hint (`mag`, `sgn`).
-///
-/// Panics if the signature is one of the rare ones the circuit cannot prove
-/// (`R.x >= n`, or a hint that needs 65 bits). Silently benchmarking an input
-/// that fails witness generation would be worse.
+/// Everything the circuit reads, which after the witness values moved into the
+/// circuit is exactly the public part of a signature: `r`, `s`, `msghash` and
+/// the public key.
 pub fn build_circuit_input(
     digest: &[u8],
     pub_key_x: &[u8],
@@ -35,41 +32,6 @@ pub fn build_circuit_input(
     let s = scalar_from_bytes(s_bytes);
     let h = <Scalar as Reduce<U256>>::reduce_bytes(FieldBytes::from_slice(digest));
 
-    let pubkey = affine_from_coordinates(pub_key_x, pub_key_y);
-
-    let sinv = Option::<Scalar>::from(s.invert()).expect("s is non-zero for a valid signature");
-    let u1 = h * sinv;
-    let u2 = r * sinv;
-
-    // R is recomputed rather than recovered: the circuit takes R.x from the
-    // public input `r` and only needs the y coordinate as a witness.
-    let big_r = (ProjectivePoint::GENERATOR * u1 + ProjectivePoint::from(pubkey) * u2).to_affine();
-    assert_ne!(big_r, AffinePoint::IDENTITY, "R must not be the identity");
-    let encoded_r = big_r.to_encoded_point(false);
-    let r_y = encoded_r.y().expect("R is not the identity").to_vec();
-    assert_eq!(
-        big_r.x().as_slice(),
-        r_bytes,
-        "R.x must equal r; signatures with R.x >= n are out of scope"
-    );
-
-    // Guard from step 7a of the circuit: the subtraction R - [u1]G is only
-    // sound when the two operands differ.
-    let u1_g = (ProjectivePoint::GENERATOR * u1).to_affine();
-    assert_ne!(
-        u1_g.x().as_slice(),
-        r_bytes,
-        "degenerate subtraction: r == ([u1]G).x"
-    );
-
-    let hint = crate::glv::decompose4(&scalar_to_bigint(&u2));
-    for x in &hint {
-        assert!(
-            x.abs().bits() <= 64,
-            "lattice hint does not fit in 64 bits: {x}"
-        );
-    }
-
     HashMap::from([
         ("r".to_string(), limbs_json(&r.to_bytes())),
         ("s".to_string(), limbs_json(&s.to_bytes())),
@@ -78,43 +40,12 @@ pub fn build_circuit_input(
             "pubkey".to_string(),
             serde_json::json!([limbs_json(pub_key_x), limbs_json(pub_key_y)]),
         ),
-        ("sinv".to_string(), limbs_json(&sinv.to_bytes())),
-        ("Ry".to_string(), limbs_json(&r_y)),
-        (
-            "mag".to_string(),
-            serde_json::json!(
-                hint.iter()
-                    .map(|x| x.abs().to_string())
-                    .collect::<Vec<String>>()
-            ),
-        ),
-        (
-            "sgn".to_string(),
-            serde_json::json!(
-                hint.iter()
-                    .map(|x| if x.is_negative() { "1" } else { "0" }.to_string())
-                    .collect::<Vec<String>>()
-            ),
-        ),
     ])
 }
 
 fn scalar_from_bytes(bytes: &[u8]) -> Scalar {
     Option::<Scalar>::from(Scalar::from_repr(*FieldBytes::from_slice(bytes)))
         .expect("scalar below the group order")
-}
-
-fn affine_from_coordinates(x: &[u8], y: &[u8]) -> AffinePoint {
-    let encoded = EncodedPoint::from_affine_coordinates(
-        FieldBytes::from_slice(x),
-        FieldBytes::from_slice(y),
-        false,
-    );
-    Option::from(AffinePoint::from_encoded_point(&encoded)).expect("public key is on the curve")
-}
-
-fn scalar_to_bigint(s: &Scalar) -> BigInt {
-    BigInt::from_bytes_be(num_bigint::Sign::Plus, &s.to_bytes())
 }
 
 /// Big-endian 32 bytes to the circuit's four 64-bit limbs, least significant
@@ -132,11 +63,101 @@ fn limbs_json(bytes: &[u8]) -> serde_json::Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use k256::elliptic_curve::point::AffineCoordinates;
+    use k256::elliptic_curve::sec1::{FromEncodedPoint, ToEncodedPoint};
+    use k256::{AffinePoint, EncodedPoint, ProjectivePoint};
+    use num_bigint::BigInt;
+    use num_traits::Signed;
 
-    /// Case 0 from `scripts/faza3_vectors.js`, produced by the JavaScript
-    /// implementation the circuit was witness-tested against (21/21 on the
-    /// 503,280-constraint build). The Rust port gets only the public half and
-    /// has to rebuild the witness half; anything else fails to prove.
+    /// The witness values the circuit now derives for itself, recomputed here so
+    /// they can be compared against the reference implementation, and so the
+    /// circuit's preconditions still get asserted somewhere.
+    ///
+    /// Panics on a signature the circuit cannot prove: `R.x >= n`, the
+    /// degenerate subtraction `r == ([u1]G).x`, or a hint needing 65 bits.
+    /// Silently benchmarking an input that fails witness generation would be
+    /// worse.
+    struct WitnessValues {
+        sinv: Vec<String>,
+        r_y: Vec<String>,
+        mag: Vec<String>,
+        sgn: Vec<String>,
+    }
+
+    fn witness_values(
+        digest: &[u8],
+        pub_key_x: &[u8],
+        pub_key_y: &[u8],
+        signature: &[u8],
+    ) -> WitnessValues {
+        let (r_bytes, s_bytes) = signature.split_at(32);
+        let s = scalar_from_bytes(s_bytes);
+        let h = <Scalar as Reduce<U256>>::reduce_bytes(FieldBytes::from_slice(digest));
+
+        let pubkey = affine_from_coordinates(pub_key_x, pub_key_y);
+
+        let sinv = Option::<Scalar>::from(s.invert()).expect("s is non-zero for a valid signature");
+        let u1 = h * sinv;
+        let u2 = scalar_from_bytes(r_bytes) * sinv;
+
+        // R is recomputed rather than recovered: the circuit takes R.x from the
+        // public input `r` and derives only the y coordinate.
+        let big_r =
+            (ProjectivePoint::GENERATOR * u1 + ProjectivePoint::from(pubkey) * u2).to_affine();
+        assert_ne!(big_r, AffinePoint::IDENTITY, "R must not be the identity");
+        let encoded_r = big_r.to_encoded_point(false);
+        let r_y = encoded_r.y().expect("R is not the identity").to_vec();
+        assert_eq!(
+            big_r.x().as_slice(),
+            r_bytes,
+            "R.x must equal r; signatures with R.x >= n are out of scope"
+        );
+
+        // Guard from step 7a of the circuit: the subtraction R - [u1]G is only
+        // sound when the two operands differ.
+        let u1_g = (ProjectivePoint::GENERATOR * u1).to_affine();
+        assert_ne!(
+            u1_g.x().as_slice(),
+            r_bytes,
+            "degenerate subtraction: r == ([u1]G).x"
+        );
+
+        let hint = crate::glv::decompose4(&scalar_to_bigint(&u2));
+        for x in &hint {
+            assert!(
+                x.abs().bits() <= 64,
+                "lattice hint does not fit in 64 bits: {x}"
+            );
+        }
+
+        WitnessValues {
+            sinv: to_limbs(&sinv.to_bytes()),
+            r_y: to_limbs(&r_y),
+            mag: hint.iter().map(|x| x.abs().to_string()).collect(),
+            sgn: hint
+                .iter()
+                .map(|x| if x.is_negative() { "1" } else { "0" }.to_string())
+                .collect(),
+        }
+    }
+
+    fn affine_from_coordinates(x: &[u8], y: &[u8]) -> AffinePoint {
+        let encoded = EncodedPoint::from_affine_coordinates(
+            FieldBytes::from_slice(x),
+            FieldBytes::from_slice(y),
+            false,
+        );
+        Option::from(AffinePoint::from_encoded_point(&encoded)).expect("public key is on the curve")
+    }
+
+    fn scalar_to_bigint(s: &Scalar) -> BigInt {
+        BigInt::from_bytes_be(num_bigint::Sign::Plus, &s.to_bytes())
+    }
+
+    /// Case 0 from the phase-3 reference vectors, produced by the JavaScript
+    /// implementation the circuit was witness-tested against. The circuit now
+    /// derives these four values itself; the constants stay because they are
+    /// what the derivation has to agree with.
     const R: &str = "96791156512790716983420836554981361349633210393766748359174448225512580277889";
     const S: &str = "33203354763501292305393002586333292996477110501749449198087039140030956875352";
     const MSGHASH: &str =
@@ -178,21 +199,36 @@ mod tests {
         serde_json::from_value(inputs[key].clone()).unwrap()
     }
 
-    #[test]
-    fn rebuilds_the_javascript_witness() {
+    fn reference_signature() -> (Vec<u8>, Vec<u8>, Vec<u8>, Vec<u8>) {
         let mut signature = be_bytes(R);
         signature.extend(be_bytes(S));
-        let inputs = build_circuit_input(
-            &be_bytes(MSGHASH),
-            &be_bytes(PUBKEY_X),
-            &be_bytes(PUBKEY_Y),
-            &signature,
-        );
+        (
+            be_bytes(MSGHASH),
+            be_bytes(PUBKEY_X),
+            be_bytes(PUBKEY_Y),
+            signature,
+        )
+    }
 
-        assert_eq!(field(&inputs, "sinv"), EXPECTED_SINV);
-        assert_eq!(field(&inputs, "Ry"), EXPECTED_RY);
-        assert_eq!(field(&inputs, "mag"), EXPECTED_MAG);
-        assert_eq!(field(&inputs, "sgn"), EXPECTED_SGN);
+    #[test]
+    fn input_carries_only_the_public_part() {
+        let (digest, x, y, signature) = reference_signature();
+        let inputs = build_circuit_input(&digest, &x, &y, &signature);
+
+        let mut keys: Vec<&String> = inputs.keys().collect();
+        keys.sort();
+        assert_eq!(keys, ["msghash", "pubkey", "r", "s"]);
+    }
+
+    #[test]
+    fn matches_the_javascript_witness() {
+        let (digest, x, y, signature) = reference_signature();
+        let values = witness_values(&digest, &x, &y, &signature);
+
+        assert_eq!(values.sinv, EXPECTED_SINV);
+        assert_eq!(values.r_y, EXPECTED_RY);
+        assert_eq!(values.mag, EXPECTED_MAG);
+        assert_eq!(values.sgn, EXPECTED_SGN);
     }
 
     #[test]
@@ -207,13 +243,15 @@ mod tests {
     /// The benchmark input has to satisfy the circuit's preconditions, and
     /// nothing about the shared generator guarantees that: a signature with
     /// `R.x >= n`, or one whose hint needs 65 bits, would be rejected by the
-    /// circuit rather than measured. The assertions live in
-    /// `build_circuit_input`; this test is what makes them run.
+    /// circuit rather than measured. The assertions live in `witness_values`;
+    /// this test is what makes them run.
     #[test]
     fn benchmark_input_is_provable() {
         let (digest, (x, y), signature) = utils::generate_ecdsa_k256_input();
+        witness_values(&digest, &x, &y, &signature);
+
         let inputs = build_circuit_input(&digest, &x, &y, &signature);
-        for key in ["r", "s", "msghash", "sinv", "Ry", "mag", "sgn"] {
+        for key in ["r", "s", "msghash"] {
             assert_eq!(field(&inputs, key).len(), LIMBS, "{key}");
         }
     }

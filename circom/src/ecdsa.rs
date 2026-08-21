@@ -2,7 +2,8 @@
 //!
 //! The fixed-base half uses a width-12 comb; the variable-base half is
 //! verified rather than computed, with a 4-dimensional fake-GLV Straus loop
-//! over the lattice hint from [`crate::glv`].
+//! over a lattice hint the circuit derives for itself. The input is therefore
+//! the public part of a signature and nothing else.
 //!
 //! Semantics match `k256`'s `verify_prehash`, which the other backends in this
 //! repository run. One deviation, shared with `circom-ecdsa`: signatures with

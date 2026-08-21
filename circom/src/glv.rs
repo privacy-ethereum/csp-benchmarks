@@ -1,4 +1,9 @@
+#![cfg(test)]
 //! Lattice hint for the 4-dimensional fake-GLV scalar multiplication.
+//!
+//! Test-only. The circuit derives the hint itself, so nothing on the proving
+//! path calls this; it stays as the independent implementation the derivation
+//! is checked against.
 //!
 //! The circuit does not compute `[u2]Q`; it *verifies* it. The prover supplies
 //! `(v0, v1, v2, v3)` with
