@@ -26,6 +26,8 @@ pragma circom 2.0.2;
 // ECDSAPrivToPub, which drags in ecdsa_func.circom (3.19 MB of stride-8 table).
 include "./comb_fixed.circom";
 include "./glv4_scalarmul.circom";
+include "./eisenstein_func.circom";
+include "./scalarmul_func.circom";
 include "../../circomlib/circuits/comparators.circom";
 
 template ECDSA4CombVerify() {
@@ -34,11 +36,15 @@ template ECDSA4CombVerify() {
     signal input msghash[4];
     signal input pubkey[2][4];
 
-    // Witnesses: the inverse of s, the y coordinate of R, and the lattice hint.
-    signal input sinv[4];
-    signal input Ry[4];
-    signal input mag[4];
-    signal input sgn[4];
+    // Witness-only values: the inverse of s, the y coordinate of R, and the
+    // lattice hint. They used to be private inputs, which made this circuit's
+    // interface differ from the other ECDSA circuits here; computing them below
+    // leaves the input to the public part alone. None of the constraints change:
+    // they never trusted these values, they check them.
+    signal sinv[4];
+    signal Ry[4];
+    signal mag[4];
+    signal sgn[4];
 
     var ordN[100] = get_secp256k1_order(64, 4);
     var prime[100] = get_secp256k1_prime(64, 4);
@@ -76,7 +82,23 @@ template ECDSA4CombVerify() {
         qOn.y[j] <== pubkey[1][j];
     }
 
-    // ---------- 3. sinv witnessed, checked with one multiplication ----------
+    // ---------- 3. sinv computed, checked with one multiplication ----------
+    // s is nonzero and below n, and n is prime, so the inverse exists.
+    var sv[100];
+    var ov[100];
+    for (var j = 0; j < 100; j++) {
+        sv[j] = 0;
+        ov[j] = 0;
+    }
+    for (var j = 0; j < 4; j++) {
+        sv[j] = s[j];
+        ov[j] = ordN[j];
+    }
+    var sinvVal[100] = mod_inv(64, 4, sv, ov);
+    for (var j = 0; j < 4; j++) {
+        sinv[j] <-- sinvVal[j];
+    }
+
     // The range check is mandatory, otherwise the limbs may exceed 64 bits.
     component sinvRange[4];
     for (var j = 0; j < 4; j++) {
@@ -100,6 +122,30 @@ template ECDSA4CombVerify() {
     for (var j = 0; j < 4; j++) {
         u1c.a[j] <== msghash[j]; u1c.b[j] <== sinv[j]; u1c.p[j] <== ordSig[j];
         u2c.a[j] <== r[j];       u2c.b[j] <== sinv[j]; u2c.p[j] <== ordSig[j];
+    }
+
+    // R = [u1]G + [u2]Q, computed off-constraint so that only its y coordinate
+    // has to be carried: x is r, which is public. The result is checked, not
+    // trusted, by the on-curve test below and by the verification equation.
+    var u1v[100];
+    var u2v[100];
+    var qxv[100];
+    var qyv[100];
+    for (var j = 0; j < 100; j++) {
+        u1v[j] = 0;
+        u2v[j] = 0;
+        qxv[j] = 0;
+        qyv[j] = 0;
+    }
+    for (var j = 0; j < 4; j++) {
+        u1v[j] = u1c.out[j];
+        u2v[j] = u2c.out[j];
+        qxv[j] = pubkey[0][j];
+        qyv[j] = pubkey[1][j];
+    }
+    var Rval[2][100] = ecdsa_R_func(64, 4, u1v, u2v, qxv, qyv);
+    for (var j = 0; j < 4; j++) {
+        Ry[j] <-- Rval[1][j];
     }
 
     // ---------- 5. R = (r, Ry) ----------
@@ -167,6 +213,15 @@ template ECDSA4CombVerify() {
         Ssub.a[1][j] <== Ry[j];
         Ssub.b[0][j] <== u1G.out[0][j];
         Ssub.b[1][j] <== negU1Gy.out[j];
+    }
+
+    // The lattice hint for u2. GLV4ScalarMulVerify constrains it fully, so a
+    // wrong hint cannot pass; computing it here only spares the caller the
+    // lattice reduction.
+    var hint[2][4] = fake_glv_decompose(64, 12, u2v);
+    for (var i = 0; i < 4; i++) {
+        mag[i] <-- hint[0][i];
+        sgn[i] <-- hint[1][i];
     }
 
     // ---------- 8. [u2]Q == S, via 4-dimensional fake-GLV ----------
