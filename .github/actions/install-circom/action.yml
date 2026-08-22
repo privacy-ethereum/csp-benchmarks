@@ -10,6 +10,14 @@ inputs:
 runs:
   using: "composite"
   steps:
+    # iden3 publishes no arm64 asset, so the macOS runners build the pinned tag
+    # from source. Cached, that happens once instead of once per job.
+    - name: Cache circom
+      uses: actions/cache@v4
+      with:
+        path: ~/.circom
+        key: ${{ runner.os }}-${{ runner.arch }}-circom-${{ inputs.version }}
+
     - shell: bash
       run: |
         set -euo pipefail
