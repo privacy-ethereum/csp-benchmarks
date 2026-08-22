@@ -42,21 +42,58 @@ fn find_rapidsnark_dirs(out_dir: &str) -> Vec<PathBuf> {
     dirs
 }
 
+const CIRCUIT_DIR: &str = "./circuits/ecdsa";
+
+fn circuit_sources() -> Vec<PathBuf> {
+    let Ok(entries) = fs::read_dir(CIRCUIT_DIR) else {
+        return Vec::new();
+    };
+    entries
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| path.extension().is_some_and(|e| e == "circom"))
+        .collect()
+}
+
+/// The generated files are not tracked, so their mtime is what says whether they
+/// still describe the circuit. CI never relies on this: its cache is keyed on a
+/// hash of the same sources, so an edited circuit misses the cache and lands
+/// here with nothing to skip.
+fn is_current(cpp: &Path, dat: &Path, sources: &[PathBuf]) -> bool {
+    if !dat.exists() || sources.is_empty() {
+        return false;
+    }
+    let Ok(built) = cpp.metadata().and_then(|m| m.modified()) else {
+        return false;
+    };
+    sources.iter().all(|source| {
+        source
+            .metadata()
+            .and_then(|m| m.modified())
+            .is_ok_and(|changed| changed <= built)
+    })
+}
+
 /// The ECDSA witness generator is the one artifact not tracked in the repo: at
 /// 57 MiB of generated C++ it is roughly three times the largest file otherwise
 /// stored here, because the width-12 comb table is inlined in the circuit. It is
 /// compiled from `ecdsa_32.circom` on demand instead, which needs `circom` on
 /// PATH. Every other circuit still ships its `.cpp` and `.dat` in tree.
 fn generate_ecdsa_witness_generator() {
-    const CIRCUIT_DIR: &str = "./circuits/ecdsa";
     const CIRCUIT: &str = "ecdsa_32.circom";
 
-    println!("cargo:rerun-if-changed={CIRCUIT_DIR}/{CIRCUIT}");
+    // Every circuit in the directory, not just `ecdsa_32.circom`: that file is a
+    // `main` component over the includes that hold the circuit itself. The
+    // directory is not watched as a whole because the generated files live in it.
+    let sources = circuit_sources();
+    for source in &sources {
+        println!("cargo:rerun-if-changed={}", source.display());
+    }
 
     let dest = Path::new(CIRCUIT_DIR).join("ecdsa_32");
     let cpp = dest.join("ecdsa_32.cpp");
     let dat = dest.join("ecdsa_32.dat");
-    if cpp.exists() && dat.exists() {
+    if is_current(&cpp, &dat, &sources) {
         return;
     }
 
