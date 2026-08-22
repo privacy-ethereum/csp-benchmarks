@@ -221,6 +221,21 @@ jobs:
       - name: Install LLVM and LLD for cairo-m
         uses: ./.github/actions/install-llvm
 
+      - name: Install circom
+        uses: ./.github/actions/install-circom
+
+      # Restored with its mtime, so a warm cache does not recompile the 57 MiB of
+      # generated C++ that circom/build.rs produces for the ECDSA circuit.
+      - name: Cache the ECDSA witness generator
+        uses: actions/cache@v4
+        with:
+          # Only the two generated files: the same directory also holds the
+          # downloaded .zkey, which must not be cached or restored over.
+          path: |
+            circom/circuits/ecdsa/ecdsa_32/ecdsa_32.cpp
+            circom/circuits/ecdsa/ecdsa_32/ecdsa_32.dat
+          key: ${{ runner.os }}-ecdsa-witness-${{ hashFiles('circom/circuits/ecdsa/**/*.circom') }}
+
       - name: Build full workspace (release)
         run: |
           INCLUDE_OPTIONAL='${{ github.event.inputs.include_optional }}'
@@ -380,6 +395,23 @@ jobs:
         if: ${{ contains(matrix.crate, 'stark-v') }}
         run: |
           rustup target add riscv32im-unknown-none-elf
+
+      - name: Install circom
+        if: ${{ contains(matrix.crate, 'circom') }}
+        uses: ./.github/actions/install-circom
+
+      # Restored with its mtime, so a warm cache does not recompile the 57 MiB of
+      # generated C++ that circom/build.rs produces for the ECDSA circuit.
+      - name: Cache the ECDSA witness generator
+        if: ${{ contains(matrix.crate, 'circom') }}
+        uses: actions/cache@v4
+        with:
+          # Only the two generated files: the same directory also holds the
+          # downloaded .zkey, which must not be cached or restored over.
+          path: |
+            circom/circuits/ecdsa/ecdsa_32/ecdsa_32.cpp
+            circom/circuits/ecdsa/ecdsa_32/ecdsa_32.dat
+          key: ${{ runner.os }}-ecdsa-witness-${{ hashFiles('circom/circuits/ecdsa/**/*.circom') }}
 
       - name: Build and copy excluded memory benchmark binary to workspace target
         if: ${{ contains(matrix.crate, 'binius64') || contains(matrix.crate, 'nexus') || contains(matrix.crate, 'cairo-m') || contains(matrix.crate, 'rookie-numbers') || contains(matrix.crate, 'stark-v') }}
