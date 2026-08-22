@@ -42,7 +42,58 @@ fn find_rapidsnark_dirs(out_dir: &str) -> Vec<PathBuf> {
     dirs
 }
 
+/// The ECDSA witness generator is the one artifact not tracked in the repo: at
+/// 57 MiB of generated C++ it is roughly three times the largest file otherwise
+/// stored here, because the width-12 comb table is inlined in the circuit. It is
+/// compiled from `ecdsa_32.circom` on demand instead, which needs `circom` on
+/// PATH. Every other circuit still ships its `.cpp` and `.dat` in tree.
+fn generate_ecdsa_witness_generator() {
+    const CIRCUIT_DIR: &str = "./circuits/ecdsa";
+    const CIRCUIT: &str = "ecdsa_32.circom";
+
+    println!("cargo:rerun-if-changed={CIRCUIT_DIR}/{CIRCUIT}");
+
+    let dest = Path::new(CIRCUIT_DIR).join("ecdsa_32");
+    let cpp = dest.join("ecdsa_32.cpp");
+    let dat = dest.join("ecdsa_32.dat");
+    if cpp.exists() && dat.exists() {
+        return;
+    }
+
+    let out_dir = std::env::var("OUT_DIR").expect("OUT_DIR is set for build scripts");
+    let staging = Path::new(&out_dir).join("ecdsa_32_circom");
+    let _ = fs::remove_dir_all(&staging);
+    fs::create_dir_all(&staging).expect("cannot create the circom output directory");
+
+    // `--c` alone: the `.r1cs` is not needed to build the witness generator, and
+    // writing it costs over 100 MB. circom emits into `<out>/ecdsa_32_cpp/`.
+    let status = std::process::Command::new("circom")
+        .current_dir(CIRCUIT_DIR)
+        .arg(CIRCUIT)
+        .arg("--c")
+        .arg("-o")
+        .arg(&staging)
+        .status()
+        .unwrap_or_else(|e| {
+            panic!(
+                "could not run `circom`, which builds the ECDSA witness generator \
+                 (the only circuit artifact not stored in the repo): {e}. \
+                 Install circom 2.2.2 and put it on PATH."
+            )
+        });
+    assert!(status.success(), "circom failed to compile {CIRCUIT}");
+
+    let emitted = staging.join("ecdsa_32_cpp");
+    fs::create_dir_all(&dest).expect("cannot create the circuit directory");
+    for file in ["ecdsa_32.cpp", "ecdsa_32.dat"] {
+        fs::copy(emitted.join(file), dest.join(file))
+            .unwrap_or_else(|e| panic!("circom did not emit {file}: {e}"));
+    }
+}
+
 fn main() {
+    generate_ecdsa_witness_generator();
+
     // SHA256 circuits
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_128");
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_256");
