@@ -1,5 +1,5 @@
 name: "Install circom"
-description: "Installs a pinned version of the circom compiler"
+description: "Installs a pinned circom compiler and the circomlib sources it compiles against"
 
 inputs:
   version:
@@ -10,6 +10,13 @@ inputs:
 runs:
   using: "composite"
   steps:
+    # `actions/checkout` fetches no submodules, and the ECDSA circuit is compiled
+    # here rather than shipped generated, so it needs circomlib's sources. The
+    # repo's other submodules stay unfetched: nothing built here includes them.
+    - name: Fetch circomlib
+      shell: bash
+      run: git submodule update --init circom/circomlib
+
     # iden3 publishes no arm64 asset, so the macOS runners build the pinned tag
     # from source. Cached, that happens once instead of once per job.
     - name: Cache circom
