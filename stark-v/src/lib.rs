@@ -108,6 +108,18 @@ pub fn prepare_keccak(input_size: usize, program: &CompiledProgram) -> PreparedB
     }
 }
 
+pub fn prepare_blake3(input_size: usize, program: &CompiledProgram) -> PreparedBench {
+    let vm = StarkV::new(program.program.clone(), secure_pcs_config());
+    let (message_bytes, digest) = utils::generate_blake3_input(input_size);
+    let input = build_prefixed_input(message_bytes);
+    PreparedBench {
+        vm,
+        input,
+        compiled_size: program.byte_size,
+        expected_digest: digest,
+    }
+}
+
 /// Build stark-v input with length-prefixed format.
 ///
 /// The guest programs expect: [len: u32 LE][data: u8...]
@@ -150,4 +162,37 @@ pub fn execution_cycles(prepared: &PreparedBench) -> u64 {
         .execute(&prepared.input)
         .expect("execute failed");
     report.total_num_cycles
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[ignore = "compiles and executes the Stark-V guest toolchain"]
+    fn blake3_guest_matches_reference() {
+        let program = load_or_compile("blake3");
+
+        for input_size in [128, 2048] {
+            let prepared = prepare_blake3(input_size, &program);
+            let (public_values, _) = prepared
+                .vm
+                .execute(&prepared.input)
+                .expect("Stark-V BLAKE3 guest execution must succeed");
+            assert_eq!(public_values, prepared.expected_digest);
+        }
+
+        let prepared = prepare_blake3(128, &program);
+        let proof = prove_bench(&prepared, &program);
+        verify_bench(&prepared, &proof, &program);
+    }
+
+    #[test]
+    #[ignore = "proves the largest Stark-V BLAKE3 benchmark input"]
+    fn blake3_2048_proof_roundtrip() {
+        let program = load_or_compile("blake3");
+        let prepared = prepare_blake3(2048, &program);
+        let proof = prove_bench(&prepared, &program);
+        verify_bench(&prepared, &proof, &program);
+    }
 }

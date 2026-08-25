@@ -8,12 +8,16 @@ anyhow = { workspace = true }
 bincode = { workspace = true }
 clap = { workspace = true }
 criterion = { workspace = true }
-flock-prover = { git = "https://github.com/succinctlabs/flock", rev = "73f72028161eaf5cae42c9a054fbfc3f1464fc12" }
+flock-prover = { git = "https://github.com/succinctlabs/flock", rev = "4af7a4da3b60f2ac86ab9aaf2c6a4ff1de416b3a" }
 serde = { workspace = true }
 utils = { workspace = true }
 
 [[bench]]
 name = "sha256"
+harness = false
+
+[[bench]]
+name = "blake3"
 harness = false
 
 [[bench]]
@@ -23,6 +27,10 @@ harness = false
 [[bin]]
 name = "sha256_mem_flock"
 path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "blake3_mem_flock"
+path = "src/bin/blake3_mem.rs"
 
 [[bin]]
 name = "keccak_mem_flock"

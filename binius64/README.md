@@ -7,7 +7,7 @@ These benchmarks use official circuits from the Binius64 project: https://github
 Use the pinned toolchain from `rust-toolchain.toml`:
 
 ```bash
-rustup toolchain install 1.95.0
+rustup toolchain install 1.97.1
 ```
 
 ## Run the benchmarks

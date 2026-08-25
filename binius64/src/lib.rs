@@ -36,7 +36,7 @@ pub const BINIUS64_BENCH_PROPERTIES: BenchProperties = BenchProperties {
 /// Setup the ZK prover and verifier and use SHA256 for Merkle tree compression.
 fn setup(cs: ConstraintSystem, log_inv_rate: usize) -> Result<(StdVerifier, StdProver)> {
     let verifier = ZKVerifier::<StdHashSuite>::setup(cs, log_inv_rate)?;
-    let prover = ZKProver::setup(verifier.clone())?;
+    let prover = ZKProver::setup(&verifier)?;
     Ok((verifier, prover))
 }
 
@@ -74,13 +74,13 @@ pub fn prove<CT: CircuitTrait>(
     compiled_circuit.populate_wire_witness(&mut filler)?; // circuit evaluation
     let witness = filler.into_value_vec();
 
-    let pub_witness = witness.public().to_vec();
+    let pub_witness = witness.inout().to_vec();
 
     // Prove
     let challenger = StdChallenger::default();
     let mut prover_transcript = ProverTranscript::new(challenger);
     let mut rng = rand::rng();
-    prover.prove(witness, &mut rng, &mut prover_transcript)?;
+    prover.prove(&witness, &mut rng, &mut prover_transcript)?;
 
     let proof = prover_transcript.finalize();
 

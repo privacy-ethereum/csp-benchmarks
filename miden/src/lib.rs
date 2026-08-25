@@ -2,13 +2,48 @@ use ere_miden::{EreMiden, compiler::MidenAsm};
 use ere_zkvm_interface::{Input, ProverResource};
 use k256::ecdsa::{RecoveryId, Signature, VerifyingKey};
 use k256::{EncodedPoint, FieldBytes};
+use std::collections::BTreeMap;
 use std::convert::TryInto;
 use utils::harness::{AuditStatus, BenchProperties};
-use utils::zkvm::{CompiledProgram, PreparedEcdsa, PreparedSha256, ProofArtifacts};
+use utils::zkvm::{CompiledProgram, PreparedBlake3, PreparedEcdsa, PreparedSha256, ProofArtifacts};
 
 pub use utils::zkvm::{
-    execution_cycles, preprocessing_size, proof_size, prove_ecdsa, prove_sha256,
+    execution_cycles, preprocessing_size, proof_size, prove_blake3, prove_ecdsa, prove_sha256,
 };
+
+const BLAKE3_INPUT_SIZES: [usize; 5] = [128, 256, 512, 1024, 2048];
+
+pub struct Blake3Programs {
+    programs: BTreeMap<usize, CompiledProgram<MidenAsm>>,
+}
+
+impl Blake3Programs {
+    fn get(&self, input_size: usize) -> &CompiledProgram<MidenAsm> {
+        self.programs
+            .get(&input_size)
+            .unwrap_or_else(|| panic!("unsupported BLAKE3 benchmark size: {input_size}"))
+    }
+}
+
+pub fn blake3_program_name(input_size: usize) -> String {
+    assert!(
+        BLAKE3_INPUT_SIZES.contains(&input_size),
+        "unsupported BLAKE3 benchmark size"
+    );
+    format!("blake3_{input_size}")
+}
+
+pub fn load_or_compile_blake3_programs() -> Blake3Programs {
+    let programs = BLAKE3_INPUT_SIZES
+        .into_iter()
+        .map(|input_size| {
+            let name = blake3_program_name(input_size);
+            let program = utils::zkvm::helpers::load_or_compile_program(&MidenAsm, &name);
+            (input_size, program)
+        })
+        .collect();
+    Blake3Programs { programs }
+}
 
 pub fn miden_bench_properties() -> BenchProperties {
     BenchProperties::new(
@@ -38,6 +73,27 @@ pub fn prepare_sha256(
     let input = build_input(message_bytes);
 
     PreparedSha256::with_expected_digest(vm, input, program.byte_size, digest)
+}
+
+pub fn prepare_blake3(input_size: usize, programs: &Blake3Programs) -> PreparedBlake3<EreMiden> {
+    prepare_blake3_with_program(input_size, programs.get(input_size))
+}
+
+pub fn prepare_blake3_with_program(
+    input_size: usize,
+    program: &CompiledProgram<MidenAsm>,
+) -> PreparedBlake3<EreMiden> {
+    assert!(
+        matches!(input_size, 128 | 256 | 512 | 1024 | 2048),
+        "unsupported BLAKE3 benchmark size"
+    );
+    let vm = EreMiden::new(program.program.clone(), ProverResource::Cpu)
+        .expect("failed to build miden prover instance");
+
+    let (message_bytes, digest) = utils::generate_blake3_input(input_size);
+    let input = build_blake3_input(&message_bytes);
+
+    PreparedBlake3::with_expected_digest(vm, input, program.byte_size, digest)
 }
 
 // Miden has custom verification logic due to special public value decoding
@@ -94,6 +150,57 @@ fn decode_public_values(raw: &[u8]) -> Vec<u8> {
             word.to_be_bytes()
         })
         .collect()
+}
+
+// BLAKE3 serializes each output word little-endian, unlike SHA-256.
+fn decode_blake3_public_values(raw: &[u8]) -> Vec<u8> {
+    raw.chunks_exact(8)
+        .take(8)
+        .flat_map(|chunk| {
+            let word =
+                u64::from_le_bytes(chunk.try_into().expect("invalid miden output chunk")) as u32;
+            word.to_le_bytes()
+        })
+        .collect()
+}
+
+fn build_blake3_input(data: &[u8]) -> Input {
+    assert!(
+        data.len().is_multiple_of(64),
+        "BLAKE3 input must contain full blocks"
+    );
+
+    let mut stdin = Vec::with_capacity(data.len() * 2);
+
+    for block in data.chunks_exact(64) {
+        let words: Vec<u32> = block
+            .chunks_exact(4)
+            .map(|chunk| u32::from_le_bytes(chunk.try_into().expect("four-byte word")))
+            .collect();
+
+        // The advice tape is a queue. Pushing m15 first leaves m0 at stack top.
+        for &word in words.iter().rev() {
+            stdin.extend_from_slice(&(word as u64).to_le_bytes());
+        }
+    }
+
+    Input::new().with_stdin(stdin)
+}
+
+pub fn verify_blake3<SharedState>(
+    prepared: &PreparedBlake3<EreMiden>,
+    proof: &ProofArtifacts,
+    _: &SharedState,
+) {
+    let public_values = prepared.verify(&proof.proof).expect("miden verify failed");
+
+    assert_eq!(public_values, proof.public_values, "public values mismatch");
+
+    let digest_bytes = decode_blake3_public_values(&proof.public_values);
+    let expected_digest = prepared
+        .expected_digest()
+        .expect("expected digest not recorded");
+    assert_eq!(digest_bytes, expected_digest, "digest mismatch");
 }
 
 pub fn prepare_ecdsa(
@@ -269,5 +376,38 @@ mod tests {
         // Ensure prove/verify plumbing also succeeds
         let proof = prove_sha256(&prepared, &program);
         verify_sha256(&prepared, &proof, &(&program));
+    }
+
+    #[test]
+    fn miden_blake3_matches_reference_digest() {
+        let programs = load_or_compile_blake3_programs();
+
+        for input_size in [128, 256, 512, 1024, 2048] {
+            let prepared = prepare_blake3(input_size, &programs);
+            let (public_values, _) = prepared
+                .vm()
+                .execute(prepared.input())
+                .expect("BLAKE3 guest execution must succeed");
+            let digest_bytes = decode_blake3_public_values(&public_values);
+            assert_eq!(
+                digest_bytes,
+                prepared.expected_digest().expect("expected digest")
+            );
+        }
+
+        // A small proof exercises the same compression AIR and proof plumbing;
+        // execution above separately covers the two-chunk 2048-byte route.
+        let prepared = prepare_blake3(128, &programs);
+        let proof = prove_blake3(&prepared, &programs);
+        verify_blake3(&prepared, &proof, &programs);
+    }
+
+    #[test]
+    #[ignore = "proves the largest Miden BLAKE3 benchmark input"]
+    fn miden_blake3_2048_proof_roundtrip() {
+        let programs = load_or_compile_blake3_programs();
+        let prepared = prepare_blake3(2048, &programs);
+        let proof = prove_blake3(&prepared, &programs);
+        verify_blake3(&prepared, &proof, &programs);
     }
 }

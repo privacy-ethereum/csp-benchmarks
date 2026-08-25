@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "hash/sha256",
+    "hash/blake3",
     "hash/keccak256",
     "hash/poseidon",
     "ecdsa",

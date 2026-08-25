@@ -2,10 +2,11 @@ use std::borrow::Cow;
 
 use flock_prover::pcs::PcsParams;
 use flock_prover::proof_io::HashKind;
-use flock_prover::r1cs::{BlockR1cs, SparseBinaryMatrix};
+use flock_prover::r1cs::{BlockR1cs, SparseBinaryMatrix, WitnessLayout};
 use serde::Serialize;
 use utils::harness::{AuditStatus, BenchProperties};
 
+mod full_blake3;
 mod full_keccak;
 mod full_sha256;
 
@@ -13,6 +14,8 @@ const TRANSCRIPT_DOMAIN: &[u8] = b"csp-benchmarks-flock-hash-v0";
 const SHA256_BLOCK_BYTES: usize = 64;
 const SHA256_LEN_BYTES: usize = 8;
 const KECCAK256_RATE_BYTES: usize = 136;
+const BLAKE3_BLOCK_BYTES: usize = 64;
+const BLAKE3_CHUNK_BYTES: usize = 1024;
 
 pub const FLOCK_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     proving_system: Cow::Borrowed("Flock"),
@@ -47,6 +50,15 @@ pub struct KeccakProof {
     proof: full_keccak::FullKeccakProof,
 }
 
+pub struct PreparedBlake3 {
+    setup: full_blake3::FullBlake3Setup,
+    operation_count: usize,
+}
+
+pub struct Blake3Proof {
+    proof: full_blake3::FullBlake3Proof,
+}
+
 pub fn sha256_compression_count(input_size: usize) -> usize {
     (input_size + 1 + SHA256_LEN_BYTES).div_ceil(SHA256_BLOCK_BYTES)
 }
@@ -61,6 +73,18 @@ pub fn keccak256_permutation_count(input_size: usize) -> usize {
 
 pub fn keccak_operation_count(input_size: usize) -> usize {
     keccak256_permutation_count(input_size)
+}
+
+pub fn blake3_compression_count(input_size: usize) -> usize {
+    assert!(
+        input_size.is_multiple_of(BLAKE3_BLOCK_BYTES) && input_size <= 2 * BLAKE3_CHUNK_BYTES,
+        "BLAKE3 benchmark supports full blocks through 2048 bytes"
+    );
+    input_size / BLAKE3_BLOCK_BYTES + usize::from(input_size > BLAKE3_CHUNK_BYTES)
+}
+
+pub fn blake3_operation_count(input_size: usize) -> usize {
+    blake3_compression_count(input_size)
 }
 
 pub fn prepare_sha256(input_size: usize) -> PreparedSha256 {
@@ -103,12 +127,36 @@ pub fn verify_keccak(prepared: &PreparedKeccak, proof: &KeccakProof) {
     full_keccak::verify(&prepared.setup, &proof.proof, TRANSCRIPT_DOMAIN);
 }
 
+pub fn prepare_blake3(input_size: usize) -> PreparedBlake3 {
+    let setup = full_blake3::prepare(input_size, false);
+    let operation_count = setup.n_compressions;
+
+    PreparedBlake3 {
+        setup,
+        operation_count,
+    }
+}
+
+pub fn prove_blake3(prepared: &PreparedBlake3) -> Blake3Proof {
+    Blake3Proof {
+        proof: full_blake3::prove(&prepared.setup, TRANSCRIPT_DOMAIN),
+    }
+}
+
+pub fn verify_blake3(prepared: &PreparedBlake3, proof: &Blake3Proof) {
+    full_blake3::verify(&prepared.setup, &proof.proof, TRANSCRIPT_DOMAIN);
+}
+
 pub fn num_constraints_sha256(prepared: &PreparedSha256) -> usize {
     full_sha256::num_constraints(&prepared.setup)
 }
 
 pub fn num_constraints_keccak(prepared: &PreparedKeccak) -> usize {
     full_keccak::num_constraints(&prepared.setup)
+}
+
+pub fn num_constraints_blake3(prepared: &PreparedBlake3) -> usize {
+    full_blake3::num_constraints(&prepared.setup)
 }
 
 #[derive(Serialize)]
@@ -127,6 +175,7 @@ struct SerializableBlockR1cs<'a> {
     k_log: usize,
     k_skip: usize,
     useful_bits: usize,
+    layout: u8,
     a_0: SerializableSparseBinaryMatrix<'a>,
     b_0: SerializableSparseBinaryMatrix<'a>,
     c_0: SerializableSparseBinaryMatrix<'a>,
@@ -170,6 +219,10 @@ impl<'a> From<&'a BlockR1cs> for SerializableBlockR1cs<'a> {
             k_log: r1cs.k_log,
             k_skip: r1cs.k_skip,
             useful_bits: r1cs.useful_bits,
+            layout: match r1cs.layout {
+                WitnessLayout::RowMajor => 0,
+                WitnessLayout::BatchMajor => 1,
+            },
             a_0: SerializableSparseBinaryMatrix::from(&r1cs.a_0),
             b_0: SerializableSparseBinaryMatrix::from(&r1cs.b_0),
             c_0: SerializableSparseBinaryMatrix::from(&r1cs.c_0),
@@ -206,12 +259,25 @@ pub fn preprocessing_size_keccak(prepared: &PreparedKeccak) -> usize {
     )
 }
 
+pub fn preprocessing_size_blake3(prepared: &PreparedBlake3) -> usize {
+    preprocessing_size(
+        HashKind::Blake3,
+        &prepared.setup.r1cs,
+        &prepared.setup.pcs_params,
+        prepared.operation_count,
+    )
+}
+
 pub fn proof_size_sha256(proof: &Sha256Proof) -> usize {
     full_sha256::proof_size(&proof.proof)
 }
 
 pub fn proof_size_keccak(proof: &KeccakProof) -> usize {
     full_keccak::proof_size(&proof.proof)
+}
+
+pub fn proof_size_blake3(proof: &Blake3Proof) -> usize {
+    full_blake3::proof_size(&proof.proof)
 }
 
 #[cfg(test)]
@@ -245,6 +311,28 @@ mod tests {
     }
 
     #[test]
+    fn reduced_blake3_roundtrip() {
+        let prepared = prepare_blake3(128);
+        let proof = prove_blake3(&prepared);
+        verify_blake3(&prepared, &proof);
+        assert!(proof_size_blake3(&proof) > 0);
+        assert_eq!(prepared.operation_count, 2);
+        assert_eq!(
+            num_constraints_blake3(&prepared),
+            prepared.setup.r1cs.useful_bits * prepared.setup.r1cs.n_outer()
+        );
+    }
+
+    #[test]
+    #[ignore = "covers the largest BLAKE3 benchmark circuit"]
+    fn blake3_two_chunk_roundtrip() {
+        let prepared = prepare_blake3(2048);
+        let proof = prove_blake3(&prepared);
+        verify_blake3(&prepared, &proof);
+        assert_eq!(prepared.operation_count, 33);
+    }
+
+    #[test]
     fn byte_size_maps_to_hash_operations() {
         assert_eq!(sha256_compression_count(128), 3);
         assert_eq!(sha256_operation_count(128), 3);
@@ -255,6 +343,12 @@ mod tests {
         assert_eq!(keccak_operation_count(128), 1);
         assert_eq!(keccak256_permutation_count(2048), 16);
         assert_eq!(keccak_operation_count(2048), 16);
+
+        assert_eq!(blake3_compression_count(128), 2);
+        assert_eq!(blake3_operation_count(128), 2);
+        assert_eq!(blake3_compression_count(1024), 16);
+        assert_eq!(blake3_compression_count(2048), 33);
+        assert_eq!(blake3_operation_count(2048), 33);
     }
 
     #[test]
@@ -271,5 +365,13 @@ mod tests {
         );
         assert_eq!(keccak.operation_count, 16);
         assert_eq!(keccak.setup.r1cs.n_outer(), 16);
+
+        let blake3 = prepare_blake3(2048);
+        assert_eq!(
+            blake3.setup.r1cs.k_log,
+            flock_prover::r1cs_hashes::blake3::K_LOG
+        );
+        assert_eq!(blake3.operation_count, 33);
+        assert_eq!(blake3.setup.r1cs.n_outer(), 64);
     }
 }

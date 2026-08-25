@@ -1,0 +1,3 @@
+[package]
+name = "blake3"
+type = "bin"

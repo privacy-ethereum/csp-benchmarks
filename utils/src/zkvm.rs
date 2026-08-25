@@ -1,3 +1,4 @@
+pub mod blake3;
 pub mod ecdsa;
 pub mod hash;
 pub mod helpers;
@@ -6,10 +7,11 @@ pub mod keccak;
 pub mod sha256;
 pub mod traits;
 
+pub use blake3::{BLAKE3_BENCH, PreparedBlake3};
 pub use ecdsa::{ECDSA_BENCH, PreparedEcdsa, build_ecdsa_input, encode_public_key};
 pub use helpers::{
-    execution_cycles, guest_dir, preprocessing_size, proof_size, prove, prove_ecdsa, prove_sha256,
-    verify_ecdsa, verify_keccak, verify_sha256,
+    execution_cycles, guest_dir, preprocessing_size, proof_size, prove, prove_blake3, prove_ecdsa,
+    prove_sha256, verify_blake3, verify_ecdsa, verify_keccak, verify_sha256,
 };
 pub use instance::{CompiledProgram, ProofArtifacts, compile_guest_program};
 pub use keccak::{KECCAK_BENCH, PreparedKeccak};

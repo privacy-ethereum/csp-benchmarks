@@ -122,10 +122,10 @@ fn build_groth16_state(scheme: NoirProofScheme) -> (Prover, Verifier) {
         .filter(|p| p.is_public())
         .map(|p| p.typ.field_count() as usize)
         .sum();
-    if let Some(ret) = &abi.return_type {
-        if matches!(ret.visibility, AbiVisibility::Public) {
-            n_public += ret.abi_type.field_count() as usize;
-        }
+    if let Some(ret) = &abi.return_type
+        && matches!(ret.visibility, AbiVisibility::Public)
+    {
+        n_public += ret.abi_type.field_count() as usize;
     }
     r1cs.num_public_inputs = n_public;
     let num_public = 1 + r1cs.num_public_inputs;

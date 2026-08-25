@@ -1,0 +1,13 @@
+[package]
+name = "jolt-blake3"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ere-platform-jolt = { git = "https://github.com/eth-act/ere", rev = "6573843", default-features = false }
+jolt-inlines-blake3 = { git = "https://github.com/a16z/jolt", rev = "2e05fe88" }
+
+[features]
+guest = []
+
+[workspace]

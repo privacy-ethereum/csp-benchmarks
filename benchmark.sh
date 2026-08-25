@@ -5,7 +5,7 @@ set -euo pipefail
 # Usage: benchmark.sh --system-dir <path> [--targets "sha256,poseidon,..."]
 
 SYSTEM_DIR=""
-TARGETS=("sha256" "ecdsa" "keccak" "poseidon" "poseidon2")
+TARGETS=("sha256" "blake3" "ecdsa" "keccak" "poseidon" "poseidon2")
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -99,7 +99,16 @@ for target in "${TARGETS[@]}"; do
 
     step "[$TARGET] Size measurement (size ${INPUT_SIZE})"
     SIZES_JSON="$SYSTEM_DIR/${TARGET}_${INPUT_SIZE}_sizes.json"
-    SIZES_JSON="$SIZES_JSON" UTILS_BIN="$UTILS_BIN" INPUT_SIZE="$INPUT_SIZE" STATE_JSON="$PROVER_JSON_FILE" bash "$PREPARE_SH"
+    if SIZES_JSON="$SIZES_JSON" UTILS_BIN="$UTILS_BIN" INPUT_SIZE="$INPUT_SIZE" STATE_JSON="$PROVER_JSON_FILE" bash "$PREPARE_SH"; then
+      :
+    else
+      PREPARE_STATUS=$?
+      if (( PREPARE_STATUS == 77 )); then
+        warn "Skipping target $TARGET at size $INPUT_SIZE: unsupported by system"
+        continue
+      fi
+      exit "$PREPARE_STATUS"
+    fi
     SIZES_JSON="$SIZES_JSON" STATE_JSON="$PROVER_JSON_FILE" bash "$MEASURE_SH" || warn "Size measurement failed"
     ok "Sizes report: $SIZES_JSON"
 
@@ -164,4 +173,3 @@ else
 fi
 
 ok "Benchmark complete"
-

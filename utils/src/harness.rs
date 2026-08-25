@@ -12,6 +12,7 @@ const SAMPLE_SIZE: usize = 10;
 #[derive(Clone, Copy, Debug)]
 pub enum BenchTarget {
     Sha256,
+    Blake3,
     Ecdsa,
     Keccak,
     Poseidon,
@@ -22,6 +23,7 @@ impl BenchTarget {
     pub fn as_str(&self) -> &'static str {
         match self {
             BenchTarget::Sha256 => "sha256",
+            BenchTarget::Blake3 => "blake3",
             BenchTarget::Ecdsa => "ecdsa",
             BenchTarget::Keccak => "keccak",
             BenchTarget::Poseidon => "poseidon",
@@ -36,6 +38,7 @@ impl FromStr for BenchTarget {
     fn from_str(s: &str) -> Result<BenchTarget, String> {
         match s {
             "sha256" => Ok(BenchTarget::Sha256),
+            "blake3" => Ok(BenchTarget::Blake3),
             "ecdsa" => Ok(BenchTarget::Ecdsa),
             "keccak" => Ok(BenchTarget::Keccak),
             "poseidon" => Ok(BenchTarget::Poseidon),
@@ -259,7 +262,7 @@ fn mem_report_filename(target: &str, size: usize, system: &str, feat: Option<&st
 
 fn input_sizes_for(target: BenchTarget) -> Vec<usize> {
     match target {
-        BenchTarget::Sha256 | BenchTarget::Keccak => selected_byte_inputs(),
+        BenchTarget::Sha256 | BenchTarget::Keccak | BenchTarget::Blake3 => selected_byte_inputs(),
         BenchTarget::Ecdsa => vec![32],
         BenchTarget::Poseidon | BenchTarget::Poseidon2 => selected_field_element_inputs(),
     }
@@ -664,6 +667,9 @@ macro_rules! __define_benchmark_harness {
 macro_rules! define_benchmark_harness {
     (BenchTarget::Sha256, $($rest:tt)*) => {
         $crate::__define_benchmark_harness!(sha256, $crate::harness::BenchTarget::Sha256, $($rest)*);
+    };
+    (BenchTarget::Blake3, $($rest:tt)*) => {
+        $crate::__define_benchmark_harness!(blake3, $crate::harness::BenchTarget::Blake3, $($rest)*);
     };
     (BenchTarget::Ecdsa, $($rest:tt)*) => {
         $crate::__define_benchmark_harness!(ecdsa, $crate::harness::BenchTarget::Ecdsa, $($rest)*);
