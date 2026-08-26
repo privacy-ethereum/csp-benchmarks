@@ -115,7 +115,7 @@ fn generate_ecdsa_witness_generator() {
             panic!(
                 "could not run `circom`, which builds the ECDSA witness generator \
                  (the only circuit artifact not stored in the repo): {e}. \
-                 Install circom 2.2.2 and put it on PATH."
+                 Install circom 2.2.3 and put it on PATH."
             )
         });
     assert!(status.success(), "circom failed to compile {CIRCUIT}");
