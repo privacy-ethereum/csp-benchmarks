@@ -302,7 +302,6 @@ jobs:
               "$ZKEYS_RELEASE_URL/$(basename "$zkey")" \
               --output "circom/$zkey"
           done <<'EOF'
-          circuits/ecdsa/ecdsa_32/ecdsa_32_0001.zkey
           circuits/keccak/keccak_1024/keccak_1024_0001.zkey
           circuits/keccak/keccak_128/keccak_128_0001.zkey
           circuits/keccak/keccak_2048/keccak_2048_0001.zkey
