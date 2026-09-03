@@ -6,19 +6,19 @@
     4-dimensional fake-GLV circuit. One variable-base multiplication instead of
     two.
 
-    R is not witnessed as a point: R.x == r and r is public, so only y is
-    witnessed and one on-curve check covers it. The sign of y is pinned by the
+    R is witnessed and constrained on-curve. Its x coordinate is reduced modulo
+    the group order and compared with public r. The sign of y is pinned by the
     verification equation, since -R would require R of order 2.
 
-    Semantics follow k256's verify_prehash, which the other backends in this
-    repository prove: the public key is validated and r, s must lie in
-    [1, n-1]. circom-ecdsa's ECDSAVerifyNoPubkeyCheck does neither, so its
-    constraint count is not a like-for-like comparison. There is no `result`
-    output; an invalid signature fails witness generation.
+    The public key is validated and r, s must lie in [1, n-1]. The shared
+    benchmark input also uses k256's low-s normalization; the circuit itself
+    accepts both standard ECDSA s representatives. circom-ecdsa's
+    ECDSAVerifyNoPubkeyCheck omits the key and scalar checks, so its constraint
+    count covers a weaker relation. There is no `result` output; an invalid
+    signature fails witness generation.
 
-    Known deviation, shared with circom-ecdsa: the standard compares R.x mod n
-    against r, here R.x == r directly, so signatures with R.x >= n are rejected
-    (probability ~2^-128).
+    The finite affine additions inside the fake-GLV verifier still sacrifice
+    completeness for inexpensive soundness checks on exceptional additions.
 */
 pragma circom 2.0.2;
 
@@ -36,12 +36,11 @@ template ECDSA4CombVerify() {
     signal input msghash[4];
     signal input pubkey[2][4];
 
-    // Witness-only values: the inverse of s, the y coordinate of R, and the
-    // lattice hint. They used to be private inputs, which made this circuit's
-    // interface differ from the other ECDSA circuits here; computing them below
-    // leaves the input to the public part alone. None of the constraints change:
-    // they never trusted these values, they check them.
+    // Witness-only values: the inverse of s, the coordinates of R, and the
+    // lattice hint. Computing them below leaves the circuit input equal to the
+    // public signature data. Each value is constrained before it is consumed.
     signal sinv[4];
+    signal Rx[4];
     signal Ry[4];
     signal mag[4];
     signal sgn[4];
@@ -56,7 +55,21 @@ template ECDSA4CombVerify() {
         primeSig[j] <== prime[j];
     }
 
-    // ---------- 1. validation: r, s in [1, n-1] ----------
+    // ---------- 1. canonical public inputs; r, s in [1, n-1] ----------
+    // The bigint templates assume 64-bit limbs. These checks are part of the
+    // public input boundary rather than assumptions on the Rust encoder.
+    component rRange[4];
+    component sRange[4];
+    component hashRange[4];
+    for (var j = 0; j < 4; j++) {
+        rRange[j] = Num2Bits(64);
+        rRange[j].in <== r[j];
+        sRange[j] = Num2Bits(64);
+        sRange[j].in <== s[j];
+        hashRange[j] = Num2Bits(64);
+        hashRange[j].in <== msghash[j];
+    }
+
     // Four limbs below 2^64 sum to less than 2^66, so the sum fits in the
     // BN254 field and is zero exactly when every limb is zero.
     component rLtN = BigLessThan(64, 4);
@@ -75,7 +88,13 @@ template ECDSA4CombVerify() {
     rZero.out === 0;
     sZero.out === 0;
 
-    // ---------- 2. the public key is on the curve ----------
+    // ---------- 2. the public key is canonical and on the curve ----------
+    component qRange[2];
+    for (var c = 0; c < 2; c++) {
+        qRange[c] = CheckInRangeSecp256k1();
+        for (var j = 0; j < 4; j++) qRange[c].in[j] <== pubkey[c][j];
+    }
+
     component qOn = Secp256k1PointOnCurve();
     for (var j = 0; j < 4; j++) {
         qOn.x[j] <== pubkey[0][j];
@@ -124,9 +143,9 @@ template ECDSA4CombVerify() {
         u2c.a[j] <== r[j];       u2c.b[j] <== sinv[j]; u2c.p[j] <== ordSig[j];
     }
 
-    // R = [u1]G + [u2]Q, computed off-constraint so that only its y coordinate
-    // has to be carried: x is r, which is public. The result is checked, not
-    // trusted, by the on-curve test below and by the verification equation.
+    // R = [u1]G + [u2]Q is computed off-constraint. Both coordinates are
+    // constrained below by the curve equation, R.x mod n == r, and the
+    // verification equation.
     var u1v[100];
     var u2v[100];
     var qxv[100];
@@ -145,60 +164,89 @@ template ECDSA4CombVerify() {
     }
     var Rval[2][100] = ecdsa_R_func(64, 4, u1v, u2v, qxv, qyv);
     for (var j = 0; j < 4; j++) {
+        Rx[j] <-- Rval[0][j];
         Ry[j] <-- Rval[1][j];
     }
 
-    // ---------- 5. R = (r, Ry) ----------
-    // Ry needs a range check and canonicity (Ry < p): Secp256k1PointOnCurve
-    // checks x^3 + 7 - y^2 == 0 mod p, which does not force y < p.
-    component ryRange[4];
-    for (var j = 0; j < 4; j++) {
-        ryRange[j] = Num2Bits(64);
-        ryRange[j].in <== Ry[j];
+    // ---------- 5. R is canonical, on-curve, and R.x mod n == r ----------
+    // Secp256k1PointOnCurve checks the equation modulo p but does not force
+    // canonical coordinates, so range-check both coordinates separately.
+    component rCoordRange[2];
+    for (var c = 0; c < 2; c++) {
+        rCoordRange[c] = CheckInRangeSecp256k1();
+        for (var j = 0; j < 4; j++) {
+            if (c == 0) rCoordRange[c].in[j] <== Rx[j];
+            else rCoordRange[c].in[j] <== Ry[j];
+        }
     }
-    component ryLtP = BigLessThan(64, 4);
-    for (var j = 0; j < 4; j++) {
-        ryLtP.a[j] <== Ry[j];
-        ryLtP.b[j] <== primeSig[j];
-    }
-    ryLtP.out === 1;
 
     component rOn = Secp256k1PointOnCurve();
     for (var j = 0; j < 4; j++) {
-        rOn.x[j] <== r[j];        // r < n < p, so r is a valid field element
+        rOn.x[j] <== Rx[j];
         rOn.y[j] <== Ry[j];
     }
 
-    // ---------- 6. [u1]G, fixed base, via the width-12 comb ----------
-    component u1G = CombFixedBase();
+    component rxModN = BigMod(64, 4);
+    for (var j = 0; j < 8; j++) {
+        if (j < 4) rxModN.a[j] <== Rx[j];
+        else rxModN.a[j] <== 0;
+    }
     for (var j = 0; j < 4; j++) {
-        u1G.k[j] <== u1c.out[j];
+        rxModN.b[j] <== ordSig[j];
+    }
+    for (var j = 0; j < 4; j++) {
+        rxModN.mod[j] === r[j];
     }
 
-    // ---------- 7a. the subtraction must not be degenerate ----------
+    // ---------- 6. [u1]G, fixed base, via the width-12 comb ----------
+    // CombFixedBase has only finite affine outputs, so it cannot represent
+    // [0]G. Map zero to one for this internal call and select the actual zero
+    // result at step 7 instead.
+    component u1Zero = IsZero();
+    u1Zero.in <== u1c.out[0] + u1c.out[1] + u1c.out[2] + u1c.out[3];
+
+    component u1G = CombFixedBase();
+    u1G.k[0] <== u1c.out[0] + u1Zero.out;
+    for (var j = 1; j < 4; j++) u1G.k[j] <== u1c.out[j];
+
+    // ---------- 7a. classify the equal-x subtraction case ----------
     // Load-bearing, not caution: Secp256k1AddUnequal leaves its output
     // unconstrained when the operands coincide (see Secp256k1AddStrict in
-    // glv4_straus.circom). A prover who supplies r = ([u1]G).x and
-    // Ry = p - ([u1]G).y gets a free S, sets it equal to [u2]Q for an
+    // glv4_straus.circom). A prover who supplies R.x = ([u1]G).x and
+    // R.y = p - ([u1]G).y gets a free S, sets it equal to [u2]Q for an
     // arbitrary Q, and verifies without the private key.
     //
     // Equality of limbs means equality of values only for canonical
     // representations: [u1]G leaves the table through a one-hot selector and
-    // is canonical by construction, r is public and constrained here.
-    component rRange[4];
-    for (var j = 0; j < 4; j++) {
-        rRange[j] = Num2Bits(64);
-        rRange[j].in <== r[j];
-    }
+    // is canonical by construction, and Rx is range checked above.
     component xSame[4];
     signal xSameAcc[4];
     for (var j = 0; j < 4; j++) {
         xSame[j] = IsZero();
-        xSame[j].in <== r[j] - u1G.out[0][j];
+        xSame[j].in <== Rx[j] - u1G.out[0][j];
     }
     xSameAcc[0] <== xSame[0].out;
     for (var j = 1; j < 4; j++) xSameAcc[j] <== xSameAcc[j - 1] * xSame[j].out;
-    xSameAcc[3] === 0;
+
+    component ySame[4];
+    signal ySameAcc[4];
+    for (var j = 0; j < 4; j++) {
+        ySame[j] = IsZero();
+        ySame[j].in <== Ry[j] - u1G.out[1][j];
+    }
+    ySameAcc[0] <== ySame[0].out;
+    for (var j = 1; j < 4; j++) ySameAcc[j] <== ySameAcc[j - 1] * ySame[j].out;
+
+    // For nonzero u1 and equal x coordinates, R = [u1]G would make
+    // R - [u1]G the point at infinity. That cannot equal [u2]Q because u2 and
+    // Q are nonzero in the prime-order group. The other equal-x case is
+    // R = -[u1]G, for which the subtraction is the valid doubling 2R.
+    signal nonzeroU1SameX;
+    nonzeroU1SameX <== (1 - u1Zero.out) * xSameAcc[3];
+    nonzeroU1SameX * ySameAcc[3] === 0;
+
+    signal skipSub;
+    skipSub <== u1Zero.out + xSameAcc[3] - u1Zero.out * xSameAcc[3];
 
     // ---------- 7. S = R - [u1]G ----------
     component negU1Gy = BigSub(64, 4);
@@ -207,12 +255,38 @@ template ECDSA4CombVerify() {
         negU1Gy.b[j] <== u1G.out[1][j];
     }
 
+    // The subtraction component requires sound distinct-x inputs even when its
+    // output is ignored. Replace both operands with fixed curve points in the
+    // zero and equal-x branches.
+    var dummy[2][100] = get_dummy_point(64, 4);
+    var gx[100] = get_gx64();
+    var gy[100] = get_gy64();
+    var negGy[100] = long_sub(64, 4, prime, gy);
     component Ssub = Secp256k1AddUnequal(64, 4);
     for (var j = 0; j < 4; j++) {
-        Ssub.a[0][j] <== r[j];
-        Ssub.a[1][j] <== Ry[j];
-        Ssub.b[0][j] <== u1G.out[0][j];
-        Ssub.b[1][j] <== negU1Gy.out[j];
+        Ssub.a[0][j] <== Rx[j] + skipSub * (dummy[0][j] - Rx[j]);
+        Ssub.a[1][j] <== Ry[j] + skipSub * (dummy[1][j] - Ry[j]);
+        Ssub.b[0][j] <== u1G.out[0][j] + skipSub * (gx[j] - u1G.out[0][j]);
+        Ssub.b[1][j] <== negU1Gy.out[j] + skipSub * (negGy[j] - negU1Gy.out[j]);
+    }
+
+    component Sdouble = Secp256k1Double(64, 4);
+    for (var j = 0; j < 4; j++) {
+        Sdouble.in[0][j] <== Rx[j];
+        Sdouble.in[1][j] <== Ry[j];
+    }
+
+    // S = R for u1 = 0, S = 2R for the valid nonzero equal-x case, and the
+    // ordinary affine subtraction otherwise.
+    signal Snonzero[2][4];
+    signal S[2][4];
+    for (var j = 0; j < 4; j++) {
+        Snonzero[0][j] <== Ssub.out[0][j]
+            + nonzeroU1SameX * (Sdouble.out[0][j] - Ssub.out[0][j]);
+        Snonzero[1][j] <== Ssub.out[1][j]
+            + nonzeroU1SameX * (Sdouble.out[1][j] - Ssub.out[1][j]);
+        S[0][j] <== Snonzero[0][j] + u1Zero.out * (Rx[j] - Snonzero[0][j]);
+        S[1][j] <== Snonzero[1][j] + u1Zero.out * (Ry[j] - Snonzero[1][j]);
     }
 
     // The lattice hint for u2. GLV4ScalarMulVerify constrains it fully, so a
@@ -232,8 +306,8 @@ template ECDSA4CombVerify() {
         glv.scalar[j] <== u2c.out[j];
         glv.P[0][j] <== pubkey[0][j];
         glv.P[1][j] <== pubkey[1][j];
-        glv.Q[0][j] <== Ssub.out[0][j];
-        glv.Q[1][j] <== Ssub.out[1][j];
+        glv.Q[0][j] <== S[0][j];
+        glv.Q[1][j] <== S[1][j];
     }
     for (var i = 0; i < 4; i++) {
         glv.mag[i] <== mag[i];

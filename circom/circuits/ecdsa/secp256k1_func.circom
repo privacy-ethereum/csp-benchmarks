@@ -57,8 +57,9 @@ function get_secp256k1_order(n, k) {
     return ret;
 }
 
-// returns G * 2 ** 255
-// TODO check that this is correct...
+// Returns a fixed canonical secp256k1 point whose x coordinate differs from G.
+// CombFixedBase and ECDSA4CombVerify use it to give Secp256k1AddUnequal
+// distinct-x operands while selecting away exceptional additions.
 function get_dummy_point(n, k) {
     assert(n == 86 && k == 3 || n == 64 && k == 4);
     var ret[2][100]; // should be [2][k]

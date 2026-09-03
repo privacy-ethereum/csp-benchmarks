@@ -43,31 +43,63 @@ fn find_rapidsnark_dirs(out_dir: &str) -> Vec<PathBuf> {
 }
 
 const CIRCUIT_DIR: &str = "./circuits/ecdsa";
+const CIRCOMLIB_DIR: &str = "./circomlib/circuits";
+const CACHE_HIT_ENV: &str = "CIRCOM_ECDSA_WITNESS_CACHE_HIT";
+const CIRCOM_OPTIMIZATION: &str = "--O2";
 
-fn circuit_sources() -> Vec<PathBuf> {
-    let Ok(entries) = fs::read_dir(CIRCUIT_DIR) else {
-        return Vec::new();
+fn collect_circom_sources(dir: &Path, sources: &mut Vec<PathBuf>) {
+    let Ok(entries) = fs::read_dir(dir) else {
+        return;
     };
-    entries
-        .flatten()
-        .map(|entry| entry.path())
-        .filter(|path| path.extension().is_some_and(|e| e == "circom"))
-        .collect()
+
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_dir() {
+            collect_circom_sources(&path, sources);
+        } else if path
+            .extension()
+            .is_some_and(|extension| extension == "circom")
+        {
+            sources.push(path);
+        }
+    }
 }
 
-/// The generated files are not tracked, so their mtime is what says whether they
-/// still describe the circuit. CI never relies on this: its cache is keyed on a
-/// hash of the same sources, so an edited circuit misses the cache and lands
-/// here with nothing to skip.
-fn is_current(cpp: &Path, dat: &Path, sources: &[PathBuf]) -> bool {
-    if !dat.exists() || sources.is_empty() {
+fn generator_inputs() -> Vec<PathBuf> {
+    let mut inputs = vec![PathBuf::from("./build.rs")];
+    for dir in [CIRCUIT_DIR, CIRCOMLIB_DIR] {
+        collect_circom_sources(Path::new(dir), &mut inputs);
+    }
+    inputs.sort();
+    inputs
+}
+
+fn is_nonempty_file(path: &Path) -> bool {
+    path.metadata()
+        .is_ok_and(|metadata| metadata.is_file() && metadata.len() > 0)
+}
+
+/// CI sets this only after an exact cache hit whose key covers the circuit
+/// sources, circomlib sources, compiler version, platform, and generation code.
+/// Trusting that key preserves the generated files' mtimes for the native build
+/// cache while the size checks reject incomplete cache entries.
+fn exact_ci_cache_hit(cpp: &Path, dat: &Path) -> bool {
+    std::env::var(CACHE_HIT_ENV).is_ok_and(|value| value == "1")
+        && is_nonempty_file(cpp)
+        && is_nonempty_file(dat)
+}
+
+/// Local builds use mtimes to decide whether the generated files still match
+/// the current generator inputs.
+fn is_current(cpp: &Path, dat: &Path, inputs: &[PathBuf]) -> bool {
+    if inputs.is_empty() || !is_nonempty_file(cpp) || !is_nonempty_file(dat) {
         return false;
     }
     let Ok(built) = cpp.metadata().and_then(|m| m.modified()) else {
         return false;
     };
-    sources.iter().all(|source| {
-        source
+    inputs.iter().all(|input| {
+        input
             .metadata()
             .and_then(|m| m.modified())
             .is_ok_and(|changed| changed <= built)
@@ -82,18 +114,20 @@ fn is_current(cpp: &Path, dat: &Path, sources: &[PathBuf]) -> bool {
 fn generate_ecdsa_witness_generator() {
     const CIRCUIT: &str = "ecdsa_32.circom";
 
-    // Every circuit in the directory, not just `ecdsa_32.circom`: that file is a
-    // `main` component over the includes that hold the circuit itself. The
-    // directory is not watched as a whole because the generated files live in it.
-    let sources = circuit_sources();
-    for source in &sources {
-        println!("cargo:rerun-if-changed={}", source.display());
+    // Watch the generation code and every circuit in the directory, not just
+    // `ecdsa_32.circom`: that file is a `main` component over the includes that
+    // hold the circuit itself. The directory is not watched as a whole because
+    // the generated files live in it.
+    let inputs = generator_inputs();
+    for input in &inputs {
+        println!("cargo:rerun-if-changed={}", input.display());
     }
+    println!("cargo:rerun-if-env-changed={CACHE_HIT_ENV}");
 
     let dest = Path::new(CIRCUIT_DIR).join("ecdsa_32");
     let cpp = dest.join("ecdsa_32.cpp");
     let dat = dest.join("ecdsa_32.dat");
-    if is_current(&cpp, &dat, &sources) {
+    if exact_ci_cache_hit(&cpp, &dat) || is_current(&cpp, &dat, &inputs) {
         return;
     }
 
@@ -102,12 +136,13 @@ fn generate_ecdsa_witness_generator() {
     let _ = fs::remove_dir_all(&staging);
     fs::create_dir_all(&staging).expect("cannot create the circom output directory");
 
-    // `--c` alone: the `.r1cs` is not needed to build the witness generator, and
-    // writing it costs over 100 MB. circom emits into `<out>/ecdsa_32_cpp/`.
+    // Generate the optimized witness calculator without an `.r1cs`, which is not
+    // needed here and costs over 100 MB. circom emits into `<out>/ecdsa_32_cpp/`.
     let status = std::process::Command::new("circom")
         .current_dir(CIRCUIT_DIR)
         .arg(CIRCUIT)
         .arg("--c")
+        .arg(CIRCOM_OPTIMIZATION)
         .arg("-o")
         .arg(&staging)
         .status()

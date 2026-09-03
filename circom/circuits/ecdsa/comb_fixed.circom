@@ -1,6 +1,9 @@
 pragma circom 2.0.2;
 
-// GENERATED FILE -- do not edit by hand.
+// The 22 comb table functions are generated data; their generator is not part
+// of this repository. The surrounding template logic is manually maintained here,
+// including the exceptional final-doubling handling in sections 3a and 7.
+// Regenerating this file must preserve that template logic.
 //
 // Width-12 signed-digit comb for the fixed base G: 22 windows of 2048
 // precomputed points each. Every window carries its own table, emitted as a
@@ -46016,14 +46019,16 @@ template CombFixedBase() {
 
     kb[0] === 1;                                  // the fold really did make k odd
 
-    // ---------- 3a. scalars that make one accumulator addition vacuous ------
+    // ---------- 3a. scalar that makes the final addition a doubling ----------
     // An addition in the accumulator below degenerates exactly when
     // partial_i == d_i * 2^(12i) mod n, which leaves the comb output free.
     // Windows 1..20 rule it out by magnitude; at window 21 an exhaustive
-    // search over the top digit finds one such scalar, rejected here. It is
-    // reachable, since u1 = h*sinv and an adversary picks h and s.
+    // search over the top digit finds one such scalar. Step 7 handles it with a
+    // point doubling. It is reachable, since u1 = h*sinv and an adversary picks
+    // h and s.
     //
-    // The list is recomputed by the generator if W or the window count change.
+    // This exceptional scalar must be recomputed with the tables if W or the
+    // window count changes.
     // k_bad[0] = 0xe00000000000000000000000000000014551231950b75fc4402da1732fc9bebf
     component badEq0[5];
     signal badAcc0[5];
@@ -46042,7 +46047,8 @@ template CombFixedBase() {
     badEq0[4] = IsZero();
     badEq0[4].in <== fold.out[4] - 0;
     badAcc0[4] <== badAcc0[3] * badEq0[4].out;
-    badAcc0[4] === 0;
+    signal useFinalDouble;
+    useFinalDouble <== badAcc0[4];
 
     // ---------- 4. the recoding: wires and XNOR only ----------
     // B[i] is the top sign bit of window i. For i = 21 the digit at position
@@ -46154,8 +46160,21 @@ template CombFixedBase() {
     }
 
     // ---------- 7. accumulation ----------
-    // Sequential, with window 0 initializing the accumulator. The equal-x case
-    // of Secp256k1AddUnequal is ruled out by step 3a above.
+    // Sequential, with window 0 initializing the accumulator. The one equal-x
+    // case occurs in the final addition and is handled below.
+    var safe[2][100] = get_dummy_point(64, 4);
+    // safeG is the secp256k1 generator G in 64-bit limbs. The constants are
+    // local so this file need not include scalarmul_func.circom only for G.
+    var safeGx[4];
+    safeGx[0] = 6481385041966929816;
+    safeGx[1] = 188021827762530521;
+    safeGx[2] = 6170039885052185351;
+    safeGx[3] = 8772561819708210092;
+    var safeGy[4];
+    safeGy[0] = 11261198710074299576;
+    safeGy[1] = 18237243440184513561;
+    safeGy[2] = 6747795201694173352;
+    safeGy[3] = 5204712524664259685;
     component acc[21];
     for (var i = 0; i < 21; i++) {
         acc[i] = Secp256k1AddUnequal(64, 4);
@@ -46163,17 +46182,37 @@ template CombFixedBase() {
             if (i == 0) {
                 acc[i].a[0][j] <== Tx[0][j];
                 acc[i].a[1][j] <== Py[0][j];
+            } else if (i == 20) {
+                acc[i].a[0][j] <== acc[i - 1].out[0][j]
+                    + useFinalDouble * (safe[0][j] - acc[i - 1].out[0][j]);
+                acc[i].a[1][j] <== acc[i - 1].out[1][j]
+                    + useFinalDouble * (safe[1][j] - acc[i - 1].out[1][j]);
             } else {
                 acc[i].a[0][j] <== acc[i - 1].out[0][j];
                 acc[i].a[1][j] <== acc[i - 1].out[1][j];
             }
-            acc[i].b[0][j] <== Tx[i + 1][j];
-            acc[i].b[1][j] <== Py[i + 1][j];
+            if (i == 20) {
+                acc[i].b[0][j] <== Tx[i + 1][j]
+                    + useFinalDouble * (safeGx[j] - Tx[i + 1][j]);
+                acc[i].b[1][j] <== Py[i + 1][j]
+                    + useFinalDouble * (safeGy[j] - Py[i + 1][j]);
+            } else {
+                acc[i].b[0][j] <== Tx[i + 1][j];
+                acc[i].b[1][j] <== Py[i + 1][j];
+            }
         }
     }
 
+    component finalDouble = Secp256k1Double(64, 4);
     for (var j = 0; j < 4; j++) {
-        out[0][j] <== acc[20].out[0][j];
-        out[1][j] <== acc[20].out[1][j];
+        finalDouble.in[0][j] <== acc[19].out[0][j];
+        finalDouble.in[1][j] <== acc[19].out[1][j];
+    }
+
+    for (var j = 0; j < 4; j++) {
+        out[0][j] <== acc[20].out[0][j]
+            + useFinalDouble * (finalDouble.out[0][j] - acc[20].out[0][j]);
+        out[1][j] <== acc[20].out[1][j]
+            + useFinalDouble * (finalDouble.out[1][j] - acc[20].out[1][j]);
     }
 }

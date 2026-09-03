@@ -1,6 +1,5 @@
 pub mod ecdsa;
 pub mod ecdsa_input;
-pub mod glv;
 pub mod keccak;
 pub mod poseidon;
 pub mod sha256;
