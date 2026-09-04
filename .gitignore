@@ -26,6 +26,10 @@ tmp/
 *.data
 third_party/
 // Circom files
+// The ECDSA witness generator is built by circom/build.rs, not stored: 57 MiB of
+// generated C++, about three times the largest artifact otherwise kept here.
+circom/circuits/ecdsa/ecdsa_32/ecdsa_32.cpp
+circom/circuits/ecdsa/ecdsa_32/ecdsa_32.dat
 *.r1cs
 *.sym
 *.wtns

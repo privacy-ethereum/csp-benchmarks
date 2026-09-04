@@ -1,0 +1,76 @@
+name: "Install circom"
+description: "Installs a pinned circom compiler and the circomlib sources it compiles against"
+
+inputs:
+  version:
+    description: circom version to install.
+    required: false
+    default: "2.2.3"
+
+outputs:
+  version:
+    description: Installed circom version
+    value: ${{ inputs.version }}
+
+runs:
+  using: "composite"
+  steps:
+    # `actions/checkout` fetches no submodules, and the ECDSA circuit is compiled
+    # here rather than shipped generated, so it needs circomlib's sources. The
+    # repo's other submodules stay unfetched: nothing built here includes them.
+    - name: Fetch circomlib
+      shell: bash
+      run: git submodule update --init circom/circomlib
+
+    # iden3 publishes no arm64 asset, so the macOS runners build the pinned tag
+    # from source. Cached, that happens once instead of once per job.
+    - name: Cache circom
+      uses: actions/cache@v4
+      with:
+        path: ~/.circom
+        key: ${{ runner.os }}-${{ runner.arch }}-circom-${{ inputs.version }}
+
+    - shell: bash
+      run: |
+        set -euo pipefail
+        VERSION="${{ inputs.version }}"
+        INSTALL_DIR="$HOME/.circom"
+
+        if [[ -x "$INSTALL_DIR/bin/circom" ]] && \
+           [[ "$("$INSTALL_DIR/bin/circom" --version 2>/dev/null)" == *"$VERSION" ]]; then
+          echo "circom $VERSION already installed"
+          echo "$INSTALL_DIR/bin" >> "$GITHUB_PATH"
+          exit 0
+        fi
+
+        ARCH="$(uname -m)"
+        OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+        BUILD_FROM_SOURCE=0
+        case "${OS}-${ARCH}" in
+          linux-x86_64) ASSET="circom-linux-amd64" ;;
+          darwin-x86_64) ASSET="circom-macos-amd64" ;;
+          # No arm64 release assets are published, so build the pinned tag instead.
+          darwin-arm64 | linux-aarch64) BUILD_FROM_SOURCE=1 ;;
+          *) echo "Unsupported platform: ${OS}-${ARCH}" >&2; exit 1 ;;
+        esac
+
+        rm -rf "$INSTALL_DIR"
+        mkdir -p "$INSTALL_DIR/bin"
+
+        if [[ "$BUILD_FROM_SOURCE" == "1" ]]; then
+          echo "No circom release asset for ${OS}-${ARCH}; building v${VERSION} from source"
+          cargo install \
+            --git https://github.com/iden3/circom \
+            --tag "v${VERSION}" \
+            --locked \
+            --root "$INSTALL_DIR" \
+            circom
+        else
+          URL="https://github.com/iden3/circom/releases/download/v${VERSION}/${ASSET}"
+          echo "Installing circom ${VERSION} from ${URL}"
+          curl -fsSL "$URL" -o "$INSTALL_DIR/bin/circom"
+          chmod +x "$INSTALL_DIR/bin/circom"
+        fi
+
+        echo "$INSTALL_DIR/bin" >> "$GITHUB_PATH"
+        "$INSTALL_DIR/bin/circom" --version

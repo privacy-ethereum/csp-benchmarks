@@ -42,13 +42,139 @@ fn find_rapidsnark_dirs(out_dir: &str) -> Vec<PathBuf> {
     dirs
 }
 
+const CIRCUIT_DIR: &str = "./circuits/ecdsa";
+const CIRCOMLIB_DIR: &str = "./circomlib/circuits";
+const CACHE_HIT_ENV: &str = "CIRCOM_ECDSA_WITNESS_CACHE_HIT";
+const CIRCOM_OPTIMIZATION: &str = "--O2";
+
+fn collect_circom_sources(dir: &Path, sources: &mut Vec<PathBuf>) {
+    let Ok(entries) = fs::read_dir(dir) else {
+        return;
+    };
+
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_dir() {
+            collect_circom_sources(&path, sources);
+        } else if path
+            .extension()
+            .is_some_and(|extension| extension == "circom")
+        {
+            sources.push(path);
+        }
+    }
+}
+
+fn generator_inputs() -> Vec<PathBuf> {
+    let mut inputs = vec![PathBuf::from("./build.rs")];
+    for dir in [CIRCUIT_DIR, CIRCOMLIB_DIR] {
+        collect_circom_sources(Path::new(dir), &mut inputs);
+    }
+    inputs.sort();
+    inputs
+}
+
+fn is_nonempty_file(path: &Path) -> bool {
+    path.metadata()
+        .is_ok_and(|metadata| metadata.is_file() && metadata.len() > 0)
+}
+
+/// CI sets this only after an exact cache hit whose key covers the circuit
+/// sources, circomlib sources, compiler version, platform, and generation code.
+/// Trusting that key preserves the generated files' mtimes for the native build
+/// cache while the size checks reject incomplete cache entries.
+fn exact_ci_cache_hit(cpp: &Path, dat: &Path) -> bool {
+    std::env::var(CACHE_HIT_ENV).is_ok_and(|value| value == "1")
+        && is_nonempty_file(cpp)
+        && is_nonempty_file(dat)
+}
+
+/// Local builds use mtimes to decide whether the generated files still match
+/// the current generator inputs.
+fn is_current(cpp: &Path, dat: &Path, inputs: &[PathBuf]) -> bool {
+    if inputs.is_empty() || !is_nonempty_file(cpp) || !is_nonempty_file(dat) {
+        return false;
+    }
+    let Ok(built) = cpp.metadata().and_then(|m| m.modified()) else {
+        return false;
+    };
+    inputs.iter().all(|input| {
+        input
+            .metadata()
+            .and_then(|m| m.modified())
+            .is_ok_and(|changed| changed <= built)
+    })
+}
+
+/// The ECDSA witness generator is the one artifact not tracked in the repo: at
+/// 57 MiB of generated C++ it is roughly three times the largest file otherwise
+/// stored here, because the width-12 comb table is inlined in the circuit. It is
+/// compiled from `ecdsa_32.circom` on demand instead, which needs `circom` on
+/// PATH. Every other circuit still ships its `.cpp` and `.dat` in tree.
+fn generate_ecdsa_witness_generator() {
+    const CIRCUIT: &str = "ecdsa_32.circom";
+
+    // Watch the generation code and every circuit in the directory, not just
+    // `ecdsa_32.circom`: that file is a `main` component over the includes that
+    // hold the circuit itself. The directory is not watched as a whole because
+    // the generated files live in it.
+    let inputs = generator_inputs();
+    for input in &inputs {
+        println!("cargo:rerun-if-changed={}", input.display());
+    }
+    println!("cargo:rerun-if-env-changed={CACHE_HIT_ENV}");
+
+    let dest = Path::new(CIRCUIT_DIR).join("ecdsa_32");
+    let cpp = dest.join("ecdsa_32.cpp");
+    let dat = dest.join("ecdsa_32.dat");
+    if exact_ci_cache_hit(&cpp, &dat) || is_current(&cpp, &dat, &inputs) {
+        return;
+    }
+
+    let out_dir = std::env::var("OUT_DIR").expect("OUT_DIR is set for build scripts");
+    let staging = Path::new(&out_dir).join("ecdsa_32_circom");
+    let _ = fs::remove_dir_all(&staging);
+    fs::create_dir_all(&staging).expect("cannot create the circom output directory");
+
+    // Generate the optimized witness calculator without an `.r1cs`, which is not
+    // needed here and costs over 100 MB. circom emits into `<out>/ecdsa_32_cpp/`.
+    let status = std::process::Command::new("circom")
+        .current_dir(CIRCUIT_DIR)
+        .arg(CIRCUIT)
+        .arg("--c")
+        .arg(CIRCOM_OPTIMIZATION)
+        .arg("-o")
+        .arg(&staging)
+        .status()
+        .unwrap_or_else(|e| {
+            panic!(
+                "could not run `circom`, which builds the ECDSA witness generator \
+                 (the only circuit artifact not stored in the repo): {e}. \
+                 Install circom 2.2.3 and put it on PATH."
+            )
+        });
+    assert!(status.success(), "circom failed to compile {CIRCUIT}");
+
+    let emitted = staging.join("ecdsa_32_cpp");
+    fs::create_dir_all(&dest).expect("cannot create the circuit directory");
+    for file in ["ecdsa_32.cpp", "ecdsa_32.dat"] {
+        fs::copy(emitted.join(file), dest.join(file))
+            .unwrap_or_else(|e| panic!("circom did not emit {file}: {e}"));
+    }
+}
+
 fn main() {
+    generate_ecdsa_witness_generator();
+
     // SHA256 circuits
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_128");
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_256");
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_512");
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_1024");
     witnesscalc_adapter::build_and_link("./circuits/sha256/sha256_2048");
+
+    // ECDSA circuit (secp256k1, fake-GLV + width-12 comb)
+    witnesscalc_adapter::build_and_link("./circuits/ecdsa/ecdsa_32");
 
     // Keccak circuits
     witnesscalc_adapter::build_and_link("./circuits/keccak/keccak_128");

@@ -1,3 +1,5 @@
+pub mod ecdsa;
+pub mod ecdsa_input;
 pub mod keccak;
 pub mod poseidon;
 pub mod sha256;
@@ -7,9 +9,16 @@ use circom_prover::{
     prover::{CircomProof, ProofLib},
     witness::WitnessFn,
 };
+use num_bigint::BigUint;
 use std::borrow::Cow;
 use std::path::Path;
 use utils::harness::{AuditStatus, BenchProperties};
+use witnesscalc_adapter::parse_witness_to_bigints;
+
+/// Stack for the witness thread. A default thread gets 2 MiB, which the ECDSA
+/// witness generator overruns: the width-12 comb table alone holds 1.88 MB of
+/// locals in a single frame, and the signature checks add another 1.1 MB on top.
+const WITNESS_STACK: usize = 8 * 1024 * 1024;
 
 pub const CIRCOM_BENCH_PROPERTIES: BenchProperties = BenchProperties {
     proving_system: Cow::Borrowed("Groth16"),
@@ -46,12 +55,29 @@ pub fn sum_file_sizes_in_the_dir(file_path: &str) -> std::io::Result<usize> {
 }
 
 pub fn prove(witness_fn: WitnessFn, input_str: String, zkey_path: String) -> CircomProof {
+    // Spawn the witness thread here rather than letting `CircomProver::prove` do
+    // it, so that it gets `WITNESS_STACK` instead of the default 2 MiB. The
+    // prover takes the thread already running and joins it.
+    let witnesses = std::thread::Builder::new()
+        .stack_size(WITNESS_STACK)
+        .spawn(move || {
+            let witness = match witness_fn {
+                WitnessFn::WitnessCalc(wit_fn) => wit_fn(input_str.as_str()).unwrap(),
+                _ => panic!("Unsupported witness function"),
+            };
+            parse_witness_to_bigints(&witness)
+                .unwrap()
+                .into_iter()
+                .map(|w| w.to_biguint().unwrap())
+                .collect::<Vec<BigUint>>()
+        })
+        .expect("Failed to spawn the witness thread");
+
     // Generate proof
-    CircomProver::prove(
+    circom_prover::prover::prove(
         ProofLib::Rapidsnark, // The rapidsnark prover
-        witness_fn,
-        input_str,
         zkey_path,
+        witnesses,
     )
     .unwrap()
 }
