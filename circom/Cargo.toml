@@ -4,10 +4,6 @@ version = "0.1.0"
 edition = "2024"
 build = "build.rs"
 
-[features]
-# Enable after publishing a zkey generated from the current ECDSA circuit.
-circom-ecdsa-bench = []
-
 [dependencies]
 circom-prover = { version = "0.1", default-features = false, features = ["witnesscalc", "rapidsnark"] }
 witnesscalc-adapter = "0.1"
@@ -34,7 +30,6 @@ harness = false
 [[bench]]
 name = "ecdsa_bench"
 harness = false
-required-features = ["circom-ecdsa-bench"]
 
 [[bench]]
 name = "poseidon_bench"
@@ -51,7 +46,6 @@ path = "src/bin/sha256_mem.rs"
 [[bin]]
 name = "ecdsa_mem_circom"
 path = "src/bin/ecdsa_mem.rs"
-required-features = ["circom-ecdsa-bench"]
 
 [[bin]]
 name = "keccak_mem_circom"

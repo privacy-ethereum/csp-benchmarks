@@ -1,6 +1,6 @@
 pragma circom 2.0.0;
 
-include "../../circomlib/circuits/sha256/sha256.circom";
+include "sha256_bits.circom";
 include "../../circomlib/circuits/bitify.circom";
 
 /**

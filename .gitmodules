@@ -4,6 +4,3 @@
 [submodule "circom/circomlib"]
 	path = circom/circomlib
 	url = https://github.com/iden3/circomlib.git
-[submodule "circom/hash-circuits"]
-	path = circom/hash-circuits
-	url = https://github.com/bkomuves/hash-circuits
