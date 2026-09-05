@@ -1,6 +1,6 @@
 pragma circom 2.0.0;
 
-include "../../hash-circuits/circuits/keccak/keccak_bytes.circom";
+include "keccak_bytes.circom";
 
 template Keccak256Hash(N) {
     signal input in[N];
