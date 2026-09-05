@@ -13,3 +13,5 @@ runs:
         brew install open-mpi
         mpirun --version
         which mpicc
+        # mpi-sys records Homebrew's versioned Cellar path in its build output.
+        cargo clean -p mpi-sys
