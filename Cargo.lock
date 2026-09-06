@@ -1163,6 +1163,7 @@ version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1df2c09229cbc5a028b1d70e00fdb2acee28b1055dfb5ca73eea49c5a25c4e7c"
 dependencies = [
+ "colored",
  "num-traits",
  "rand 0.8.5",
 ]
@@ -1187,6 +1188,12 @@ dependencies = [
  "rand 0.8.5",
  "rayon",
 ]
+
+[[package]]
+name = "array-init"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3d62b7694a562cdf5a74227903507c56ab2cc8bdd1f781ed5cb4cf9c9f810bfc"
 
 [[package]]
 name = "arraydeque"
@@ -2832,6 +2839,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75"
 
 [[package]]
+name = "colored"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "117725a109d387c937a1533ce01b450cbde6b88abceea8473c4d7a85853cda3c"
+dependencies = [
+ "lazy_static",
+ "windows-sys 0.48.0",
+]
+
+[[package]]
 name = "combine"
 version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4363,6 +4380,81 @@ dependencies = [
 ]
 
 [[package]]
+name = "ethabi"
+version = "18.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7413c5f74cc903ea37386a8965a936cbeb334bd270862fdece542c1b2dcbc898"
+dependencies = [
+ "ethereum-types",
+ "hex",
+ "once_cell",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha3",
+ "thiserror 1.0.69",
+ "uint",
+]
+
+[[package]]
+name = "ethbloom"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c22d4b5885b6aa2fe5e8b9329fb8d232bf739e434e6b87347c63bdd00c120f60"
+dependencies = [
+ "crunchy",
+ "fixed-hash 0.8.0",
+ "impl-codec",
+ "impl-rlp",
+ "impl-serde",
+ "scale-info",
+ "tiny-keccak",
+]
+
+[[package]]
+name = "ethereum-types"
+version = "0.14.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "02d215cbf040552efcbe99a38372fe80ab9d00268e20012b79fcd0f073edd8ee"
+dependencies = [
+ "ethbloom",
+ "fixed-hash 0.8.0",
+ "impl-codec",
+ "impl-rlp",
+ "impl-serde",
+ "primitive-types 0.12.2",
+ "scale-info",
+ "uint",
+]
+
+[[package]]
+name = "ethers-core"
+version = "2.0.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "82d80cc6ad30b14a48ab786523af33b37f28a8623fc06afd55324816ef18fb1f"
+dependencies = [
+ "arrayvec",
+ "bytes",
+ "chrono",
+ "const-hex",
+ "elliptic-curve 0.13.8",
+ "ethabi",
+ "generic-array 0.14.7",
+ "k256 0.13.4",
+ "num_enum 0.7.5",
+ "open-fastrlp",
+ "rand 0.8.5",
+ "rlp",
+ "serde",
+ "serde_json",
+ "strum 0.26.3",
+ "tempfile",
+ "thiserror 1.0.69",
+ "tiny-keccak",
+ "unicode-xid",
+]
+
+[[package]]
 name = "ethnum"
 version = "1.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5137,6 +5229,81 @@ dependencies = [
 ]
 
 [[package]]
+name = "halo2-axiom"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18316396f9bc7dcd6ac1602443ea4f83f2c93fa5abe448a28db3abceb9c7aab3"
+dependencies = [
+ "blake2b_simd",
+ "crossbeam",
+ "ff 0.13.1",
+ "group 0.13.0",
+ "halo2curves-axiom 0.7.3",
+ "itertools 0.11.0",
+ "maybe-rayon",
+ "pairing 0.23.0",
+ "rand 0.8.5",
+ "rand_core 0.6.4",
+ "rayon",
+ "rustc-hash 1.1.0",
+ "sha3",
+ "tracing",
+]
+
+[[package]]
+name = "halo2-base"
+version = "0.4.2-alpha.0"
+source = "git+https://github.com/axiom-crypto/halo2-lib.git?branch=develop#3788855467db2a351cd63b6f99a70c9e8cbd0cdb"
+dependencies = [
+ "ark-std 0.3.0",
+ "getset",
+ "halo2-axiom",
+ "itertools 0.11.0",
+ "log",
+ "num-bigint 0.4.6",
+ "num-integer",
+ "num-traits",
+ "poseidon-primitives",
+ "rand 0.8.5",
+ "rand_chacha 0.3.1",
+ "rayon",
+ "rustc-hash 1.1.0",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "halo2-ecc"
+version = "0.4.1"
+source = "git+https://github.com/axiom-crypto/halo2-lib.git?branch=develop#3788855467db2a351cd63b6f99a70c9e8cbd0cdb"
+dependencies = [
+ "halo2-base",
+ "itertools 0.11.0",
+ "num-bigint 0.4.6",
+ "num-integer",
+ "num-traits",
+ "rand 0.8.5",
+ "rand_chacha 0.3.1",
+ "rand_core 0.6.4",
+ "rayon",
+ "serde",
+ "serde_json",
+ "test-case",
+]
+
+[[package]]
+name = "halo2_circuits"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "criterion",
+ "halo2-base",
+ "rand_core 0.6.4",
+ "utils 0.1.0",
+ "zkevm-hashes",
+]
+
+[[package]]
 name = "halo2_proofs"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5235,6 +5402,34 @@ dependencies = [
 name = "halo2curves-axiom"
 version = "0.7.2"
 source = "git+https://github.com/axiom-crypto/halo2curves.git?tag=v0.7.2#3a65a710e27fe03711f6fb4fc0c4469ae351974a"
+dependencies = [
+ "blake2b_simd",
+ "digest 0.10.7",
+ "ff 0.13.1",
+ "group 0.13.0",
+ "hex",
+ "lazy_static",
+ "num-bigint 0.4.6",
+ "num-traits",
+ "pairing 0.23.0",
+ "pasta_curves 0.5.1",
+ "paste",
+ "rand 0.8.5",
+ "rand_core 0.6.4",
+ "rayon",
+ "serde",
+ "serde_arrays 0.1.0",
+ "sha2 0.10.9",
+ "static_assertions",
+ "subtle",
+ "unroll",
+]
+
+[[package]]
+name = "halo2curves-axiom"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "276d6c463e0e8e70c1a221baae62b670453f6ef851dd1c73f0764e5215fda64d"
 dependencies = [
  "blake2b_simd",
  "digest 0.10.7",
@@ -5856,6 +6051,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ba6a270039626615617f3f36d15fc827041df3b78c439da2cadfa47455a77f2f"
 dependencies = [
  "parity-scale-codec",
+]
+
+[[package]]
+name = "impl-rlp"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f28220f89297a075ddc7245cd538076ee98b01f2a9c23a53a4f1105d5a322808"
+dependencies = [
+ "rlp",
+]
+
+[[package]]
+name = "impl-serde"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ebc88fc67028ae3db0c853baa36269d398d5f45b6982f95549ff5def78c935cd"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
@@ -6697,6 +6910,16 @@ dependencies = [
  "mavros-artifacts",
  "opcode-gen",
  "tracing",
+]
+
+[[package]]
+name = "maybe-rayon"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ea1f30cedd69f0a2954655f7188c6a834246d2bcf1e315e2ac40c4b24dc9519"
+dependencies = [
+ "cfg-if",
+ "rayon",
 ]
 
 [[package]]
@@ -7984,6 +8207,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "open-fastrlp"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "786393f80485445794f6043fd3138854dd109cc6c4bd1a6383db304c9ce9b9ce"
+dependencies = [
+ "arrayvec",
+ "auto_impl",
+ "bytes",
+ "ethereum-types",
+ "open-fastrlp-derive",
+]
+
+[[package]]
+name = "open-fastrlp-derive"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "003b2be5c6c53c1cfeb0a238b8a1c3915cd410feb684457a36c10038f764bb1c"
+dependencies = [
+ "bytes",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "openssl"
 version = "0.10.75"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8083,7 +8331,7 @@ dependencies = [
  "derive-new 0.6.0",
  "derive_more 1.0.0",
  "eyre",
- "halo2curves-axiom",
+ "halo2curves-axiom 0.7.2",
  "num-bigint 0.4.6",
  "num-traits",
  "openvm-algebra-transpiler",
@@ -8118,7 +8366,7 @@ name = "openvm-algebra-guest"
 version = "1.4.3"
 source = "git+https://github.com/openvm-org/openvm.git?tag=v1.4.3#e8feb93717200e6f334b4f368dd2d0a143f69436"
 dependencies = [
- "halo2curves-axiom",
+ "halo2curves-axiom 0.7.2",
  "num-bigint 0.4.6",
  "once_cell",
  "openvm-algebra-complex-macros",
@@ -8333,7 +8581,7 @@ dependencies = [
  "cfg-if",
  "derive-new 0.6.0",
  "derive_more 1.0.0",
- "halo2curves-axiom",
+ "halo2curves-axiom 0.7.2",
  "hex-literal",
  "lazy_static",
  "num-bigint 0.4.6",
@@ -8362,7 +8610,7 @@ dependencies = [
  "ecdsa 0.16.9",
  "elliptic-curve 0.13.8",
  "group 0.13.0",
- "halo2curves-axiom",
+ "halo2curves-axiom 0.7.2",
  "once_cell",
  "openvm 1.4.3",
  "openvm-algebra-guest",
@@ -8598,7 +8846,7 @@ dependencies = [
  "derive-new 0.6.0",
  "derive_more 1.0.0",
  "eyre",
- "halo2curves-axiom",
+ "halo2curves-axiom 0.7.2",
  "num-bigint 0.4.6",
  "num-traits",
  "openvm-algebra-circuit",
@@ -8624,7 +8872,7 @@ version = "1.4.3"
 source = "git+https://github.com/openvm-org/openvm.git?tag=v1.4.3#e8feb93717200e6f334b4f368dd2d0a143f69436"
 dependencies = [
  "blstrs",
- "halo2curves-axiom",
+ "halo2curves-axiom 0.7.2",
  "hex-literal",
  "itertools 0.14.0",
  "lazy_static",
@@ -10376,6 +10624,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "poseidon-primitives"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2bd95570f7ea849b4187298b5bb229643e44e1d47ddf3979d0db8a1c28be26a8"
+dependencies = [
+ "bitvec",
+ "ff 0.13.1",
+ "lazy_static",
+ "log",
+ "rand 0.8.5",
+ "rand_xorshift 0.3.0",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "poseidon2"
 version = "0.1.0"
 source = "git+https://github.com/worldfnd/ProveKit?rev=b910fe8da2b909bb84f0c48a5078101369bfb435#b910fe8da2b909bb84f0c48a5078101369bfb435"
@@ -10512,6 +10775,9 @@ checksum = "0b34d9fd68ae0b74a41b21c03c2f62847aa0ffea044eee893b4c140b37e244e2"
 dependencies = [
  "fixed-hash 0.8.0",
  "impl-codec",
+ "impl-rlp",
+ "impl-serde",
+ "scale-info",
  "uint",
 ]
 
@@ -11686,7 +11952,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb919243f34364b6bd2fc10ef797edbfa75f33c252e7998527479c6d6b47e1ec"
 dependencies = [
  "bytes",
+ "rlp-derive",
  "rustc-hex",
+]
+
+[[package]]
+name = "rlp-derive"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e33d7b2abe0c340d8797fe2907d3f20d3b5ea5908683618bfe80df7f621f672a"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -13277,6 +13555,45 @@ dependencies = [
 ]
 
 [[package]]
+name = "snark-verifier"
+version = "0.1.8"
+source = "git+https://github.com/axiom-crypto/snark-verifier.git?branch=develop#27309cfeb30d68daa08e2218d7da0f47037c5fcf"
+dependencies = [
+ "halo2-base",
+ "halo2-ecc",
+ "hex",
+ "itertools 0.11.0",
+ "lazy_static",
+ "num-bigint 0.4.6",
+ "num-integer",
+ "num-traits",
+ "pairing 0.23.0",
+ "rand 0.8.5",
+ "serde",
+]
+
+[[package]]
+name = "snark-verifier-sdk"
+version = "0.1.8"
+source = "git+https://github.com/axiom-crypto/snark-verifier.git?branch=develop#27309cfeb30d68daa08e2218d7da0f47037c5fcf"
+dependencies = [
+ "bincode 1.3.3",
+ "getset",
+ "halo2-base",
+ "hex",
+ "itertools 0.11.0",
+ "lazy_static",
+ "num-bigint 0.4.6",
+ "num-integer",
+ "num-traits",
+ "rand 0.8.5",
+ "rand_chacha 0.3.1",
+ "serde",
+ "serde_json",
+ "snark-verifier",
+]
+
+[[package]]
 name = "snowbridge-amcl"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -14364,6 +14681,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "test-case"
+version = "3.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eb2550dd13afcd286853192af8601920d959b14c401fcece38071d53bf0768a8"
+dependencies = [
+ "test-case-macros",
+]
+
+[[package]]
+name = "test-case-core"
+version = "3.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "adcb7fd841cd518e279be3d5a3eb0636409487998a4aff22f3de87b81e88384f"
+dependencies = [
+ "cfg-if",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.114",
+]
+
+[[package]]
+name = "test-case-macros"
+version = "3.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c89e72a01ed4c579669add59014b9a524d609c0c88c6a585ce37485879f6ffb"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.114",
+ "test-case-core",
+]
+
+[[package]]
 name = "textwrap"
 version = "0.16.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -15138,6 +15488,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bd30d05e69d1478e13fe3e7a853409cfec82cebc2cf9b8d613b3c6b0081781ed"
 dependencies = [
  "nom",
+]
+
+[[package]]
+name = "type-map"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb30dbbd9036155e74adad6812e9898d03ec374946234fbcebd5dfc7b9187b90"
+dependencies = [
+ "rustc-hash 2.1.1",
 ]
 
 [[package]]
@@ -16546,6 +16905,27 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.114",
+]
+
+[[package]]
+name = "zkevm-hashes"
+version = "0.2.1"
+source = "git+https://github.com/axiom-crypto/halo2-lib.git?branch=develop#3788855467db2a351cd63b6f99a70c9e8cbd0cdb"
+dependencies = [
+ "array-init",
+ "ethers-core",
+ "getset",
+ "halo2-base",
+ "itertools 0.11.0",
+ "lazy_static",
+ "log",
+ "num-bigint 0.4.6",
+ "rand 0.8.5",
+ "rayon",
+ "serde",
+ "sha3",
+ "snark-verifier-sdk",
+ "type-map",
 ]
 
 [[package]]

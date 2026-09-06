@@ -67,6 +67,7 @@ pub enum ProvingSystem {
     RookieNumbers,
     StarkV,
     Flock,
+    Halo2,
     // Extend as needed
 }
 
@@ -90,6 +91,7 @@ impl ProvingSystem {
             ProvingSystem::RookieNumbers => "rookie-numbers",
             ProvingSystem::StarkV => "stark-v",
             ProvingSystem::Flock => "flock",
+            ProvingSystem::Halo2 => "halo2",
         }
     }
 }
