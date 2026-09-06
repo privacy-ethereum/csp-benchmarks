@@ -1,0 +1,32 @@
+[package]
+name = "halo2_circuits"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Keep on `branch`, not a `rev`: snark-verifier pulls halo2-base from this same branch, and a
+# differing git ref duplicates the crate. See README.
+# `display` is a default feature of both and prints to stdout from inside `configure`
+# (and sets an env var), so it is disabled here.
+zkevm-hashes = { git = "https://github.com/axiom-crypto/halo2-lib.git", branch = "develop", default-features = false, features = ["halo2-axiom"] }
+halo2-base = { git = "https://github.com/axiom-crypto/halo2-lib.git", branch = "develop", default-features = false, features = ["halo2-axiom"] }
+rand_core = { version = "0.6", features = ["getrandom"] }
+criterion = { workspace = true }
+clap = { workspace = true }
+utils = { workspace = true }
+
+[[bench]]
+name = "sha256"
+harness = false
+
+[[bench]]
+name = "keccak"
+harness = false
+
+[[bin]]
+name = "sha256_mem_halo2"
+path = "src/bin/sha256_mem.rs"
+
+[[bin]]
+name = "keccak_mem_halo2"
+path = "src/bin/keccak_mem.rs"
